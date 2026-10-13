@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 63 — Quantum Mechanics Reconstruction (Formal Equivalence Layer)</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #3b82f6;
+--accent-obs: #94a3b8; --accent-exp: #fbbf24; --accent-master: #c084fc; --accent-lock: #f87171; --accent-final: #2dd4bf;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6;
+--accent-gold: #fbbf24;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-gold); font-family: sans-serif; font-size: 0.85rem; min-width: 450px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls, #nav-summary-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+#screen-lab.active { display: flex; flex-direction: column; height: calc(100vh - 50px); }
+
+#screen-portal { justify-content: flex-start; padding-top: 6dvh; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 50px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 2px; font-weight: bold; letter-spacing: 0.5px; padding-bottom: 0px; }
+.module-subtitle { text-align: center; font-family: sans-serif; color: var(--accent-gold); margin-bottom: 5px; font-weight: bold; letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.primary-constant-box { background: #000; border: 1px solid var(--accent-unified); padding: 2px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 8px; }
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(59, 130, 246, 0.05); border: 1px solid var(--accent-unified); padding: 5px; border-radius: 5px; margin-bottom: 8px; font-size: 0.7rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; }
+#plot-area { flex-grow: 1; width: 100%; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #fff; border: 1px solid var(--accent-unified); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer { width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem; color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 63 — QM RECONSTRUCTION (Formal Equivalence Layer)</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">Quantum Substrate Dynamics</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">Recovering Quantum Mechanics as Emergent Substrate Modes.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-unified);">
+<h2 style="color:var(--accent-unified);">1. Wavefunction Emergence</h2>
+<p>$\Psi$ as Substrate Perturbation Mode.</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-exp);">
+<h2 style="color:var(--accent-exp);">2. Operator Structure</h2>
+<p>Deriving $\hat{p}$ and $\hat{E}$ from Phase Gradients.</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-master);">
+<h2 style="color:var(--accent-master);">3. Schrödinger Equation</h2>
+<p>Linearized Substrate Evolution.</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-lock);">
+<h2 style="color:var(--accent-lock);">4. Probability & Born Rule</h2>
+<p>Emergence from Excitation Density.</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-final);">
+<h2 style="color:var(--accent-final);">5. Commutation Relations</h2>
+<p>Structural Phase-Position Duality.</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-unified);">
+<h2 style="color:var(--accent-unified);">6. Stage 63 Summary</h2>
+<p>Quantum Equivalence Statement.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color:var(--accent-unified); text-align:center;">Stage 63: Formal QM Recovery</h2>
+<section>
+<p>Quantum Mechanics is recovered exactly as an emergent dynamical description of substrate modes. All probabilistic "axioms" are replaced by structural necessity.</p>
+<div style="background: rgba(59,130,246,0.03); padding: 15px; border-radius: 8px; font-family: monospace; font-size: 0.85rem; border: 1px solid var(--accent-unified); line-height: 1.6;">
+<strong>DYNAMIC IDENTITY:</strong><br>
+$(K, P) \implies \Psi(x,t)$<br>
+$i\hbar \partial_t \psi = \hat{H} \psi$
+</div>
+<h4 style="color: var(--accent-gold); margin-bottom: 5px;">MAPPING CLOSURE</h4>
+<ul style="font-size: 0.85rem; line-height: 1.4;">
+<li>Wavefunction $\Psi$ arises as linearized substrate excitation modes.</li>
+<li>Operators represent generators of substrate field transformations.</li>
+<li>Schrödinger Equation recovered as the substrate's fundamental evolution law.</li>
+<li>Born Rule emerges from structural excitation density conservation.</li>
+</ul>
+<p style="text-align:center; font-weight:bold; margin-top:20px; color: var(--accent-gold);">FINAL STAGE STATEMENT</p>
+<p style="text-align:center; border: 1px solid var(--accent-gold); padding: 10px; background: rgba(251, 191, 36, 0.05);">Quantum Mechanics is not a fundamental probabilistic theory, but an emergent dynamical description of substrate modes governed by the structural parameters K and P.</p>
+</section>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div id="active-module-result" class="module-subtitle">--</div>
+<div class="primary-constant-box">
+<div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val">11.350</span></div>
+<div class="const-item"><span class="const-label">Synthesis P</span><span class="const-val">0.6900</span></div>
+</div>
+
+<div id="mapping-box-area"></div>
+
+<div class="diagnostic-panel">
+<span class="diag-title">Derivation Telemetry</span>
+<div id="telemetry-area"></div>
+</div>
+
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-unified); font-size:0.75rem; cursor:pointer; padding:6px;">RE-VALIDATE DYNAMICS</button>
+<div id="panel-footer-text" style="font-size: 0.85rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.3; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:8px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Recovered Standard Form</span>
+<div id="metrics-content" style="font-size:0.85rem; text-align:center; padding:5px;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Validation Chain</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.65rem; color: var(--text-dim); line-height: 1.3; background: #000; padding: 5px; border-radius: 0px; border: 1px solid #222; margin-bottom: 0px; margin-top: auto;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "WAVEFUNCTION EMERGENCE",
+result: "ψ Mapping Complete",
+resultSize: "0.85rem",
+
+brief: `<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 63 — Module 1: Wavefunction Emergence</h2>
+<h3 style="color: #3b82f6;">Exact Graph Interpretation</h3>
+<p style="color: #eee; line-height: 1.6;">
+This visualization represents the <strong>Substrate Mode ($\psi$)</strong>, the foundational "wave-packet" of the Synthesis Framework.
+<br><br>
+<b style="color: #3b82f6;">The X-Axis:</b> Represents the spatial coordinates of the vacuum substrate. Unlike empty space, this is a physical medium with measurable stiffness ($K$).
+<br>
+<b style="color: #3b82f6;">The Blue Wave:</b> This is a localized excitation. It demonstrates that what we perceive as a "particle" is actually a <strong>standing vibration</strong> of the substrate.
+<br>
+<b style="color: #3b82f6;">The Amplitude Slider:</b> Adjusting this changes the displacement of the substrate. It proves that energy and existence are proportional to the magnitude of substrate disturbance.
+</p>
+</div>`,
+
+math: `<h3>Mathematics: Modal Decomposition</h3><p>$$\\delta \\mathcal{S}(x,t) \\to \\psi(x,t)$$</p><p>The complex representation is a requirement for tracking simultaneous amplitude $A$ and phase gradients $\\nabla \\theta$ in substrate flow.</p>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>EXCITATION AMPLITUDE</span><input type="number" id="m_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'm_sl')"></div><input type="range" id="m_sl" min="0" max="200" step="1" value="100" oninput="syncVal(this.value, 'm_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">$ψ(x,t) = A(x,t) e^{iθ(x,t)}$<br>(complex substrate excitation mode)</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">MODE STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Complex Structure Recovered</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-unified);">MODE: Ξ perturbation → ψ<br>REGIME: Linear → superposition<br>STRUCTURE: $ψ = A e^{iθ}$<br>CONSTRAINT: ∫|ψ|² dV = 1<br>OBSERVABLE: |ψ|²</span>`,
+metricsContent: `$ψ(x,t) = A(x,t) e^{iθ(x,t)}$<br>(amplitude = intensity, phase = dynamics)`,
+hierarchy: `Wavefunction = Substrate Mode`,
+footer: "ψ is a normalized complex excitation mode of the substrate.",
+rightNote: `<div style="color: #94a3b8; line-height: 1.3; margin: 2px; text-align: center; font-size: 0.80rem;">Analogy:<br>gμν → geometry (GR)<br>ψ → excitation mode (QM)<p>The wavefunction is not a mathematical abstraction; it is a complex excitation mode of the substrate.</p><p><div style="text-align:center; font-size: 0.80rem; color: var(--accent-gold);">👉 This Module Establishes:<br>That the wavefunction ψ represents a normalized substrate excitation mode. "Particles" are localized stable excitation modes of the substrate, and measurable reality corresponds to |ψ|² (excitation density), not ψ directly.</div>`
+},
+
+2: {
+title: "MODULE 2: OPERATOR STRUCTURE",
+result: "Operator Set Derived",
+resultSize: "0.85rem",
+brief: `<h3>2. Operator Structure</h3><p>Deriving momentum and energy operators from substrate variations.</p><h4>Steps:</h4><ul><li>Identify momentum $p$ with spatial phase gradient $\\nabla \\theta$.</li><li>Identify energy $E$ with temporal phase evolution $\\partial_t \\theta$.</li><li>Establish $\\hat{p} = -i\\hbar\\nabla$ as a transformation generator.</li></ul><p style="color:var(--accent-gold);">Recovered Standard Form: $\\hat{p} = -i\\hbar\\nabla, \\hat{E} = i\\hbar \\partial_t$</p>`,
+math: `<h3>Mathematics: Operator Derivation</h3><p>$$\\hat{p} = -i\\hbar \\nabla, \\quad \\hat{E} = i\\hbar \\partial_t$$</p><p>Operators emerge as generators of substrate translation and evolution.</p>`,
+sliders: `<div class="control-item"><div class="label-group"><span>PHASE GRADIENT</span><input type="number" id="c_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'c_sl')"></div><input type="range" id="c_sl" min="0" max="200" step="1" value="100" oninput="syncVal(this.value, 'c_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Phase Gradient $\\to$ Generator (Operator)</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">ACTION STATUS</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">$\\hat{p}, \\hat{E}$ Structurally Recovered</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-exp);">DERIVE: p = ħ∇θ → p̂ = -iħ∇<br>DERIVE: E = -ħ∂tθ → Ê = iħ∂t<br>IDENTITY: Operators generate phase evolution<br>ACTION: Operators act on ψ, not on observables<br>CONSISTENCY: Linear ψ → linear operator action.</span>`,
+metricsContent: `$$\\hat{p} = -i\\hbar \\nabla, \\quad \\hat{E} = i\\hbar \\partial_t$$`,
+hierarchy: `Operators = Phase Generators`,
+footer: `<div style="color: #94a3b8; line-height: 1.2; margin: 0px; text-align: center; font-size: 0.75rem;">Operators are derived from phase gradients of ψ.`,
+rightNote: `<div style="color: #94a3b8; line-height: 1.3; margin: 5px; text-align: center; font-size: 0.8rem;">Operators are not axiomatic; they are generators of phase evolution in ψ.<p>ψ → phase → generators → operators</p><p><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">👉 This Module Establishes:<br>That physical operators arise as generators of phase variation. Momentum (p) corresponds to spatial phase gradient, and energy (E) corresponds to temporal phase gradient, removing the need for independent postulates.</div>`
+},
+
+3: {
+title: "MODULE 3: SCHRÖDINGER EQUATION",
+result: "Evolution Equation Recovered",
+resultSize: "0.85rem",
+brief: `<h3>3. Schrödinger Equation</h3><p>Recovering the fundamental evolution law from substrate energy relations.</p><h4>Steps:</h4><ul><li>Start from $E = \\frac{p^2}{2m} + V$ on substrate modes.</li><li>Substitute substrate-derived operators $\\hat{E}$ and $\\hat{p}$.</li><li>Recover the linearized substrate dynamics.</li></ul><p style="color:var(--accent-gold);">Recovered Standard Form: $i\\hbar \\partial_t \\psi = \\hat{H} \\psi$</p>`,
+math: `<h3>Mathematics: Schrödinger Form</h3><p>$$i\\hbar \\partial_t \\psi = \\left(-\\frac{\\hbar^2}{2m}\\nabla^2 + V\\right)\\psi$$</p><p>Mass $m$ is linked to the structural ratio $K^2/P$.</p>`,
+sliders: `<div class="control-item"><div class="label-group"><span>SUBSTRATE POTENTIAL</span><input type="number" id="r_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'r_sl')"></div><input type="range" id="r_sl" min="0" max="200" step="1" value="100" oninput="syncVal(this.value, 'r_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Phase Evolution → Schrödinger Equation</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">RECOVERY STATUS</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Full Schrödinger Recovered</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-master);">INPUT: E = p²/2m + V (energy relation)<br>SUBSTITUTE: Ê, p̂ acting on ψ<br>RESULT: iħ∂tψ = Hψ (necessary evolution law)<br>FORM: H = -ħ²/2m ∇² + V<br>CONSISTENCY: Linear operators → linear evolution</span>`,
+metricsContent: `$i\\hbar \\partial_t \\psi = \\hat{H} \\psi$`,
+hierarchy: `Schrödinger Recovery`,
+footer: `<div style="color: #94a3b8; line-height: 1.2; margin: 0px; text-align: center; font-size: 0.8rem;">The Schrödinger equation is the linear limit of substrate dynamics.`,
+rightNote: `<div style="color: #94a3b8; line-height: 1.2; margin: 5px; text-align: center; font-size: 0.8rem;">All terms (time, spatial variation, and mass) arise from substrate parameters (K, P) via phase evolution.<p>ψ → operators → evolution</p><p><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">👉 This Module Establishes:<br>That time-evolution is a hydrodynamic (effective description of phase dynamics in a complex excitation field) necessity. It shows that the Schrödinger equation is the wave-equation (governing phase evolution of ψ) for a substrate under synthesis pressure (P), governed by the restorative action of vacuum stiffness (K).</div>`
+},
+
+4: {
+title: "MODULE 4: PROBABILITY & BORN RULE",
+result: "Born Rule Derived",
+resultSize: "0.85rem",
+brief: `<h3>4. Probability & Born Rule</h3><p>Deriving $\\rho = |\\psi|^2$ from structural excitation density.</p><h4>Steps:</h4><ul><li>Define $\\rho = |\\psi|^2$ as the substrate intensity.</li><li>Show conservation via continuity: $\\partial_t \\rho + \\nabla \\cdot J = 0$.</li><li>Show probability arises from interaction projection.</li></ul><p style="color:var(--accent-gold);">Recovered Standard Form: $P(x) = |\\psi|^2$</p>`,
+math: `<h3>Mathematics: Born Rule Emergence</h3><p>$$\\partial_t |\\psi|^2 + \\nabla \\cdot \\mathbf{j} = 0$$</p><p>Probability is the emergent interpretation of conserved excitation density.</p>`,
+sliders: `<div class="control-item"><div class="label-group"><span>DENSITY CONSERVATION</span><input type="number" id="e_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'e_sl')"></div><input type="range" id="e_sl" min="0" max="100" step="1" value="100" oninput="syncVal(this.value, 'e_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Excitation Density $\\to$ Probability</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">CONSERVATION</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Born Rule Emerged via Substrate</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-lock);">CHECK: $\\partial_t \\rho + \\nabla \\cdot J = 0$ holds identically<br>INTERPRET: ρ ≡ |ψ|² (excitation density)<br>PROJECTION: Measurement induces probability mapping.</span>`,
+metricsContent: `$$P(x,t) = |\\psi(x,t)|^2$$`,
+hierarchy: `Born Rule Emergence`,
+footer: "Probability is the measure of substrate excitation density (|ψ|²)..",
+rightNote: `<div style="color: #94a3b8; line-height: 1.3; margin: 10px; text-align:center; font-size: 0.8rem;">Probability is not fundamental; it arises from excitation density conservation during measurement.<p>ψ → |ψ|² → density → probability</p><p><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">👉 This Module Establishes:<br>That Probability is Excitation Density Mapping. It shows the Born Rule ($|\\psi|^2$) follows from localized excitation density of the substrate mode.</div>`
+},
+
+5: {
+title: "MODULE 5: COMMUTATION RELATIONS",
+result: "[x, p] = iħ Recovered",
+resultSize: "0.85rem",
+brief: `<h3>5. Commutation Relations</h3><p>Deriving the canonical commutator from substrate phase-position duality.</p><h4>Steps:</h4><ul><li>Define position $x$ and gradient $-i\\hbar\\nabla$ actions.</li><li>Compute $[\\hat{x}, \\hat{p}]$ on substrate modes.</li><li>Recover $i\\hbar$ from the non-commutativity of gradients.</li></ul><p style="color:var(--accent-gold);">Recovered Standard Form: $[\\hat{x}, \\hat{p}] = i\\hbar$</p>`,
+math: `<h3>Mathematics: Non-Commutativity</h3><p>$$[\\hat{x}, \\hat{p}]\\psi = i\\hbar\\psi$$</p><p>Uncertainty is a structural limitation of substrate mode definition.</p>`,
+sliders: `<div class="control-item"><div class="label-group"><span>MODE DUALITY</span><input type="number" id="f_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'f_sl')"></div><input type="range" id="f_sl" min="0" max="200" step="1" value="100" oninput="syncVal(this.value, 'f_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="color: var(--accent-gold); line-height: 1.3; text-align: center; font-size: 0.77rem;">Phase-Position Structural Non-Commutativity</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">COMMUTATOR STATUS</span><div style="color: var(--accent-gold); line-height: 1.3; text-align: center; font-size: 0.8rem;">[x, p] = iħ Recovered</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-final);">STRUCTURE: Gradient-position duality analyzed<br>RESULT: [x̂, p̂] = iħ<br>ORIGIN: Substrate structural non-commutativity.</span>`,
+metricsContent: `$[\\hat{x}, \\hat{p}] = i\\hbar$`,
+hierarchy: `Commutator Recovery`,
+footer: `<div style="color: #94a3b8; line-height: 1.3; margin: 10px; text-align:center; font-size: 0.85rem;">Commutation relations arise from substrate geometry.`,
+rightNote: `<div style="color: #94a3b8; line-height: 1.2; margin: 5px; text-align: center; font-size: 0.8rem;">Uncertainty is not epistemic; it is a structural property of wave-like excitations in a continuous medium.<p>ψ → phase → gradient → non-commutativity → [x, p] = iħ</p><p><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">👉 This Module Establishes:<br>The Mechanical Resolution Limit of the vacuum. It shows that i\hbar is the structural granularity of the substrate, where defining a coordinate (x) inherently strains the gradient (p) within the unified fabric.<p>👉 This Stage Establishes:<br>[x, p] = iħ is structurally fixed by the substrate.</p></div>`
+}
+};
+
+function syncVal(val, id) {
+const sliderId = id.includes('_in') ? id.replace('_in', '_sl') : id;
+const inputId = id.includes('_sl') ? id.replace('_sl', '_in') : id;
+if(document.getElementById(sliderId)) document.getElementById(sliderId).value = val;
+if(document.getElementById(inputId)) document.getElementById(inputId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+document.getElementById('brief-box-content').innerHTML = content.brief;
+document.getElementById('math-box-content').innerHTML = content.math;
+document.getElementById('control-sliders').innerHTML = content.sliders;
+
+document.getElementById('active-module-title').innerText = content.title;
+const resultEl = document.getElementById('active-module-result');
+resultEl.innerText = content.result;
+resultEl.style.fontSize = content.resultSize || "0.75rem";
+
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('metrics-content').innerHTML = content.metricsContent;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+document.getElementById('telemetry-area').innerHTML = content.telemetry;
+showScreen('briefing');
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() {
+showScreen('lab');
+setTimeout(() => { runLab(); window.dispatchEvent(new Event('resize')); }, 100);
+}
+
+function runLab() {
+const target = document.getElementById('plot-area');
+let data = [];
+let layout = {
+paper_bgcolor: 'black', plot_bgcolor: 'black', margin: {t:60,b:10,l:0,r:0},
+showlegend: false, font: { family: 'sans-serif', size: 10 },
+scene: {
+xaxis: { gridcolor: '#222', color: '#94a3b8', title: 'Space' },
+yaxis: { gridcolor: '#222', color: '#94a3b8', title: 'Time' },
+zaxis: { gridcolor: '#222', color: '#94a3b8', title: 'Amplitude' }
+}
+};
+
+if (currentTool === 1) { // ψ Emergence
+// 1. Reactive Input: Amplitude linked to slider
+let amp = parseFloat(document.getElementById('m_sl')?.value || 100) / 100;
+
+// 2. Data Generation: Substrate Wave Packet
+let x_vals = Array.from({length: 200}, (_, i) => (i - 100) / 2); // Higher resolution
+let y_vals = x_vals.map(xi => amp * Math.cos(xi / 2) * Math.exp(-(xi * xi) / 100));
+
+data.push({
+x: x_vals,
+y: y_vals,
+type: 'scatter',
+mode: 'lines',
+name: 'Substrate Mode ψ(x)', // Legend Name
+line: { color: '#3b82f6', width: 4 },
+fill: 'tozeroy',
+fillcolor: 'rgba(59, 130, 246, 0.1)'
+});
+
+// 3. Layout: Bright #eee Axis, Top-Left Legend, Colored Title
+layout.title = {
+text: "ψ AS EMERGENT SUBSTRATE MODE",
+font: { color: '#3b82f6', size: 16 }
+};
+
+layout.showlegend = true;
+layout.legend = {
+font: { color: '#eee', size: 11 },
+x: 0.02,
+y: 0.98,
+xanchor: 'left',
+yanchor: 'top',
+bgcolor: 'rgba(0,0,0,0.5)',
+bordercolor: '#3b82f6',
+borderwidth: 1
+};
+
+layout.xaxis = {
+title: { text: 'Substrate Coordinate (x)', font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+gridcolor: '#222',
+zerolinecolor: '#444'
+};
+
+layout.yaxis = {
+title: { text: 'Mode Amplitude (A)', font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+gridcolor: '#222',
+zerolinecolor: '#444',
+range: [-1.2, 1.2] // Fixed range ensures slider movement is visible
+};
+layout.margin = { t: 60, b: 60, l: 60, r: 40 };
+
+
+} else if (currentTool === 2) { // Operator Structure
+// 1. Reactive Input: Phase Gradient linked to slider
+let grad = parseFloat(document.getElementById('c_sl')?.value || 100) / 100;
+
+// 2. Data Generation: Linear Phase Gradient Mapping
+let x_vals = Array.from({length: 100}, (_, i) => (i - 50));
+let y_vals = x_vals.map(xi => grad * (xi / 10));
+
+data.push({
+x: x_vals,
+y: y_vals,
+mode: 'lines',
+name: 'Phase Gradient ∇θ (p)', // Legend Name
+line: {
+color: '#fbbf24',
+width: 3,
+dash: 'solid'
+},
+hoverinfo: 'x+y+name'
+});
+
+// 3. Layout: Bright #eee Axis, Top-Left Legend, Colored Title
+layout.title = {
+text: "OPERATOR DERIVATION: PHASE GRADIENTS",
+font: { color: '#fbbf24', size: 16 }
+};
+
+layout.showlegend = true;
+layout.legend = {
+font: { color: '#eee', size: 11 },
+x: 0.02,
+y: 0.98,
+xanchor: 'left',
+yanchor: 'top',
+bgcolor: 'rgba(0,0,0,0.6)',
+bordercolor: '#fbbf24',
+borderwidth: 1
+};
+
+layout.xaxis = {
+title: { text: 'Substrate Position (x)', font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+gridcolor: '#222',
+zerolinecolor: '#444'
+};
+
+layout.yaxis = {
+title: { text: 'Momentum Magnitude (p)', font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+gridcolor: '#222',
+zerolinecolor: '#444',
+range: [-15, 15] // Fixed range to make the tilt response to the slider visible
+};
+layout.margin = { t: 60, b: 60, l: 60, r: 40 };
+
+
+} else if (currentTool === 3) { // Schrödinger Dynamics
+// 1. Reactive Input
+let pot = parseFloat(document.getElementById('r_sl')?.value || 100) / 100;
+
+// 2. Data Generation
+let x_vals = Array.from({length: 40}, (_, i) => (i - 20) / 2);
+let y_vals = Array.from({length: 40}, (_, i) => (i - 20) / 2);
+
+let z_vals = x_vals.map(xi => y_vals.map(yi => {
+let r = Math.sqrt(xi*xi + yi*yi);
+return Math.cos(r - (pot * 2)) * Math.exp(-r/8) * pot;
+}));
+
+data.push({
+type: 'surface',
+z: z_vals,
+x: x_vals,
+y: y_vals,
+colorscale: 'Viridis',
+showscale: false, // Hides the color bar to make room for the legend
+showlegend: true, // FORCED: Ensures the legend entry appears
+name: 'Substrate Evolution Ψ(x,y)',
+hoverinfo: 'z+name'
+});
+
+// 3. Layout Configuration
+layout.title = {
+text: "SCHRÖDINGER DYNAMICS: SUBSTRATE EVOLUTION",
+font: { color: '#c084fc', size: 18 }
+};
+
+layout.showlegend = true;
+layout.legend = {
+font: { color: '#eee', size: 12 },
+x: 0,
+y: 1,
+xanchor: 'left',
+yanchor: 'top',
+bgcolor: 'rgba(0,0,0,0.5)'
+};
+
+layout.scene = {
+xaxis: {
+title: { text: 'Substrate Space X', font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+gridcolor: '#333'
+},
+yaxis: {
+title: { text: 'Substrate Space Y', font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+gridcolor: '#333'
+},
+zaxis: {
+title: { text: 'Ψ Amplitude', font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+gridcolor: '#333',
+range: [-1.5, 1.5]
+},
+camera: {
+eye: { x: 1.5, y: 1.5, z: 1.2 }
+}
+};
+
+
+} else if (currentTool === 4) { // Probability & Born Rule
+// 1. Reactive Input: Density/Intensity linked to slider
+let dens = parseFloat(document.getElementById('e_sl')?.value || 100) / 100;
+
+// 2. Data Generation: Squared Amplitude (Probability Density)
+let x_vals = Array.from({length: 100}, (_, i) => i - 50);
+let y_vals = x_vals.map(xi => dens * Math.pow(Math.exp(-xi * xi / 200), 2));
+
+data.push({
+x: x_vals,
+y: y_vals,
+fill: 'tozeroy',
+fillcolor: 'rgba(248, 113, 113, 0.2)', // Soft red glow
+line: { color: '#f87171', width: 3 },
+name: 'Probability Density |ψ|²', // Legend Name
+type: 'scatter',
+mode: 'lines'
+});
+
+// 3. Layout: Bright #eee, Top-Left Legend, Breathing Space
+layout.title = {
+text: "BORN RULE: DENSITY CONSERVATION",
+font: { color: '#f87171', size: 16 }
+};
+
+layout.showlegend = true;
+layout.legend = {
+font: { color: '#eee', size: 11 },
+x: 0.02,
+y: 0.98,
+xanchor: 'left',
+yanchor: 'top',
+bgcolor: 'rgba(0,0,0,0.6)',
+bordercolor: '#f87171',
+borderwidth: 1
+};
+
+layout.xaxis = {
+title: { text: 'Spatial Coordinate (x)', font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+gridcolor: '#222',
+zerolinecolor: '#444',
+range: [-80, 80] // (2) Providing "breathing space" on X axis
+};
+
+layout.yaxis = {
+title: { text: 'Probability P(x)', font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+gridcolor: '#222',
+zerolinecolor: '#444',
+range: [0, 1.2] // Keeps height consistent as density shifts
+};
+layout.margin = { t: 60, b: 60, l: 60, r: 40 };
+
+
+
+} else if (currentTool === 5) { // Commutation Identity
+// 1. Reactive Input: Dual Operator Scale
+let dual = parseFloat(document.getElementById('f_sl')?.value || 100) / 100;
+
+// 2. Data Generation: Bar chart for Operators
+data.push({
+x: ['Position [x]', 'Momentum [p]'], // Clearer labels
+y: [1.0, dual],
+type: 'bar',
+name: 'Structural Limit [x, p]',
+marker: {
+color: '#2dd4bf',
+line: { color: '#eee', width: 2 }
+},
+width: 0.4 // Sleek bars to prevent crowding
+});
+
+// 3. Layout: Expanded space for readability
+layout.title = {
+text: "COMMUTATION IDENTITY: [x, p] = iħ",
+font: { color: '#2dd4bf', size: 18 }
+};
+
+layout.showlegend = true;
+layout.legend = {
+font: { color: '#eee', size: 12 },
+x: 0.02,
+y: 0.98,
+xanchor: 'left',
+yanchor: 'top',
+bgcolor: 'rgba(0,0,0,0.6)'
+};
+
+layout.xaxis = {
+title: { text: 'Substrate Operator Domain', font: { color: '#eee' }, standoff: 20 },
+tickfont: { color: '#eee', size: 12 },
+gridcolor: '#222',
+// (2) SIGNIFICANT BREATHING SPACE:
+// We set the range wider than the 0 and 1 indices of the bars
+range: [-0.8, 1.8],
+automargin: true // Ensures labels aren't cut off at the bottom
+};
+
+layout.yaxis = {
+title: { text: 'Commutation Value (ħ)', font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+gridcolor: '#222',
+zerolinecolor: '#444',
+range: [0, 1.5]
+};
+
+// Extra padding to ensure the whole graph fits the container
+layout.margin = { t: 60, b: 60, l: 60, r: 40 };
+}
+
+Plotly.react('plot-area', data, layout, {responsive: true, displayModeBar: false});
+}
+
+function resetLab() {
+syncVal(100, 'm_sl');
+syncVal(100, 'c_sl');
+syncVal(100, 'r_sl');
+syncVal(100, 'e_sl');
+syncVal(100, 'f_sl');
+}
+
+window.onload = () => { showScreen('portal'); };
+</script>
+</body>
+</html>
+

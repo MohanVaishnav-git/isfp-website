@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 35 — Probability & Uncertainty</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #00ffcc;
+--accent-prob: #f472b6; --accent-uncert: #fbbf24; --accent-dens: #60a5fa; --accent-bound: #a78bfa; --accent-limit: #f87171;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-unified); font-family: sans-serif; font-size: 0.85rem; min-width: 350px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls, #nav-summary-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+#screen-lab.active { display: flex; flex-direction: column; height: calc(100vh - 50px); }
+
+#screen-portal { justify-content: flex-start; padding-top: 8dvh; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 70px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.constant-display-box {
+background: #111; border: 1px solid var(--accent-unified); padding: 6px; border-radius: 8px;
+display: flex; justify-content: space-around; margin-bottom: 10px;
+}
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(0, 255, 204, 0.05); border: 1px solid var(--accent-unified); padding: 8px; border-radius: 8px; margin-bottom: 8px; font-size: 0.6rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; }
+#plot-area { flex-grow: 1; width: 100%; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #000; border: 1px solid var(--accent-unified); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer {
+width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem;
+color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 35 — PROBABILITY & UNCERTAINTY</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">Probability & Uncertainty Lab</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">The Mechanical Origin of Statistical Distributions in the Vacuum Substrate.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-prob);">
+<h2 style="color:var(--accent-prob);">1. Born Density Origin</h2>
+<p>Mapping $|\Psi|^2$ as Substrate Displacement Density.</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-uncert);">
+<h2 style="color:var(--accent-uncert);">2. The Jitter Constant</h2>
+<p>Pressure P and the $\Delta x \Delta p$ Relationship.</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-dens);">
+<h2 style="color:var(--accent-dens);">3. Structural Confinement</h2>
+<p>K-Stiffness influence on Probability Peaks.</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-bound);">
+<h2 style="color:var(--accent-bound);">4. Wavepacket Dispersion</h2>
+<p>Evolution of the Probability Envelope over Time.</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-limit);">
+<h2 style="color:var(--accent-limit);">5. Quantum Limit Bounds</h2>
+<p>Defining the Minimum Uncertainty Product.</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-unified); background: linear-gradient(135deg, #0f1115 0%, #0a1a1a 100%);">
+<h2 style="color:var(--accent-unified);">6. Mathematical Structure</h2>
+<p>Summary of Statistical Dynamics.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color:var(--accent-unified); text-align:center;">Summary — Mathematical Structure of Stage 35</h2>
+<section>
+<p>This stage establishes the mathematical description of probability, uncertainty, confinement, dispersion, and the minimum quantum action bound. The equations collectively describe how oscillatory excitations in the vacuum substrate produce the statistical structure observed in quantum mechanics.</p>
+
+<h4 style="color:var(--accent-unified);">1. Probability Density (Born Relation)</h4>
+<p>The probability density associated with a quantum excitation is defined by the squared amplitude of the wavefield:</p>
+<p style="text-align:center;">$$P(x)=|\psi(x)|^2$$</p>
+<p>where $\psi(x)$ is the substrate oscillation amplitude and $P(x)$ is the probability density of excitation. According to this framework, the probability distribution represents the spatial density of oscillatory energy within the vacuum substrate.</p>
+
+<h4 style="color:var(--accent-unified);">2. Gaussian Localization of Wave Packets</h4>
+<p>Localized excitations form Gaussian probability envelopes:</p>
+<p style="text-align:center;">$$\psi(x)=A e^{-x^2/(2\sigma^2)}$$</p>
+<p>which gives:</p>
+<p style="text-align:center;">$$P(x)=A^2 e^{-x^2/\sigma^2}$$</p>
+<p>where $\sigma$ is the localization scale. Vacuum stiffness determines the confinement scale $\sigma \sim \frac{1}{\sqrt{K}}$. Thus stronger stiffness produces sharper localization of probability peaks.</p>
+
+<h4 style="color:var(--accent-unified);">3. Uncertainty Relation</h4>
+<p>The fundamental uncertainty bound between position and momentum is:</p>
+<p style="text-align:center;">$$\Delta x \Delta p \ge \frac{\hbar}{2}$$</p>
+<p>This inequality defines the minimum phase-space area occupied by a quantum state. The boundary curve of allowed states is $\Delta p = \frac{\hbar}{2\Delta x}$, corresponding to the hyperbolic limit shown in the visualization.</p>
+
+<h4 style="color:var(--accent-unified);">4. Wavepacket Dispersion</h4>
+<p>The spatial width of a Gaussian wave packet evolves with time according to:</p>
+<p style="text-align:center;">$$\sigma(t)=\sigma_0\sqrt{1+t^2}$$</p>
+<p>or more generally:</p>
+<p style="text-align:center;">$$\sigma(t)=\sqrt{\sigma_0^2+\left(\frac{\hbar t}{2m\sigma_0}\right)^2}$$</p>
+<p>where $\sigma_0$ is the initial packet width. According to this framework the spreading arises from phase divergence between oscillatory substrate modes.</p>
+
+<h4 style="color:var(--accent-unified);">5. Minimum Action Constraint</h4>
+<p>The uncertainty relation implies a minimum quantum of action:</p>
+<p style="text-align:center;">$$S \ge \hbar$$</p>
+<p>where $S \sim \Delta x \Delta p$. This establishes Planck’s constant as the smallest physically meaningful action scale.</p>
+
+<h4 style="color:var(--accent-unified);">6. Structural Origin of Quantum Limits</h4>
+<p>According to this framework the structural parameters of the vacuum substrate determine the quantum scales. Vacuum stiffness determines spatial confinement $\sigma \sim \frac{1}{\sqrt{K}}$. Synthesis pressure introduces stochastic fluctuations $\Delta p \sim \sqrt{P}$. Combining the two gives an action scale:</p>
+<p style="text-align:center;">$$S \sim \sigma \Delta p$$</p>
+<p>which approaches the universal constant $S \rightarrow \hbar$ at structural equilibrium.</p>
+
+<h4 style="color:var(--accent-unified);">7. Phase-Space Interpretation</h4>
+<p>The minimum cell of phase space is $A_{cell}=2\pi\hbar$. No physical state can occupy a phase-space region smaller than this quantum cell. Thus the structure of phase space becomes discretized at the quantum scale.</p>
+
+<h4 style="color:var(--accent-unified);">8. Unified Hierarchy of Stage 35</h4>
+<p style="text-align:center; line-height:1.8;">
+Vacuum stiffness $K$ + Synthesis pressure $P$<br>
+↓<br>
+Oscillatory substrate excitations<br>
+↓<br>
+Probability density $P(x)=|\psi|^2$<br>
+↓<br>
+Localization scale $\sigma \sim 1/\sqrt{K}$<br>
+↓<br>
+Uncertainty relation $\Delta x \Delta p \ge \hbar/2$<br>
+↓<br>
+Minimum action $S \ge \hbar$<br>
+↓<br>
+Quantum statistical behavior
+</p>
+
+<h4 style="color:var(--accent-unified);">Conclusion</h4>
+<p>Stage 35 establishes that probability, uncertainty, dispersion, and quantum limits arise from the mathematical structure of oscillatory excitations in the vacuum substrate. The statistical character of quantum mechanics emerges from the interaction between vacuum stiffness $K$ and synthesis pressure $P$, which together determine the localization scale, fluctuation strength, and minimum action governing quantum systems.</p>
+</div>
+
+</section>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div class="constant-display-box">
+<div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val">11.350</span></div>
+<div class="const-item"><span class="const-label">Pressure P</span><span class="const-val">0.6900</span></div>
+</div>
+<div id="mapping-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Statistical Telemetry</span>
+<span id="epoch-label" style="font-family:monospace; font-size:0.85rem; color:var(--accent-unified);">DISTRIBUTION STABLE</span>
+</div>
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:8px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:6px;">RESET PARAMETERS</button>
+<div id="panel-footer-text" style="font-size: 0.75rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.4; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:8px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:6px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Substrate Logic</span>
+<div id="metrics-content" style="font-size:0.75rem; font-family:monospace; line-height:1.7;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Emergence Hierarchy</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.75rem; color: var(--text-dim); line-height: 1.4; background: #000; padding: 10px; border-radius: 8px; border: 1px solid #222; margin-top: auto;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "Born Density Origin",
+brief: `<div class="briefing-content" style="padding: 0px 40px 40px 40px;">
+<h2 style="color:var(--accent-prob); margin-top: 20px; text-align:center;">Detailed Briefing: Born Density Origin</h2>
+<h3 style="color:var(--text-main); font-style: italic;">Mapping $|\\Psi|^2$ as Substrate Displacement Density</h3>
+
+<h4 style="color:var(--accent-unified);">1. Conceptual Objective</h4>
+<p>This module introduces the structural interpretation of the Born probability rule within the synthesis framework. In conventional quantum mechanics the Born rule states that the probability of detecting a particle at position $x$ is proportional to the square of the wavefunction amplitude:</p>
+<p style="text-align:center; background:rgba(255,255,255,0.03); padding:10px; border-radius:8px;">$P(x)=|\\Psi(x)|^2$</p>
+<p>Standard quantum theory treats this rule as a postulate, meaning that the rule is assumed rather than derived.</p>
+<p>This module proposes a different interpretation. It suggests that the quantity $|\\Psi|^2$ represents the local displacement density of the vacuum substrate. In this view the wavefunction is not merely a mathematical tool but the physical oscillation pattern of the substrate itself.</p>
+<p>Thus probability becomes a mechanical property of the substrate oscillation field.</p>
+
+<h4 style="color:var(--accent-unified);">2. Physical Meaning of the Wavefunction</h4>
+<p>Within the synthesis framework, a quantum wavefunction corresponds to a localized oscillatory excitation of the vacuum substrate.</p>
+<p>The oscillation represents the distribution of energy stored in the substrate medium. At different spatial points the amplitude of the oscillation varies.</p>
+<p><strong>Where the amplitude is large:</strong></p>
+<ul>
+<li>substrate displacement is larger</li>
+<li>energy density is higher</li>
+<li>interaction probability increases</li>
+</ul>
+<p><strong>Where the amplitude is small:</strong></p>
+<ul>
+<li>substrate displacement is weaker</li>
+<li>energy density is lower</li>
+<li>interaction probability decreases</li>
+</ul>
+<p>Therefore the squared amplitude $|\\Psi|^2$ measures how strongly the substrate is locally excited.</p>
+
+<h4 style="color:var(--accent-unified);">3. Role of Vacuum Stiffness K</h4>
+<p>The spatial shape of the probability distribution is controlled primarily by the vacuum stiffness parameter $K$.</p>
+<p>Vacuum stiffness determines how strongly the substrate resists deformation. When an excitation appears in the substrate, the stiffness generates restoring forces that confine the oscillation.</p>
+<p>Mathematically the restoring force behaves approximately like:</p>
+<p style="text-align:center;">$F=-Kx$</p>
+<p>This produces a harmonic potential:</p>
+<p style="text-align:center;">$V(x)=\\frac{1}{2}Kx^2$</p>
+<p>The stable oscillation envelope therefore takes a Gaussian-like form:</p>
+<p style="text-align:center;">$\\Psi(x)=Ae^{-Kx^2}$</p>
+<p>The corresponding probability density becomes:</p>
+<p style="text-align:center;">$P(x)=|\\Psi|^2=A^2e^{-2Kx^2}$</p>
+<p>Thus the shape of the probability peak is determined by substrate stiffness. Higher stiffness produces sharper localization of the excitation.</p>
+
+<h4 style="color:var(--accent-unified);">4. Role of Synthesis Pressure P</h4>
+<p>While stiffness determines confinement, the synthesis pressure $P$ influences the excitation amplitude.</p>
+<p>Pressure represents the dynamical activity of the substrate medium. It injects energy into oscillatory modes and determines the intensity of substrate fluctuations.</p>
+<p>In this module the amplitude slider represents the excitation strength $A$. Increasing amplitude increases the energy stored in the oscillation but does not change the fundamental shape of the distribution.</p>
+<p><strong>Thus:</strong></p>
+<ul>
+<li><strong>Amplitude</strong> → excitation energy</li>
+<li><strong>Stiffness</strong> → spatial confinement</li>
+<li><strong>Probability</strong> → energy density of oscillation</li>
+</ul>
+
+<h4 style="color:var(--accent-unified);">5. Emergence Hierarchy</h4>
+<p>The visual panel on the right summarizes the causal chain:</p>
+<p style="text-align:center; font-weight:bold; color:var(--accent-prob);">Stiffness → Displacement → Probability</p>
+<p>The meaning of this hierarchy is the following: Vacuum stiffness determines how the substrate deforms when energy is introduced. That deformation appears as an oscillatory displacement field. The spatial density of that displacement corresponds directly to the probability of interaction with a detector.</p>
+<p>Thus probability is not fundamental randomness but the mechanical footprint of a substrate wave.</p>
+
+<h4 style="color:var(--accent-unified);">6. Interpretation of Measurement</h4>
+<p>When a detector interacts with the oscillating substrate, the probability of detection is proportional to the local energy density of the oscillation.</p>
+<p>Regions where the wave amplitude is large contain more excitation energy. A detector interacting with the substrate therefore has a higher likelihood of interacting in those regions. This produces the statistical detection pattern predicted by the Born rule.</p>
+<p>Thus measurement statistics arise naturally from the distribution of substrate excitation energy.</p>
+
+<h4 style="color:var(--accent-unified);">7. Meaning of the Visualization</h4>
+<p>The graph displayed in the module shows a Gaussian probability peak. The horizontal axis represents spatial position within the substrate. The vertical axis represents probability density.</p>
+<p>The peak corresponds to the region where the substrate oscillation is strongest.</p>
+<p>Adjusting amplitude changes the overall intensity but leaves the distribution shape intact. The shape itself reflects the confinement imposed by the vacuum stiffness parameter $K=11.350$.</p>
+
+<h4 style="color:var(--accent-unified);">8. Conceptual Significance</h4>
+<p>This module attempts to reinterpret the Born rule as a physical property of the vacuum substrate rather than a purely mathematical rule.</p>
+<p><strong>In standard quantum mechanics:</strong> Probability is fundamental.</p>
+<p><strong>In the synthesis framework:</strong> Probability emerges from mechanical displacement of the substrate wavefield. Thus $|\Psi|^2$ represents the energy density of a localized substrate oscillation. The Born rule therefore becomes a natural consequence of substrate dynamics.</p>
+
+<h4 style="color:var(--accent-unified);">9. Role in the Overall Architecture</h4>
+<p>This module forms the foundation for the rest of Stage 35. The remaining modules build upon this interpretation by explaining how substrate pressure generates uncertainty, how stiffness produces particle localization, how wave packets spread over time, and how Planck’s constant arises as a structural limit.</p>
+<p>Thus Module 1 establishes the central idea that quantum probability originates from the dynamics of the vacuum substrate itself.</p>
+</div>`,
+
+math: `<div class="math-content" style="padding: 0px 40px 40px 40px;">
+<h2 style="color:var(--accent-prob); margin-top: 20px; text-align:center;">Explicit Mathematics</h2>
+
+<h4 style="color:var(--accent-unified);">Primary Equation</h4>
+<p style="text-align:center; background:rgba(255,255,255,0.03); padding:15px; border-radius:8px; font-size:1.2rem;">
+$$P(x)=|\\psi(x)|^{2}$$
+</p>
+<p>This relation defines the probability density for detecting a quantum excitation at spatial position $x$. In the synthesis framework this quantity represents the local displacement density of the substrate wavefield.</p>
+
+<h4 style="color:var(--accent-unified);">Definitions of Variables</h4>
+<ul style="list-style: none; padding-left: 0;">
+<li><strong>$P(x)$</strong> : probability density of detection at position $x$</li>
+<li><strong>$\\psi(x)$</strong> : wavefield amplitude representing substrate oscillation</li>
+<li><strong>$x$</strong> : spatial coordinate in the substrate</li>
+<li><strong>$|\\psi|^{2}$</strong> : local energy density of the oscillatory mode</li>
+<li><strong>$A$</strong> : amplitude of the excitation</li>
+<li><strong>$K$</strong> : vacuum stiffness parameter</li>
+</ul>
+
+<h4 style="color:var(--accent-unified);">Relation to Substrate Parameters K and P</h4>
+<p>The spatial structure of the wavefunction is determined by the restoring force produced by vacuum stiffness. The restoring force acting on the substrate displacement obeys approximately:</p>
+<p style="text-align:center;">$$F=-Kx$$</p>
+<p>This generates a harmonic potential field:</p>
+<p style="text-align:center;">$$V(x)=\\frac{1}{2}Kx^{2}$$</p>
+<p>A localized oscillatory excitation within this potential produces a Gaussian envelope:</p>
+<p style="text-align:center;">$$\\psi(x)=A e^{-Kx^{2}}$$</p>
+<p>The probability density therefore becomes:</p>
+<p style="text-align:center;">$$P(x)=|\\psi(x)|^{2}=A^{2}e^{-2Kx^{2}}$$</p>
+
+<h4 style="color:var(--accent-unified);">Interpretation of the Equation</h4>
+<p>The Gaussian profile indicates that the probability density is highest at the center of the excitation and decreases exponentially with distance. The parameter $K$ controls the width of the distribution.</p>
+<p><strong>Large K:</strong> $K \\uparrow \\Rightarrow \\text{stronger confinement}$</p>
+<p><strong>Small K:</strong> $K \\downarrow \\Rightarrow \\text{broader probability distribution}$</p>
+
+<h4 style="color:var(--accent-unified);">Role of Amplitude</h4>
+<p>The amplitude $A$ determines the excitation energy stored in the substrate oscillation.</p>
+<p style="text-align:center;">$$E \\propto A^{2}$$</p>
+<p>Increasing amplitude increases the probability density uniformly without altering the spatial structure.</p>
+
+<h4 style="color:var(--accent-unified);">Connection to Detection Probability</h4>
+<p>The probability of detecting the excitation in a small spatial interval $dx$ is:</p>
+<p style="text-align:center;">$$dP = |\\psi(x)|^{2}dx$$</p>
+<p>Total probability normalization requires:</p>
+<p style="text-align:center;">$$\\int_{-\infty}^{\infty} |\\psi(x)|^{2} dx = 1$$</p>
+<p>Normalized Gaussian solution:</p>
+<p style="text-align:center;">$$\\psi(x)=\\left(\\frac{K}{\\pi}\\right)^{1/4} e^{-Kx^{2}/2}$$</p>
+<p>Thus:</p>
+<p style="text-align:center;">$$P(x)=\\left(\\frac{K}{\\pi}\\right)^{1/2} e^{-Kx^{2}}$$</p>
+
+<h4 style="color:var(--accent-unified);">Structural Interpretation</h4>
+<p>In this framework the wavefunction represents a real oscillatory displacement field of the vacuum substrate. The squared amplitude therefore measures the density of oscillatory energy. Higher energy density corresponds to a higher probability of interaction during measurement.</p>
+
+<h4 style="color:var(--accent-unified);">Emergence Hierarchy</h4>
+<p style="text-align:center; line-height:1.8;">
+Vacuum stiffness $K$<br>
+↓<br>
+Restoring force<br>
+↓<br>
+Substrate oscillation<br>
+↓<br>
+Displacement density<br>
+↓<br>
+Probability distribution
+</p>
+
+<h4 style="color:var(--accent-unified);">Conclusion</h4>
+<p>The Born probability rule $P(x)=|\\psi(x)|^{2}$ is interpreted as the mechanical footprint of substrate oscillations. Probability therefore emerges from the spatial distribution of oscillatory energy in the vacuum substrate rather than being a fundamental postulate of quantum mechanics.</p>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>Amplitude (A)</span><input type="number" id="a_in" class="digital-entry" value="1.0" oninput="syncVal(this.value, 'a_sl')"></div><input type="range" id="a_sl" min="0.1" max="2" step="0.1" value="1" oninput="syncVal(this.value, 'a_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Mapping</span><div style="text-align:center; font-size: 1.00rem;">$|\\Psi|^2 \\rightarrow \\text{Density}$</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Born Law</span><div style="text-align:center; font-size: 1.10rem;">$P(x) = |\\Psi|^2$</div>`,
+hierarchy: "Stiffness<br>↓<br>Displacement<br>↓<br>Probability",
+footer: "Higher amplitude corresponds to higher excitation density.",
+rightNote: "Probability is the mechanical footprint of the wave."
+},
+2: {
+title: "The Jitter Constant",
+brief: `<div class="briefing-content" style="padding: 0px 40px 40px 40px;">
+<h2 style="color:var(--accent-uncert); margin-top: 20px; text-align:center;">Detailed Briefing: The Jitter Constant</h2>
+<h3 style="color:var(--text-main); font-style: italic;">Pressure P and the Origin of Quantum Uncertainty</h3>
+
+<h4 style="color:var(--accent-unified);">Conceptual Objective</h4>
+<p>This module explains the structural origin of quantum uncertainty within the synthesis framework. In conventional quantum mechanics, the uncertainty principle is expressed by the relation:</p>
+<p style="text-align:center; background:rgba(255,255,255,0.03); padding:10px; border-radius:8px;">$$\\Delta x \\, \\Delta p \\ge \\frac{\\hbar}{2}$$</p>
+<p>and is usually interpreted as a fundamental limit on simultaneous knowledge of position and momentum. The theory does not provide a clear mechanical cause for this limitation.</p>
+<p>The purpose of this module is to reinterpret this relation as a consequence of substrate dynamics, specifically the microscopic agitation generated by the synthesis pressure $P$.</p>
+<p>The visualization shows how a probability peak becomes irregular and fluctuating when pressure-induced noise is present in the substrate.</p>
+
+<h4 style="color:var(--accent-unified);">Origin of Substrate Noise</h4>
+<p>The synthesis pressure parameter $P$ represents the dynamical activity of the vacuum substrate. Even in the absence of external disturbances, the substrate contains intrinsic fluctuations produced by the interaction of the stabilizing, conserving, and motive fields.</p>
+<p>These fluctuations produce small random displacements in the oscillatory wavefield representing the quantum state. The resulting effect appears visually as jitter around the smooth probability distribution.</p>
+<p>Thus the wave packet is never perfectly smooth. Instead, it contains microscopic irregularities caused by pressure-driven fluctuations.</p>
+
+<h4 style="color:var(--accent-unified);">Pressure as the Source of Jitter</h4>
+<p>In the synthesis framework, pressure represents the kinetic component of the substrate. While stiffness $K$ provides structural stability and confinement, pressure produces continuous microscopic agitation.</p>
+<p><strong>The causal chain is:</strong></p>
+<p style="text-align:center; font-weight:bold; color:var(--accent-uncert);">Pressure P → Substrate agitation → Wavefield jitter → Measurement uncertainty</p>
+<p>This mechanism explains why perfect precision in both position and momentum cannot be achieved simultaneously.</p>
+
+<h4 style="color:var(--accent-unified);">Relationship Between Pressure and Uncertainty</h4>
+<p>The uncertainty relation emerges because localization of a wave packet requires compressing the oscillation into a smaller region of space. Compression increases gradients in the wavefield, which increases momentum fluctuations.</p>
+<p>At the same time, the substrate pressure continually injects small fluctuations into the oscillatory motion. The result is a minimum bound on simultaneous localization of position and momentum.</p>
+<p>Mathematically the uncertainty relation is:</p>
+<p style="text-align:center;">$$\\Delta x \\, \\Delta p \\ge \\frac{\\hbar}{2}$$</p>
+<p>In this interpretation the constant $\hbar$ represents the minimum excitation scale permitted by the equilibrium between stiffness and pressure.</p>
+
+<h4 style="color:var(--accent-unified);">Meaning of the Visualization</h4>
+<p>The graph displayed in the module shows a probability distribution with visible noise around the central peak. The smooth envelope corresponds to the underlying wave packet. The irregular fluctuations represent the substrate jitter produced by synthesis pressure.</p>
+<p>When the pressure noise parameter increases, the fluctuations become stronger. When pressure decreases, the distribution becomes smoother. Thus the visualization illustrates how pressure determines the magnitude of statistical fluctuations.</p>
+
+<h4 style="color:var(--accent-unified);">Emergence Hierarchy</h4>
+<p>The panel on the right summarizes the causal hierarchy:</p>
+<p style="text-align:center; font-weight:bold; color:var(--accent-uncert);">Pressure → Jitter → Uncertainty</p>
+<p>This hierarchy emphasizes that uncertainty is not introduced by measurement or by observer limitations. Instead it arises directly from the microscopic dynamics of the vacuum substrate.</p>
+
+<h4 style="color:var(--accent-unified);">Interpretation of the Uncertainty Principle</h4>
+<p>Within this framework the uncertainty principle reflects a physical limitation of the substrate medium. Perfect certainty would require a completely motionless substrate with zero pressure. However, such a state would eliminate the dynamical equilibrium that sustains the universe.</p>
+<p>Therefore a minimum level of fluctuation is unavoidable. These fluctuations produce the statistical limits observed in quantum measurements.</p>
+
+<h4 style="color:var(--accent-unified);">Structural Meaning of the Jitter Constant</h4>
+<p>The term “Jitter Constant” refers to the minimum fluctuation scale imposed by substrate pressure. This scale determines the smallest possible product of position and momentum uncertainties.</p>
+<p>In effect, the constant $\hbar$ becomes a measure of the minimum dynamical disturbance of the substrate.</p>
+
+<h4 style="color:var(--accent-unified);">Role in the Architecture of Stage 35</h4>
+<p>Module 1 explained how probability arises from the spatial density of substrate oscillations. Module 2 explains why that probability distribution cannot be perfectly smooth. The unavoidable fluctuations introduced by pressure create statistical uncertainty.</p>
+<p>Together, these two modules establish the foundation for the statistical nature of quantum measurements. Probability arises from oscillatory energy distribution, while uncertainty arises from pressure-driven fluctuations in the substrate.</p>
+
+<h4 style="color:var(--accent-unified);">Conceptual Significance</h4>
+<p>This interpretation transforms the uncertainty principle from an abstract mathematical rule into a physical consequence of substrate dynamics.</p>
+<p><strong>In standard quantum mechanics:</strong> Uncertainty is fundamental.</p>
+<p><strong>In the synthesis framework:</strong> Uncertainty emerges from pressure-driven jitter in the vacuum substrate.</p>
+<p>Thus the relation $\\Delta x \\, \\Delta p \\ge \\frac{\\hbar}{2}$ becomes the natural result of equilibrium between substrate stiffness and synthesis pressure. The vacuum cannot be perfectly quiet, and that microscopic agitation manifests as quantum uncertainty.</p>
+</div>`,
+
+math: `<div class="math-content" style="padding: 0px 40px 40px 40px;">
+<h2 style="color:var(--accent-uncert); margin-top: 20px; text-align: center;">Explicit Mathematics</h2>
+
+<h4 style="color:var(--accent-unified);">Primary Equation</h4>
+<p style="text-align:center; background:rgba(255,255,255,0.03); padding:15px; border-radius:8px; font-size:1.2rem;">
+$$\\Delta x\\,\\Delta p \\ge \\frac{\hbar}{2}$$
+</p>
+<p>This equation represents the fundamental uncertainty relation between position and momentum. In the synthesis framework this limit emerges from substrate pressure–induced fluctuations acting on localized oscillatory modes.</p>
+
+<h4 style="color:var(--accent-unified);">Definitions of Variables</h4>
+<ul style="list-style: none; padding-left: 0;">
+<li><strong>$\\Delta x$</strong> : uncertainty in spatial localization of the excitation</li>
+<li><strong>$\\Delta p$</strong> : uncertainty in momentum of the oscillatory mode</li>
+<li><strong>$\\hbar$</strong> : reduced Planck constant</li>
+<li><strong>$K$</strong> : vacuum stiffness parameter</li>
+<li><strong>$P$</strong> : synthesis pressure parameter</li>
+</ul>
+
+<h4 style="color:var(--accent-unified);">Relation to Substrate Parameters</h4>
+<p>Vacuum stiffness $K$ produces restoring forces that confine the wave packet spatially. The confinement scale can be approximated by:</p>
+<p style="text-align:center;">$$\\Delta x \\propto \\frac{1}{\\sqrt{K}}$$</p>
+<p>Higher stiffness therefore reduces spatial uncertainty.</p>
+<p>Synthesis pressure $P$ generates microscopic fluctuations in the substrate, producing momentum jitter. The magnitude of momentum fluctuations scales approximately as:</p>
+<p style="text-align:center;">$$\\Delta p \\propto P$$</p>
+<p>Combining the two relations gives:</p>
+<p style="text-align:center;">$$\\Delta x\\,\\Delta p \\propto \\frac{P}{\\sqrt{K}}$$</p>
+
+<h4 style="color:var(--accent-unified);">Minimum Uncertainty Condition</h4>
+<p>At the equilibrium scale of substrate oscillations, the product of uncertainties reaches a minimum value defined by the Planck scale:</p>
+<p style="text-align:center;">$$\\Delta x\\,\\Delta p = \\frac{\\hbar}{2}$$</p>
+<p>Thus:</p>
+<p style="text-align:center;">$$\\frac{P}{\\sqrt{K}} \\sim \\hbar$$</p>
+<p>This relation links the uncertainty bound to the equilibrium interaction of substrate stiffness and pressure.</p>
+
+<h4 style="color:var(--accent-unified);">Wave Packet Representation</h4>
+<p>Consider a Gaussian wave packet:</p>
+<p style="text-align:center;">$$\\psi(x)=A e^{-x^2/2\\sigma^2}$$</p>
+<p>Position uncertainty:</p>
+<p style="text-align:center;">$$\\Delta x = \\sigma$$</p>
+<p>Momentum-space wavefunction obtained through Fourier transform:</p>
+<p style="text-align:center;">$$\\phi(p)=B e^{-p^2\\sigma^2/2\\hbar^2}$$</p>
+<p>Momentum uncertainty:</p>
+<p style="text-align:center;">$$\\Delta p=\\frac{\\hbar}{2\\sigma}$$</p>
+<p>Multiplying the uncertainties gives:</p>
+<p style="text-align:center;">$$\\Delta x\\,\\Delta p = \\frac{\\hbar}{2}$$</p>
+<p>This Gaussian packet therefore represents the minimum uncertainty state.</p>
+
+<h4 style="color:var(--accent-unified);">Interpretation in Substrate Dynamics</h4>
+<p>The wave packet represents a localized oscillatory excitation of the vacuum substrate. Vacuum stiffness attempts to compress the oscillation into a localized region. Synthesis pressure simultaneously injects fluctuations into the oscillatory motion. The competition between these two effects produces a minimum fluctuation scale.</p>
+
+<h4 style="color:var(--accent-unified);">Emergence Hierarchy</h4>
+<p style="text-align:center; line-height:1.8;">
+Synthesis pressure $P$<br>
+↓<br>
+Substrate agitation<br>
+↓<br>
+Momentum fluctuations<br>
+↓<br>
+Position–momentum uncertainty
+</p>
+
+<h4 style="color:var(--accent-unified);">Conclusion</h4>
+<p>The uncertainty relation $\\Delta x\\,\\Delta p \\ge \\frac{\\hbar}{2}$ is interpreted as the noise floor produced by pressure-driven fluctuations in the vacuum substrate. Perfect localization would require eliminating substrate pressure entirely, which would destroy the dynamical equilibrium of the vacuum medium. Therefore the uncertainty bound represents the minimum fluctuation scale permitted by the equilibrium of stiffness $K$ and synthesis pressure $P$.</p>
+</div>`,
+
+
+sliders: `<div class="control-item"><div class="label-group"><span>Pressure Noise (P)</span><input type="number" id="p_in" class="digital-entry" value="0.69" oninput="syncVal(this.value, 'p_sl')"></div><input type="range" id="p_sl" min="0.1" max="1.5" step="0.01" value="0.69" oninput="syncVal(this.value, 'p_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Origin</span><div style="text-align:center; font-size: 1.00rem;">Substrate Noise</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Uncertainty</span><div style="text-align:center; font-size: 1.10rem;">$\\Delta x \\Delta p \\geq \\hbar/2$</div>`,
+hierarchy: "Pressure<br>↓<br>Jitter<br>↓<br>Uncertainty",
+footer: "P regulates the minimum spread of the wavefunction.",
+rightNote: "Zero uncertainty would require zero substrate pressure."
+},
+3: {
+title: "Structural Confinement",
+brief: `<div class="briefing-content" style="padding: 0px 40px 40px 40px;">
+<h2 style="color:var(--accent-bound); margin-top: 20px; text-align: center;">Detailed Briefing: Structural Confinement</h2>
+<h3 style="color:var(--text-main); font-style: italic;">Influence of Vacuum Stiffness K on Probability Localization</h3>
+
+<h4 style="color:var(--accent-unified);">Conceptual Objective</h4>
+<p>This module explains why quantum probability distributions form localized peaks rather than spreading uniformly through space. In the synthesis framework, localization arises from the structural property of the vacuum substrate known as vacuum stiffness $K$.</p>
+<p>Vacuum stiffness represents the resistance of the substrate to deformation. When an oscillatory excitation forms in the substrate, the stiffness generates restoring forces that prevent the excitation from dispersing freely. As a result, the oscillation becomes confined within a limited spatial region.</p>
+<p>The visualization demonstrates how increasing stiffness sharpens the central probability peak, effectively compressing the wave excitation into a narrower region of space.</p>
+
+<h4 style="color:var(--accent-unified);">Physical Meaning of Structural Confinement</h4>
+<p>Within this framework, particles are interpreted as stable wave excitations of the vacuum substrate. However, these excitations cannot expand indefinitely because the substrate resists deformation.</p>
+<p>When a wave excitation attempts to spread outward, the restoring force generated by stiffness pulls the oscillation back toward equilibrium. This mechanism produces a binding effect, causing the wave amplitude to concentrate near the center of the excitation.</p>
+<p><strong>The confinement process can be understood through the following causal chain:</strong></p>
+<p style="text-align:center; font-weight:bold; color:var(--accent-bound);">Restoration → Binding → Probability Peak</p>
+<p>The restoring force continuously pushes the oscillatory energy back toward the equilibrium position, creating a stable probability distribution.</p>
+
+<h4 style="color:var(--accent-unified);">Role of Vacuum Stiffness K</h4>
+<p>The vacuum stiffness parameter $K$ controls the strength of the restoring force in the substrate. The restoring force behaves approximately like a harmonic force:</p>
+<p style="text-align:center;">$F = -Kx$</p>
+<p>This force increases linearly with displacement. The farther the oscillation moves away from equilibrium, the stronger the restoring force becomes. The potential energy associated with this restoring force is:</p>
+<p style="text-align:center;">$V(x)=\\frac{1}{2}Kx^2$</p>
+<p>This quadratic potential naturally produces Gaussian-shaped stationary wave solutions. The resulting probability distribution takes the form:</p>
+<p style="text-align:center;">$P(x)\\propto e^{-Kx^2}$</p>
+<p>Thus the stiffness parameter directly determines the width of the probability peak.</p>
+
+<h4 style="color:var(--accent-unified);">Effect of Increasing Stiffness</h4>
+<p>When stiffness increases, the restoring force becomes stronger. This produces several observable effects:</p>
+<ul>
+<li>the wave excitation becomes more tightly bound</li>
+<li>the probability peak becomes narrower</li>
+<li>localization becomes stronger</li>
+<li>the particle appears more sharply defined</li>
+</ul>
+<p>In the visualization, increasing the stiffness slider causes the Gaussian distribution to become steeper and narrower. This demonstrates that stiffness compresses the probability distribution into a smaller spatial region.</p>
+
+<h4 style="color:var(--accent-unified);">Interpretation of the Probability Peak</h4>
+<p>The central peak of the probability distribution represents the region where the oscillatory excitation is most concentrated. In the synthesis framework this peak corresponds to the stable equilibrium position of the substrate oscillation.</p>
+<p>The surrounding region contains lower amplitude oscillations, which correspond to lower probabilities of interaction. Thus the particle-like appearance of matter emerges naturally from the localized concentration of oscillatory energy within the substrate.</p>
+
+<h4 style="color:var(--accent-unified);">Relationship Between Stiffness and Particle Identity</h4>
+<p>The stiffness parameter plays a crucial role in determining the apparent size of quantum particles. Higher stiffness produces stronger confinement and smaller spatial extent. Lower stiffness allows broader wave distributions.</p>
+<p>Thus the effective size of a particle can be interpreted as the equilibrium balance between oscillatory energy and substrate stiffness. This interpretation replaces the classical notion of a point particle with a confined wave structure within the vacuum substrate.</p>
+
+<h4 style="color:var(--accent-unified);">Stability of the Distribution</h4>
+<p>The module also emphasizes that the probability distribution remains stable over time as long as the restoring forces remain balanced. Stiffness ensures that small disturbances do not cause the excitation to disperse completely. Instead, deviations from equilibrium are corrected by the restoring force, preserving the overall structure of the probability peak.</p>
+<p>This stabilizing effect allows wave excitations to behave as persistent particle-like objects.</p>
+
+<h4 style="color:var(--accent-unified);">Meaning of the Visualization</h4>
+<p>The graph displayed in the module shows a Gaussian probability distribution centered at the origin. The horizontal axis represents spatial position within the substrate. The vertical axis represents probability density.</p>
+<p>The width of the peak represents the spatial extent of the wave excitation. As stiffness increases, the peak becomes sharper and the distribution contracts toward the center. This visual demonstration illustrates how structural properties of the vacuum determine the localization of quantum states.</p>
+
+<h4 style="color:var(--accent-unified);">Emergence Hierarchy</h4>
+<p>The module summarizes the structural process through the hierarchy displayed on the right side of the screen:</p>
+<p style="text-align:center; font-weight:bold; color:var(--accent-bound);">Restoration → Binding → Peak</p>
+<p>This hierarchy represents the formation of localized probability structures within the substrate. The restoring forces generated by stiffness bind the oscillatory excitation into a confined region, producing the characteristic probability peak observed in quantum systems.</p>
+
+<h4 style="color:var(--accent-unified);">Conceptual Significance</h4>
+<p>This module provides an intuitive explanation for one of the fundamental features of quantum mechanics: the localization of particles. In standard quantum theory, localization arises from the mathematical form of the wavefunction. In the synthesis framework, localization arises from the physical stiffness of the vacuum substrate.</p>
+<p>Particles are therefore interpreted not as isolated objects but as stable wave structures confined by the elastic properties of the vacuum medium.</p>
+
+<h4 style="color:var(--accent-unified);">Role Within Stage 35</h4>
+<p>Module 1 established that probability corresponds to the density of substrate oscillation. Module 2 explained how synthesis pressure introduces microscopic fluctuations that generate uncertainty. Module 3 now shows how vacuum stiffness confines the oscillation and produces localized probability peaks.</p>
+<p>Together these mechanisms explain why quantum states exhibit both statistical behavior and spatial localization. Probability arises from oscillatory energy distribution, uncertainty arises from pressure-driven jitter, and localization arises from stiffness-induced confinement. These three mechanisms form the structural foundation of quantum statistical behavior in the synthesis framework.</p>
+</div>`,
+
+math: `<div class="math-content" style="padding: 0px 40px 40px 40px;">
+<h2 style="color:var(--accent-bound); margin-top: 20px; text-align: center;">Explicit Mathematics</h2>
+
+<h4 style="color:var(--accent-unified);">Primary Equation</h4>
+<p style="text-align:center; background:rgba(255,255,255,0.03); padding:15px; border-radius:8px; font-size:1.2rem;">
+$$\\psi(x)\\propto e^{-Kx^{2}}$$
+</p>
+<p>This equation represents the spatial envelope of a localized substrate excitation. According to this framework, the exponential confinement arises from the restoring force generated by vacuum stiffness $K$.</p>
+
+<h4 style="color:var(--accent-unified);">Definitions of Variables</h4>
+<ul style="list-style: none; padding-left: 0;">
+<li><strong>$\\psi(x)$</strong> : wavefield amplitude of the substrate oscillation</li>
+<li><strong>$x$</strong> : spatial coordinate</li>
+<li><strong>$K$</strong> : vacuum stiffness parameter</li>
+<li><strong>$P(x)$</strong> : probability density</li>
+<li><strong>$A$</strong> : excitation amplitude</li>
+</ul>
+
+<h4 style="color:var(--accent-unified);">Relation to Framework Parameters K and P</h4>
+<p>Vacuum stiffness produces a restoring force that resists displacement of the substrate. The restoring force is approximated by a harmonic relation:</p>
+<p style="text-align:center;">$$F=-Kx$$</p>
+<p>The corresponding potential energy field is:</p>
+<p style="text-align:center;">$$V(x)=\\frac{1}{2}Kx^{2}$$</p>
+<p>Oscillatory excitations confined in this potential produce Gaussian stationary solutions:</p>
+<p style="text-align:center;">$$\\psi(x)=A e^{-Kx^{2}/2}$$</p>
+
+<h4 style="color:var(--accent-unified);">Probability Density</h4>
+<p>The probability density is obtained from the squared amplitude:</p>
+<p style="text-align:center;">$$P(x)=|\\psi(x)|^{2}$$</p>
+<p>Substituting the wavefunction gives:</p>
+<p style="text-align:center;">$$P(x)=A^{2}e^{-Kx^{2}}$$</p>
+<p>Thus the probability distribution is directly determined by the stiffness parameter.</p>
+
+<h4 style="color:var(--accent-unified);">Effect of Vacuum Stiffness</h4>
+<p>The spatial width of the probability peak is determined by the inverse square root of stiffness. Define the localization scale:</p>
+<p style="text-align:center;">$$\\sigma = \\frac{1}{\\sqrt{K}}$$</p>
+<p>Then the wavefunction becomes:</p>
+<p style="text-align:center;">$$\\psi(x)=A e^{-x^{2}/2\\sigma^{2}}$$</p>
+<p>Probability density:</p>
+<p style="text-align:center;">$$P(x)=A^{2}e^{-x^{2}/\\sigma^{2}}$$</p>
+
+<h4 style="color:var(--accent-unified);">Consequences</h4>
+<p><strong>Large stiffness:</strong> $K \\uparrow \\Rightarrow \\sigma \\downarrow$ (Probability peak becomes narrower.)</p>
+<p><strong>Small stiffness:</strong> $K \\downarrow \\Rightarrow \\sigma \\uparrow$ (Probability distribution spreads over a wider region.)</p>
+
+<h4 style="color:var(--accent-unified);">Normalization Condition</h4>
+<p>The wavefunction must satisfy:</p>
+<p style="text-align:center;">$$\\int_{-\\infty}^{\\infty} |\\psi(x)|^{2} dx = 1$$</p>
+<p>Normalized Gaussian solution:</p>
+<p style="text-align:center;">$$\\psi(x)=\\left(\\frac{K}{\\pi}\\right)^{1/4} e^{-Kx^{2}/2}$$</p>
+<p>Thus:</p>
+<p style="text-align:center;">$$P(x)=\\left(\\frac{K}{\\pi}\\right)^{1/2} e^{-Kx^{2}}$$</p>
+
+<h4 style="color:var(--accent-unified);">Structural Interpretation</h4>
+<p>According to this framework, vacuum stiffness produces restoring forces that compress oscillatory substrate excitations into localized spatial regions. The Gaussian probability peak represents the equilibrium configuration where restoring forces balance the kinetic energy of oscillation.</p>
+
+<h4 style="color:var(--accent-unified);">Emergence Hierarchy</h4>
+<p style="text-align:center; line-height:1.8;">
+Vacuum stiffness $K$<br>
+↓<br>
+Restoring force<br>
+↓<br>
+Oscillation confinement<br>
+↓<br>
+Localized probability peak
+</p>
+
+<h4 style="color:var(--accent-unified);">Conclusion</h4>
+<p>The spatial localization of quantum states arises naturally from substrate stiffness. According to this framework, particles appear as confined wave excitations whose probability distributions are shaped by the elastic properties of the vacuum substrate.</p>
+</div>`,
+
+
+sliders: `<div class="control-item"><div class="label-group"><span>K-Stiffness</span><input type="number" id="k_in" class="digital-entry" value="11.35" oninput="syncVal(this.value, 'k_sl')"></div><input type="range" id="k_sl" min="5" max="20" step="0.05" value="11.35" oninput="syncVal(this.value, 'k_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Effect</span><div style="text-align:center; font-size: 1.10rem;">Confinement</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Confinement</span><div style="text-align:center; font-size: 1.10rem;">$\\psi \\propto e^{-Kx^2}$</div>`,
+hierarchy: "Restoration<br>↓<br>Binding<br>↓<br>Peak",
+footer: "K stiffness dictates the 'sharpness' of a particle peak.",
+rightNote: "Higher K crushes the probability into a smaller region."
+},
+4: {
+title: "Wavepacket Dispersion",
+
+brief: `<div class="briefing-content" style="padding: 0px 40px 40px 40px;">
+<h2 style="color:var(--accent-dens); margin-top: 20px; text-align: center;">Detailed Briefing: Wavepacket Dispersion</h2>
+<h3 style="color:var(--text-main); font-style: italic;">Time Evolution of the Probability Envelope</h3>
+
+<h4 style="color:var(--accent-unified);">Conceptual Objective</h4>
+<p>This module explains how the spatial distribution of a quantum excitation evolves over time. The visualization demonstrates that even when a wave packet begins as a localized probability peak, it gradually spreads outward as time progresses.</p>
+<p>In standard quantum mechanics this phenomenon is known as wavepacket dispersion. The spreading occurs because a localized wave packet is composed of many different frequency components that propagate with slightly different velocities.</p>
+<p>According to this framework, the same phenomenon can be interpreted as the temporal evolution of oscillatory energy in the vacuum substrate. As time passes, phase differences between oscillatory modes cause the excitation to redistribute spatially. Thus the initially confined probability peak slowly expands.</p>
+
+<h4 style="color:var(--accent-unified);">Physical Meaning of Wavepacket Dispersion</h4>
+<p>A localized wave packet is formed by superposing many harmonic oscillations with different wavelengths. At the initial moment these oscillations are aligned in phase so that their interference produces a narrow spatial peak.</p>
+<p>However, each frequency component propagates through the substrate with slightly different phase velocity. As time evolves the relative phases gradually change. This produces partial cancellation at the center and reinforcement at neighboring regions. The result is a gradual broadening of the probability distribution.</p>
+
+<h4 style="color:var(--accent-unified);">Role of Time in Probability Evolution</h4>
+<p>The right side of the visualization shows the causal hierarchy:</p>
+<p style="text-align:center; font-weight:bold; color:var(--accent-dens);">Time → Entropy → Spread</p>
+<p>The meaning of this hierarchy is that temporal evolution naturally increases the spatial uncertainty of the wave packet. As time progresses, the ordered phase structure of the initial wave packet becomes progressively more disordered. This corresponds to an increase in entropy. The increasing entropy manifests as the spreading of the probability envelope.</p>
+
+<h4 style="color:var(--accent-unified);">Influence of Substrate Parameters</h4>
+<p>The dispersion rate depends on the structural properties of the vacuum substrate. Two parameters influence the process: <strong>Vacuum stiffness $K$</strong> and <strong>Synthesis pressure $P$</strong>.</p>
+<p>Vacuum stiffness provides restoring forces that tend to confine oscillatory excitations. Stronger stiffness slows the rate of spatial spreading. Synthesis pressure introduces fluctuations and dynamic motion in the substrate, which promotes diffusion of oscillatory energy.</p>
+<p>The stability of the wave packet therefore requires a balance between these two parameters. The statement displayed in the visualization summarizes this condition: <em>“Stability requires a balance of $K$ and $P$ over time.”</em></p>
+
+<h4 style="color:var(--accent-unified);">Interpretation of the Visualization</h4>
+<p>The graph shows a Gaussian probability peak representing a localized excitation of the substrate. The horizontal axis represents spatial position. The vertical axis represents probability density.</p>
+<p>The time slider controls the parameter $t$. As time increases the peak becomes wider and lower. This indicates that the excitation is spreading across a larger spatial region. The total probability remains constant, but the probability density becomes more distributed.</p>
+
+<h4 style="color:var(--accent-unified);">Physical Interpretation</h4>
+<p>According to this framework, wavepacket dispersion represents the gradual redistribution of oscillatory energy in the vacuum substrate. Initially the excitation energy is concentrated within a narrow spatial region.</p>
+<p>As time evolves the energy flows outward due to phase differences between oscillatory modes. This redistribution produces the widening of the probability envelope. Thus dispersion reflects the natural dynamical behavior of the substrate medium.</p>
+
+<h4 style="color:var(--accent-unified);">Connection to Quantum Mechanics</h4>
+<p>In standard quantum theory the spreading of a free wave packet is described by the time-dependent Schrödinger equation. A Gaussian wave packet evolves according to the relation:</p>
+<p style="text-align:center;">$$\\sigma(t)=\\sigma_0 \\sqrt{1+t^2}$$</p>
+<p>where $\\sigma(t)$ represents the width of the packet at time $t$. According to this framework the same mathematical behavior arises from the dynamics of oscillatory modes in the vacuum substrate. The spreading of the packet therefore reflects the physical evolution of the substrate excitation.</p>
+
+<h4 style="color:var(--accent-unified);">Stability of Localized Structures</h4>
+<p>Although free wave packets spread indefinitely, localized structures can remain stable if restoring forces are present. Vacuum stiffness acts as a confining influence that counteracts dispersion. In bound systems such as atoms, the balance between oscillatory energy and restoring forces produces stationary wave states that do not spread over time. Thus dispersion occurs primarily in systems where confinement forces are weak or absent.</p>
+
+<h4 style="color:var(--accent-unified);">Conceptual Significance</h4>
+<p>This module demonstrates that quantum probability distributions are not static objects. They are dynamic structures that evolve continuously with time. According to this framework the spreading of a wave packet represents the temporal diffusion of oscillatory energy within the vacuum substrate. This interpretation provides a physical explanation for the time-dependent behavior of quantum probability distributions.</p>
+
+<h4 style="color:var(--accent-unified);">Role Within Stage 35</h4>
+<p>Module 1 established that probability corresponds to the spatial density of substrate oscillation. Module 2 explained that synthesis pressure produces microscopic fluctuations that generate uncertainty. Module 3 showed that vacuum stiffness confines oscillatory energy and produces localized probability peaks. Module 4 now demonstrates how those localized peaks evolve over time.</p>
+<p>The module therefore completes the description of dynamic probability behavior. Probability arises from oscillatory energy distribution, uncertainty arises from pressure-driven fluctuations, localization arises from stiffness-induced confinement, and dispersion arises from the temporal evolution of oscillatory modes in the vacuum substrate.</p>
+</div>`,
+
+math: `<div class="math-content" style="padding: 0px 40px 40px 40px;">
+<h2 style="color:var(--accent-dens); margin-top: 20px; text-align: center;">Explicit Mathematics</h2>
+
+<h4 style="color:var(--accent-unified);">Primary Evolution Law</h4>
+<p>The spreading of a localized probability packet is described by the time-dependent width:</p>
+<p style="text-align:center; background:rgba(255,255,255,0.03); padding:15px; border-radius:8px; font-size:1.2rem;">
+$$\\sigma(t)=\\sigma_0\\sqrt{1+t^2}$$
+</p>
+<p>where $\\sigma_0$ is the initial spatial width of the packet. This equation expresses the gradual widening of the probability envelope as time progresses.</p>
+
+<h4 style="color:var(--accent-unified);">Initial Gaussian Wavepacket</h4>
+<p>At time $t=0$ the localized excitation is represented by a Gaussian distribution:</p>
+<p style="text-align:center;">$$\\psi(x,0)=A\\,e^{-\\frac{x^2}{2\\sigma_0^2}}$$</p>
+<p>where $x$ is the spatial coordinate, $\\sigma_0$ is the initial localization scale, and $A$ is the normalization constant. Normalization gives:</p>
+<p style="text-align:center;">$$A=\\left(\\frac{1}{2\\pi\\sigma_0^2}\\right)^{1/4}$$</p>
+
+<h4 style="color:var(--accent-unified);">Time Evolution of the Wavefunction</h4>
+<p>According to quantum wave dynamics the wavefunction evolves as:</p>
+<p style="text-align:center;">$$\\psi(x,t)= \\frac{1}{\\sqrt{1+it}} \\exp\\left( -\\frac{x^2}{2\\sigma_0^2(1+it)} \\right)$$</p>
+<p>Taking the modulus squared gives the probability density $P(x,t)=|\psi(x,t)|^2$, which produces the spreading Gaussian:</p>
+<p style="text-align:center;">$$P(x,t)= \\frac{1}{\\sqrt{2\\pi\\sigma(t)^2}} \\exp\\left( -\\frac{x^2}{2\\sigma(t)^2} \\right)$$</p>
+<p>where the time-dependent width is $\\sigma(t)=\\sigma_0\\sqrt{1+t^2}$. Thus the packet widens with time while total probability remains conserved.</p>
+
+<h4 style="color:var(--accent-unified);">Variance Evolution</h4>
+<p>The spatial variance of the probability distribution is $\\langle x^2 \\rangle = \\sigma(t)^2$. Substituting the time dependence:</p>
+<p style="text-align:center;">$$\\langle x^2 \\rangle = \\sigma_0^2(1+t^2)$$</p>
+<p>Thus spatial uncertainty grows quadratically with time.</p>
+
+<h4 style="color:var(--accent-unified);">Connection to Momentum Uncertainty</h4>
+<p>A localized wavepacket requires a spread of momentum components. Initial momentum variance:</p>
+<p style="text-align:center;">$$\\sigma_p=\\frac{\\hbar}{2\\sigma_0}$$</p>
+<p>This follows from the uncertainty relation $\\Delta x \\Delta p \\ge \\frac{\\hbar}{2}$. Because different momentum components travel at different velocities, the packet spreads.</p>
+
+<h4 style="color:var(--accent-unified);">Velocity Dispersion</h4>
+<p>Particle velocity associated with momentum $p$ is $v=\\frac{p}{m}$. Momentum spread therefore produces velocity spread $\\sigma_v=\\frac{\\sigma_p}{m}$. The spatial width evolves approximately as:</p>
+<p style="text-align:center;">$$\\sigma(t)^2=\\sigma_0^2 + (\\sigma_v t)^2$$</p>
+<p>Substituting $\\sigma_v=\\frac{\\hbar}{2m\\sigma_0}$ gives:</p>
+<p style="text-align:center;">$$\\sigma(t)=\\sqrt{\\sigma_0^2+\\left(\\frac{\\hbar t}{2m\\sigma_0}\\right)^2}$$</p>
+
+<h4 style="color:var(--accent-unified);">Structural Interpretation</h4>
+<p>According to this framework, dispersion reflects the redistribution of oscillatory energy across the vacuum substrate. A localized excitation contains a spectrum of oscillatory modes. Each mode propagates through the substrate with slightly different phase velocity. Phase differences accumulate over time, producing spatial spreading of the excitation envelope.</p>
+
+<h4 style="color:var(--accent-unified);">Role of Vacuum Stiffness K</h4>
+<p>Vacuum stiffness determines the localization scale $\\sigma_0 \\sim \\frac{1}{\\sqrt{K}}$. Thus stronger stiffness produces smaller initial localization. Substituting $\\sigma_0 = \\frac{1}{\\sqrt{K}}$, the spreading relation becomes:</p>
+<p style="text-align:center;">$$\\sigma(t)=\\frac{1}{\\sqrt{K}}\\sqrt{1+t^2}$$</p>
+<p>This shows that stiffness governs the initial confinement of the packet.</p>
+
+<h4 style="color:var(--accent-unified);">Role of Synthesis Pressure P</h4>
+<p>Synthesis pressure introduces substrate fluctuations that enhance dispersion. The effective spreading rate may therefore be expressed as:</p>
+<p style="text-align:center;">$$\\sigma(t)=\\sigma_0\\sqrt{1+\\alpha P t^2}$$</p>
+<p>where $\\alpha$ is a proportionality constant determined by the substrate dynamics.</p>
+
+<h4 style="color:var(--accent-unified);">Emergence Hierarchy</h4>
+<p style="text-align:center; line-height:1.8;">
+Time $t$<br>
+↓<br>
+Phase divergence of oscillatory modes<br>
+↓<br>
+Energy redistribution<br>
+↓<br>
+Probability spread
+</p>
+
+<h4 style="color:var(--accent-unified);">Conclusion</h4>
+<p>The spreading of a wavepacket is a direct consequence of the phase evolution of its constituent oscillatory modes. According to this framework, dispersion represents the gradual redistribution of excitation energy within the vacuum substrate. Vacuum stiffness determines the initial confinement scale, while synthesis pressure influences the rate at which the probability envelope spreads over time.</p>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>Time (t)</span><input type="number" id="t_in" class="digital-entry" value="0" oninput="syncVal(this.value, 't_sl')"></div><input type="range" id="t_sl" min="0" max="10" step="0.1" value="0" oninput="syncVal(this.value, 't_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Evolution</span><div style="text-align:center; font-size: 1.10rem;">Dispersion</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Spread</span><div style="text-align:center; font-size: 1.10rem;">$\\sigma(t) = \\sigma_0\\sqrt{1+t^2}$</div>`,
+hierarchy: "Time<br>↓<br>Entropy<br>↓<br>Spread",
+footer: "Substrate resistance slows the natural dispersion of the packet.",
+rightNote: "Stability requires a balance of K and P over time."
+},
+5: {
+title: "Quantum Limit Bounds",
+
+brief: `<div class="briefing-content" style="padding: 0px 40px 40px 40px;">
+<h2 style="color:var(--accent-prob); margin-top: 20px; text-align: center;">Detailed Briefing: Quantum Limit Bounds</h2>
+<h3 style="color:var(--text-main); font-style: italic;">Minimum Action Constraint</h3>
+
+<h4 style="color:var(--accent-unified);">Conceptual Objective</h4>
+<p>This module explains the fundamental limit that governs how precisely a physical excitation can be localized in the vacuum substrate. The visualization demonstrates the well-known quantum relation between spatial localization and momentum uncertainty.</p>
+<p>The displayed curve shows how the uncertainty in momentum increases as the position uncertainty becomes smaller. The key inequality displayed in the module is:</p>
+<p style="text-align:center; background:rgba(255,255,255,0.03); padding:10px; border-radius:8px;">$S \\ge \\hbar$</p>
+<p>which represents the minimum action constraint. This expresses the fundamental statement that physical processes cannot occur with arbitrarily small action.</p>
+
+<h4 style="color:var(--accent-unified);">Meaning of the Graph</h4>
+<p>The horizontal axis represents spatial uncertainty $\\Delta x$. The vertical axis represents momentum uncertainty $\\Delta p$. The red curve shows the lower boundary of allowed states.</p>
+<p>As localization becomes sharper (smaller $\\Delta x$), the momentum uncertainty must increase. The curve therefore forms a hyperbolic boundary that defines the minimum possible uncertainty combination. Any physically allowed quantum state must lie above this boundary.</p>
+
+<h4 style="color:var(--accent-unified);">Interpretation of the Boundary</h4>
+<p>The boundary represents the fundamental uncertainty relation:</p>
+<p style="text-align:center;">$\\Delta x \\Delta p \\ge \\frac{\\hbar}{2}$</p>
+<p>This relation states that the product of position uncertainty and momentum uncertainty cannot fall below a universal constant. If the position uncertainty is reduced, the momentum uncertainty must increase correspondingly. This principle defines the smallest possible phase-space cell that a physical system can occupy.</p>
+
+<h4 style="color:var(--accent-unified);">Role of Planck’s Constant</h4>
+<p>The constant $\\hbar$ represents the minimum quantum of action. It determines the fundamental scale of quantum phenomena. In classical mechanics action can be arbitrarily small, but quantum mechanics introduces a discrete lower limit. Thus $\\hbar$ defines the boundary separating classical and quantum behavior.</p>
+
+<h4 style="color:var(--accent-unified);">Interpretation in Terms of the Vacuum Substrate</h4>
+<p>According to this framework, Planck’s constant arises from the structural equilibrium of the vacuum substrate. The visualization indicates the following causal chain:</p>
+<p style="text-align:center; font-weight:bold; color:var(--accent-prob);">$K$–$P$ equilibrium → limit → $\\hbar$</p>
+<p>The stiffness $K$ and synthesis pressure $P$ together determine the dynamical properties of the substrate. Their equilibrium establishes the minimum oscillatory action that can exist in the system. This minimum action manifests physically as Planck’s constant.</p>
+
+<h4 style="color:var(--accent-unified);">Meaning of the Slider</h4>
+<p>The module includes a slider labeled Limit Scale. This control allows exploration of how the uncertainty curve behaves as the action scale varies. Reducing the limit scale moves the curve downward, implying smaller allowed uncertainty products. Increasing the scale raises the curve, implying larger minimum uncertainty. The equilibrium value corresponds to the physical constant $\hbar$.</p>
+
+<h4 style="color:var(--accent-unified);">Physical Consequences</h4>
+<p>The uncertainty boundary has several important implications:</p>
+<ul>
+<li>Perfect localization of a particle is impossible. Attempting to confine a particle to a very small region forces extremely large momentum fluctuations.</li>
+<li>Particles cannot remain completely stationary. Even in the lowest energy state there must be residual motion.</li>
+<li>Quantum systems possess intrinsic fluctuations that cannot be removed.</li>
+</ul>
+<p>These consequences arise directly from the minimum action constraint.</p>
+
+<h4 style="color:var(--accent-unified);">Relation to Quantum Mechanics</h4>
+<p>In standard quantum mechanics the uncertainty principle is derived from the non-commuting nature of the position and momentum operators. The commutation relation is $[x,p] = i\hbar$. From this relation the uncertainty inequality follows. The visualization illustrates this inequality as a geometric boundary in phase space.</p>
+
+<h4 style="color:var(--accent-unified);">Interpretation According to This Framework</h4>
+<p>According to this framework the uncertainty relation reflects the mechanical structure of the vacuum substrate. Localization requires the compression of oscillatory modes into a smaller spatial region. However, the substrate cannot sustain arbitrarily sharp compression without generating oscillatory momentum fluctuations. These fluctuations correspond to the increased momentum uncertainty. Thus the uncertainty principle expresses a physical limitation imposed by the structural dynamics of the vacuum substrate.</p>
+
+<h4 style="color:var(--accent-unified);">Emergence Hierarchy</h4>
+<p>The hierarchy displayed on the right side summarizes the structural origin of the quantum limit:</p>
+<p style="text-align:center; line-height:1.8;">
+<strong>$K$–$P$ equilibrium</strong><br>
+↓<br>
+<strong>minimum action</strong><br>
+↓<br>
+<strong>$\\hbar$</strong>
+</p>
+<p>Vacuum stiffness $K$ and synthesis pressure $P$ interact to produce an equilibrium state. This equilibrium establishes the minimum oscillatory action of the substrate. That minimum action appears physically as Planck’s constant.</p>
+
+<h4 style="color:var(--accent-unified);">Conceptual Role in Stage 35</h4>
+<p>The earlier modules of Stage 35 introduced the concepts of probability, noise, confinement, and dispersion. This module establishes the ultimate bound that governs all of those behaviors. Probability distributions cannot become arbitrarily sharp because the substrate enforces a minimum action scale. Thus the uncertainty principle emerges as a structural constraint of the vacuum substrate.</p>
+
+<h4 style="color:var(--accent-unified);">Final Interpretation</h4>
+<p>The visualization shows that attempts to localize a quantum excitation beyond the minimum action boundary lead to infinite momentum fluctuations. Therefore the vacuum cannot support arbitrarily sharp localization. According to this framework, the uncertainty principle is not merely a mathematical property of wavefunctions. It reflects the fundamental structural limits of the vacuum substrate itself.</p>
+</div>`,
+
+math: `<div class="math-content" style="padding: 0px 40px 40px 40px;">
+<h2 style="color:var(--accent-prob); margin-top: 20px; text-align: center;">Explicit Mathematics</h2>
+
+<h4 style="color:var(--accent-unified);">Primary Constraint (Minimum Action)</h4>
+<p style="text-align:center; background:rgba(255,255,255,0.03); padding:15px; border-radius:8px; font-size:1.2rem;">
+$$S \\ge \\hbar$$
+</p>
+<p>This relation states that the action associated with any physical process cannot fall below Planck’s constant.</p>
+
+<h4 style="color:var(--accent-unified);">Definition of Action</h4>
+<p>Action is defined as the time integral of the Lagrangian:</p>
+<p style="text-align:center;">$$S=\\int L\\,dt$$</p>
+<p>where $L = T - V$ ($T$ = kinetic energy, $V$ = potential energy). For a localized excitation the characteristic action scale becomes comparable to $\\hbar$.</p>
+
+<h4 style="color:var(--accent-unified);">Phase-Space Representation</h4>
+<p>In phase space the elementary quantum cell has area:</p>
+<p style="text-align:center;">$$\\Delta x \\Delta p \\ge \\frac{\\hbar}{2}$$</p>
+<p>This is the fundamental uncertainty relation.</p>
+
+<h4 style="color:var(--accent-unified);">Variables</h4>
+<ul style="list-style: none; padding-left: 0;">
+<li><strong>$\\Delta x$</strong> = position uncertainty</li>
+<li><strong>$\\Delta p$</strong> = momentum uncertainty</li>
+<li><strong>$\\hbar$</strong> = reduced Planck constant</li>
+</ul>
+
+<h4 style="color:var(--accent-unified);">Hyperbolic Boundary</h4>
+<p>The lower boundary of allowed states is:</p>
+<p style="text-align:center;">$$\\Delta p = \\frac{\\hbar}{2\\Delta x}$$</p>
+<p>This equation generates the curve shown in the visualization. As localization improves ($\\Delta x \\downarrow$), momentum uncertainty increases ($\\Delta p \\uparrow$). Thus the curve forms a hyperbolic limit in phase space.</p>
+
+<h4 style="color:var(--accent-unified);">Derivation from Operator Commutation</h4>
+<p>Quantum mechanics defines the position and momentum operators:</p>
+<p style="text-align:center;">$x = x$, &nbsp;&nbsp; $p = -i\\hbar \\frac{d}{dx}$</p>
+<p>Their commutation relation is $[x,p] = i\\hbar$. Using the Robertson inequality:</p>
+<p style="text-align:center;">$$\\Delta A \\Delta B \\ge \\frac{1}{2}|\\langle[A,B]\\rangle|$$</p>
+<p>Substituting $A=x, B=p$ gives $\\Delta x \\Delta p \\ge \\frac{\\hbar}{2}$. Thus the uncertainty principle arises from the non-commuting structure of quantum observables.</p>
+
+<h4 style="color:var(--accent-unified);">Wavepacket Interpretation</h4>
+<p>A localized wavepacket requires a spectrum of Fourier components. Wavefunction expansion:</p>
+<p style="text-align:center;">$$\\psi(x)=\\int \\phi(k)e^{ikx}dk$$</p>
+<p>Momentum is related to wave number $p=\\hbar k$, thus $\\Delta p = \\hbar \\Delta k$. Fourier theory gives $\\Delta x \\Delta k \\ge \\frac{1}{2}$. Substituting $\\Delta x (\\Delta p/\\hbar) \\ge \\frac{1}{2}$ gives $\\Delta x \\Delta p \\ge \\frac{\\hbar}{2}$.</p>
+
+<h4 style="color:var(--accent-unified);">Connection to Minimum Action</h4>
+<p>The product $\\Delta x \\Delta p$ has dimensions of action. Thus $\\Delta x \\Delta p \\sim S$. The uncertainty relation therefore becomes $S \\ge \\hbar$, meaning that the smallest physically meaningful action is Planck’s constant.</p>
+
+<h4 style="color:var(--accent-unified);">Connection to Framework Parameters</h4>
+<p>According to this framework the quantum action scale emerges from the equilibrium between vacuum stiffness $K$ and synthesis pressure $P$. Vacuum stiffness produces spatial confinement $\\sigma \\sim \\frac{1}{\\sqrt{K}}$. Momentum fluctuations are driven by substrate pressure fluctuations $\\Delta p \\sim \\sqrt{P}$.</p>
+<p>Combining the two scales gives an action magnitude $S \\sim \\sigma \\Delta p$. Substituting the structural scales:</p>
+<p style="text-align:center;">$$S \\sim \\frac{\\sqrt{P}}{\\sqrt{K}}$$</p>
+<p>At structural equilibrium the product becomes a universal constant $S \\rightarrow \\hbar$. Thus the minimum action arises from the balanced interaction between stiffness and pressure in the vacuum substrate.</p>
+
+<h4 style="color:var(--accent-unified);">Phase-Space Interpretation</h4>
+<p>The minimum cell of phase space has area $A_{cell} = 2\\pi\\hbar$. No physical state can occupy an area smaller than this fundamental quantum cell. Thus the phase space of physical systems becomes discretized at the Planck scale.</p>
+
+<h4 style="color:var(--accent-unified);">Emergence Hierarchy</h4>
+<p style="text-align:center; line-height:1.8;">
+Vacuum stiffness $K$<br>
++<br>
+Synthesis pressure $P$<br>
+↓<br>
+Substrate oscillation equilibrium<br>
+↓<br>
+Minimum action scale<br>
+↓<br>
+Planck constant $\\hbar$
+</p>
+
+<h4 style="color:var(--accent-unified);">Conclusion</h4>
+<p>The uncertainty principle expresses the smallest action scale allowed by the dynamics of physical systems. According to this framework this limit emerges from the structural equilibrium between the confining elasticity of the vacuum substrate and the fluctuating pressure that drives oscillatory motion. The result is the universal quantum bound $\\Delta x \\Delta p \\ge \\frac{\\hbar}{2}$, which defines the minimum physically realizable localization of any excitation in the substrate.</p>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>Limit Scale</span><input type="number" id="l_in" class="digital-entry" value="1.0" oninput="syncVal(this.value, 'l_sl')"></div><input type="range" id="l_sl" min="0.5" max="2" step="0.1" value="1" oninput="syncVal(this.value, 'l_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Boundary</span><div style="text-align:center; font-size: 1.10rem;">Minimum Action</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Action Limit</span><div style="text-align:center; font-size: 1.10rem;">$S \\geq \\hbar$</div>`,
+hierarchy: "K-P Equilibrium<br>↓<br>Limit<br>↓<br>h-Constant",
+footer: "Planck's constant is the structural limit of substrate action.",
+rightNote: "The vacuum cannot be localized beyond the h-limit."
+}
+};
+
+function syncVal(val, id) {
+const sliderId = id.includes('_in') ? id.replace('_in', '_sl') : id;
+const inputId = id.includes('_sl') ? id.replace('_sl', '_in') : id;
+if(document.getElementById(sliderId)) document.getElementById(sliderId).value = val;
+if(document.getElementById(inputId)) document.getElementById(inputId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+document.getElementById('brief-box-content').innerHTML = content.brief || "Coming Soon";
+document.getElementById('math-box-content').innerHTML = content.math || "Coming Soon";
+document.getElementById('control-sliders').innerHTML = content.sliders;
+document.getElementById('active-module-title').innerText = content.title;
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+showScreen('briefing');
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() {
+showScreen('lab');
+setTimeout(() => {
+runLab();
+window.dispatchEvent(new Event('resize'));
+}, 100);
+}
+
+function runLab() {
+const target = document.getElementById('plot-area');
+if (!target) return;
+let data = [];
+let layout = {
+paper_bgcolor: 'black', plot_bgcolor: 'black', margin: {t:40,b:40,l:50,r:30},
+xaxis: { color: '#666', gridcolor: '#111', range: [-5, 5] },
+yaxis: { color: '#666', gridcolor: '#111', range: [0, 1.2] },
+showlegend: false
+};
+
+if (currentTool === 1) {
+let a = parseFloat(document.getElementById('a_sl')?.value) || 1;
+let x = [], y = [];
+for(let i=-5; i<=5; i+=0.1) { x.push(i); y.push(a * Math.exp(-i*i)); }
+data = [{ x, y, fill: 'tozeroy', line: {color: '#f472b6', width: 3}, fillcolor: 'rgba(244, 114, 182, 0.2)' }];
+} else if (currentTool === 2) {
+let p = parseFloat(document.getElementById('p_sl')?.value) || 0.69;
+let x = [], y = [];
+for(let i=-5; i<=5; i+=0.05) { x.push(i); y.push(Math.exp(-i*i/(2*p)) + (Math.random()-0.5)*0.1); }
+data = [{ x, y, mode: 'lines', line: {color: '#fbbf24', width: 2} }];
+} else if (currentTool === 3) {
+let k = parseFloat(document.getElementById('k_sl')?.value) || 11.35;
+let x = [], y = [];
+for(let i=-5; i<=5; i+=0.1) { x.push(i); y.push(Math.exp(-(k/10)*i*i)); }
+data = [{ x, y, fill: 'tozeroy', line: {color: '#a78bfa', width: 3}, fillcolor: 'rgba(167, 139, 250, 0.2)' }];
+} else if (currentTool === 4) {
+let t = parseFloat(document.getElementById('t_sl')?.value) || 0;
+let x = [], y = [];
+let w = 1 + (t*0.3);
+for(let i=-5; i<=5; i+=0.1) { x.push(i); y.push((1/w) * Math.exp(-i*i/(w*w))); }
+data = [{ x, y, fill: 'tozeroy', line: {color: '#60a5fa', width: 2} }];
+} else if (currentTool === 5) {
+let l = parseFloat(document.getElementById('l_sl')?.value) || 1;
+let x = [], y = [];
+for(let i=0.2; i<=5; i+=0.2) { x.push(i); y.push((l * 0.5) / i); }
+data = [{ x, y, mode: 'lines+markers', line: {color: '#f87171', shape: 'spline'} }];
+layout.xaxis.title = "Δx"; layout.yaxis.title = "Δp"; layout.xaxis.range = [0, 5];
+}
+
+Plotly.react('plot-area', data, layout, {responsive: true, displayModeBar: false});
+}
+
+function resetLab() {
+// 1. Reset the logic based on the active tool
+if (currentTool === 1) syncVal(1.0, 'a_sl');
+if (currentTool === 2) syncVal(0.69, 'p_sl');
+if (currentTool === 3) syncVal(11.35, 'k_sl');
+if (currentTool === 4) syncVal(0, 't_sl');
+if (currentTool === 5) syncVal(1.0, 'l_sl');
+
+// 2. Re-run the visualizer
+runLab();
+}
+</script>
+</body>
+</html>

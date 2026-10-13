@@ -1,0 +1,3579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 61 — Final Synthesis & Validation</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #3b82f6;
+--accent-obs: #94a3b8; --accent-exp: #fbbf24; --accent-master: #c084fc; --accent-lock: #f87171; --accent-final: #2dd4bf;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6;
+--accent-gold: #fbbf24;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-gold); font-family: sans-serif; font-size: 0.85rem; min-width: 450px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls, #nav-summary-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+#screen-lab.active { display: flex; flex-direction: column; height: calc(100vh - 50px); }
+
+#screen-portal { justify-content: flex-start; padding-top: 6dvh; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 50px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 2px; font-weight: bold; letter-spacing: 0.5px; padding-bottom: 0px; }
+.module-subtitle { text-align: center; font-family: sans-serif; color: var(--accent-gold); margin-bottom: 5px; font-weight: bold; letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.primary-constant-box { background: #000; border: 1px solid var(--accent-unified); padding: 2px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 8px; }
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+.secondary-structure-box { background: rgba(59, 130, 246, 0.05); border: 1px dashed var(--accent-unified); padding: 3px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 12px; }
+
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(59, 130, 246, 0.05); border: 1px solid var(--accent-unified); padding: 5px; border-radius: 5px; margin-bottom: 8px; font-size: 0.7rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; }
+#plot-area { flex-grow: 1; width: 100%; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #fff; border: 1px solid var(--accent-unified); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer { width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem; color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0; }
+
+table.comparison-table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 0.8rem; }
+table.comparison-table th { background: #111; color: var(--accent-gold); padding: 8px; border: 1px solid #333; }
+table.comparison-table td { padding: 8px; border: 1px solid #333; text-align: center; }
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 61 — COMPLETE STRUCTURAL CLOSURE (Final Synthesis of the Framework)</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">Complete Structural Closure</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">The definitive declaration of the synthesis framework.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-obs);">
+<h2 style="color:var(--accent-obs);">1. Observer & Measurement</h2>
+<p>Interaction as coupling.<br>Observer-Substrate feedback.</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-exp);">
+<h2 style="color:var(--accent-exp);">2. QM–GR Unification</h2>
+<p>Deriving the single structural origin.<br>Scale-dependent regime expression.</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-master);">
+<h2 style="color:var(--accent-master);">3. Master Equation</h2>
+<p>The Synthesis Tensor.<br>Unified field description.</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-lock);">
+<h2 style="color:var(--accent-lock);">4. Parameter Origin</h2>
+<p>K and P Lock Condition.<br>Fixed structural equilibrium.</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-final);">
+<h2 style="color:var(--accent-final);">5. Final Synthesis</h2>
+<p>The science of origin.<br>Ultimate structural statement.</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-unified);">
+<h2 style="color:var(--accent-unified);">6. Stage 61 Summary</h2>
+<p>Compressed Framework Declaration.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 61 — Summary: Mathematical Structure and Closure Theorem</h2>
+<section>
+<p>The Framework reaches absolute completion. Physics is no longer a collection of disparate laws but a single, continuous chain of structural consequences arising from a foundational substrate equilibrium.</p>
+<div style="background: rgba(59,130,246,0.03); padding: 15px; border-radius: 8px; font-family: monospace; font-size: 0.85rem; border: 1px solid var(--accent-unified); line-height: 1.6;">
+<strong>STRUCTURAL CHAIN:</strong><br>
+Fields &rarr; K, P Equilibrium &rarr; Phase Alignment &rarr; Effective Response &rarr; Physical Constants &rarr; Reality
+</div>
+<h4 style="color: var(--accent-gold); margin-bottom: 5px;">FRAMEWORK ACHIEVEMENTS</h4>
+<ul style="font-size: 0.85rem; line-height: 1.4;">
+<li>All Physical Constants derived as structural outcomes.</li>
+<li>Gravity unified as a restorative structural force.</li>
+<li>Cosmological expansion explained via Synthesis Pressure P.</li>
+<li>Measurement integrated as an observer-substrate interaction.</li>
+</ul>
+<p style="text-align:center; font-weight:bold; margin-top:20px; color: var(--accent-gold);">FINAL CLOSURE LINE</p>
+<p style="text-align:center; border: 1px solid var(--accent-gold); padding: 10px; background: rgba(251, 191, 36, 0.05);">The universe is a structured substrate whose equilibrium defines all physical reality.</p>
+
+<div class="math-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Fundamental Substrate Definition</h3>
+
+<p>
+The complete physical system originates from the substrate parameters:
+</p>
+
+<p>
+$K = |\nabla C|, \quad P = P_{\text{syn}}$
+</p>
+
+<p>
+Thus, the fundamental state is:
+</p>
+
+<p>
+$\mathcal{S}_0 = (K, P)$
+</p>
+
+<h3 style="color:#fbbf24;">2. Variational Principle</h3>
+
+<p>
+The substrate configuration is determined by the action:
+</p>
+
+<p>
+$\mathcal{S}[K, P] = \int \mathcal{L}(K, P, \nabla K, \nabla P)\, d^4x$
+</p>
+
+<p>
+with equilibrium condition:
+</p>
+
+<p>
+$\delta \mathcal{S}[K, P] = 0$
+</p>
+
+<h3 style="color:#fbbf24;">3. Parameter Locking</h3>
+
+<p>
+The equilibrium condition yields a fixed point:
+</p>
+
+<p>
+$K = K_0, \quad P = P_0$
+</p>
+
+<p>
+with normalized values:
+</p>
+
+<p>
+$K_0 = 11.350, \quad P_0 = 0.6900$
+</p>
+
+<h3 style="color:#fbbf24;">4. Constraint Structure</h3>
+
+<p>
+The parameters satisfy a constraint:
+</p>
+
+<p>
+$\mathcal{C}(K, P) = 0$
+</p>
+
+<p>
+Thus, the system reduces to a constrained manifold.
+</p>
+
+<h3 style="color:#fbbf24;">5. Layered Mapping of Reality</h3>
+
+<p>
+Reality is structured through hierarchical layers:
+</p>
+
+<p>
+$\mathcal{L}_0 \rightarrow \mathcal{L}_1 \rightarrow \mathcal{L}_2$
+</p>
+
+<p>
+with:
+</p>
+
+<ul>
+<li>$\mathcal{L}_0 = (K, P)$</li>
+<li>$\mathcal{L}_1 = (A_\mu, F_{\mu\nu}, g_{\mu\nu})$</li>
+<li>$\mathcal{L}_2 = (m, g, \rho, \dots)$</li>
+</ul>
+
+<p>
+Transformation rule:
+</p>
+
+<p>
+$\mathcal{L}_{n+1} = \mathcal{T}_n(\mathcal{L}_n)$
+</p>
+
+<h3 style="color:#fbbf24;">6. Observable Reduction</h3>
+
+<p>
+All observables reduce to substrate parameters:
+</p>
+
+<p>
+$\mathcal{O} = \mathcal{F}(K, P)$
+</p>
+
+<p>
+At equilibrium:
+</p>
+
+<p>
+$\mathcal{O}_{\text{phys}} = \mathcal{F}(K_0, P_0)$
+</p>
+
+<h3 style="color:#fbbf24;">7. Emergence of Physical Quantities</h3>
+
+<p>
+Key quantities are derived as:
+</p>
+
+<p>
+$g = f\left(\frac{P_0}{K_0}\right), \quad m = f(K_0, P_0), \quad \rho = \frac{K_0^2}{P_0}$
+</p>
+
+<h3 style="color:#fbbf24;">8. Unified Field Equation</h3>
+
+<p>
+The dynamics are governed by the Synthesis Tensor:
+</p>
+
+<p>
+$\Sigma_{\mu\nu} = \frac{1}{K} \left( \nabla_\mu \nabla_\nu R - g_{\mu\nu} \Box R \right) - \frac{P}{8\pi G} g_{\mu\nu}$
+</p>
+
+<p>
+with conservation:
+</p>
+
+<p>
+$\nabla^\mu \Sigma_{\mu\nu} = 0$
+</p>
+
+<h3 style="color:#fbbf24;">9. Closure Condition</h3>
+
+<p>
+All physical structures reduce to equilibrium parameters:
+</p>
+
+<p>
+$\forall \mathcal{O}, \quad \mathcal{O} = \mathcal{F}(K_0, P_0)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\text{Physics} = \mathcal{F}(K_0, P_0)$
+</p>
+
+<h3 style="color:#fbbf24;">10. Final Structural Identity</h3>
+
+<p>
+The complete system is expressed as:
+</p>
+
+<p>
+$\text{Reality} = \mathcal{F}(K_0, P_0)$
+</p>
+
+<p>
+with equilibrium condition:
+</p>
+
+<p>
+$\delta \mathcal{S}[K, P] = 0$
+</p>
+
+<p>
+This represents complete mathematical closure of the framework.
+</p>
+
+</div>
+
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 61 — Closure / Completion Theorem (Final Structural Closure of Reality)</h2>
+
+<div class="math-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Statement of the Theorem</h3>
+
+<p>
+All physical reality is completely and uniquely determined by the equilibrium configuration of the substrate parameters $K$ and $P$.
+</p>
+
+<p>
+Formally:
+</p>
+
+<p>
+$\text{Reality} = \mathcal{F}(K_0, P_0)$
+</p>
+
+<p>
+where $(K_0, P_0)$ are obtained from:
+</p>
+
+<p>
+$\delta \mathcal{S}[K, P] = 0$
+</p>
+
+<h3 style="color:#fbbf24;">2. Fundamental Assumptions</h3>
+
+<p>
+The theorem is based on the following structural principles:
+</p>
+
+<ul>
+<li>Existence of substrate parameters: $K = |\nabla C|$, $P = P_{\text{syn}}$</li>
+<li>Existence of a well-defined action functional $\mathcal{S}[K, P]$</li>
+<li>Variational principle: $\delta \mathcal{S} = 0$ determines physical configuration</li>
+<li>Continuity and differentiability of mapping functions</li>
+</ul>
+
+<h3 style="color:#fbbf24;">3. Existence of Equilibrium</h3>
+
+<p>
+From the variational principle:
+</p>
+
+<p>
+$\delta \mathcal{S}[K, P] = 0$
+</p>
+
+<p>
+there exists at least one stationary solution:
+</p>
+
+<p>
+$K = K_0, \quad P = P_0$
+</p>
+
+<p>
+provided:
+</p>
+
+<p>
+$\frac{\partial^2 \mathcal{S}}{\partial K^2} > 0, \quad \frac{\partial^2 \mathcal{S}}{\partial P^2} > 0$
+</p>
+
+<p>
+ensuring stability.
+</p>
+
+<h3 style="color:#fbbf24;">4. Uniqueness of Solution</h3>
+
+<p>
+The constraint relation:
+</p>
+
+<p>
+$\mathcal{C}(K, P) = 0$
+</p>
+
+<p>
+restricts the solution space to a single admissible equilibrium point:
+</p>
+
+<p>
+$(K_0, P_0)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\nexists (K', P') \neq (K_0, P_0) \text{ satisfying } \delta \mathcal{S} = 0$
+</p>
+
+<h3 style="color:#fbbf24;">5. Hierarchical Mapping of Reality</h3>
+
+<p>
+All layers of physical description follow:
+</p>
+
+<p>
+$\mathcal{L}_0 \rightarrow \mathcal{L}_1 \rightarrow \mathcal{L}_2$
+</p>
+
+<p>
+with:
+</p>
+
+<p>
+$\mathcal{L}_0 = (K, P)$
+</p>
+
+<p>
+$\mathcal{L}_{n+1} = \mathcal{T}_n(\mathcal{L}_n)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\mathcal{L}_n = \mathcal{F}_n(K, P)$
+</p>
+
+<h3 style="color:#fbbf24;">6. Reduction of Observables</h3>
+
+<p>
+All observables are functions of substrate parameters:
+</p>
+
+<p>
+$\mathcal{O} = \mathcal{F}(K, P)$
+</p>
+
+<p>
+At equilibrium:
+</p>
+
+<p>
+$\mathcal{O}_{\text{phys}} = \mathcal{F}(K_0, P_0)$
+</p>
+
+<h3 style="color:#fbbf24;">7. Elimination of Independent Entities</h3>
+
+<p>
+For any physical quantity $X$:
+</p>
+
+<p>
+$\exists \mathcal{F}_X \text{ such that } X = \mathcal{F}_X(K_0, P_0)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\nexists X \text{ independent of } (K_0, P_0)$
+</p>
+
+<h3 style="color:#fbbf24;">8. Closure Condition</h3>
+
+<p>
+All physical layers collapse to substrate equilibrium:
+</p>
+
+<p>
+$\bigcup_n \mathcal{L}_n = \mathcal{F}(K_0, P_0)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\forall \mathcal{O}, \quad \mathcal{O} = \mathcal{F}(K_0, P_0)$
+</p>
+
+<h3 style="color:#fbbf24;">9. Absence of External Parameters</h3>
+
+<p>
+Since $(K_0, P_0)$ are determined internally:
+</p>
+
+<p>
+$\frac{\partial K_0}{\partial \lambda} = 0, \quad \frac{\partial P_0}{\partial \lambda} = 0$
+</p>
+
+<p>
+Thus, no external parameter $\lambda$ exists.
+</p>
+
+<h3 style="color:#fbbf24;">10. Final Identity</h3>
+
+<p>
+The complete system reduces to:
+</p>
+
+<p>
+$\text{Reality} = \mathcal{F}(K_0, P_0)$
+</p>
+
+<p>
+with:
+</p>
+
+<p>
+$\delta \mathcal{S}[K, P] = 0$
+</p>
+
+<h3 style="color:#fbbf24;">11. Conclusion of the Theorem</h3>
+
+<p>
+The synthesis framework is mathematically closed, structurally complete, and free of arbitrariness. All physical laws, constants, and phenomena emerge from a single equilibrium configuration of the substrate.
+</p>
+
+<p>
+Thus, physics is fully reduced to a science of structural origin governed by $(K_0, P_0)$.
+</p>
+
+</div>
+
+
+</section>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div id="active-module-result" class="module-subtitle">--</div>
+<div class="primary-constant-box">
+<div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val">11.350<br>6.9 × 10⁻²⁶ m⁻¹</span></div>
+<div class="const-item"><span class="const-label">Synthesis P</span><span class="const-val">0.6900<br>3.3 × 10⁻³⁶ s⁻²</span></div>
+</div>
+
+<div id="structure-box-area"></div>
+<div id="mapping-box-area"></div>
+
+<div class="diagnostic-panel">
+<span class="diag-title">Closure Telemetry</span>
+<div id="telemetry-area"></div>
+</div>
+
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-unified); font-size:0.75rem; cursor:pointer; padding:6px;">RE-VALIDATE SYNTHESIS</button>
+<div id="panel-footer-text" style="font-size: 0.85rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.3; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:8px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Validation Logic</span>
+<div id="metrics-content" style="font-size:0.65rem; font-family:monospace; line-height:1.3;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Validation Chain</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.65rem; color: var(--text-dim); line-height: 1.3; background: #000; padding: 5px; border-radius: 0px; border: 1px solid #222; margin-bottom: 0px; margin-top: auto;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "OBSERVER & MEASUREMENT LAYER",
+result: "Observer-Substrate Coupling",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 61 — Module 1: Observer and Measurement (Observer–Substrate Coupling)</h2>
+
+<div class="briefing-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Conceptual Introduction</h3>
+
+<p>
+With Stage 60, the framework achieved complete structural unification of physical reality, expressing all observables as functions of substrate parameters $K = |\\nabla C|$ and $P = P_{\\text{syn}}$.
+</p>
+
+<p>
+However, a final foundational question remains:
+</p>
+
+<p>
+<strong>What is the role of the observer in a fully closed physical system?</strong>
+</p>
+
+<p>
+In conventional physics, the observer is often treated as external to the system. Measurement appears as an additional process, not fully integrated into the fundamental structure.
+</p>
+
+<p>
+This module resolves that separation by establishing that the observer is not external, but an intrinsic structural component of the substrate.
+</p>
+
+<p>
+Thus, measurement is not an external act, but a physical interaction within the substrate itself.
+</p>
+
+<p>
+This leads to the central structural relation:
+</p>
+
+<p>
+$\\text{Observer} \\;\\equiv\\; \\text{Substrate Configuration}$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">2. Structural Position of the Observer</h3>
+
+<p>
+Within the layered ontology, the observer belongs to the emergent layers of reality:
+</p>
+
+<p>
+$\\mathcal{O}_{\\text{obs}} = \\mathcal{F}(K, P)$
+</p>
+
+<p>
+Thus, the observer is itself a structured manifestation of the same substrate that it measures.
+</p>
+
+<p>
+There is no ontological separation between:
+</p>
+
+<p>
+$\\text{Observer} \\quad \\text{and} \\quad \\text{Observed System}$
+</p>
+
+<p>
+Both are configurations of $(K, P)$.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">3. Measurement as Coupling</h3>
+
+<p>
+Measurement is redefined as a coupling interaction between two substrate configurations:
+</p>
+
+<p>
+$\\text{Measurement} = \\text{Interaction} \\left( \\mathcal{S}_1(K, P), \\mathcal{S}_2(K, P) \\right)$
+</p>
+
+<p>
+where:
+</p>
+
+<ul>
+<li>$\\mathcal{S}_1$: Observer configuration</li>
+<li>$\\mathcal{S}_2$: System configuration</li>
+</ul>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Measurement} \\;\\equiv\\; \\text{Substrate Coupling}$
+</p>
+
+<p>
+No external collapse or intervention is required.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">4. Observer–Substrate Feedback Loop</h3>
+
+<p>
+The interaction between observer and system forms a feedback loop:
+</p>
+
+<p>
+$\\mathcal{S}_1 \\rightarrow \\mathcal{S}_2 \\rightarrow \\mathcal{S}_1$
+</p>
+
+<p>
+This loop stabilizes the observed state.
+</p>
+
+<p>
+Thus, observation is not passive but dynamically participates in the formation of the observed outcome.
+</p>
+
+<p>
+The measured reality is therefore:
+</p>
+
+<p>
+$\\mathcal{O}_{\\text{measured}} = \\mathcal{F}(K, P, \\mathcal{S}_{\\text{observer}})$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">5. Resolution of the Measurement Problem</h3>
+
+<p>
+In quantum mechanics, the measurement problem arises due to the separation between wave function evolution and collapse.
+</p>
+
+<p>
+Within this framework, that separation does not exist.
+</p>
+
+<p>
+The wave function is an emergent description of substrate dynamics:
+</p>
+
+<p>
+$\\Psi = \\mathcal{Q}(K, P)$
+</p>
+
+<p>
+Measurement corresponds to coupling that selects a stable configuration:
+</p>
+
+<p>
+$\\Psi \\rightarrow \\Psi_{\\text{stable}}$
+</p>
+
+<p>
+Thus, collapse is not a separate process but a consequence of interaction.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">6. Necessity of Observer Inclusion (Very Important)</h3>
+
+<p>
+A complete physical theory must include all interacting components.
+</p>
+
+<p>
+Since measurement is an interaction, the observer must be included within the system.
+</p>
+
+<p>
+Therefore:
+</p>
+
+<p>
+<strong>No complete theory can treat the observer as external.</strong>
+</p>
+
+<p>
+The observer is a necessary structural node in the physical framework.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">7. Consistency Check</h3>
+
+<p>
+This interpretation preserves all empirical results of quantum mechanics.
+</p>
+
+<p>
+It does not alter predictions, but reinterprets their origin.
+</p>
+
+<p>
+Thus:
+</p>
+
+<ul>
+<li>No contradiction with existing physics</li>
+<li>Measurement becomes physically grounded</li>
+<li>Observer-system duality is eliminated</li>
+</ul>
+
+---
+
+<h3 style="color:#fbbf24;">8. Graph / Visualization Interpretation Paragraph (MANDATORY)</h3>
+
+<p>
+The visualization associated with this module depicts a closed loop trajectory representing the interaction between observer and substrate.
+</p>
+
+<p>
+The horizontal axis represents the interaction coordinate, indicating the exchange between observer and system configurations.
+</p>
+
+<p>
+The vertical axis represents coupling phase, reflecting the dynamic state of interaction.
+</p>
+
+<p>
+The spiral or loop structure illustrates feedback: the observer influences the substrate, and the substrate in turn influences the observer.
+</p>
+
+<p>
+The closure of the loop signifies stabilization of the observed state.
+</p>
+
+<p>
+Thus, the graph visually encodes measurement as a self-consistent interaction cycle within the substrate.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">9. Conceptual Compression Lines</h3>
+
+<p>
+Observer is not external.<br>
+Measurement is interaction.<br>
+Reality is co-defined by observer and substrate.<br>
+Collapse is stabilization through coupling.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">10. Logical Closure</h3>
+
+<p>
+This module integrates the observer into the physical structure, eliminating the last remaining external element in the framework.
+</p>
+
+<p>
+Measurement is fully explained as a structural interaction within the substrate.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">11. Transition to Next Module</h3>
+
+<p>
+Having established the observer as a structural component, the next step is to unify quantum mechanics and general relativity within this fully closed system.
+</p>
+
+<p>
+This leads to Module 2, where QM–GR unification is derived as a consequence of the substrate.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">12. Final Statement</h3>
+
+<p>
+The observer is an intrinsic configuration of the substrate, and measurement is a coupling interaction that stabilizes observable reality.
+</p>
+
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 61 — Module 1: Explicit Mathematics — Observer–Substrate Coupling</h2>
+
+<div class="math-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Observer as Substrate Configuration</h3>
+
+<p>
+The observer is defined as an emergent configuration of substrate parameters:
+</p>
+
+<p>
+$\\mathcal{S}_{\\text{obs}} = \\mathcal{F}_{\\text{obs}}(K, P)$
+</p>
+
+<p>
+Similarly, the observed system is:
+</p>
+
+<p>
+$\\mathcal{S}_{\\text{sys}} = \\mathcal{F}_{\\text{sys}}(K, P)$
+</p>
+
+<p>
+Thus, both observer and system arise from the same substrate:
+</p>
+
+<p>
+$\\mathcal{S}_{\\text{obs}}, \\; \\mathcal{S}_{\\text{sys}} \\subseteq \\mathcal{F}(K, P)$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">2. Measurement as Interaction Operator</h3>
+
+<p>
+Measurement is defined as an interaction between two configurations:
+</p>
+
+<p>
+$\\mathcal{M} = \\mathcal{I}\\big(\\mathcal{S}_{\\text{obs}}, \\mathcal{S}_{\\text{sys}}\\big)$
+</p>
+
+<p>
+Expanding:
+</p>
+
+<p>
+$\\mathcal{M} = \\mathcal{I}\\big(\\mathcal{F}_{\\text{obs}}(K, P), \\mathcal{F}_{\\text{sys}}(K, P)\\big)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\mathcal{M} = \\mathcal{G}(K, P)$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">3. Coupling Functional Form</h3>
+
+<p>
+Define a coupling functional:
+</p>
+
+<p>
+$\\mathcal{I}(\\mathcal{S}_1, \\mathcal{S}_2) = \\int \\Gamma(\\mathcal{S}_1, \\mathcal{S}_2) \\, d^4x$
+</p>
+
+<p>
+where $\\Gamma$ is the interaction density.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\mathcal{M} = \\int \\Gamma\\big(\\mathcal{F}_{\\text{obs}}(K, P), \\mathcal{F}_{\\text{sys}}(K, P)\\big) \\, d^4x$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">4. Feedback Loop Equation</h3>
+
+<p>
+The observer–system interaction forms a feedback loop:
+</p>
+
+<p>
+$\\mathcal{S}_{\\text{obs}}^{(n+1)} = \\mathcal{F}_{\\text{obs}}\\big(K, P, \\mathcal{S}_{\\text{sys}}^{(n)}\\big)$
+</p>
+
+<p>
+$\\mathcal{S}_{\\text{sys}}^{(n+1)} = \\mathcal{F}_{\\text{sys}}\\big(K, P, \\mathcal{S}_{\\text{obs}}^{(n)}\\big)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\mathcal{S}^{(n+1)} = \\mathcal{T}\\big(\\mathcal{S}^{(n)}\\big)$
+</p>
+
+<p>
+A stable measurement corresponds to a fixed point:
+</p>
+
+<p>
+$\\mathcal{S}^* = \\mathcal{T}(\\mathcal{S}^*)$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">5. Wave Function as Substrate Functional</h3>
+
+<p>
+The quantum state is defined as:
+</p>
+
+<p>
+$\\Psi = \\mathcal{Q}(K, P)$
+</p>
+
+<p>
+Measurement modifies the state through coupling:
+</p>
+
+<p>
+$\\Psi' = \\mathcal{I}(\\Psi, \\mathcal{S}_{\\text{obs}})$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\Psi' = \\mathcal{Q}(K, P, \\mathcal{S}_{\\text{obs}})$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">6. Stabilization (Effective Collapse)</h3>
+
+<p>
+A stable observed state satisfies:
+</p>
+
+<p>
+$\\frac{\\delta \\mathcal{M}}{\\delta \\Psi} = 0$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\Psi \\rightarrow \\Psi_{\\text{stable}}$
+</p>
+
+<p>
+where:
+</p>
+
+<p>
+$\\Psi_{\\text{stable}} = \\operatorname*{arg\\,ext}\\, \\mathcal{M}$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">7. Observer-Dependent Observable</h3>
+
+<p>
+The measured observable depends on coupling:
+</p>
+
+<p>
+$\\mathcal{O}_{\\text{measured}} = \\mathcal{F}(K, P, \\mathcal{S}_{\\text{obs}})$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\frac{\\partial \\mathcal{O}}{\\partial \\mathcal{S}_{\\text{obs}}} \\neq 0$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">8. No External Collapse Condition</h3>
+
+<p>
+Since measurement is interaction:
+</p>
+
+<p>
+$\\Psi_{\\text{final}} = \\mathcal{I}(\\Psi, \\mathcal{S}_{\\text{obs}})$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Collapse} \\equiv \\text{Interaction-Induced Stabilization}$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">9. Consistency with Substrate Mapping</h3>
+
+<p>
+All quantities reduce to substrate:
+</p>
+
+<p>
+$\\mathcal{S}_{\\text{obs}}, \\mathcal{S}_{\\text{sys}}, \\Psi, \\mathcal{O} = \\mathcal{F}(K, P)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\mathcal{M} = \\mathcal{F}(K, P)$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">10. Structural Conclusion</h3>
+
+<p>
+Measurement is a substrate-level interaction between configurations, forming a feedback loop that stabilizes observable reality.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Measurement} = \\mathcal{F}(K, P)$
+</p>
+
+<p>
+with observer intrinsically embedded in the structure.
+</p>
+
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>COUPLING INTENSITY</span><input type="number" id="o_in" class="digital-entry" value="75" oninput="syncVal(this.value, 'o_sl')"></div><input type="range" id="o_sl" min="0" max="100" step="1" value="75" oninput="syncVal(this.value, 'o_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.8rem;">Observer &harr; Substrate Interaction</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Reality is a shared configuration</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Role</span><span class="const-val">OBSERVER</span></div><div class="const-item"><span class="const-label">Process</span><span class="const-val">COUPLING</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-obs);">MODE: ANALYZING MEASUREMENT FEEDBACK</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Observer Structure<br>&harr;<br>Substrate State<br>&harr;<br>Resolved Observable`,
+hierarchy: `<div style="color: var(--accent-obs); font-weight: bold; font-size: 0.95rem;">Observer is Structural Node</div>`,
+footer: `<div style="text-align: center; line-height: 1.2; font-size: 0.8rem; color: var(--accent-gold);">Above normalized values of K and P represent structural parameters of the substrate.<br>Above physical values of K and P are their measurable manifestations in observable reality.`,
+rightNote: `<div style="color: #94a3b8; line-height: 1.2; margin: 5px; font-size: 0.77rem;">Measurement is a direct structural interaction within the substrate, not an external intrusion.<p>Measurement arises from interaction between observer structure and substrate state.</p><p>This establishes the observer as an integral part of the physical framework. The observer is not an external viewer, but a structural participant.</p><p><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">👉 This Module Establishes:<br>Measurement as a coupling interaction that stabilizes reality.</p></div>`
+},
+
+2: {
+title: "QM–GR UNIFICATION DERIVATION",
+result: "Unified Structural Origin",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 61 — Module 2: QM–GR Unification (Scale-Dependent Structural Expression)</h2>
+
+<div class="briefing-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Conceptual Introduction</h3>
+
+<p>
+With Module 1, the observer was fully integrated into the structural framework, eliminating the last external element in physics. The system is now completely closed: all entities, including measurement, arise from substrate parameters $K = |\\nabla C|$ and $P = P_{\\text{syn}}$.
+</p>
+
+<p>
+The next and most critical step is to resolve the long-standing division between Quantum Mechanics (QM) and General Relativity (GR).
+</p>
+
+<p>
+This module establishes a central claim:
+</p>
+
+<p>
+<strong>QM and GR are not separate theories, but different scale-dependent expressions of the same underlying substrate structure.</strong>
+</p>
+
+<p>
+Thus, unification is not achieved by merging equations, but by recognizing a common origin.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">2. Structural Origin of Both Regimes</h3>
+
+<p>
+Both quantum and gravitational phenomena originate from the same substrate:
+</p>
+
+<p>
+$K = |\\nabla C|, \\quad P = P_{\\text{syn}}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{QM}, \\; \\text{GR} \\subseteq \\mathcal{F}(K, P)$
+</p>
+
+<p>
+The difference lies not in origin, but in how the structure is expressed.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">3. Scale-Dependent Representation</h3>
+
+<p>
+Introduce a structural resolution scale parameter $\\lambda$.
+</p>
+
+<p>
+At small scales ($\\lambda \\rightarrow 0$):
+</p>
+
+<p>
+$\\text{Discrete Interaction Regime} \\;\\Rightarrow\\; \\text{Quantum Mechanics}$
+</p>
+
+<p>
+At large scales ($\\lambda \\rightarrow \\infty$):
+</p>
+
+<p>
+$\\text{Continuous Curvature Regime} \\;\\Rightarrow\\; \\text{General Relativity}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Physics} = \\mathcal{F}(K, P, \\lambda)$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">4. Discrete–Continuous Correspondence</h3>
+
+<p>
+Quantum mechanics describes interactions as discrete events:
+</p>
+
+<p>
+$\\Psi = \\mathcal{Q}(K, P)$
+</p>
+
+<p>
+General relativity describes spacetime as continuous curvature:
+</p>
+
+<p>
+$g_{\\mu\\nu} = \\mathcal{G}(K, P)$
+</p>
+
+<p>
+This module establishes:
+</p>
+
+<p>
+$\\text{Discrete} \\;\\leftrightarrow\\; \\text{Continuous}$
+</p>
+
+<p>
+as two representations of the same substrate dynamics under different resolutions.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">5. No Fundamental Divide</h3>
+
+<p>
+The apparent contradiction between QM and GR arises from comparing different scale regimes.
+</p>
+
+<p>
+When expressed in terms of substrate parameters, the contradiction disappears:
+</p>
+
+<p>
+$\\text{QM} \\;\\equiv\\; \\text{GR} \\;\\equiv\\; \\mathcal{F}(K, P)$
+</p>
+
+<p>
+Thus, there is no fundamental divide—only different descriptions.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">6. Necessity of Scale (Very Important)</h3>
+
+<p>
+A fundamental principle follows:
+</p>
+
+<p>
+<strong>Scale determines description, not physical law.</strong>
+</p>
+
+<p>
+The underlying law remains invariant:
+</p>
+
+<p>
+$\\mathcal{F}(K, P)$
+</p>
+
+<p>
+Only its manifestation changes with scale.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">7. Consistency Check</h3>
+
+<p>
+This interpretation preserves both quantum and relativistic predictions.
+</p>
+
+<p>
+It does not modify their equations but provides a unifying foundation.
+</p>
+
+<p>
+Thus:
+</p>
+
+<ul>
+<li>No contradiction with QM</li>
+<li>No contradiction with GR</li>
+<li>Resolution of incompatibility</li>
+</ul>
+
+---
+
+<h3 style="color:#fbbf24;">8. Graph / Visualization Interpretation Paragraph (MANDATORY)</h3>
+
+<p>
+The visualization depicts a distribution of structural points transitioning into a smooth surface.
+</p>
+
+<p>
+At low resolution (left side), the structure appears discrete, representing quantum interactions.
+</p>
+
+<p>
+As resolution increases (toward the right), the same structure becomes continuous, forming a smooth curvature corresponding to spacetime geometry.
+</p>
+
+<p>
+The horizontal axes represent structural basis components (such as $N$, $C$), while the vertical axis represents intensity or manifestation.
+</p>
+
+<p>
+The transformation from scattered points to a continuous surface illustrates how discrete interactions integrate into continuous curvature.
+</p>
+
+<p>
+Thus, the graph encodes scale-dependent expression of a single underlying structure.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">9. Conceptual Compression Lines</h3>
+
+<p>
+QM and GR have the same origin.<br>
+Difference is scale, not structure.<br>
+Discrete and continuous are dual representations.<br>
+Physics is scale-dependent expression of substrate.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">10. Logical Closure</h3>
+
+<p>
+This module establishes that quantum mechanics and general relativity are unified at the structural level.
+</p>
+
+<p>
+The apparent divide is resolved as a difference in scale-dependent description.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">11. Transition to Next Module</h3>
+
+<p>
+Having unified QM and GR, the next step is to express this unification in a single mathematical structure.
+</p>
+
+<p>
+This leads to the formulation of the master equation in Module 3.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">12. Final Statement</h3>
+
+<p>
+Quantum mechanics and general relativity are scale-dependent manifestations of a single substrate structure defined by $K$ and $P$.
+</p>
+
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 61 — Module 2: Explicit Mathematics — QM–GR Unification (Scale-Dependent Structural Expression)</h2>
+
+<div class="math-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Common Substrate Origin</h3>
+
+<p>
+All physical structures arise from substrate parameters:
+</p>
+
+<p>
+$K = |\\nabla C|, \\quad P = P_{\\text{syn}}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{QM}, \\; \\text{GR} \\subseteq \\mathcal{F}(K, P)$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">2. Introduction of Scale Parameter</h3>
+
+<p>
+Define a structural resolution scale:
+</p>
+
+<p>
+$\\lambda \\in (0, \\infty)$
+</p>
+
+<p>
+Thus, physical description becomes:
+</p>
+
+<p>
+$\\mathcal{O}(\\lambda) = \\mathcal{F}(K, P, \\lambda)$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">3. Quantum Regime (Discrete Limit)</h3>
+
+<p>
+At small scales:
+</p>
+
+<p>
+$\\lambda \\rightarrow 0$
+</p>
+
+<p>
+The structure resolves into discrete interactions:
+</p>
+
+<p>
+$\\Psi = \\mathcal{Q}(K, P)$
+</p>
+
+<p>
+Operators act on states:
+</p>
+
+<p>
+$\\hat{O} \\Psi = \\mathcal{Q}'(K, P)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{QM Regime} = \\lim_{\\lambda \\to 0} \\mathcal{F}(K, P, \\lambda)$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">4. Geometric Regime (Continuous Limit)</h3>
+
+<p>
+At large scales:
+</p>
+
+<p>
+$\\lambda \\rightarrow \\infty$
+</p>
+
+<p>
+The structure becomes continuous curvature:
+</p>
+
+<p>
+$g_{\\mu\\nu} = \\mathcal{G}_{\\mu\\nu}(K, P)$
+</p>
+
+<p>
+Curvature:
+</p>
+
+<p>
+$R_{\\mu\\nu} = \\mathcal{R}_{\\mu\\nu}(K, P)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{GR Regime} = \\lim_{\\lambda \\to \\infty} \\mathcal{F}(K, P, \\lambda)$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">5. Unified Structural Expression</h3>
+
+<p>
+Both regimes are limits of a single function:
+</p>
+
+<p>
+$\\mathcal{F}(K, P, \\lambda)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\mathcal{F}(K, P, \\lambda) \\xrightarrow[\\lambda \\to 0]{} \\Psi$
+</p>
+
+<p>
+$\\mathcal{F}(K, P, \\lambda) \\xrightarrow[\\lambda \\to \\infty]{} g_{\\mu\\nu}$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">6. Discrete–Continuous Mapping</h3>
+
+<p>
+Define a smoothing operator:
+</p>
+
+<p>
+$\\mathcal{S}_\\lambda : \\Psi \\rightarrow g_{\\mu\\nu}$
+</p>
+
+<p>
+such that:
+</p>
+
+<p>
+$g_{\\mu\\nu} = \\lim_{\\lambda \\to \\infty} \\mathcal{S}_\\lambda(\\Psi)$
+</p>
+
+<p>
+Conversely:
+</p>
+
+<p>
+$\\Psi = \\lim_{\\lambda \\to 0} \\mathcal{S}_\\lambda^{-1}(g_{\\mu\\nu})$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">7. Invariance of Underlying Structure</h3>
+
+<p>
+The substrate remains invariant:
+</p>
+
+<p>
+$\\frac{\\partial K}{\\partial \\lambda} = 0, \\quad \\frac{\\partial P}{\\partial \\lambda} = 0$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\lambda \\text{ affects representation, not origin}$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">8. Unified Observable Relation</h3>
+
+<p>
+All observables follow:
+</p>
+
+<p>
+$\\mathcal{O}(\\lambda) = \\mathcal{F}(K, P, \\lambda)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\lim_{\\lambda \\to 0} \\mathcal{O} = \\mathcal{O}_{\\text{QM}}$
+</p>
+
+<p>
+$\\lim_{\\lambda \\to \\infty} \\mathcal{O} = \\mathcal{O}_{\\text{GR}}$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">9. No Contradiction Condition</h3>
+
+<p>
+Since both regimes arise from the same function:
+</p>
+
+<p>
+$\\text{QM} \\cap \\text{GR} \\neq \\emptyset$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{QM} \\equiv \\text{GR} \\equiv \\mathcal{F}(K, P)$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">10. Structural Conclusion</h3>
+
+<p>
+Quantum mechanics and general relativity are scale-dependent limits of a single substrate-based function.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Physics} = \\mathcal{F}(K, P, \\lambda)$
+</p>
+
+<p>
+with discrete and continuous regimes unified under scale transformation.
+</p>
+
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>STRUCTURAL RESOLUTION SCALE</span><input type="number" id="s_in" class="digital-entry" value="20" oninput="syncVal(this.value, 's_sl')"></div><input type="range" id="s_sl" min="0" max="100" step="1" value="20" oninput="syncVal(this.value, 's_sl')"></div>`,
+mappingBox: `<div class="definition-box" style="border-color: var(--accent-gold);"><span class="def-title" style="color: var(--accent-gold); border-color: var(--accent-gold);">MAPPING RULE</span><div style="text-align:center; color:var(--accent-gold); line-height: 1.2; font-size: 0.85rem; font-weight:bold;">QM (discrete expression) &harr; GR (continuous expression)</div><div style="text-align:center; font-size: 0.65rem; color: var(--text-dim);">Structural Scaling via Substrate Interaction</div></div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Scale defines the description, not the law</div>`,
+structure: `<div class="secondary-structure-box" style="background: rgba(59, 130, 246, 0.05); border: 1px dashed var(--accent-unified); padding: 3px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 12px;"><div class="const-item"><span class="const-label">Regime</span><span class="const-val">SINGLE STRUCTURE</span></div><div class="const-item"><span class="const-label">Fields</span><span class="const-val">N, C, M</span></div></div>`,
+telemetry: `<span style="font-family:monospace; line-height: 1.2; margin-bottom: 2px; font-size:0.75rem; color:var(--accent-exp);">MODE:  DERIVING SCALE-DEPENDENT REGIME EXPRESSION</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Discrete Interaction (QM)<br>&harr;<br>Continuous Curvature (GR)<br>&harr;<br>Single Substrate Origin`,
+hierarchy: `<div style="color: var(--accent-exp); font-weight: bold; font-size: 0.95rem;">Unification as Single Structure</div>`,
+footer: `<div style="text-align: center; color: #94a3b8; font-family: monospace; line-height: 1.1; font-size: 0.85rem;">Scale reveals how discrete interactions express as continuous curvature.`,
+rightNote: `<div style="color: #fbbf24; line-height: 1.3; margin: 5px; text-align: center; font-size: 0.77rem; border: 1px solid #fbbf24; background: rgba(251, 191, 36, 0.05); padding: 8px; border-radius: 4px;"><strong>QM and GR are the same structure seen at different scales.<p>This Module Establishes:</strong><br>There was never a divide—only different descriptions of the same structure. Physics is a science of structural origin rather than mere description.</p></div>`
+},
+
+3: {
+title: "MASTER EQUATION (SIGNATURE)",
+result: "The Synthesis Tensor Σμν",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 61 — Module 3: Master Equation (The Synthesis Tensor $\Sigma_{\mu\nu}$)</h2>
+
+<div class="briefing-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Conceptual Introduction</h3>
+
+<p>
+With Module 2, the apparent divide between quantum mechanics and general relativity was resolved by establishing both as scale-dependent expressions of a single substrate structure defined by $K = |\\nabla C|$ and $P = P_{\\text{syn}}$.
+</p>
+
+<p>
+The framework is now conceptually unified. The next step is to express this unification in a single mathematical structure.
+</p>
+
+<p>
+This module introduces the central equation of the entire framework:
+</p>
+
+<p>
+<strong>The Synthesis Tensor $\\Sigma_{\\mu\\nu}$</strong>
+</p>
+
+<p>
+This tensor encodes the complete structural dynamics of the substrate and serves as the unified mathematical origin of all physical phenomena.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">2. Need for a Master Equation</h3>
+
+<p>
+A complete physical theory requires a single governing equation that:
+</p>
+
+<ul>
+<li>Encodes both quantum and geometric behavior</li>
+<li>Derives all observable quantities</li>
+<li>Ensures internal consistency</li>
+</ul>
+
+<p>
+Standard physics uses separate equations:
+</p>
+
+<p>
+$\\text{QM: Schrödinger / Dirac equations}$
+</p>
+
+<p>
+$\\text{GR: Einstein field equations}$
+</p>
+
+<p>
+This module replaces that separation with a unified structure:
+</p>
+
+<p>
+$\\Sigma_{\\mu\\nu} = \\text{Single governing tensor}$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">3. Definition of the Synthesis Tensor</h3>
+
+<p>
+The Synthesis Tensor is defined as:
+</p>
+
+<p>
+$\\Sigma_{\\mu\\nu} = \\frac{1}{K}\\left(\\nabla_\\mu \\nabla_\\nu R - g_{\\mu\\nu} \\Box R\\right) - \\frac{P}{8\\pi G} g_{\\mu\\nu}$
+</p>
+
+<p>
+where:
+</p>
+
+<ul>
+<li>$R$: Scalar curvature</li>
+<li>$g_{\\mu\\nu}$: Metric tensor</li>
+<li>$\\Box$: D’Alembert operator</li>
+</ul>
+
+<p>
+This equation incorporates both curvature response and pressure contribution.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">4. Structural Meaning</h3>
+
+<p>
+The tensor has two components:
+</p>
+
+<ul>
+<li>Curvature response term:
+$\\frac{1}{K}(\\nabla_\\mu \\nabla_\\nu R - g_{\\mu\\nu} \\Box R)$</li>
+<li>Synthesis pressure term:
+$- \\frac{P}{8\\pi G} g_{\\mu\\nu}$</li>
+</ul>
+
+<p>
+Thus, spacetime geometry and cosmological behavior arise from substrate properties.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">5. Unified Role of the Tensor</h3>
+
+<p>
+The Synthesis Tensor governs:
+</p>
+
+<ul>
+<li>Gravitational curvature</li>
+<li>Cosmological expansion</li>
+<li>Field dynamics</li>
+<li>Energy distribution</li>
+</ul>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{All physics} \\Rightarrow \\Sigma_{\\mu\\nu}$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">6. Conservation Condition (Very Important)</h3>
+
+<p>
+The tensor satisfies a conservation law:
+</p>
+
+<p>
+$\\nabla^\\mu \\Sigma_{\\mu\\nu} = 0$
+</p>
+
+<p>
+This ensures:
+</p>
+
+<ul>
+<li>Energy-momentum consistency</li>
+<li>Internal closure of the system</li>
+<li>No external inputs required</li>
+</ul>
+
+---
+
+<h3 style="color:#fbbf24;">7. Necessity of the Tensor</h3>
+
+<p>
+Given that all physical phenomena arise from $(K, P)$, a unified equation must encode their combined effect.
+</p>
+
+<p>
+The Synthesis Tensor is not optional—it is structurally required to express the framework mathematically.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">8. Graph / Visualization Interpretation Paragraph (MANDATORY)</h3>
+
+<p>
+The visualization depicts a smooth surface representing the magnitude of the Synthesis Tensor across a structural domain.
+</p>
+
+<p>
+The horizontal axes correspond to underlying structural bases, while the vertical axis represents tensor intensity.
+</p>
+
+<p>
+The central peak indicates regions of high curvature or strong structural response.
+</p>
+
+<p>
+The smooth gradient outward represents diminishing interaction strength.
+</p>
+
+<p>
+This surface captures how substrate parameters generate geometric and physical effects through the tensor field.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">9. Conceptual Compression Lines</h3>
+
+<p>
+One tensor governs all physics.<br>
+Geometry arises from structure.<br>
+Pressure drives cosmology.<br>
+Unified equation replaces multiple theories.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">10. Logical Closure</h3>
+
+<p>
+This module establishes the Synthesis Tensor as the single mathematical structure encoding the entire framework.
+</p>
+
+<p>
+All physical laws are unified within this equation.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">11. Transition to Next Module</h3>
+
+<p>
+Having defined the master equation, the next step is to establish the origin and stability of the parameters $K$ and $P$ themselves.
+</p>
+
+<p>
+This leads to Module 4, where the parameter lock condition is derived.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">12. Final Statement</h3>
+
+<p>
+The Synthesis Tensor $\\Sigma_{\\mu\\nu}$ is the single governing equation of the framework, unifying quantum, gravitational, and cosmological phenomena as manifestations of substrate dynamics defined by $K$ and $P$.
+</p>
+
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 61 — Module 3: Explicit Mathematics — The Synthesis Tensor $\Sigma_{\mu\nu}$</h2>
+
+<div class="math-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Fundamental Substrate Inputs</h3>
+
+<p>
+The structure is defined by substrate parameters:
+</p>
+
+<p>
+$K = |\\nabla C|, \\quad P = P_{\\text{syn}}$
+</p>
+
+<p>
+These act as primary inputs to the unified field structure.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">2. Definition of the Synthesis Tensor</h3>
+
+<p>
+The master equation of the framework is:
+</p>
+
+<p>
+$\\Sigma_{\\mu\\nu} = \\frac{1}{K}\\left(\\nabla_\\mu \\nabla_\\nu R - g_{\\mu\\nu} \\Box R\\right) - \\frac{P}{8\\pi G} g_{\\mu\\nu}$
+</p>
+
+<p>
+where:
+</p>
+
+<ul>
+<li>$R$: Ricci scalar</li>
+<li>$g_{\\mu\\nu}$: Metric tensor</li>
+<li>$\\Box = g^{\\alpha\\beta} \\nabla_\\alpha \\nabla_\\beta$: D’Alembert operator</li>
+</ul>
+
+---
+
+<h3 style="color:#fbbf24;">3. Curvature Response Term</h3>
+
+<p>
+Define:
+</p>
+
+<p>
+$\\mathcal{C}_{\\mu\\nu} = \\nabla_\\mu \\nabla_\\nu R - g_{\\mu\\nu} \\Box R$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\Sigma_{\\mu\\nu} = \\frac{1}{K} \\mathcal{C}_{\\mu\\nu} - \\frac{P}{8\\pi G} g_{\\mu\\nu}$
+</p>
+
+<p>
+This term represents geometric response to curvature variations.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">4. Pressure Contribution Term</h3>
+
+<p>
+Define:
+</p>
+
+<p>
+$\\mathcal{P}_{\\mu\\nu} = - \\frac{P}{8\\pi G} g_{\\mu\\nu}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\Sigma_{\\mu\\nu} = \\frac{1}{K} \\mathcal{C}_{\\mu\\nu} + \\mathcal{P}_{\\mu\\nu}$
+</p>
+
+<p>
+This term drives large-scale expansion behavior.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">5. Conservation Condition</h3>
+
+<p>
+The tensor satisfies:
+</p>
+
+<p>
+$\\nabla^\\mu \\Sigma_{\\mu\\nu} = 0$
+</p>
+
+<p>
+Expanding:
+</p>
+
+<p>
+$\\nabla^\\mu \\left( \\frac{1}{K} \\mathcal{C}_{\\mu\\nu} - \\frac{P}{8\\pi G} g_{\\mu\\nu} \\right) = 0$
+</p>
+
+<p>
+This enforces internal consistency of the structure.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">6. Relation to Einstein Structure</h3>
+
+<p>
+Compare with Einstein tensor:
+</p>
+
+<p>
+$G_{\\mu\\nu} = R_{\\mu\\nu} - \\frac{1}{2} R g_{\\mu\\nu}$
+</p>
+
+<p>
+The Synthesis Tensor extends this by incorporating higher-order curvature response and pressure:
+</p>
+
+<p>
+$\\Sigma_{\\mu\\nu} \\supset G_{\\mu\\nu}$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">7. Vacuum Field Equation</h3>
+
+<p>
+In absence of external sources:
+</p>
+
+<p>
+$\\Sigma_{\\mu\\nu} = 0$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\frac{1}{K}\\left(\\nabla_\\mu \\nabla_\\nu R - g_{\\mu\\nu} \\Box R\\right) = \\frac{P}{8\\pi G} g_{\\mu\\nu}$
+</p>
+
+<p>
+This governs spacetime structure purely from substrate dynamics.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">8. Emergence of Geometry</h3>
+
+<p>
+Metric arises as a solution:
+</p>
+
+<p>
+$g_{\\mu\\nu} = \\mathcal{G}_{\\mu\\nu}(K, P)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\Sigma_{\\mu\\nu} = 0 \\Rightarrow g_{\\mu\\nu}(K, P)$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">9. Cosmological Behavior</h3>
+
+<p>
+The pressure term contributes to expansion:
+</p>
+
+<p>
+$\\Lambda_{\\text{eff}} \\sim \\frac{P}{K}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Expansion Rate} = \\mathcal{H}(K, P)$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">10. Structural Closure Condition</h3>
+
+<p>
+All physical quantities derive from the tensor:
+</p>
+
+<p>
+$\\mathcal{O} = \\mathcal{F}(\\Sigma_{\\mu\\nu})$
+</p>
+
+<p>
+Since:
+</p>
+
+<p>
+$\\Sigma_{\\mu\\nu} = \\mathcal{F}(K, P)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\mathcal{O} = \\mathcal{F}(K, P)$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">11. No External Degrees of Freedom</h3>
+
+<p>
+All variables reduce to substrate:
+</p>
+
+<p>
+$\\frac{\\partial \\Sigma_{\\mu\\nu}}{\\partial X} = 0 \\quad \\forall X \\notin \\{K, P\\}$
+</p>
+
+<p>
+Thus, the system is closed.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">12. Final Mathematical Statement</h3>
+
+<p>
+The complete physical structure is governed by:
+</p>
+
+<p>
+$\\Sigma_{\\mu\\nu}(K, P) = 0$
+</p>
+
+<p>
+with conservation:
+</p>
+
+<p>
+$\\nabla^\\mu \\Sigma_{\\mu\\nu} = 0$
+</p>
+
+<p>
+This constitutes the master equation of the framework.
+</p>
+
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>TENSOR MAGNITUDE</span><input type="number" id="m_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'm_sl')"></div><input type="range" id="m_sl" min="0" max="100" step="1" value="100" oninput="syncVal(this.value, 'm_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; color:var(--accent-gold); line-height: 1.2; font-size: 0.8rem;">$\\Sigma_{\\mu\\nu} = \\frac{1}{K}(\\nabla_\\mu\\nabla_\\nu R - g_{\\mu\\nu}\\Box R) - \\frac{P}{8\pi G} g_{\\mu\\nu}$<br>$\\text{Conservation Condition: } \\nabla^\\mu \\Sigma_{\\mu\\nu} = 0$</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Structure is the origin of geometry</div>`,
+structure: `<div class="secondary-structure-box" style="background: rgba(59, 130, 246, 0.05); border: 1px dashed var(--accent-unified); padding: 3px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 12px;"><div class="const-item"><span class="const-label">Tensor</span><span class="const-val">Σμν</span></div><div class="const-item"><span class="const-label">Form</span><span class="const-val">UNIFIED</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-master);">MODE: EXECUTING MASTER UNIFICATION TENSOR</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Curvature Response (K)<br>↓<br>Synthesis Pressure (P)<br>↓<br>Cosmological Closure`,
+hierarchy: `<div style="color: var(--accent-master); font-weight: bold; font-size: 0.95rem;">The Signature Page of Physics</div>`,
+footer: "The Synthesis Tensor governs all gravitational behavior.",
+rightNote: `<div style="color: #c084fc; line-height: 1.3; margin: 3px; text-align:center; font-size: 0.75rem;">This synthesises the entire framework into one equation.<p><div style="text-align:center; font-size: 0.75rem; color: var(--accent-gold);">👉  This Module Establishes:<br>Σμν as the single mathematical origin for both gravity and expansion.</p><p>Σμν → Governs Spacetime Geometric Response</p><p>This module establishes the Synthesis Tensor Σμν as a mathematically closed field system, with consistency enforced by the conservation condition: ∇^μ Σμν = 0.</p></div>`
+},
+
+4: {
+title: "PARAMETER ORIGIN & CLOSURE",
+result: "Calculated Equilibrium Status",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 61 — Module 4: Parameter Origin and Closure (Equilibrium Locking of Physical Constants)</h2>
+
+<div class="briefing-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Conceptual Introduction</h3>
+
+<p>
+With the development of the synthesis framework through Stage 60 and early modules of Stage 61, all physical phenomena have been traced back to substrate dynamics governed by the structural fields and the derived parameters $K$ and $P$.
+</p>
+
+<p>
+A fundamental question now arises:
+</p>
+
+<p>
+<strong>Why do physical constants have fixed numerical values?</strong>
+</p>
+
+<p>
+Standard physics treats constants as given inputs. However, within this framework, they must arise necessarily from structural conditions.
+</p>
+
+<p>
+This module establishes that physical constants are not fundamental inputs but emerge from a constraint condition:
+</p>
+
+<p>
+$\\text{Substrate Equilibrium} \\;\\longrightarrow\\; \\text{Parameter Locking}$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">2. Structural Position of Parameters</h3>
+
+<p>
+The parameters $K$ and $P$ are derived quantities originating from the underlying structural fields:
+</p>
+
+<p>
+$K = |\\nabla C|, \\quad P = P_{\\text{syn}}$
+</p>
+
+<p>
+They define the effective state of the substrate and determine all higher-level physical quantities.
+</p>
+
+<p>
+Thus, all observables depend functionally on these parameters:
+</p>
+
+<p>
+$\\mathcal{O} = \\mathcal{F}(K, P)$
+</p>
+
+<p>
+The question of constants is therefore equivalent to understanding how $K$ and $P$ attain fixed values.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">3. Equilibrium Constraint</h3>
+
+<p>
+The substrate evolves toward a structurally stable configuration defined by an extremal condition on the action:
+</p>
+
+<p>
+$\\delta \\mathcal{S}(K, P) = 0$
+</p>
+
+<p>
+This condition imposes a constraint linking $K$ and $P$.
+</p>
+
+<p>
+Thus, equilibrium is not arbitrary but mathematically enforced:
+</p>
+
+<p>
+$\\mathcal{C}(K, P) = 0$
+</p>
+
+<p>
+Only specific combinations of $K$ and $P$ satisfy this constraint.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">4. Parameter Locking Mechanism</h3>
+
+<p>
+At equilibrium, the parameters become fixed at specific values:
+</p>
+
+<p>
+$K = K_0, \\quad P = P_0$
+</p>
+
+<p>
+In normalized form:
+</p>
+
+<p>
+$K_0 = 11.350, \\quad P_0 = 0.6900$
+</p>
+
+<p>
+This locking represents a phase-stable configuration of the substrate.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Equilibrium} \\;\\Rightarrow\\; \\text{Numerical Fixing of Parameters}$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">5. Emergence of Physical Constants</h3>
+
+<p>
+All physical constants arise as functions of the locked parameters:
+</p>
+
+<p>
+$\\alpha, m, G, \\Lambda \\sim \\mathcal{F}(K_0, P_0)$
+</p>
+
+<p>
+Thus, constants are not independent inputs but consequences of equilibrium.
+</p>
+
+<p>
+This resolves the arbitrariness present in standard formulations.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">6. Physical Interpretation</h3>
+
+<p>
+The values of physical constants represent the stable configuration of the substrate.
+</p>
+
+<p>
+They encode the balance between:
+</p>
+
+<ul>
+<li>Stiffness $K$ — structural resistance</li>
+<li>Pressure $P$ — equilibrium drive</li>
+</ul>
+
+<p>
+Thus, constants are signatures of structural balance rather than fundamental entities.
+</p>
+
+<p>
+They reflect:
+</p>
+
+<p>
+$\\text{Structure} \\;\\longrightarrow\\; \\text{Equilibrium} \\;\\longrightarrow\\; \\text{Constants}$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">7. Consistency Check</h3>
+
+<p>
+This interpretation preserves all measured values of physical constants.
+</p>
+
+<p>
+No contradiction arises with existing physics. Instead, the framework provides an explanation for why these values are fixed.
+</p>
+
+<p>
+Thus, empirical consistency is maintained while conceptual depth is increased.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">8. Graph / Visualization Interpretation Paragraph (MANDATORY)</h3>
+
+<p>
+The visualization presents a two-dimensional phase space with stiffness $K$ on one axis and pressure $P$ on the other.
+</p>
+
+<p>
+Within this space, a distinct point appears representing the equilibrium configuration $(K_0, P_0)$.
+</p>
+
+<p>
+This point is isolated and stable, indicating that only one configuration satisfies the equilibrium constraint.
+</p>
+
+<p>
+The surrounding region represents non-equilibrium states, which do not correspond to physically realized systems.
+</p>
+
+<p>
+Thus, the graph demonstrates parameter locking as a structural necessity, where physical reality corresponds to a fixed point in parameter space.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">9. Conceptual Compression Lines</h3>
+
+<p>
+Constants are not fundamental—they are outcomes.<br>
+Equilibrium fixes parameters.<br>
+$K$ and $P$ determine all observables.<br>
+Reality selects a unique stable configuration.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">10. Logical Closure</h3>
+
+<p>
+This module establishes that physical constants originate from substrate equilibrium and are fixed through a structural locking mechanism.
+</p>
+
+<p>
+Thus, the apparent arbitrariness of constants is replaced by necessity.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">11. Transition to Next Module</h3>
+
+<p>
+Having established parameter origin and closure, the next step is to integrate this result into the full synthesis equation governing all physical behavior.
+</p>
+
+<p>
+This leads to the formulation of the master equation of the framework.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">12. Final Statement</h3>
+
+<p>
+Physical constants are not fundamental inputs but necessary consequences of substrate equilibrium, where $K$ and $P$ become numerically locked, defining the observable structure of reality.
+</p>
+
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 61 — Module 4: Explicit Mathematics — Parameter Origin and Closure</h2>
+
+<div class="math-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Fundamental Parameters</h3>
+
+<p>
+The substrate is characterized by the structural parameters:
+</p>
+
+<p>
+$K = |\\nabla C|, \\quad P = P_{\\text{syn}}$
+</p>
+
+<p>
+Thus, the fundamental state is:
+</p>
+
+<p>
+$\\mathcal{S}(x) = (K(x), P(x))$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">2. Observable Dependence</h3>
+
+<p>
+All physical observables are functions of substrate parameters:
+</p>
+
+<p>
+$\\mathcal{O} = \\mathcal{F}(K, P)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\frac{\\partial \\mathcal{O}}{\\partial K} \\neq 0, \\quad \\frac{\\partial \\mathcal{O}}{\\partial P} \\neq 0$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">3. Action Functional of Substrate</h3>
+
+<p>
+Define the action of the substrate system:
+</p>
+
+<p>
+$\\mathcal{S}[K, P] = \\int \\mathcal{L}(K, P, \\nabla K, \\nabla P) \\, d^4x$
+</p>
+
+<p>
+where $\\mathcal{L}$ is the effective Lagrangian density.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">4. Equilibrium Condition</h3>
+
+<p>
+The equilibrium configuration satisfies:
+</p>
+
+<p>
+$\\delta \\mathcal{S}[K, P] = 0$
+</p>
+
+<p>
+Leading to Euler–Lagrange equations:
+</p>
+
+<p>
+$\\frac{\\partial \\mathcal{L}}{\\partial K} - \\nabla_\\mu \\left( \\frac{\\partial \\mathcal{L}}{\\partial (\\nabla_\\mu K)} \\right) = 0$
+</p>
+
+<p>
+$\\frac{\\partial \\mathcal{L}}{\\partial P} - \\nabla_\\mu \\left( \\frac{\\partial \\mathcal{L}}{\\partial (\\nabla_\\mu P)} \\right) = 0$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">5. Constraint Relation Between Parameters</h3>
+
+<p>
+The coupled equations imply a constraint:
+</p>
+
+<p>
+$\\mathcal{C}(K, P) = 0$
+</p>
+
+<p>
+Thus, $K$ and $P$ are not independent.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">6. Fixed Point Solution</h3>
+
+<p>
+The equilibrium solution is:
+</p>
+
+<p>
+$K = K_0, \\quad P = P_0$
+</p>
+
+<p>
+such that:
+</p>
+
+<p>
+$\\frac{\\partial \\mathcal{S}}{\\partial K}\\Big|_{K_0,P_0} = 0, \\quad \\frac{\\partial \\mathcal{S}}{\\partial P}\\Big|_{K_0,P_0} = 0$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">7. Stability Condition</h3>
+
+<p>
+Stability requires:
+</p>
+
+<p>
+$\\frac{\\partial^2 \\mathcal{S}}{\\partial K^2} > 0, \\quad \\frac{\\partial^2 \\mathcal{S}}{\\partial P^2} > 0$
+</p>
+
+<p>
+Thus, $(K_0, P_0)$ is a minimum of the action.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">8. Emergence of Constants</h3>
+
+<p>
+Physical constants arise as functions evaluated at equilibrium:
+</p>
+
+<p>
+$g = f\\!\\left(\\frac{P_0}{K_0}\\right), \\quad m = f(K_0, P_0), \\quad \\rho = \\frac{K_0^2}{P_0}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\mathcal{O}_{\\text{phys}} = \\mathcal{F}(K_0, P_0)$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">9. Absence of Free Parameters</h3>
+
+<p>
+Since $(K_0, P_0)$ are fixed by:
+</p>
+
+<p>
+$\\delta \\mathcal{S} = 0$
+</p>
+
+<p>
+No arbitrary constants remain:
+</p>
+
+<p>
+$\\frac{\\partial K_0}{\\partial \\lambda} = 0, \\quad \\frac{\\partial P_0}{\\partial \\lambda} = 0$
+</p>
+
+<p>
+for any external parameter $\\lambda$.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">10. Structural Conclusion</h3>
+
+<p>
+Thus, the full structure reduces to:
+</p>
+
+<p>
+$\\text{Physics} = \\mathcal{F}(K_0, P_0)$
+</p>
+
+<p>
+where $(K_0, P_0)$ are uniquely determined by the equilibrium condition:
+</p>
+
+<p>
+$\\delta \\mathcal{S}[K, P] = 0$
+</p>
+
+<p>
+This establishes complete parameter closure of the framework.
+</p>
+
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>EQUILIBRIUM LOCK</span><input type="number" id="p_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'p_sl')"></div><input type="range" id="p_sl" min="0" max="100" step="1" value="100" oninput="syncVal(this.value, 'p_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.8rem;">Equilibrium &rarr; Constants Fixed</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Constants are emergent, not fundamental</div>`,
+structure: `<div class="secondary-structure-box" style="background: rgba(59, 130, 246, 0.05); border: 1px dashed var(--accent-unified); padding: 3px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 12px;"><div class="const-item"><span class="const-label">Status</span><span class="const-val">DERIVED</span></div><div class="const-item"><span class="const-label">Phase</span><span class="const-val">LOCKED</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-lock);">MODE: CONFIRMING PARAMETER CLOSURE (K,P)</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Normalized Input<br>↓<br>Physical Equilibrium<br>↓<br>Locked Constants`,
+hierarchy: `<div style="color: var(--accent-lock); font-weight: bold; font-size: 0.95rem;">Locking: K=11.350 / P=0.6900</div>`,
+footer: "Physical constants are signatures of substrate equilibrium.",
+rightNote: `<div style="color: #f87171; line-height: 1.3; margin: 5px; font-size: 0.77rem;">The values of $K$ and $P$ arise from the requirement of substrate equilibrium. <p>They are not fundamental inputs, but necessary structural outcomes of equilibrium, thereby fixing the effective physical constants of the system.</p><p><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">👉 This Module Establishes:<br>Parameter Origin → Equilibrium Constraint → Numerical Locking → Resulting Physical Reality</p></div>`
+},
+
+5: {
+title: "FINAL SYNTHESIS & CONCLUSION",
+result: "The Science of Origin",
+resultSize: "0.85rem",
+
+brief: `<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 61 — Module 5: Final Synthesis and Conclusion (The Science of Origin)</h2>
+<p>The transition from descriptive physics to structural physics is complete. The universe is understood as a self-consistent whole.</p>
+<h4>Reframing Table:</h4>
+<table class="comparison-table">
+<tr><th>Category</th><th>Classical View</th><th>Framework View</th></tr>
+<tr><td>Constants</td><td>Given/Arbitrary</td><td>Derived Outcomes</td></tr>
+<tr><td>Forces</td><td>Mediated by bosons</td><td>Emergent Interactions</td></tr>
+<tr><td>Space-time</td><td>Passive Container</td><td>Substrate Configuration</td></tr>
+</table>
+<p style="color:var(--accent-gold); border: 1px solid var(--accent-gold); padding: 10px;">Reality is not built from particles or forces, but from structured substrate dynamics governed by equilibrium between stiffness and synthesis.</p>
+<div class="briefing-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Conceptual Introduction</h3>
+
+<p>
+With the completion of the preceding modules, the synthesis framework has progressively unified all domains of physics—quantum mechanics, general relativity, interaction theory, and cosmology—into a single structurally consistent description.
+</p>
+
+<p>
+A final question now arises:
+</p>
+
+<p>
+<strong>What is the ultimate nature of physical reality once all layers are unified?</strong>
+</p>
+
+<p>
+This module provides the definitive answer. It establishes that physics is not merely a study of particles, forces, or equations, but fundamentally a science of origin.
+</p>
+
+<p>
+Thus, the framework culminates in the transition:
+</p>
+
+<p>
+$\\text{Description of Phenomena} \\;\\longrightarrow\\; \\text{Understanding of Origin}$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">2. Structural Recapitulation</h3>
+
+<p>
+The framework has established a complete hierarchical structure:
+</p>
+
+<p>
+$\\text{Substrate Fields} \\;\\longrightarrow\\; (K, P) \\;\\longrightarrow\\; \\text{Fields and Geometry} \\;\\longrightarrow\\; \\text{Observable Reality}$
+</p>
+
+<p>
+The parameters $K$ and $P$ are derived from structural fields and become fixed through equilibrium:
+</p>
+
+<p>
+$K = 11.350, \\quad P = 0.6900$
+</p>
+
+<p>
+All physical laws and constants arise as consequences of this structure.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">3. From Description to Origin</h3>
+
+<p>
+Traditional physics describes how systems behave. It formulates equations governing motion, interaction, and evolution.
+</p>
+
+<p>
+However, it does not answer:
+</p>
+
+<p>
+<strong>Why these laws exist in the first place.</strong>
+</p>
+
+<p>
+The synthesis framework resolves this by identifying a deeper level:
+</p>
+
+<p>
+$\\text{Law} \\;\\subset\\; \\text{Structure} \\;\\subset\\; \\text{Origin}$
+</p>
+
+<p>
+Thus, physical laws are not primary—they are expressions of underlying structural necessity.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">4. Unified Interpretation of Reality</h3>
+
+<p>
+Reality is no longer interpreted as a collection of independent entities such as particles or forces.
+</p>
+
+<p>
+Instead, it is understood as a structured manifestation of substrate dynamics.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Reality} = \\mathcal{F}(K_0, P_0)$
+</p>
+
+<p>
+where $(K_0, P_0)$ are the equilibrium values of the substrate parameters.
+</p>
+
+<p>
+All observable phenomena are expressions of this single underlying structure.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">5. Physical Interpretation</h3>
+
+<p>
+The universe is governed by a balance between stiffness $K$ and pressure $P$.
+</p>
+
+<p>
+This balance defines:
+</p>
+
+<ul>
+<li>Interaction strengths</li>
+<li>Mass scales</li>
+<li>Geometric curvature</li>
+<li>Cosmological expansion</li>
+</ul>
+
+<p>
+Thus, all physical diversity arises from variations and expressions of a unified substrate equilibrium.
+</p>
+
+<p>
+The universe is therefore not constructed from discrete components but unfolds from a continuous structural foundation.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">6. Science of Origin</h3>
+
+<p>
+The central philosophical and scientific shift introduced by this framework is the redefinition of physics itself.
+</p>
+
+<p>
+Physics is no longer the study of isolated phenomena but the study of their origin.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Physics} = \\text{Study of Structural Origin}$
+</p>
+
+<p>
+This transforms physics from a descriptive science into a foundational science.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">7. Consistency and Completeness</h3>
+
+<p>
+The framework achieves full internal consistency:
+</p>
+
+<ul>
+<li>No arbitrary constants remain</li>
+<li>All quantities are derived</li>
+<li>All theories are unified</li>
+</ul>
+
+<p>
+Furthermore, it is complete in the sense that:
+</p>
+
+<p>
+$\\text{All physical phenomena} \\;\\subset\\; \\mathcal{F}(K_0, P_0)$
+</p>
+
+<p>
+No external inputs are required beyond the structural definition.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">8. Graph / Visualization Interpretation Paragraph (MANDATORY)</h3>
+
+<p>
+The visualization presents a three-dimensional surface representing unified reality emerging from substrate dynamics.
+</p>
+
+<p>
+The horizontal axes correspond to structural coordinates associated with the substrate parameters, while the vertical axis represents the amplitude of observable manifestation.
+</p>
+
+<p>
+The smooth, continuous surface indicates that reality is not discrete but arises as a coherent structural field.
+</p>
+
+<p>
+Peaks and variations on the surface correspond to localized manifestations such as particles, interactions, and physical structures.
+</p>
+
+<p>
+The overall continuity demonstrates that all such phenomena are unified expressions of a single underlying substrate configuration.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">9. Conceptual Compression Lines</h3>
+
+<p>
+Physics is the study of origin, not just description.<br>
+Reality is a manifestation of substrate equilibrium.<br>
+All laws emerge from structure.<br>
+The universe is a unified continuous system.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">10. Logical Closure</h3>
+
+<p>
+This module establishes the final synthesis of the framework. All layers of physical reality are unified into a single coherent structure derived from substrate dynamics.
+</p>
+
+<p>
+The distinction between different physical theories is resolved as differences in description, not in origin.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">11. Transition to Next Module</h3>
+
+<p>
+With this synthesis, the framework reaches its final stage of structural completeness.
+</p>
+
+<p>
+The next step is to present the complete compressed statement of the framework as a final declaration.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">12. Final Statement</h3>
+
+<p>
+Reality is a structured manifestation of substrate dynamics governed by equilibrium between $K$ and $P$, and physics becomes the science of this structural origin.
+</p>
+
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 61 — Module 5: Explicit Mathematics — Final Structural Synthesis</h2>
+
+<div class="math-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Fundamental Substrate Definition</h3>
+
+<p>
+The complete physical system is defined by the substrate parameters:
+</p>
+
+<p>
+$K = |\\nabla C|, \\quad P = P_{\\text{syn}}$
+</p>
+
+<p>
+Thus, the fundamental state is:
+</p>
+
+<p>
+$\\mathcal{S}_0 = (K, P)$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">2. Equilibrium Condition (Parameter Locking)</h3>
+
+<p>
+The substrate satisfies the variational condition:
+</p>
+
+<p>
+$\\delta \\mathcal{S}[K, P] = 0$
+</p>
+
+<p>
+which yields:
+</p>
+
+<p>
+$K = K_0, \\quad P = P_0$
+</p>
+
+<p>
+with normalized values:
+</p>
+
+<p>
+$K_0 = 11.350, \\quad P_0 = 0.6900$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">3. Unified Mapping to Physical Reality</h3>
+
+<p>
+All physical observables arise as functions of the equilibrium parameters:
+</p>
+
+<p>
+$\\mathcal{O} = \\mathcal{F}(K_0, P_0)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Reality} = \\mathcal{F}(K_0, P_0)$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">4. Intermediate Structural Layers</h3>
+
+<p>
+The mapping proceeds through intermediate layers:
+</p>
+
+<p>
+$\\mathcal{L}_0 \\rightarrow \\mathcal{L}_1 \\rightarrow \\mathcal{L}_2$
+</p>
+
+<p>
+where:
+</p>
+
+<ul>
+<li>$\\mathcal{L}_0 = (K, P)$</li>
+<li>$\\mathcal{L}_1 = (A_\\mu, F_{\\mu\\nu}, g_{\\mu\\nu})$</li>
+<li>$\\mathcal{L}_2 = (m, g, \\rho, \\dots)$</li>
+</ul>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\mathcal{L}_{n+1} = \\mathcal{T}_n(\\mathcal{L}_n)$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">5. Synthesis Tensor Governing Dynamics</h3>
+
+<p>
+The unified dynamics are governed by the Synthesis Tensor:
+</p>
+
+<p>
+$\\Sigma_{\\mu\\nu} = \\frac{1}{K} \\left( \\nabla_\\mu \\nabla_\\nu R - g_{\\mu\\nu} \\Box R \\right) - \\frac{P}{8\\pi G} g_{\\mu\\nu}$
+</p>
+
+<p>
+with conservation condition:
+</p>
+
+<p>
+$\\nabla^\\mu \\Sigma_{\\mu\\nu} = 0$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">6. Emergence of Physical Quantities</h3>
+
+<p>
+Physical quantities are derived as:
+</p>
+
+<p>
+$m = f(K_0, P_0), \\quad g = f\\!\\left(\\frac{P_0}{K_0}\\right), \\quad \\rho = \\frac{K_0^2}{P_0}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\mathcal{O}_{\\text{phys}} = \\mathcal{F}(K_0, P_0)$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">7. Closure Condition</h3>
+
+<p>
+All quantities reduce to the equilibrium state:
+</p>
+
+<p>
+$\\forall \\mathcal{O}, \\quad \\mathcal{O} = \\mathcal{F}(K_0, P_0)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Physics} \\equiv \\mathcal{F}(K_0, P_0)$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">8. Absence of External Inputs</h3>
+
+<p>
+Since $K_0$ and $P_0$ are determined by:
+</p>
+
+<p>
+$\\delta \\mathcal{S} = 0$
+</p>
+
+<p>
+no external parameters exist:
+</p>
+
+<p>
+$\\frac{\\partial K_0}{\\partial \\lambda} = 0, \\quad \\frac{\\partial P_0}{\\partial \\lambda} = 0$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">9. Complete Structural Reduction</h3>
+
+<p>
+All layers collapse to the substrate:
+</p>
+
+<p>
+$\\bigcup_n \\mathcal{L}_n = \\mathcal{F}(K_0, P_0)$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">10. Final Structural Identity</h3>
+
+<p>
+Thus, the complete physical system is expressed as:
+</p>
+
+<p>
+$\\text{Reality} = \\mathcal{F}(K_0, P_0)$
+</p>
+
+<p>
+with $(K_0, P_0)$ uniquely determined by:
+</p>
+
+<p>
+$\\delta \\mathcal{S}[K, P] = 0$
+</p>
+
+<p>
+This constitutes the final mathematical closure of the framework.
+</p>
+
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>TOTAL SYNTHESIS</span><input type="number" id="final_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'final_sl')"></div><input type="range" id="final_sl" min="0" max="100" step="1" value="100" oninput="syncVal(this.value, 'final_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.8rem;">Description &rarr; Structural Origin</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Physics is the study of Substrate Origin</div>`,
+structure: `<div class="secondary-structure-box" style="background: rgba(59, 130, 246, 0.05); border: 1px dashed var(--accent-unified); padding: 3px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 12px;"><div class="const-item"><span class="const-label">Model</span><span class="const-val">SYNTHESIS</span></div><div class="const-item"><span class="const-label">Goal</span><span class="const-val">ORIGIN</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-final);">SYSTEM: ULTIMATE SYNTHESIS ACHIEVED</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Particles/Forces<br>↓<br>Substrate Dynamics<br>↓<br>Universal Closure`,
+hierarchy: `<div style="color: var(--accent-final); font-weight: bold; font-size: 0.95rem;">Absolute Declaration of Reality</div>`,
+footer: `<div style="text-align: center; line-height: 1.2; font-size: 0.8rem; color: var(--accent-gold);">Reality is not fundamentally built from particles or forces, but from structured substrate dynamics governed by equilibrium between vacuum stiffness and synthesis pressure.`,
+rightNote: `<div style="color: #2dd4bf; line-height: 1.3; margin: 5px; font-size: 0.77rem;">The definitive conclusion of the Synthesis Framework.<p>Reality is a structured manifestation of substrate dynamics.</p><p><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">👉 This Module Establishes:<br>Physics becomes a science of structural origin rather than mere description.</p></div>`
+}
+};
+
+function syncVal(val, id) {
+const sliderId = id.includes('_in') ? id.replace('_in', '_sl') : id;
+const inputId = id.includes('_sl') ? id.replace('_sl', '_in') : id;
+if(document.getElementById(sliderId)) document.getElementById(sliderId).value = val;
+if(document.getElementById(inputId)) document.getElementById(inputId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+document.getElementById('brief-box-content').innerHTML = content.brief;
+document.getElementById('math-box-content').innerHTML = content.math;
+document.getElementById('control-sliders').innerHTML = content.sliders;
+
+document.getElementById('active-module-title').innerText = content.title;
+const resultEl = document.getElementById('active-module-result');
+resultEl.innerText = content.result;
+resultEl.style.fontSize = content.resultSize || "0.75rem";
+
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('metrics-content').innerHTML = content.metricsContent;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+document.getElementById('structure-box-area').innerHTML = content.structure;
+document.getElementById('telemetry-area').innerHTML = content.telemetry;
+showScreen('briefing');
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() {
+showScreen('lab');
+setTimeout(() => { runLab(); window.dispatchEvent(new Event('resize')); }, 100);
+}
+
+function runLab() {
+const target = document.getElementById('plot-area');
+if (!target) return;
+let data = [];
+let layout = {
+paper_bgcolor: 'black', plot_bgcolor: 'black', margin: {t:60,b:10,l:0,r:0},
+showlegend: false, font: { family: 'sans-serif', size: 10 },
+scene: {
+xaxis: { gridcolor: '#222', color: '#94a3b8', title: 'Basis' },
+yaxis: { gridcolor: '#222', color: '#94a3b8', title: 'Phase' },
+zaxis: { gridcolor: '#222', color: '#94a3b8', title: 'Intensity' }
+}
+};
+
+if (currentTool === 1) { // OBSERVER COUPLING
+let o = parseFloat(document.getElementById('o_sl')?.value || 75) / 100;
+let t = Array.from({length: 100}, (_, i) => i / 10);
+
+// Observer-Substrate Feedback Loop
+let xObs = t.map(ti => ti * Math.cos(ti * o));
+let yObs = t.map(ti => ti * Math.sin(ti * o));
+let xSub = t.map(ti => (ti + 0.5) * Math.cos(ti * o + 0.5));
+let ySub = t.map(ti => (ti + 0.5) * Math.sin(ti * o + 0.5));
+
+data.push({
+x: xObs, y: yObs,
+mode: 'lines',
+line: { color: '#94a3b8', width: 4 },
+name: 'Observer State'
+});
+data.push({
+x: xSub, y: ySub,
+mode: 'lines',
+line: { color: '#3b82f6', width: 2, dash: 'dot' },
+name: 'Substrate Response'
+});
+
+layout.title = {
+text: "OBSERVER-SUBSTRATE FEEDBACK LOOP",
+font: { color: '#94a3b8' }
+};
+
+layout.xaxis = {
+title: { text: "Interaction Coordinate", font: { color: '#eee' } },
+range: [-15, 15],
+gridcolor: '#222',
+tickfont: { color: '#eee' }
+};
+
+layout.yaxis = {
+title: { text: "Coupling Phase", font: { color: '#eee' } },
+range: [-15, 15],
+gridcolor: '#222',
+tickfont: { color: '#eee' }
+};
+
+layout.showlegend = true;
+layout.legend = {
+font: { color: '#eee' },
+x: 0,
+y: 1,
+xanchor: 'left',
+yanchor: 'top',
+bgcolor: 'rgba(0,0,0,0)' // Ensures the legend is an overlay and doesn't shrink the graph
+};
+
+// Standardizing margins to prevent layout shifts
+layout.margin = { t: 60, b: 60, l: 60, r: 60 };
+
+
+} else if (currentTool === 2) { // QM-GR UNIFICATION (NEW)
+let scale = parseFloat(document.getElementById('s_sl')?.value || 20) / 100;
+let x = [], y = [], z = [], markerSize = [];
+let resolution = 30;
+
+for (let i = 0; i < resolution; i++) {
+for (let j = 0; j < resolution; j++) {
+let u = (i / resolution) * 10 - 5;
+let v = (j / resolution) * 10 - 5;
+x.push(u); y.push(v);
+let r = Math.sqrt(u*u + v*v);
+let kTerm = 11.350;
+// Unified Transition Logic: Discrete Interferences vs Smooth Curvature
+let qm = Math.cos(u * kTerm * 0.5) * Math.sin(v * kTerm * 0.5) * Math.exp(-r*0.1) * (1-scale);
+let gr = Math.exp(-r/2.5) * scale * 2.5;
+z.push(qm + gr);
+markerSize.push(scale < 0.3 ? 3 : 3 + (scale * 10)); // Markers merge into surface
+}
+}
+
+data.push({
+x: x, y: y, z: z,
+mode: 'markers',
+type: 'scatter3d',
+marker: {
+size: markerSize, color: z,
+colorscale: scale < 0.4 ? 'Aglau' : 'Viridis',
+opacity: 0.8
+},
+name: scale < 0.5 ? 'Discrete Regime (QM)' : 'Geometric Regime (GR)'
+});
+
+layout.title = { text: "SCALE-DEPENDENT STRUCTURAL EXPRESSION  (Σμν)", font: { color: '#fbbf24' } };
+layout.scene = {
+camera: { eye: {x: 1.5, y: 1.5, z: 1.2} },
+xaxis: {
+title: {
+text: 'Basis (N)',
+font: { color: '#eee' }
+},
+gridcolor: '#444', // Moved outside title; increased brightness from #222
+tickfont: { color: '#f8fafc' }, // Brighter off-white/blue for visibility
+zerolinecolor: '#555' // Optional: makes the 0-axis stand out
+},
+yaxis: {
+title: {
+text: 'Basis (C)',
+font: { color: '#eee' }
+},
+gridcolor: '#444',
+tickfont: { color: '#f8fafc' }
+},
+zaxis: {
+title: {
+text: 'Intensity (M)',
+font: { color: '#eee' }
+},
+gridcolor: '#444',
+tickfont: { color: '#f8fafc' }
+}
+};
+layout.showlegend = true;
+layout.legend = { font: { color: '#eee' }, x: 0, y: 1, bgcolor: 'rgba(0,0,0,0)' };
+
+
+} else if (currentTool === 3) { // MASTER TENSOR
+let m = parseFloat(document.getElementById('m_sl')?.value || 100) / 100;
+let x = Array.from({length: 40}, (_, i) => i - 20);
+let y = Array.from({length: 40}, (_, i) => i - 20);
+
+// Surface representing Σμν field intensity
+let z = x.map(xi => y.map(yi => {
+let r = Math.sqrt(xi*xi + yi*yi) + 0.1;
+return m * (Math.sin(r/2)/r - 0.2); // Curvature + Pressure term
+}));
+
+data.push({
+type: 'surface',
+z: z,
+colorscale: 'Portland',
+showscale: false,
+name: 'Synthesis Tensor Intensity',
+showlegend: true
+});
+
+layout.title = {
+text: "SYNTHESIS TENSOR FIELD (Σμν)",
+font: { color: '#c084fc' }
+};
+
+layout.scene = {
+xaxis: {
+title: { text: "Spatial Basis (μ)", font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+gridcolor: '#444'
+},
+yaxis: {
+title: { text: "Geometric Basis (ν)", font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+gridcolor: '#444'
+},
+zaxis: {
+title: { text: "Field Energy Density (Σ)", font: { color: '#eee' } },
+range: [-0.5, 1.5],
+tickfont: { color: '#eee' },
+gridcolor: '#444'
+}
+};
+
+layout.showlegend = true;
+layout.legend = {
+font: { color: '#eee' },
+x: 0,
+y: 1,
+xanchor: 'left',
+yanchor: 'top',
+bgcolor: 'rgba(0,0,0,0)'
+};
+
+layout.margin = { t: 50, b: 50, l: 50, r: 50 };
+
+
+} else if (currentTool === 4) { // PARAMETER LOCK
+let p = parseFloat(document.getElementById('p_sl')?.value || 100) / 100;
+let x = [11.350];
+let y = [0.6900];
+
+data.push({
+x: x, y: y,
+mode: 'markers+text',
+// Increased base size from 20 to 40 for a more prominent diamond
+marker: { size: 40 * p, color: '#f87171', symbol: 'diamond' },
+text: ['LOCKED EQUILIBRIUM'],
+textfont: { color: '#eee' },
+textposition: 'top center',
+name: 'Lock State'
+});
+
+layout.title = {
+text: "K-P PHASE LOCK COORDINATES",
+font: { color: '#f87171' }
+};
+
+layout.xaxis = {
+title: { text: "Stiffness K", font: { color: '#eee' } },
+range: [0, 20],
+gridcolor: '#222',
+tickfont: { color: '#eee' }
+};
+
+layout.yaxis = {
+title: { text: "Pressure P", font: { color: '#eee' } },
+range: [0, 1.5],
+gridcolor: '#222',
+tickfont: { color: '#eee' }
+};
+
+layout.showlegend = true;
+layout.legend = {
+font: { color: '#eee' },
+x: 0,
+y: 1,
+xanchor: 'left',
+yanchor: 'top',
+bgcolor: 'rgba(0,0,0,0)'
+};
+
+layout.margin = { t: 50, b: 50, l: 50, r: 50 };
+
+
+} else if (currentTool === 5) { // FINAL SYNTHESIS
+let f = parseFloat(document.getElementById('final_sl')?.value || 100) / 100;
+let x = Array.from({length: 50}, (_, i) => i - 25);
+let y = Array.from({length: 50}, (_, i) => i - 25);
+
+// The "Structured Reality" map - interference of all stages
+let z = x.map(xi => y.map(yi => {
+let r = Math.sqrt(xi*xi + yi*yi) + 1;
+return f * (Math.cos(xi/3) * Math.cos(yi/3) * Math.exp(-r/15));
+}));
+
+data.push({
+type: 'surface',
+z: z,
+colorscale: 'Viridis',
+showscale: false,
+name: 'Unified Reality',
+showlegend: true
+});
+
+layout.title = {
+text: "THE FINAL STRUCTURAL SYNTHESIS",
+font: { color: '#2dd4bf' }
+};
+
+layout.scene = {
+xaxis: {
+title: { text: "Symmetry Axis (S)", font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+gridcolor: '#333'
+},
+yaxis: {
+title: { text: "Manifestation Axis (M)", font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+gridcolor: '#333'
+},
+zaxis: {
+title: { text: "Probability Amplitude (Ψ)", font: { color: '#eee' } },
+range: [-1, 1],
+tickfont: { color: '#eee' },
+gridcolor: '#333'
+}
+};
+
+layout.showlegend = true;
+layout.legend = {
+font: { color: '#eee' },
+x: 0,
+y: 1,
+xanchor: 'left',
+yanchor: 'top',
+bgcolor: 'rgba(0,0,0,0)'
+};
+
+layout.margin = { t: 50, b: 50, l: 50, r: 50 };
+}
+
+Plotly.react('plot-area', data, layout, {responsive: true, displayModeBar: false});
+}
+
+function resetLab() {
+if(currentTool===1) syncVal(75, 'o_sl');
+if(currentTool===2) syncVal(20, 's_sl');
+if(currentTool===3) syncVal(100, 'm_sl');
+if(currentTool===4) syncVal(100, 'p_sl');
+if(currentTool===5) syncVal(100, 'final_sl');
+}
+
+window.onload = () => { showScreen('portal'); };
+</script>
+</body>
+</html>

@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 50 — Gauge Structure of Reality</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #3b82f6;
+--accent-id: #f43f5e; --accent-decomp: #a855f7; --accent-algebra: #fbbf24; --accent-charge: #22d3ee; --accent-gauge: #10b981;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6;
+--accent-gold: #fbbf24;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-unified); font-family: sans-serif; font-size: 0.85rem; min-width: 450px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls, #nav-summary-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+#screen-lab.active { display: flex; flex-direction: column; height: calc(100vh - 50px); }
+
+#screen-portal { justify-content: flex-start; padding-top: 4dvh; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 30px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 2px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; padding-bottom: 0px; }
+.module-subtitle { text-align: center; font-family: sans-serif; color: var(--accent-gold); margin-bottom: 12px; font-weight: bold; letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.primary-constant-box { background: #000; border: 1px solid var(--accent-unified); padding: 2px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 8px; }
+.secondary-structure-box { background: rgba(59, 130, 246, 0.05); border: 1px dashed var(--accent-unified); padding: 3px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 12px; }
+
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(59, 130, 246, 0.05); border: 1px solid var(--accent-unified); padding: 5px; border-radius: 5px; margin-bottom: 8px; font-size: 0.7rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; }
+#plot-area { flex-grow: 1; width: 100%; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #fff; border: 1px solid var(--accent-unified); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer { width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem; color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 50 — GAUGE STRUCTURE OF REALITY</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">Gauge Structure of Reality</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">The specific symmetry $SU(3) \times SU(2) \times U(1)$ governing our universe.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-id);">
+<h2 style="color:var(--accent-id);">1. Symmetry Selection</h2>
+<p>Identification: $\boxed{ SU(3) \times SU(2) \times U(1) }$<br>Nature's architectural choice.</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-decomp);">
+<h2 style="color:var(--accent-decomp);">2. Sector Decomposition</h2>
+<p>Mapping: $\boxed{ G \rightarrow \text{EM + Weak + Strong} }$<br>Differentiated interaction domains.</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-algebra);">
+<h2 style="color:var(--accent-algebra);">3. Algebraic Force Nature</h2>
+<p>Dynamics: $\boxed{ [T^a, T^b] = i f^{abc} T^c }$<br>Linear vs Non-linear force behavior.</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-charge);">
+<h2 style="color:var(--accent-charge);">4. Charge Structure</h2>
+<p>Couplings: $\boxed{ Q, T_3, Y }$<br>Charges as symmetry labels.</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-gauge);">
+<h2 style="color:var(--accent-gauge);">5. Unified Gauge Framework</h2>
+<p>Closure: $\boxed{ \text{Abstract} \Rightarrow \text{Concrete} }$<br>Unity explaining diversity.</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-unified);">
+<h2 style="color:var(--accent-unified);">6. Stage 50 Summary</h2>
+<p>Symmetry becomes Physical Reality.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">STAGE 50 — MATHEMATICAL STRUCTURE SUMMARY</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #fbbf24; margin-bottom: 10px;">Gauge Structure of Reality</h3>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 1. SYMMETRY SELECTION</h3>
+<p>$\boxed{ G = SU(3)_C \times SU(2)_L \times U(1)_Y }$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 2. LIE ALGEBRA DECOMPOSITION</h3>
+<p>$\boxed{ \mathfrak{g} = \mathfrak{su}(3) \oplus \mathfrak{su}(2) \oplus \mathfrak{u}(1) }$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 3. GENERATOR STRUCTURE</h3>
+<p>$T = \{T^a_C,\; T^i_L,\; Y\}$</p>
+<p>$[T^a, T^b] = i f^{abc} T^c$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 4. GAUGE FIELD</h3>
+<p>$A_\mu = G_\mu^a T^a + W_\mu^i T^i + B_\mu Y$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 5. COVARIANT DERIVATIVE</h3>
+<p>$\boxed{ D_\mu = \partial_\mu + i g_3 G_\mu^a T^a + i g_2 W_\mu^i T^i + i g_1 B_\mu Y }$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 6. FIELD STRENGTH</h3>
+<p>$F_{\mu\nu} = \partial_\mu A_\nu - \partial_\nu A_\mu + i [A_\mu, A_\nu]$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 7. COMPONENT FORM</h3>
+<p>
+\begin{aligned}
+G_{\mu\nu}^a &= \partial_\mu G_\nu^a - \partial_\nu G_\mu^a + g_3 f^{abc} G_\mu^b G_\nu^c \\
+W_{\mu\nu}^i &= \partial_\mu W_\nu^i - \partial_\nu W_\mu^i + g_2 \epsilon^{ijk} W_\mu^j W_\nu^k \\
+B_{\mu\nu} &= \partial_\mu B_\nu - \partial_\nu B_\mu
+\end{aligned}
+</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 8. GAUGE LAGRANGIAN</h3>
+<p>$\boxed{ \mathcal{L}_{\text{gauge}} = -\frac{1}{4} G_{\mu\nu}^a G^{a\mu\nu} -\frac{1}{4} W_{\mu\nu}^i W^{i\mu\nu} -\frac{1}{4} B_{\mu\nu} B^{\mu\nu} }$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 9. MATTER INTERACTION</h3>
+<p>$\boxed{ \mathcal{L}_{\text{int}} = \bar{\psi} \gamma^\mu D_\mu \psi }$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 10. CHARGE DEFINITIONS</h3>
+<p>$T^a \psi = \lambda^a \psi$</p>
+<p>$\boxed{ \text{Charge} = \lambda^a }$</p>
+<p>$\boxed{ Q = T^3 + \frac{Y}{2} }$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 11. ALGEBRAIC DYNAMICS</h3>
+<p>[T^a, T^b] = i f^{abc} T^c</p>
+<p>$\boxed{ f^{abc} \neq 0 \Rightarrow \text{non-linear (self-interacting)} }$</p>
+<p>$\boxed{ f^{abc} = 0 \Rightarrow \text{linear} }$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 12. FINAL STRUCTURAL EQUATION</h3>
+<p>$\boxed{ D_\mu = \partial_\mu + \sum_{i} i g_i A_\mu^{(i)} T^{(i)} }$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 FINAL RESULT</h3>
+<p>$\boxed{ SU(3)\times SU(2)\times U(1) \;\Rightarrow\; \text{complete gauge structure of interactions} }$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 WHAT STAGE 50 ESTABLISHES (MATHEMATICAL)</h3>
+<p>$\boxed{ \text{Gauge symmetry} \;\rightarrow\; \text{forces + charges + interactions} }$</p>
+
+<p>This is complete, final, and stable mathematical closure of Stage 50.</p>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<h2 style="color:var(--accent-blue); text-align: center;">THEOREM</h2>
+<p style="text-align: center;">Understood — formal closure theorem, purely mathematical, precise and complete.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 STAGE 50 — CLOSURE / COMPLETION THEOREM</h3>
+<p>Gauge Structure of Reality</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 THEOREM (Stage 50 Completion)</h3>
+<p>Let</p>
+<p>$G = SU(3)_C \times SU(2)_L \times U(1)_Y$</p>
+<p>be a local gauge symmetry acting on fields $\psi \in R(G)$.</p>
+<p>Then the following structure uniquely determines the full interaction framework:</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 GIVEN</h3>
+<p><strong>1. Local Gauge Invariance:</strong> $\psi(x) \rightarrow U(x)\psi(x), \quad U(x) \in G$</p>
+<p><strong>2. Covariant Derivative:</strong> $D_\mu = \partial_\mu + \sum_i i g_i A_\mu^{(i)} T^{(i)}$</p>
+<p><strong>3. Field Strength:</strong> $F_{\mu\nu} = \partial_\mu A_\nu - \partial_\nu A_\mu + i [A_\mu, A_\nu]$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 THEN (STRUCTURAL CONSEQUENCES)</h3>
+<p><strong>(i) Sector Decomposition:</strong> $G = \prod_i G_i \;\Rightarrow\; \mathcal{L} = \bigoplus_i \mathcal{L}_{G_i}$</p>
+<p><strong>(ii) Force Dynamics from Algebra:</strong> $$[T^a, T^b] = i f^{abc} T^c; f^{abc} \neq 0 \Rightarrow \text{non-linear dynamics}; f^{abc} = 0 \Rightarrow \text{linear dynamics}$$</p>
+<p><strong>(iii) Charges as Eigenvalues:</strong> $T^a \psi = \lambda^a \psi; \boxed{ \text{Charges} = \{\lambda^a\} }$</p>
+<p><strong>(iv) Interaction Structure:</strong> $\mathcal{L}_{\text{int}} = \bar{\psi} \gamma^\mu D_\mu \psi$</p>
+<p><strong>(v) Gauge Lagrangian:</strong> $\mathcal{L}_{\text{gauge}} = -\frac{1}{4} \sum_i F_{\mu\nu}^{(i)} F^{(i)\mu\nu}$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 COMPLETION STATEMENT</h3>
+<p>$\boxed{ \left(G,\; D_\mu,\; F_{\mu\nu},\; R(G)\right) \;\Rightarrow\; \text{complete gauge interaction structure} }$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 UNIQUENESS (WITHIN ASSUMPTIONS)</h3>
+<p>Given: Local gauge invariance, Lie group structure, Representation space R(G)</p>
+<p>Then: $\boxed{ \mathcal{L} = -\frac{1}{4} F^2 + \bar{\psi} i \gamma^\mu D_\mu \psi }$ is the minimal consistent Lagrangian.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 FINAL RESULT</h3>
+<p>$\boxed{ SU(3)\times SU(2)\times U(1) \;\Longrightarrow\; \text{Forces + Charges + Interaction Laws} }$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 STAGE 50 CLOSURE</h3>
+<p>$\boxed{ \text{Gauge symmetry} \;\equiv\; \text{complete structural origin of interactions} }$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 WHAT IS COMPLETED</h3>
+<p style="margin-bottom: 0;">$\boxed{ \text{Abstract symmetry} \;\rightarrow\; \text{fully specified interaction framework} }$</p>
+</div>
+</section>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div id="active-module-result" class="module-subtitle">--</div>
+<div class="primary-constant-box">
+<div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val">11.350</span></div>
+<div class="const-item"><span class="const-label">Synthesis P</span><span class="const-val">0.6900</span></div>
+</div>
+
+<div id="structure-box-area"></div>
+<div id="mapping-box-area"></div>
+
+<div class="diagnostic-panel">
+<span class="diag-title">Realization Telemetry</span>
+<div id="telemetry-area"></div>
+</div>
+
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-unified); font-size:0.75rem; cursor:pointer; padding:6px;">RESET GAUGE</button>
+<div id="panel-footer-text" style="font-size: 0.75rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.3; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:8px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Gauge Logic</span>
+<div id="metrics-content" style="font-size:0.65rem; font-family:monospace; line-height:1.3;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Structural Outcome</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.65rem; color: var(--text-dim); line-height: 1.4; background: #000; padding: 5px; border-radius: 0px; border: 1px solid #222; margin-top: auto;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "SYMMETRY IDENTIFICATION",
+result: "Nature selects a definite symmetry structure",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Symmetry Identification — Selection of Gauge Structure</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔷 MODULE OVERVIEW</h3>
+<p>This module introduces the idea that physical reality is governed by a definite gauge symmetry structure, selected from a broader space of possible symmetries. It establishes that the symmetry observed in nature is not arbitrary, but corresponds to a specific, realized structure.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 LEFT PANEL — CONCEPTUAL STRUCTURE</h3>
+<p><strong>Nature selects a definite symmetry structure:</strong> Physical reality does not exhibit all possible symmetries. Instead, it corresponds to a specific symmetry configuration.</p>
+<p><strong>Selection Rule:</strong> Reality = Selection of a definite gauge symmetry structure. This means: A range of symmetry possibilities exists; Only one structure is realized physically; This realized structure governs all interactions.</p>
+<p><strong>Symmetry: Identified:</strong> At this stage: Symmetry is no longer abstract; It is recognized as the operative structure of physical reality.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 CENTRAL VISUALIZATION — GRAPH INTERPRETATION</h3>
+<p><strong>Selection of Gauge Symmetry:</strong> The visualization represents: A space of possible gauge symmetries and a selection path through this space.</p>
+<p><strong>Axes Interpretation:</strong></p>
+<ul>
+<li><strong>General Symmetry Space (G):</strong> Represents the set of possible symmetry groups.</li>
+<li><strong>Selection Parameter / Potential:</strong> Represents structural constraints influencing realization.</li>
+<li><strong>Selection Probability (P):</strong> Indicates relative stability or viability.</li>
+</ul>
+<p><strong>Physical Meaning:</strong> Not all symmetry structures are equally realized. Structural constraints guide the system toward a stable configuration. The resulting selection corresponds to the physically observed gauge structure: <strong>👉 SU(3) × SU(2) × U(1)</strong></p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 RIGHT PANEL — LOGICAL FLOW</h3>
+<p><strong>Golden Axiom:</strong> Nature operates through definite gauge Lie group structures. This reflects that: Physical interactions are governed by symmetry groups; These groups are mathematically described as Lie groups.</p>
+<p><strong>Gauge Logic:</strong> General Symmetry Space → Structural Selection → SU(3) × SU(2) × U(1).</p>
+<p><strong>Structural Outcome:</strong> Reality: Selected Gauge Structure. This means: The physical world is organized according to a specific symmetry group; This structure defines the framework for all interactions.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 PHYSICAL SIGNIFICANCE</h3>
+<p>At this stage: Abstract symmetry becomes physically realized structure. The gauge group defines: Interaction types, Force structure, and Field behavior.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 MODULE CONCLUSION</h3>
+<p><strong>👉 This Module Establishes:</strong> Possible symmetry space → selected physical gauge structure.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 ROLE IN STAGE 50</h3>
+<p style="margin-bottom: 0;">This module sets the foundation for: Decomposition into interaction sectors (next module); Understanding how different forces arise from symmetry; Transition from abstract symmetry to physical interactions. This is now WS-ready briefing format — clean, direct, and consistent.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Symmetry Realization:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\mathcal{G} \\xrightarrow{\\text{Identification}} G_{\\text{phys}}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The transition from abstract mathematical potential to physical reality occurs via the selection of the primary gauge symmetry structure.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematical Structure: Symmetry Identification</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔷 1. GENERAL SYMMETRY SPACE</h3>
+<p>Let the space of admissible internal symmetries be:</p>
+<p>$$\\mathcal{G} = \{ G \\mid G \\text{ is a compact Lie group compatible with local gauge invariance} \}$$</p>
+<p>Each candidate symmetry $$G \\in \\mathcal{G}$$ is characterized by:</p>
+<ul>
+<li>Lie algebra $$\\mathfrak{g}$$</li>
+<li>Generators $$T^a$$</li>
+<li>Structure constants $$f^{abc}$$</li>
+</ul>
+<p>$$[T^a, T^b] = i f^{abc} T^c$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 2. LOCAL GAUGE STRUCTURE</h3>
+<p>A physically admissible symmetry must support local gauge invariance:</p>
+<p>$$\\psi(x) \\;\\rightarrow\\; U(x)\\psi(x), \\quad U(x) \\in G$$</p>
+<p>Gauge field:</p>
+<p>$$A_\\mu(x) = A_\\mu^a(x) T^a$$</p>
+<p>Covariant derivative:</p>
+<p>$$D_\\mu = \\partial_\\mu + i g A_\\mu^a T^a$$</p>
+<p>Field strength:</p>
+<p>$$F_{\\mu\\nu}^a = \\partial_\\mu A_\\nu^a - \\partial_\\nu A_\\mu^a + g f^{abc} A_\\mu^b A_\\nu^c$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 3. SELECTION CONSTRAINT (STRUCTURAL CONSISTENCY)</h3>
+<p>Admissible $$G$$ must satisfy:</p>
+<p><strong>(i) Renormalizability:</strong> $$\\mathcal{L} \\text{ must be renormalizable}$$</p>
+<p><strong>(ii) Anomaly Cancellation:</strong> $$\\sum_{\\text{fermions}} \\text{Tr}(T^a \\{T^b, T^c\\}) = 0$$</p>
+<p><strong>(iii) Representation Compatibility:</strong> Fermion representations $$R$$ must satisfy: $$R \\in \\text{Rep}(G)$$</p>
+<p><strong>(iv) Product Decomposability:</strong> $$G = \\prod_i G_i$$ into simple/abelian factors.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 4. STRUCTURAL SELECTION</h3>
+<p>The realized symmetry is:</p>
+<p>$$G_{\\text{phys}} = SU(3)_C \\times SU(2)_L \\times U(1)_Y$$</p>
+<p>Corresponding Lie algebras:</p>
+<p>$$\\mathfrak{g} = \\mathfrak{su}(3) \\oplus \\mathfrak{su}(2) \\oplus \\mathfrak{u}(1)$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 5. GAUGE FIELD CONTENT</h3>
+<p>$$A_\\mu = (G_\\mu^a, W_\\mu^i, B_\\mu)$$</p>
+<p>Where:</p>
+<ul>
+<li>$$G_\\mu^a, a=1,\\dots,8 \\rightarrow SU(3)$$</li>
+<li>$$W_\\mu^i, i=1,2,3 \\rightarrow SU(2)$$</li>
+<li>$$B_\\mu \\rightarrow U(1)$$</li>
+</ul>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 6. LAGRANGIAN STRUCTURE</h3>
+<p>Gauge sector:</p>
+<p>$$\\mathcal{L}_{\\text{gauge}} = - \\frac{1}{4} G_{\\mu\\nu}^a G^{a\\mu\\nu} - \\frac{1}{4} W_{\\mu\\nu}^i W^{i\\mu\\nu} - \\frac{1}{4} B_{\\mu\\nu} B^{\\mu\\nu}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 7. SELECTION AS MINIMALLY CONSISTENT STRUCTURE</h3>
+<p>Formally:</p>
+<p>$$G_{\\text{phys}} = \\operatorname*{arg\\,min}_{G \\in \\mathcal{G}} \\; \\mathcal{C}(G)$$</p>
+<p>Where $$\\mathcal{C}(G)$$ encodes: anomaly constraints, renormalizability, and representation consistency.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 8. INTERPRETATION</h3>
+<p>$$\\mathcal{G} \\longrightarrow G_{\\text{phys}}$$</p>
+<p>This represents: Restriction from all admissible groups to the physically realized gauge structure.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 9. FINAL MATHEMATICAL STATEMENT</h3>
+<p>$$\\boxed{ \\text{Physical reality is governed by a gauge group } G_{\\text{phys}} \\in \\mathcal{G}, \\text{ selected under structural consistency constraints} }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 MODULE RESULT (MATHEMATICAL FORM)</h3>
+<p>$$\\boxed{ \\mathcal{G} \\;\\xrightarrow{\\text{constraints}}\\; SU(3)_C \\times SU(2)_L \\times U(1)_Y }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 WHAT THIS MODULE ESTABLISHES (MATHEMATICAL)</h3>
+<p style="margin-bottom: 0;">$$\\boxed{ \\text{Possible symmetry space} \\;\\rightarrow\\; \\text{selected gauge group} }$$</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Mathematical Selection:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\mathcal{C}(G) \\rightarrow 0$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Symmetry is identified as the minimal consistent set of Lie group structures that satisfy the fundamental stability and consistency constraints of the substrate.</p>
+</div>
+</div>`,
+
+
+sliders: `<div class="control-item"><div class="label-group"><span>REVEAL SELECTION</span><input type="number" id="s_in" class="digital-entry" value="0" oninput="syncVal(this.value, 's_sl')"></div><input type="range" id="s_sl" min="0" max="100" step="1" value="0" oninput="syncVal(this.value, 's_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">SELECTION RULE</span><div style="text-align:center; font-size: 0.9rem;">Reality = Selection of a definite gauge symmetry structure</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Nature operates through definite gauge Lie group structures</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">System</span><span class="const-val">SM-G</span></div><div class="const-item"><span class="const-label">Entity</span><span class="const-val">SYMMETRY SELECTION</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-id);">SYMMETRY: IDENTIFIED</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">General Symmetry Space<br>↓<br>Structural Selection<br>↓<br>SU(3)×SU(2)×U(1)`,
+hierarchy: `<div style="color: var(--accent-id); font-weight: bold; font-size: 0.95rem;">Reality: Selected Gauge Structure</div>`,
+footer: "The universe is defined by the symmetry it selects.",
+rightNote: `<div style="color: #f43f5e; line-height: 1.3; margin-top: 8px; padding: 10px; font-size: 0.9rem;">Abstract symmetry becomes concrete physical structure at this junction.<p>👉This Module Establishes:<br>Symmetry is not arbitrary — it is structurally selected and realized as SU(3) × SU(2) × U(1)</p></div>`
+},
+
+2: {
+title: "SECTOR DECOMPOSITION",
+result: "Product groups define interaction domains",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Sector Decomposition — Product Groups Define Interaction Domains</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔷 MODULE OVERVIEW</h3>
+<p>This module explains how a single unified gauge symmetry gives rise to multiple interaction domains (forces) through its decomposition into sub-groups. It establishes that force diversity is not independent — it emerges from the product structure of the gauge group.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 LEFT PANEL — CONCEPTUAL STRUCTURE</h3>
+<p><strong>Product groups define interaction domains:</strong> The total gauge symmetry $$G = SU(3) \\times SU(2) \\times U(1)$$ is a direct product of sub-groups. Each sub-group corresponds to a distinct interaction sector.</p>
+<p><strong>Mapping Rule:</strong> Forces = Manifestations of sub-group invariance. Meaning: Each force is associated with invariance under a specific sub-group; Different interactions arise from different symmetry components.</p>
+<p><strong>Sectors: Decoupled:</strong> At this level: Each sub-group operates independently; No mixing between sectors is considered.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 CENTRAL VISUALIZATION — GRAPH INTERPRETATION</h3>
+<p><strong>Sector Decomposition:</strong> The visualization represents: A single unified symmetry structure and its decomposition into separate sectors.</p>
+<p><strong>Axes Interpretation:</strong></p>
+<ul>
+<li><strong>Interaction Strength (g):</strong> Coupling associated with each sector.</li>
+<li><strong>Symmetry Component:</strong> Different sub-group directions.</li>
+<li><strong>Force Range / Behavior:</strong> Physical manifestation of the interaction.</li>
+</ul>
+<p><strong>Sector Representation:</strong></p>
+<ul>
+<li>$$SU(3) \\rightarrow$$ Strong sector</li>
+<li>$$SU(2) \\rightarrow$$ Weak sector</li>
+<li>$$U(1) \\rightarrow$$ Electromagnetic sector</li>
+</ul>
+<p>Each point corresponds to a distinct interaction domain emerging from the same unified symmetry.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 RIGHT PANEL — LOGICAL FLOW</h3>
+<p><strong>Golden Axiom:</strong> Composite symmetry yields force diversity.</p>
+<p><strong>Gauge Logic:</strong> Total Group G → Sub-group decomposition → Differentiated forces.</p>
+<p><strong>Structural Outcome:</strong> Forces: Manifested symmetry domains. Meaning: Forces are not independent entities; They are expressions of symmetry structure.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 PHYSICAL SIGNIFICANCE</h3>
+<p>A single gauge structure produces multiple forces. Each force corresponds to: Its own gauge field, Its own coupling constant, and Its own interaction behavior.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 MATHEMATICAL FORM</h3>
+<p>Gauge group decomposition: $$G = SU(3)_C \\times SU(2)_L \\times U(1)_Y$$</p>
+<p>Independent gauge fields: $$A_\\mu = (G_\\mu^a,\\, W_\\mu^i,\\, B_\\mu)$$</p>
+<p>Covariant derivative: $$D_\\mu = \\partial_\\mu + i g_3 G_\\mu^a T^a + i g_2 W_\\mu^i \\tau^i + i g_1 B_\\mu Y$$</p>
+<p><strong>Interpretation:</strong> Each term corresponds to a separate interaction sector, acting independently.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 MODULE CONCLUSION</h3>
+<p><strong>👉 This Module Establishes:</strong> One symmetry → multiple interaction domains.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 ROLE IN STAGE 50</h3>
+<p>This module builds on: Module 1: selection of symmetry. And prepares for: Module 3: algebraic structure of interactions; Module 4: charge structure; Module 5: unified realization.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 SUMMARY</h3>
+<p style="margin-bottom: 0;">The gauge group is composite. Each component defines an interaction. Force diversity arises from symmetry decomposition.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Symmetry Splitting:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$G \\rightarrow \\bigotimes_{i} G_i$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Force diversity is the physical manifestation of the internal product structure of the fundamental gauge group.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: Sector Decomposition</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔷 1. GAUGE GROUP DECOMPOSITION</h3>
+<p>$$G = SU(3)_C \\times SU(2)_L \\times U(1)_Y$$</p>
+<p>Lie algebra:</p>
+<p>$$\\mathfrak{g} = \\mathfrak{su}(3) \\oplus \\mathfrak{su}(2) \\oplus \\mathfrak{u}(1)$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 2. GENERATOR STRUCTURE</h3>
+<p>$$T^A = \{ T^a_C,\\; T^i_L,\\; Y \}$$</p>
+<p>Where:</p>
+<ul>
+<li>$$T^a_C, a=1,\\dots,8$$ (SU(3))</li>
+<li>$$T^i_L, i=1,2,3$$ (SU(2))</li>
+<li>$$Y$$ (U(1))</li>
+</ul>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 3. COMMUTATION RELATIONS</h3>
+<p>Within each sector:</p>
+<p>$$[T^a_C, T^b_C] = i f^{abc} T^c_C$$</p>
+<p>$$[T^i_L, T^j_L] = i \\epsilon^{ijk} T^k_L$$</p>
+<p>$$[Y, Y] = 0$$</p>
+<p>Across sectors (direct product property):</p>
+<p>$$[T^a_C, T^i_L] = 0,\\quad [T^a_C, Y] = 0,\\quad [T^i_L, Y] = 0$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 4. GAUGE FIELDS</h3>
+<p>$$A_\\mu = (G_\\mu^a,\\; W_\\mu^i,\\; B_\\mu)$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 5. COVARIANT DERIVATIVE</h3>
+<p>$$D_\\mu = \\partial_\\mu + i g_3 G_\\mu^a T^a_C + i g_2 W_\\mu^i T^i_L + i g_1 B_\\mu Y$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 6. FIELD STRENGTH TENSORS</h3>
+<p><strong>SU(3):</strong></p>
+<p>$$G_{\\mu\\nu}^a = \\partial_\\mu G_\\nu^a - \\partial_\\nu G_\\mu^a + g_3 f^{abc} G_\\mu^b G_\\nu^c$$</p>
+<p><strong>SU(2):</strong></p>
+<p>$$W_{\\mu\\nu}^i = \\partial_\\mu W_\\nu^i - \\partial_\\nu W_\\mu^i + g_2 \\epsilon^{ijk} W_\\mu^j W_\\nu^k$$</p>
+<p><strong>U(1):</strong></p>
+<p>$$B_{\\mu\\nu} = \\partial_\\mu B_\\nu - \\partial_\\nu B_\\mu$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 7. GAUGE LAGRANGIAN</h3>
+<p>$$\\mathcal{L}_{\\text{gauge}} = -\\frac{1}{4} G_{\\mu\\nu}^a G^{a\\mu\\nu} -\\frac{1}{4} W_{\\mu\\nu}^i W^{i\\mu\\nu} -\\frac{1}{4} B_{\\mu\\nu} B^{\\mu\\nu}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 8. SECTOR DECOUPLING (STRUCTURAL FORM)</h3>
+<p>$$\\mathcal{L}_{\\text{gauge}} = \\mathcal{L}_{SU(3)} \\;\\oplus\\; \\mathcal{L}_{SU(2)} \\;\\oplus\\; \\mathcal{L}_{U(1)}$$</p>
+<p>Each sector evolves independently at this level.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 9. INTERACTION DECOMPOSITION</h3>
+<p>$$D_\\mu = D_\\mu^{(3)} + D_\\mu^{(2)} + D_\\mu^{(1)}$$</p>
+<p>Where:</p>
+<ul>
+<li>$$D_\\mu^{(3)} = i g_3 G_\\mu^a T^a_C$$</li>
+<li>$$D_\\mu^{(2)} = i g_2 W_\\mu^i T^i_L$$</li>
+<li>$$D_\\mu^{(1)} = i g_1 B_\\mu Y$$</li>
+</ul>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 10. FINAL MATHEMATICAL STATEMENT</h3>
+<p>$$\\boxed{ G = \\prod_i G_i \\;\\Rightarrow\\; D_\\mu = \\partial_\\mu + \\sum_i i g_i A_\\mu^{(i)} T^{(i)} }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 MODULE RESULT (MATHEMATICAL FORM)</h3>
+<p>$$\\boxed{ \\text{Single gauge group} \\;\\longrightarrow\\; \\text{independent interaction sectors} }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 WHAT THIS MODULE ESTABLISHES (MATHEMATICAL)</h3>
+<p style="margin-bottom: 0;">$$\\boxed{ SU(3)\\times SU(2)\\times U(1) \\;\\Rightarrow\\; \\{\\text{Strong},\\;\\text{Weak},\\;\\text{EM}\\} }$$</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Algebraic Splitting:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\mathfrak{g} = \\bigoplus_{i} \\mathfrak{g}_i$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The decomposition of the total Lie algebra into direct sums ensures that each interaction sector preserves its own symmetry and conservation laws independently.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>DECOMPOSITION SCALE</span><input type="number" id="d_in" class="digital-entry" value="0" oninput="syncVal(this.value, 'd_sl')"></div><input type="range" id="d_sl" min="0" max="100" step="1" value="0" oninput="syncVal(this.value, 'd_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.8rem;">Forces = Projections of Sub-Group Invariance</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">Composite symmetry yields force diversity</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Domain</span><span class="const-val">TRIADIC</span></div><div class="const-item"><span class="const-label">Entity</span><span class="const-val">FORCE SECTORS</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-decomp);">SECTORS: DECOUPLED</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.9rem;">Total Group G<br>↓<br>Sub-group Projections<br>↓<br>Differentiated Forces`,
+hierarchy: `<div style="color: var(--accent-decomp); font-weight: bold; font-size: 0.95rem;">Forces: Manifested Symmetry Domains</div>`,
+footer: "Unity at the level of principle, diversity at the level of manifestation.",
+rightNote: `<div style="color: #a855f7; line-height: 1.3; margin-top: 8px; padding: 10px; font-size: 0.9rem;">Each sector operates independently under the global gauge constraint.<p>👉This Module Establishes:<br>One symmetry → multiple interaction domains</p></div>`
+},
+
+3: {
+title: "ALGEBRAIC FORCE NATURE",
+result: "Algebraic structure determines force behavior",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: ALGEBRAIC FORCE NATURE</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #fbbf24; margin-bottom: 10px;">Algebraic structure determines force behavior</h3>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 CORE IDEA</h3>
+<p>This module establishes that the qualitative behavior of forces is not arbitrary, but is directly determined by the algebraic structure of the gauge group. The key distinction is: <strong>Abelian algebra &rarr; linear, non-self-interacting forces</strong>; <strong>Non-Abelian algebra &rarr; non-linear, self-interacting forces</strong>. Thus, force dynamics = algebraic property of symmetry.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 MATHEMATICAL FOUNDATION</h3>
+<p><strong>1. Commutation Structure:</strong> For generators $$T^a$$: $$[T^a, T^b] = i f^{abc} T^c$$. Where $$f^{abc} = 0 \\rightarrow$$ Abelian (commutative) and $$f^{abc} \\neq 0 \\rightarrow$$ Non-Abelian (non-commutative).</p>
+<p><strong>2. Gauge Field Strength:</strong> $$F_{\\mu\\nu}^a = \\partial_\\mu A_\\nu^a - \\partial_\\nu A_\\mu^a + g f^{abc} A_\\mu^b A_\\nu^c$$. 👉 Critical term: $$g f^{abc} A_\\mu^b A_\\nu^c$$. This term is present only if $$f^{abc} \\neq 0$$ and represents the self-interaction term.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 PHYSICAL CONSEQUENCE</h3>
+<p><strong>Abelian Case (U(1)):</strong> $$f^{abc} = 0$$. Resulting in $$F_{\\mu\\nu} = \\partial_\\mu A_\\nu - \\partial_\\nu A_\\mu$$. No self-interaction; Linear propagation. Example: Electromagnetism.</p>
+<p><strong>Non-Abelian Case (SU(2), SU(3)):</strong> $$f^{abc} \\neq 0$$. Resulting in $$F_{\\mu\\nu}^a = \\partial_\\mu A_\\nu^a - \\partial_\\nu A_\\mu^a + g f^{abc} A_\\mu^b A_\\nu^c$$. Gauge bosons interact with themselves; Non-linear dynamics. Examples: Weak interaction (SU(2)) and Strong interaction (SU(3)).</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 INTERPRETATION OF VISUAL (GRAPH PARAGRAPH)</h3>
+<p>The spiral trajectory represents force evolution in field space under self-interaction. Axes correspond to: Field amplitude, Internal phase space, and Self-interaction strength. In the Abelian case: &rarr; trajectory would be straight / linear. In the Non-Abelian case: &rarr; trajectory becomes curved / spiral, reflecting: $$A_\\mu \\rightarrow A_\\mu + A_\\mu^2 \\text{ contribution}$$. Thus, the spiral visual encodes: $$\\text{Non-zero } f^{abc} \\Rightarrow \\text{non-linear propagation}$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 STRUCTURAL LOGIC</h3>
+<p>$$\\text{Algebra} \\;\\rightarrow\\; \\text{Commutator} \\;\\rightarrow\\; \\text{Self-interaction term} \\;\\rightarrow\\; \\text{Force behavior}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 SYNTHESIS STATEMENT</h3>
+<p>$$\\boxed{ \\text{Force behavior is encoded in the Lie algebra structure} }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 WHAT THIS MODULE ACHIEVES</h3>
+<p>👉 It establishes: $$\\boxed{ \\text{Algebraic structure} \\;\\rightarrow\\; \\text{force behavior} }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 POSITION IN FLOW</h3>
+<p style="margin-bottom: 0;">Module 1: Symmetry selected; Module 2: Symmetry decomposed into sectors; Module 3 (this): Algebra determines how each sector behaves.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Algebraic Logic:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$[T^a, T^b] \neq 0 \implies \text{Self-Interaction}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The fundamental nature of a force—whether it is linear or non-linear—is a direct mathematical consequence of the non-commutativity of its underlying symmetry group generators.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: Algebraic Force Nature</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔷 1. LIE ALGEBRA DEFINITION</h3>
+<p>$$[T^a, T^b] = i f^{abc} T^c$$</p>
+<p>Where $$f^{abc}$$ are the structure constants. This determines the algebra type.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 2. ABELIAN VS NON-ABELIAN</h3>
+<p><strong>Abelian (U(1)):</strong></p>
+<p>$$[T, T] = 0 \\;\\;\\Rightarrow\\;\\; f^{abc} = 0$$</p>
+<p><strong>Non-Abelian (SU(N)):</strong></p>
+<p>$$[T^a, T^b] = i f^{abc} T^c,\\quad f^{abc} \\neq 0$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 3. GAUGE FIELD</h3>
+<p>$$A_\\mu = A_\\mu^a T^a$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 4. FIELD STRENGTH TENSOR</h3>
+<p>$$F_{\\mu\\nu} = \\partial_\\mu A_\\nu - \\partial_\\nu A_\\mu + i g [A_\\mu, A_\\nu]$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 5. EXPANDED FORM</h3>
+<p>$$F_{\\mu\\nu}^a = \\partial_\\mu A_\\nu^a - \\partial_\\nu A_\\mu^a + g f^{abc} A_\\mu^b A_\\nu^c$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 6. ABELIAN LIMIT</h3>
+<p>If $$f^{abc} = 0$$:</p>
+<p>$$F_{\\mu\\nu} = \\partial_\\mu A_\\nu - \\partial_\\nu A_\\mu$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 7. GAUGE LAGRANGIAN</h3>
+<p>$$\\mathcal{L} = -\\frac{1}{4} F_{\\mu\\nu}^a F^{a\\mu\\nu}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 8. INTERACTION TERMS (EXPANSION)</h3>
+<p>$$\\mathcal{L} = -\\frac{1}{4} (\\partial A + g A A)^2$$</p>
+<p>Expands to:</p>
+<p>$$\\mathcal{L} = (\\partial A)^2 + g (\\partial A) A A + g^2 A^4$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 9. INTERPRETATION</h3>
+<ul>
+<li>$$(\\partial A)^2 \\rightarrow$$ free propagation</li>
+<li>$$g (\\partial A) A A \\rightarrow$$ 3-point interaction</li>
+<li>$$g^2 A^4 \\rightarrow$$ 4-point interaction</li>
+</ul>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 10. ABELIAN CASE</h3>
+<p>$$\\mathcal{L}_{U(1)} = -\\frac{1}{4} (\\partial_\\mu A_\\nu - \\partial_\\nu A_\\mu)^2$$</p>
+<p>No interaction terms: $$\\Rightarrow \\text{purely linear theory}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 11. NON-ABELIAN CASE</h3>
+<p>$$\\mathcal{L}_{SU(N)} = -\\frac{1}{4} (\\partial A + g A A)^2$$</p>
+<p>Contains: $$A^3,\\; A^4 \\;\\text{terms}$$. $$\\Rightarrow \\text{self-interacting gauge fields}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 12. FINAL MATHEMATICAL STATEMENT</h3>
+<p>$$\\boxed{ f^{abc} = 0 \\;\\Rightarrow\\; \\text{linear force} }$$</p>
+<p>$$\\boxed{ f^{abc} \\neq 0 \\;\\Rightarrow\\; \\text{non-linear force with self-interaction} }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 MODULE RESULT (MATHEMATICAL)</h3>
+<p>$$\\boxed{ [T^a, T^b] \\;\\Rightarrow\\; F_{\\mu\\nu} \\;\\Rightarrow\\; \\mathcal{L} \\;\\Rightarrow\\; \\text{force dynamics} }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 WHAT THIS MODULE ESTABLISHES (MATHEMATICAL)</h3>
+<p style="margin-bottom: 0;">$$\\boxed{ \\text{Lie algebra structure} \\;\\rightarrow\\; \\text{force behavior} }$$</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Dynamic Selection:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\mathcal{L}_{int} \propto g \cdot f^{abc}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The presence or absence of self-interaction—and thus the fundamental behavior of the force carrier—is mathematically dictated by the structure constants of the gauge group's Lie algebra.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>NON-LINEARITY (f)</span><input type="number" id="a_in" class="digital-entry" value="0" oninput="syncVal(this.value, 'a_sl')"></div><input type="range" id="a_sl" min="0" max="100" step="1" value="0" oninput="syncVal(this.value, 'a_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">DYNAMICS RULE</span><div style="text-align:center; font-size: 0.8rem;">Abelian algebra → linear force behavior</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">Force behavior is a property of the group algebra</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Commutator</span><span class="const-val">Lie-f</span></div><div class="const-item"><span class="const-label">Entity</span><span class="const-val">NON-LINEARITY</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-algebra);">ALGEBRA: NON-ABELIAN</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.9rem;">Algebraic Structure<br>↓<br>Self-Interaction Term<br>↓<br>Force Behavior`,
+hierarchy: `<div style="color: var(--accent-algebra); font-weight: bold; font-size: 1.00rem;">Force: Encoded Algebraic Dynamics</div>`,
+footer: "Linearity and non-linearity are structural properties of symmetry.",
+rightNote: `<div style="color: #fbbf24; line-height: 1.3; margin-top: 8px; padding: 10px; font-size: 0.9rem;">The difference between electromagnetic and strong interactions is purely algebraic.<p>👉This Module Establishes:<br>Algebraic structure → force behavior</p></div>`
+},
+
+4: {
+title: "CHARGE STRUCTURE",
+result: "Charges as representation labels",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: CHARGE STRUCTURE</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #fbbf24; margin-bottom: 10px;">Charges as representation labels</h3>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 CORE IDEA</h3>
+<p>This module establishes that charges are not independent physical quantities, but arise as labels of symmetry representations. Mathematically: <strong>Charge = eigenvalue of symmetry generator</strong>. Thus, what is observed as electric charge, weak charge, or color charge is fundamentally: <strong>a representation property of the gauge group</strong>.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 MATHEMATICAL FOUNDATION</h3>
+<p><strong>1. Generator Action:</strong> For a state $$\\psi$$: $$T^a \\psi = \\lambda^a \\psi$$. Where $$T^a$$ is the generator of symmetry and $$\\lambda^a$$ is the eigenvalue &rarr; charge.</p>
+<p><strong>2. Abelian Case (U(1)):</strong> $$Y \\psi = y \\psi$$, where $$y = \\text{hypercharge}$$. Direct observable coupling: $$D_\\mu = \\partial_\\mu + i g_1 y B_\\mu$$.</p>
+<p><strong>3. Non-Abelian Case:</strong></p>
+<ul>
+<li><strong>SU(2):</strong> $$T^3 \\psi = t_3 \\psi$$, where $$t_3 = \\text{weak isospin component}$$.</li>
+<li><strong>SU(3):</strong> States belong to representations: $$\\psi \\in \\mathbf{3},\\ \\mathbf{\\bar{3}},\\ \\mathbf{8}$$. Charges correspond to eigenvalues of Cartan generators: $$(T^3, T^8)$$.</li>
+</ul>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 4. ELECTRIC CHARGE RELATION</h3>
+<p>$$Q = T^3 + \\frac{Y}{2}$$</p>
+<p>This is the <strong>Gell-Mann–Nishijima relation</strong>.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 5. COVARIANT DERIVATIVE (FULL FORM)</h3>
+<p>$$D_\\mu = \\partial_\\mu + i g_3 G_\\mu^a T^a + i g_2 W_\\mu^i T^i + i g_1 B_\\mu Y$$</p>
+<p>👉 Charges appear as coefficients multiplying gauge fields.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 6. INTERPRETATION</h3>
+<p>Charges determine interaction strength and type. They are not added parameters, but arise from: $$\\text{representation of } G$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 GRAPH INTERPRETATION PARAGRAPH</h3>
+<p>The visualization represents points in charge space defined by symmetry generators. Axes correspond to: Hypercharge (Y), Weak isospin ($$T^3$$), and Electric charge (Q). Each point represents a state with definite eigenvalues: $$(Y, T^3, Q)$$. The discrete positioning reflects: $$\\text{quantization of eigenvalues}$$. Thus, the graph encodes: $$\\text{Symmetry generators} \\;\\rightarrow\\; \\text{discrete charge spectrum}$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 STRUCTURAL LOGIC</h3>
+<p>$$\\text{Generator} \\;\\rightarrow\\; \\text{Eigenvalue} \\;\\rightarrow\\; \\text{Charge} \\;\\rightarrow\\; \\text{Interaction}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 SYNTHESIS STATEMENT</h3>
+<p>$$\\boxed{ \\text{Charges are eigenvalues of symmetry generators} }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 WHAT THIS MODULE ACHIEVES</h3>
+<p>👉 It establishes: $$\\boxed{ \\text{Symmetry representation} \\;\\rightarrow\\; \\text{observable charge} }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 POSITION IN FLOW</h3>
+<p style="margin-bottom: 0;">Module 1: Symmetry selected; Module 2: Symmetry decomposed; Module 3: Algebra defines force behavior; Module 4 (this): Charges define interaction identity.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Eigenvalue Mapping:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\hat{Q} |\psi\rangle = q |\psi\rangle$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Physical charges are identified as the discrete eigenvalues of the symmetry group's diagonal generators, mapping mathematical group properties directly to observable interaction strengths.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: Charge Structure</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔷 1. GENERATOR EIGENVALUE EQUATION</h3>
+<p>$$T^a \\, \\psi = \\lambda^a \\, \\psi$$</p>
+<p>$$\\boxed{\\text{Charge} = \\lambda^a}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 2. U(1) (HYPERCHARGE)</h3>
+<p>$$Y \\psi = y \\psi$$</p>
+<p>Covariant derivative term:</p>
+<p>$$D_\\mu = \\partial_\\mu + i g_1 y B_\\mu$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 3. SU(2) (WEAK ISOSPIN)</h3>
+<p>$$T^i = \\frac{\\sigma^i}{2}$$</p>
+<p>$$T^3 \\psi = t_3 \\psi$$</p>
+<p>$$t_3 = \\pm \\frac{1}{2}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 4. ELECTRIC CHARGE RELATION</h3>
+<p>$$\\boxed{ Q = T^3 + \\frac{Y}{2} }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 5. SU(3) (COLOR CHARGE)</h3>
+<p>Cartan generators: $$T^3,\\quad T^8$$</p>
+<p>$$T^3 \\psi = \\lambda_3 \\psi,\\quad T^8 \\psi = \\lambda_8 \\psi$$</p>
+<p>Fundamental representation weights:</p>
+<p>$$\\left( \\frac{1}{2}, \\frac{1}{2\\sqrt{3}} \\right),\\; \\left( -\\frac{1}{2}, \\frac{1}{2\\sqrt{3}} \\right),\\; \\left( 0, -\\frac{1}{\\sqrt{3}} \\right)$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 6. FULL COVARIANT DERIVATIVE</h3>
+<p>$$D_\\mu = \\partial_\\mu + i g_3 G_\\mu^a T^a + i g_2 W_\\mu^i T^i + i g_1 B_\\mu Y$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 7. INTERACTION TERM</h3>
+<p>$$\\mathcal{L}_{\\text{int}} = \\bar{\\psi} \\gamma^\\mu D_\\mu \\psi$$</p>
+<p>Expands to:</p>
+<p>$$\\bar{\\psi} \\gamma^\\mu \\left( i g_3 G_\\mu^a T^a + i g_2 W_\\mu^i T^i + i g_1 B_\\mu Y \\right) \\psi$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 8. ELECTROMAGNETIC COUPLING</h3>
+<p>After mixing: $$A_\\mu = B_\\mu \\cos\\theta_W + W_\\mu^3 \\sin\\theta_W$$</p>
+<p>$$\\boxed{ \\mathcal{L}_{EM} = e Q \\bar{\\psi} \\gamma^\\mu A_\\mu \\psi }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 9. CHARGE AS REPRESENTATION LABEL</h3>
+<p>$$\\psi \\in R(G)$$</p>
+<p>$$\\boxed{ \\text{Charges} = \\text{eigenvalues of generators in } R(G) }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 10. FINAL MATHEMATICAL STATEMENT</h3>
+<p>$$\\boxed{ T^a \\psi = \\lambda^a \\psi \\;\\Rightarrow\\; \\text{interaction coupling } \\propto \\lambda^a }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 MODULE RESULT (MATHEMATICAL)</h3>
+<p>$$\\boxed{ \\text{Generators} \\;\\rightarrow\\; \\text{Eigenvalues} \\;\\rightarrow\\; \\text{Charges} }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 WHAT THIS MODULE ESTABLISHES (MATHEMATICAL)</h3>
+<p style="margin-bottom: 0;">$$\\boxed{ \\text{Representation} \\;\\rightarrow\\; \\text{observable charge} }$$</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Charge Quantification:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\text{Spec}(T^a) \rightarrow \text{Quantized Charges}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The interaction identity of any particle is determined by its position within the representation space of the gauge group, with physical charges emerging as the quantized eigenvalues of the associated symmetry operators.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>COUPLING STRENGTH</span><input type="number" id="c_in" class="digital-entry" value="0" oninput="syncVal(this.value, 'c_sl')"></div><input type="range" id="c_sl" min="0" max="100" step="1" value="0" oninput="syncVal(this.value, 'c_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">IDENTITY RULE</span><div style="text-align:center; font-size: 0.8rem;">Charge = Eigenvalue of symmetry generator</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">Symmetry labeling defines physical interaction</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Label</span><span class="const-val">QUANTUM #</span></div><div class="const-item"><span class="const-label">Entity</span><span class="const-val">COUPLING</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-charge);">CHARGE: STRUCTURAL LABEL</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.9rem;">Symmetry Generator<br>↓<br>Representation Eigenvalue<br>↓<br>Observable Charge`,
+hierarchy: `<div style="color: var(--accent-charge); font-weight: bold; font-size: 0.95rem;">Charge: Symmetry Projection Label</div>`,
+footer: "Fermions (next stage) will populate these structural charge slots.",
+rightNote: `<div style="color: #22d3ee; line-height: 1.3; margin-top: 8px; padding: 8px; font-size: 0.85rem;">At this level, charges are defined abstractly as field labels before matter exists.<p>👉This Module Establishes:<br>Symmetry representation → observable charge</p></div>`
+},
+
+5: {
+title: "UNIFIED GAUGE FRAMEWORK",
+result: "Symmetry explains force diversity",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: UNIFIED GAUGE FRAMEWORK</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #fbbf24; margin-bottom: 10px;">Symmetry explains force diversity</h3>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 CORE IDEA</h3>
+<p>This module completes the construction: $$SU(3) \\times SU(2) \\times U(1)$$ and establishes that all interaction diversity arises from a single unified symmetry structure expressed as a product group. There is: One underlying gauge principle and Multiple manifested interaction domains. Thus: <strong>Unity at structure level &rarr; diversity at physical level</strong>.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 MATHEMATICAL FOUNDATION</h3>
+<p><strong>1. Unified Gauge Group:</strong> $$G = SU(3)_C \\times SU(2)_L \\times U(1)_Y$$. This is a direct product, not a single simple group.</p>
+<p><strong>2. Total Covariant Derivative:</strong> $$D_\\mu = \\partial_\\mu + i g_3 G_\\mu^a T^a + i g_2 W_\\mu^i T^i + i g_1 B_\\mu Y$$. This single operator encodes all interactions simultaneously.</p>
+<p><strong>3. Total Gauge Lagrangian:</strong> $$\\mathcal{L}_{\\text{gauge}} = -\\frac{1}{4} G_{\\mu\\nu}^a G^{a\\mu\\nu} -\\frac{1}{4} W_{\\mu\\nu}^i W^{i\\mu\\nu} -\\frac{1}{4} B_{\\mu\\nu} B^{\\mu\\nu}$$</p>
+<p><strong>4. Full Interaction Structure:</strong> $$\\mathcal{L}_{\\text{int}} = \\bar{\\psi} \\gamma^\\mu D_\\mu \\psi$$. This expands into: <strong>Strong &oplus; Weak &oplus; Hypercharge</strong>.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 INTERPRETATION</h3>
+<p>A single symmetry framework governs all interactions. Different forces arise due to: Different subgroups, Different generators, and Different coupling constants: $$(g_3,\\; g_2,\\; g_1)$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 GRAPH INTERPRETATION PARAGRAPH</h3>
+<p>The spiral visualization represents continuous evolution within a unified symmetry space. Axes correspond to: Unified field amplitude, Gauge transformation parameter, and Structural manifestation level. The single continuous curve indicates: <strong>one underlying symmetry trajectory</strong>. The separation into visible “layers” reflects: <strong>projection into $$SU(3),\; SU(2),\; U(1)$$</strong>. Thus, the graph encodes: <strong>Unified symmetry &rarr; differentiated interaction sectors</strong>.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 STRUCTURAL LOGIC</h3>
+<p>$$\text{Unified group} \;\rightarrow\; \text{Product structure} \\;\\rightarrow\\; \\text{Independent sectors} \\;\\rightarrow\\; \\text{Different forces}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 SYNTHESIS STATEMENT</h3>
+<p>$$\\boxed{ \\text{Physical reality is the realization of a product gauge symmetry} }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 WHAT THIS MODULE ACHIEVES</h3>
+<p>👉 It establishes: $$\\boxed{ \\text{Unified symmetry} \\;\\rightarrow\\; \\text{differentiated forces} }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 POSITION IN FLOW</h3>
+<p style="margin-bottom: 0;">Module 1: Symmetry selected; Module 2: Sector decomposition; Module 3: Algebra defines force behavior; Module 4: Charges define interaction identity; Module 5 (this): Full unified gauge structure realized.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Unified Realization:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\Psi_{tot} \\in \\bigotimes_{i} \\text{Rep}(G_i)$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The complete physical state is realized through the tensor product of individual sector representations, allowing a single underlying gauge principle to manifest as the complex diversity of observed interactions.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: Unified Gauge Framework</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔷 1. TOTAL GAUGE GROUP</h3>
+<p>$$\\boxed{ G = SU(3)_C \\times SU(2)_L \\times U(1)_Y }$$</p>
+<p>Lie algebra:</p>
+<p>$$\\mathfrak{g} = \\mathfrak{su}(3) \\oplus \\mathfrak{su}(2) \\oplus \\mathfrak{u}(1)$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 2. TOTAL GAUGE FIELD</h3>
+<p>$$A_\\mu = G_\\mu^a T^a + W_\\mu^i T^i + B_\\mu Y$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 3. TOTAL COVARIANT DERIVATIVE</h3>
+<p>$$\\boxed{ D_\\mu = \\partial_\\mu + i g_3 G_\\mu^a T^a + i g_2 W_\\mu^i T^i + i g_1 B_\\mu Y }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 4. FIELD STRENGTH (UNIFIED FORM)</h3>
+<p>$$F_{\\mu\\nu} = \\partial_\\mu A_\\nu - \\partial_\\nu A_\\mu + i [A_\\mu, A_\\nu]$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 5. COMPONENT DECOMPOSITION</h3>
+<p>$$F_{\\mu\\nu} = (G_{\\mu\\nu}^a,\\; W_{\\mu\\nu}^i,\\; B_{\\mu\\nu})$$</p>
+<p><strong>SU(3):</strong></p>
+<p>$$G_{\\mu\\nu}^a = \\partial_\\mu G_\\nu^a - \\partial_\\nu G_\\mu^a + g_3 f^{abc} G_\\mu^b G_\\nu^c$$</p>
+<p><strong>SU(2):</strong></p>
+<p>$$W_{\\mu\\nu}^i = \\partial_\\mu W_\\nu^i - \\partial_\\nu W_\\mu^i + g_2 \\epsilon^{ijk} W_\\mu^j W_\\nu^k$$</p>
+<p><strong>U(1):</strong></p>
+<p>$$B_{\\mu\\nu} = \\partial_\\mu B_\\nu - \\partial_\\nu B_\\mu$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 6. TOTAL GAUGE LAGRANGIAN</h3>
+<p>$$\\boxed{ \\mathcal{L}_{\\text{gauge}} = -\\frac{1}{4} G_{\\mu\\nu}^a G^{a\\mu\\nu} -\\frac{1}{4} W_{\\mu\\nu}^i W^{i\\mu\\nu} -\\frac{1}{4} B_{\\mu\\nu} B^{\\mu\\nu} }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 7. MATTER INTERACTION</h3>
+<p>$$\\boxed{ \\mathcal{L}_{\\text{int}} = \\bar{\\psi} \\gamma^\\mu D_\\mu \\psi }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 8. PRODUCT STRUCTURE (DECOUPLED FORM)</h3>
+<p>$$\\mathcal{L}_{\\text{gauge}} = \\mathcal{L}_{SU(3)} \\;\\oplus\\; \\mathcal{L}_{SU(2)} \\;\\oplus\\; \\mathcal{L}_{U(1)}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 9. GAUGE TRANSFORMATION</h3>
+<p>$$\\psi \\rightarrow U(x)\\psi$$</p>
+<p>$$U(x) = e^{i \\alpha^a(x) T^a} e^{i \\beta^i(x) T^i} e^{i \\gamma(x) Y}$$</p>
+<p>$$A_\\mu \\rightarrow U A_\\mu U^{-1} - \\frac{i}{g} (\\partial_\\mu U) U^{-1}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 10. FINAL MATHEMATICAL STATEMENT</h3>
+<p>$$\\boxed{ D_\\mu = \\partial_\\mu + \\sum_{i=1}^{3} i g_i A_\\mu^{(i)} T^{(i)} }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 MODULE RESULT (MATHEMATICAL)</h3>
+<p>$$\\boxed{ SU(3)\\times SU(2)\\times U(1) \\;\\Rightarrow\\; \\text{complete interaction structure} }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 WHAT THIS MODULE ESTABLISHES (MATHEMATICAL)</h3>
+<p style="margin-bottom: 0;">$$\\boxed{ \\text{Unified gauge group} \\;\\rightarrow\\; \\text{differentiated interaction sectors} }$$</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Symmetry Synthesis:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\mathcal{L}_{total} = \\sum_{sector} \\mathcal{L}_{sector}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The unified framework demonstrates that force diversity is the necessary and rigorous outcome of a single gauge-invariant action principle operating across a composite product group structure.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>INTEGRATION (%)</span><input type="number" id="f_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'f_sl')"></div><input type="range" id="f_sl" min="0" max="100" step="1" value="100" oninput="syncVal(this.value, 'f_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">SYNTHESIS CONCLUSION</span><div style="text-align:center; font-size: 0.8rem;">Reality = Physical realization of product gauge symmetry</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">Unity at principle, Diversity at manifestation</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Status</span><span class="const-val">CONCRETE</span></div><div class="const-item"><span class="const-label">Group</span><span class="const-val">SM: SU(3) × SU(2) × U(1)</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-gauge);">FRAMEWORK: PHYSICALIZED</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.9rem;">Unified Gauge Symmetry<br>↓<br>Product Group Structure<br>↓<br>Differentiated Interactions`,
+hierarchy: `<div style="color: var(--accent-gauge); font-weight: bold; font-size: 1.00rem;">Reality: Differentiated Gauge Unity</div>`,
+footer: "The universe is a structured projection of its internal symmetry.",
+rightNote: `<div style="color: var(--accent-gold); line-height: 1.3; margin-top: 8px; padding: 10px; font-size: 0.85rem;">The triad transition is complete: Math → Principle → Reality.<p>👉This Module Establishes:<br>Unified symmetry → differentiated forces</p></div>`
+}
+};
+
+function syncVal(val, id) {
+const sliderId = id.includes('_in') ? id.replace('_in', '_sl') : id;
+const inputId = id.includes('_sl') ? id.replace('_sl', '_in') : id;
+if(document.getElementById(sliderId)) document.getElementById(sliderId).value = val;
+if(document.getElementById(inputId)) document.getElementById(inputId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+document.getElementById('brief-box-content').innerHTML = content.brief;
+document.getElementById('math-box-content').innerHTML = content.math;
+document.getElementById('control-sliders').innerHTML = content.sliders;
+
+document.getElementById('active-module-title').innerText = content.title;
+const resultEl = document.getElementById('active-module-result');
+resultEl.innerText = content.result;
+resultEl.style.fontSize = content.resultSize || "0.65rem";
+
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('metrics-content').innerHTML = content.metricsContent;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+document.getElementById('structure-box-area').innerHTML = content.structure;
+document.getElementById('telemetry-area').innerHTML = content.telemetry;
+showScreen('briefing');
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() {
+showScreen('lab');
+setTimeout(() => { runLab(); window.dispatchEvent(new Event('resize')); }, 100);
+}
+
+function runLab() {
+const target = document.getElementById('plot-area');
+if (!target) return;
+let data = [];
+let layout = {
+paper_bgcolor: 'black', plot_bgcolor: 'black', margin: {t:60,b:10,l:0,r:0},
+showlegend: true, font: { family: 'sans-serif', size: 10 },
+
+// --- UPDATE THIS SECTION ---
+legend: {
+font: { color: '#e5e7eb' }, // This sets the text to a bright, clean off-white
+x: 0.7,
+y: 0.9,
+bgcolor: 'rgba(0,0,0,0.5)' // Optional: adds a slight dark backing for contrast
+},
+// ---------------------------
+
+scene: {
+xaxis: { gridcolor: '#222', color: '#94a3b8' },
+yaxis: { gridcolor: '#222', color: '#94a3b8' },
+zaxis: { gridcolor: '#222', color: '#94a3b8' },
+camera: { eye: { x: 1.5, y: 1.5, z: 1.2 } }
+}
+};
+
+if (currentTool === 1) { // SYMMETRY IDENTIFICATION
+let reveal = parseFloat(document.getElementById('s_sl')?.value || 0) / 100;
+let r = 5;
+let t = Array.from({length: 100}, (_, i) => i * 0.2);
+data.push({ type: 'scatter3d', mode: 'lines', x: t.map(v => r * Math.cos(v)), y: t.map(v => r * Math.sin(v)), z: t, line: { color: '#eee' }, name: 'Possible Gauge Structures' });
+if(reveal > 0.5) {
+data.push({ type: 'scatter3d', mode: 'markers', x: [0], y: [0], z: [10], marker: { size: 12, color: '#f43f5e' }, name: 'Selected Physical Structure (SM)' });
+}
+layout.title = { text: "SELECTION OF GAUGE SYMMETRY", font: { color: '#f43f5e' } };
+layout.scene.xaxis.title = "Symmetry Space (G)"; 
+layout.scene.yaxis.title = "Selection Potential (V)"; 
+layout.scene.zaxis.title = "Selection Probability (P)";
+
+
+} else if (currentTool === 2) { // SECTOR DECOMPOSITION
+let d = parseFloat(document.getElementById('d_sl')?.value || 0) / 100;
+
+// 1. Strong Sector [SU(3)]
+data.push({
+type: 'scatter3d', mode: 'markers',
+x: [0], y: [0], z: [5],
+marker: { size: 15, color: '#10b981' },
+name: 'Strong Sector [SU(3)]',
+legendfont: { color: '#10b981' }
+});
+
+// 2. Weak Sector [SU(2)]
+data.push({
+type: 'scatter3d', mode: 'markers',
+x: [2 * d], y: [2 * d], z: [5],
+marker: { size: 10, color: '#a855f7' },
+name: 'Weak Sector [SU(2)]',
+legendfont: { color: '#a855f7' }
+});
+
+// 3. EM Sector [U(1)]
+data.push({
+type: 'scatter3d', mode: 'markers',
+x: [-2 * d], y: [-2 * d], z: [5],
+marker: { size: 8, color: '#fbbf24' },
+name: 'EM Sector [U(1)]',
+legendfont: { color: '#fbbf24' }
+});
+
+layout.title = { text: "SECTOR DECOMPOSITION", font: { color: '#a855f7' } };
+layout.scene.xaxis.title = "Interaction Strength (g)";
+layout.scene.yaxis.title = "Symmetry Component";
+layout.scene.zaxis.title = "Force Range";
+
+
+} else if (currentTool === 3) { // ALGEBRAIC FORCE
+let f = parseFloat(document.getElementById('a_sl')?.value || 0) / 100;
+let x = [], y = [], z = [];
+for(let i=0; i<50; i++){
+let ang = i * 0.3;
+x.push(ang * Math.cos(ang)); y.push(ang * Math.sin(ang)); z.push(ang * f);
+}
+data.push({ type: 'scatter3d', mode: 'lines', x: x, y: y, z: z, line: { color: '#fbbf24', width: 4 }, name: 'Force Propagation Path' });
+layout.title = { text: "ALGEBRAIC NON-LINEARITY", font: { color: '#fbbf24' } };
+layout.scene.xaxis.title = "Field Amplitude";
+layout.scene.yaxis.title = "Phase Space";
+layout.scene.zaxis.title = "Self-Interaction Term";
+
+
+} else if (currentTool === 4) { // CHARGE STRUCTURE
+let c = parseFloat(document.getElementById('c_sl')?.value || 0) / 100;
+data.push({ type: 'scatter3d', mode: 'markers', x: [1, -1, 0.5], y: [c, -c, 0], z: [0, 0, 1], marker: { size: 8, color: '#22d3ee' }, name: 'Symmetry Representation Labels' });
+layout.title = { text: "CHARGE STRUCTURE (SYMMETRY LABELS)", font: { color: '#22d3ee' } };
+layout.scene.xaxis.title = "Weak Isospin (T3)";
+layout.scene.yaxis.title = "Hypercharge (Y)";
+layout.scene.zaxis.title = "Electric Charge (Q)";
+
+
+} else if (currentTool === 5) { // UNIFIED GAUGE
+let f = parseFloat(document.getElementById('f_sl')?.value || 100) / 100;
+let phi = Array.from({length: 100}, (_, i) => i * 0.1);
+data.push({ type: 'scatter3d', mode: 'lines', x: phi.map(p => f*Math.cos(p)), y: phi.map(p => f*Math.sin(p)), z: phi.map(p => p), line: { color: '#10b981', width: 6 }, name: 'Integrated SM Framework' });
+layout.title = { text: "UNIFIED GAUGE ARCHITECTURE", font: { color: '#10b981' } };
+layout.scene.xaxis.title = "Unified Field (A)";
+layout.scene.yaxis.title = "Gauge Transformation";
+layout.scene.zaxis.title = "Structural Manifestation";
+}
+
+Plotly.react('plot-area', data, layout, {responsive: true, displayModeBar: false});
+}
+
+function resetLab() {
+if(currentTool===1) syncVal(0, 's_sl');
+if(currentTool===2) syncVal(0, 'd_sl');
+if(currentTool===3) syncVal(0, 'a_sl');
+if(currentTool===4) syncVal(0, 'c_sl');
+if(currentTool===5) syncVal(100, 'f_sl');
+}
+
+window.onload = () => { showScreen('portal'); };
+</script>
+</body>
+</html>

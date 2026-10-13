@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 54 — Couplings & Interaction Structure</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #3b82f6;
+--accent-charge: #f59e0b; --accent-coupling: #10b981; --accent-mixing: #ec4899; --accent-hierarchy: #8b5cf6; --accent-structure: #2dd4bf;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6;
+--accent-gold: #fbbf24;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-structure); font-family: sans-serif; font-size: 0.85rem; min-width: 450px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls, #nav-summary-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+#screen-lab.active { display: flex; flex-direction: column; height: calc(100vh - 50px); }
+
+#screen-portal { justify-content: flex-start; padding-top: 6dvh; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 50px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 2px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; padding-bottom: 0px; }
+.module-subtitle { text-align: center; font-family: sans-serif; color: var(--accent-gold); margin-bottom: 12px; font-weight: bold; letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.primary-constant-box { background: #000; border: 1px solid var(--accent-unified); padding: 2px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 8px; }
+.secondary-structure-box { background: rgba(59, 130, 246, 0.05); border: 1px dashed var(--accent-unified); padding: 3px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 12px; }
+
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(59, 130, 246, 0.05); border: 1px solid var(--accent-unified); padding: 5px; border-radius: 5px; margin-bottom: 8px; font-size: 0.7rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; }
+#plot-area { flex-grow: 1; width: 100%; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #fff; border: 1px solid var(--accent-unified); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer { width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem; color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 54 — COUPLINGS & INTERACTION STRUCTURE</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">Couplings & Interaction Structure</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">The mechanics of interaction strength and field mixing.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-charge);">
+<h2 style="color:var(--accent-charge);">1. Charge as Coupling</h2>
+<p>Generator Eigenvalues.<br>$Q = T^3 + Y/2$.</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-coupling);">
+<h2 style="color:var(--accent-coupling);">2. Coupling Constants</h2>
+<p>Interaction Strength.<br>$g, g', g_s$ defined.</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-mixing);">
+<h2 style="color:var(--accent-mixing);">3. Mixing of Fields</h2>
+<p>Symmetry State Hybridization.<br>Weinberg and CKM Mixing.</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-hierarchy);">
+<h2 style="color:var(--accent-hierarchy);">4. Interaction Hierarchy</h2>
+<p>Force Scaling.<br>Strong > Weak > EM.</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-structure);">
+<h2 style="color:var(--accent-structure);">5. Complete Structure</h2>
+<p>Full Interaction Dynamics.<br>Symmetry to Observable Force.</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-unified);">
+<h2 style="color:var(--accent-unified);">6. Stage 54 Summary</h2>
+<p>Structure determined by Coupling & Mixing.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Mathematical Structure of Stage 54 — Couplings & Interaction Framework</h2>
+
+<div class="briefing-content" style="font-size: 0.95rem; line-height: 1.6; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔷 1. Structural Progression</h3>
+
+<p>
+Stage 54 establishes the complete interaction structure through a sequential emergence:
+</p>
+
+<p>
+$$
+T^a \rightarrow q_a \rightarrow g \rightarrow U \rightarrow m \rightarrow \text{Interaction}
+$$
+</p>
+
+<p>
+Where:
+<br>• \(T^a\) = symmetry generators
+<br>• \(q_a\) = charge eigenvalues
+<br>• \(g\) = coupling constants
+<br>• \(U\) = mixing transformations
+<br>• \(m\) = mediator mass (range control)
+</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 2. Fundamental Relations</h3>
+
+<p>
+Eigenvalue definition of charge:
+$$
+T^a |\psi\rangle = q_a |\psi\rangle
+$$
+</p>
+
+<p>
+Gauge interaction structure:
+$$
+D_\mu = \partial_\mu - i g A_\mu^a T^a
+$$
+</p>
+
+<p>
+Interaction Lagrangian:
+$$
+\mathcal{L}_{int} = g A_\mu^a \bar{\psi} \gamma^\mu T^a \psi
+$$
+</p>
+
+<p>
+Mixing transformation:
+$$
+|\phi\rangle = U |\psi\rangle, \quad U^\dagger U = I
+$$
+</p>
+
+<p>
+Spatial interaction profile:
+$$
+V(r) = \frac{(g q)^2}{4\pi r} e^{-m r}
+$$
+</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 3. Unified Interaction Law</h3>
+
+<p>
+Combining all structural elements:
+</p>
+
+<p>
+$$
+\boxed{
+\text{Interaction}(r) = U \cdot \left( \frac{(g q)^2}{4\pi r} e^{-m r} \right)
+}
+$$
+</p>
+
+<p>
+👉 This represents the complete mathematical form of all interactions.
+</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 4. Structural Interpretation</h3>
+
+<p>
+All interactions are determined by four fundamental structural parameters:
+</p>
+
+<p>
+$$
+(q, g, U, m)
+$$
+</p>
+
+<p>
+• \(q\): defines interaction channel (symmetry response)
+<br>• \(g\): sets interaction strength scale
+<br>• \(U\): determines observable particle basis (mixing)
+<br>• \(m\): controls interaction range
+</p>
+
+<p>
+👉 Forces differ only in these parameters, not in fundamental nature.
+</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 5. Completion Theorem (Stage 54)</h3>
+
+<p>
+<strong>Interaction Structure Completion Theorem:</strong>
+</p>
+
+<p>
+All physical interactions are completely determined by the symmetry generator eigenvalues (q), coupling constants (g), mixing transformations (U), and mediator masses (m), which together uniquely define the strength, range, and observable form of forces.
+</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 6. Conceptual Closure</h3>
+
+<p>
+Stage 54 achieves full transition from symmetry to interaction:
+</p>
+
+<p>
+$$
+\text{Symmetry} \rightarrow \text{Charge} \rightarrow \text{Coupling} \rightarrow \text{Mixing} \rightarrow \text{Hierarchy} \rightarrow \text{Interaction}
+$$
+</p>
+
+<p>
+👉 This completes the structural foundation of forces.
+</p>
+
+<p>
+👉 Stage 55 will convert this into measurable reality.
+</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 7. Final Structural Statement</h3>
+
+<p style="margin-bottom: 0;">
+$$
+\boxed{
+\text{Interaction} = \text{Structured manifestation of symmetry through coupling, mixing, and scale}
+}
+$$
+</p>
+
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 12px; background: rgba(0,0,0,0.25); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.95rem; line-height: 1.7;">
+<span style="color: #94a3b8;">Unified Interaction Framework:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">
+$$
+(q, g, U, m) \;\Rightarrow\; \text{All Forces}
+$$
+</span>
+<p style="margin-top: 10px; color: #e2e8f0;">
+The diversity of physical forces emerges from a unified structural framework in which symmetry-defined charges, scaled by coupling constants, transformed through mixing, and constrained by mediator mass, generate the complete spectrum of observable interactions.
+</p>
+</div>
+</div>
+</section>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div id="active-module-result" class="module-subtitle">--</div>
+<div class="primary-constant-box">
+<div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val">11.350</span></div>
+<div class="const-item"><span class="const-label">Synthesis P</span><span class="const-val">0.6900</span></div>
+</div>
+
+<div id="structure-box-area"></div>
+<div id="mapping-box-area"></div>
+
+<div class="diagnostic-panel">
+<span class="diag-title">Interaction Telemetry</span>
+<div id="telemetry-area"></div>
+</div>
+
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-unified); font-size:0.75rem; cursor:pointer; padding:6px;">RESET FIELD</button>
+<div id="panel-footer-text" style="font-size: 0.75rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.3; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:8px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Coupling Logic</span>
+<div id="metrics-content" style="font-size:0.65rem; font-family:monospace; line-height:1.3;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Structural Outcome</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.65rem; color: var(--text-dim); line-height: 1.4; background: #000; padding: 5px; border-radius: 0px; border: 1px solid #222; margin-top: auto;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "CHARGE AS GENERATOR COUPLING",
+result: "Charge = Eigenvalue of symmetry generators",
+resultSize: "0.80rem",
+
+brief: `<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Charge as Generator Coupling — Eigenvalue of Symmetry</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Starting Point (Context from Previous Stage)</h3>
+<p>Stage 53 established: $$\\langle \\phi \\rangle = v \\;\\longrightarrow\\; m_i = g_i v$$. Mass arises from coupling to the vacuum. 👉 However, the deeper question remains: <strong>What determines the coupling itself?</strong></p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Core Question of This Module</h3>
+<p><strong>What is the origin of coupling between fields and interactions?</strong> More fundamentally: Why do different fields couple differently? What structurally defines interaction strength?</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Conceptual Development</h3>
+
+<p><strong>(A) Structural Setup:</strong> Interactions arise from symmetry principles. Fields transform under symmetry operations generated by operators $$T^a$$.</p>
+
+<p><strong>(B) Generator Action:</strong> A field state $$|\\psi\\rangle$$ responds to symmetry transformation as:
+$$
+T^a |\\psi\\rangle = q_a |\\psi\\rangle
+$$
+👉 The field is characterized by its response to the generator.</p>
+
+<p><strong>(C) Definition of Charge:</strong> The quantity $$q_a$$ is the <strong>eigenvalue</strong> of the generator $$T^a$$. Thus:
+$$
+\\text{Charge} = \\text{Eigenvalue of symmetry generator}
+$$</p>
+
+<p><strong>(D) Structural Meaning:</strong> Charge is not an arbitrary label. It encodes how a field transforms under symmetry. 👉 It is the <strong>intrinsic response of the field to symmetry operations</strong>.</p>
+
+<p><strong>(E) Coupling Emergence:</strong> Interaction strength arises because fields with non-zero charge couple to gauge fields associated with the symmetry.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Key Structural Insight</h3>
+<p>$$
+\\text{Symmetry Generator} \\;\\longrightarrow\\; \\text{Eigenvalue} \\;\\longrightarrow\\; \\text{Charge} \\;\\longrightarrow\\; \\text{Coupling}
+$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Mathematical Anchor (Light)</h3>
+<p>Eigenvalue equation:
+$$
+T^a |\\psi\\rangle = q_a |\\psi\\rangle
+$$
+Gauge interaction (minimal coupling):
+$$
+D_\\mu = \\partial_\\mu - i g A_\\mu^a T^a
+$$
+👉 Coupling depends on generator structure and charge eigenvalues.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Physical Interpretation</h3>
+<p><strong>Neutral field:</strong> $$q_a = 0$$ → no interaction with corresponding force.<br>
+<strong>Charged field:</strong> $$q_a \\neq 0$$ → interacts with gauge field.<br>
+👉 Charge determines how strongly a field “feels” a force.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Graph Interpretation Paragraph (MANDATORY)</h3>
+<p>The graph represents charge space as an eigenvalue distribution across symmetry generators. Axes correspond to different generators (e.g., hypercharge, weak isospin, color). Each point represents a particle state with coordinates given by its charge eigenvalues $$q_a$$. Clustering reflects symmetry structure: particles sharing representations align in patterns. 👉 The visualization demonstrates: <strong>charge is not arbitrary, but structured as eigenvalue positions in symmetry space</strong>.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Role of This Module</h3>
+<p>This module introduces: Origin of charge from symmetry, Interpretation of charge as eigenvalue, and Foundation of coupling structure. 👉 It replaces “given charge” with <strong>derived structural quantity</strong>.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 9. WHAT THIS MODULE ACHIEVES (FINAL LINE)</h3>
+<p style="margin-bottom: 0;">👉 This module establishes: $$\\boxed{ \\text{Symmetry generator} \\;\\longrightarrow\\; \\text{charge eigenvalue} \\;\\longrightarrow\\; \\text{interaction coupling} }$$</p>
+
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Charge Definition:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$T^a |\\psi\\rangle = q_a |\\psi\\rangle$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Charge emerges as the eigenvalue of symmetry generators, encoding how fields respond to transformations and determining their interaction with gauge forces.</p>
+</div>
+</div>`,
+
+math: `<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: Charge as Eigenvalue of Symmetry Generators</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Starting Mathematical Object</h3>
+<p>Symmetry group generators: $$T^a$$ acting on field space. Field state: $$|\\psi\\rangle$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Core Definition</h3>
+<p>Eigenvalue equation:
+$$
+T^a |\\psi\\rangle = q_a |\\psi\\rangle
+$$
+👉 Charge $$q_a$$ is the eigenvalue of generator $$T^a$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Generator Algebra</h3>
+<p>Generators satisfy Lie algebra:
+$$
+[T^a, T^b] = i f^{abc} T^c
+$$
+👉 Structure constants $$f^{abc}$$ define the symmetry group.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Representation Space</h3>
+<p>Fields transform under representation:
+$$
+\\psi \\rightarrow e^{i \\alpha^a T^a} \\psi
+$$
+👉 Charges depend on representation eigenvalues.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Covariant Derivative (Coupling Entry)</h3>
+<p>Gauge-covariant derivative:
+$$
+D_\\mu = \\partial_\\mu - i g A_\\mu^a T^a
+$$
+👉 Interaction enters via generators.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Action on Eigenstate</h3>
+<p>For eigenstate:
+$$
+D_\\mu |\\psi\\rangle = (\\partial_\\mu - i g A_\\mu^a q_a) |\\psi\\rangle
+$$
+👉 Coupling strength proportional to charge eigenvalue.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Physical Quantity Extraction</h3>
+<p>Interaction term:
+$$
+\\mathcal{L}_{int} = g A_\\mu^a \\bar{\\psi} \\gamma^\\mu T^a \\psi
+$$
+Eigenvalue form:
+$$
+\\mathcal{L}_{int} = g q_a A_\\mu^a \\bar{\\psi} \\gamma^\\mu \\psi
+$$
+👉 Observable interaction depends on $$q_a$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Multi-Charge Structure</h3>
+<p>Charge vector:
+$$
+\\vec{q} = (q_1, q_2, \\dots)
+$$
+Mass relation (from Stage 53):
+$$
+m_i = g_i v
+$$
+👉 Coupling $$g_i$$ reflects charge structure.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 9. Final Mathematical Statement</h3>
+<p>Charge is the eigenvalue of symmetry generators, and interaction strength arises from coupling of these generators to gauge fields.</p>
+
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Charge–Coupling Relation:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$T^a |\\psi\\rangle = q_a |\\psi\\rangle \\Rightarrow D_\\mu = \\partial_\\mu - i g q_a A_\\mu^a$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Charge emerges as an eigenvalue of symmetry generators, and directly determines how fields couple to gauge interactions, forming the structural basis of interaction strength.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>GEN. STRENGTH</span><input type="number" id="c_in" class="digital-entry" value="10" oninput="syncVal(this.value, 'c_sl')"></div><input type="range" id="c_sl" min="0" max="50" step="1" value="10" oninput="syncVal(this.value, 'c_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">CHARGE RULE</span><div style="text-align:center; font-size: 0.8rem;">Charge = Eigenvalue of Symmetry Generator (response to symmetry)</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Existence is Response</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Type</span><span class="const-val">EIGENVALUE</span></div><div class="const-item"><span class="const-label">Entity</span><span class="const-val">CHARGE</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-charge);">STATE: COUPLING DEFINED</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Symmetry Generator $\T^a$<br>↓<br>Field State |$\\psi\\rangle$<br>↓<br>Charge Eigenvalue $\q_a$`,
+hierarchy: `<div style="color: var(--accent-charge); font-weight: bold; font-size: 0.95rem;">Charge: Symmetry Resonance</div>`,
+footer: "Every particle 'hears' the symmetry through its specific charge.",
+rightNote: `<div style="color: #f59e0b; line-height: 1.3; margin-top: 8px; padding: 10px; font-size: 0.9rem;">Charge determines how a field transforms under symmetry (and hence how it couples to forces).<p>$T^a |\\psi\\rangle = q_a |\\psi\\rangle$</p><p><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">👉 This Module Establishes:<br>Symmetry generator → charge eigenvalue</p></div>`
+},
+
+2: {
+title: "COUPLING CONSTANTS",
+result: "g, g', gs: Coupling constants (interaction strengths)",
+resultSize: "0.80rem",
+
+brief: `<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Coupling Constants — Strength as Structural Quantity</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Starting Point (Context from Previous Module)</h3>
+<p>Module 1 established: $$T^a |\\psi\\rangle = q_a |\\psi\\rangle$$. Charge arises as the eigenvalue of symmetry generators. 👉 However, charge alone does not determine interaction strength.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Core Question of This Module</h3>
+<p><strong>What determines how strong an interaction is?</strong> Why do different forces act with different magnitudes, even when symmetry structure is known?</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Conceptual Development</h3>
+
+<p><strong>(A) Structural Setup:</strong> Interactions arise through gauge fields $$A_\\mu^a$$ coupled to matter via generators $$T^a$$.</p>
+
+<p><strong>(B) Introduction of Coupling Constant:</strong> The interaction strength is controlled by a scalar parameter $$g$$:
+$$
+D_\\mu = \\partial_\\mu - i g A_\\mu^a T^a
+$$
+👉 The constant $$g$$ scales the interaction.</p>
+
+<p><strong>(C) Physical Meaning:</strong> The coupling constant $$g$$ determines how strongly a field responds to the gauge interaction. Larger $$g$$ → stronger interaction.</p>
+
+<p><strong>(D) Structural Interpretation:</strong> Coupling is not arbitrary—it is a property of the symmetry structure and energy scale:
+$$
+\\text{Interaction Strength} \\propto g
+$$</p>
+
+<p><strong>(E) Multiple Interactions:</strong> Different symmetry groups have different couplings:
+$$
+g_1, \\; g_2, \\; g_3
+$$
+👉 Corresponding to different fundamental forces.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Key Structural Insight</h3>
+<p>$$
+\\text{Gauge Field} \\;\\longrightarrow\\; \\text{Coupling Constant} \\;\\longrightarrow\\; \\text{Interaction Strength}
+$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Mathematical Anchor (Light)</h3>
+<p>Interaction Lagrangian:
+$$
+\\mathcal{L}_{int} = g A_\\mu^a \\bar{\\psi} \\gamma^\\mu T^a \\psi
+$$
+👉 Strength of interaction directly proportional to $$g$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Physical Interpretation</h3>
+<p><strong>Weak coupling:</strong> Small $$g$$ → interaction is weak (longer range, smaller probability).<br>
+<strong>Strong coupling:</strong> Large $$g$$ → interaction is strong (short range, high probability).<br>
+👉 Coupling determines observable force strength.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Graph Interpretation Paragraph (MANDATORY)</h3>
+<p>The graph represents interaction potential decay as a function of distance. The X-axis denotes distance $$r$$, while the Y-axis represents interaction potential or strength. The curve shows exponential or power-law decay depending on interaction type. The slope and amplitude are controlled by the coupling constant $$g$$. 👉 The visualization demonstrates: <strong>interaction strength profile is governed by coupling magnitude</strong>.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Role of This Module</h3>
+<p>This module introduces: Coupling constants as fundamental parameters, Connection between symmetry and interaction strength, and Basis of force magnitude. 👉 It converts abstract symmetry into measurable physical strength.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 9. WHAT THIS MODULE ACHIEVES (FINAL LINE)</h3>
+<p style="margin-bottom: 0;">👉 This module establishes: $$\\boxed{ \\text{Gauge structure} \\;\\longrightarrow\\; \\text{coupling constant} \\;\\longrightarrow\\; \\text{interaction strength} }$$</p>
+
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Interaction Strength:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\mathcal{L}_{int} = g A_\\mu^a \\bar{\\psi} \\gamma^\\mu T^a \\psi$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The coupling constant translates symmetry structure into physical interaction strength, acting as the quantitative bridge between abstract generators and observable forces.</p>
+</div>
+</div>`,
+
+math: `<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: Coupling Constants as Interaction Strength Parameters</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Starting Mathematical Object</h3>
+<p>Gauge field: $$A_\\mu^a$$. Generator: $$T^a$$. Coupling constant: $$g$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Core Definition</h3>
+<p>Gauge-covariant derivative:
+$$
+D_\\mu = \\partial_\\mu - i g A_\\mu^a T^a
+$$
+👉 The parameter $$g$$ defines interaction strength.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Interaction Lagrangian</h3>
+<p>Fermion–gauge interaction:
+$$
+\\mathcal{L}_{int} = g A_\\mu^a \\bar{\\psi} \\gamma^\\mu T^a \\psi
+$$
+👉 Linear dependence on $$g$$ establishes strength scaling.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Eigenvalue Reduction</h3>
+<p>For eigenstate $$T^a |\\psi\\rangle = q_a |\\psi\\rangle$$:
+$$
+\\mathcal{L}_{int} = g q_a A_\\mu^a \\bar{\\psi} \\gamma^\\mu \\psi
+$$
+👉 Effective interaction strength becomes $$g q_a$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Force Strength Relation</h3>
+<p>Amplitude scaling:
+$$
+\\mathcal{M} \\propto g
+$$
+Probability scaling:
+$$
+|\\mathcal{M}|^2 \\propto g^2
+$$
+👉 Observables depend quadratically on $$g$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Multiple Couplings</h3>
+<p>Standard set:
+$$
+g_1, \\quad g_2, \\quad g_3
+$$
+Corresponding to:
+$$
+U(1)_Y, \\quad SU(2)_L, \\quad SU(3)_C
+$$
+👉 Each symmetry sector has its own coupling strength.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Running Coupling (Scale Dependence)</h3>
+<p>Renormalization group equation:
+$$
+\\mu \\frac{d g}{d\\mu} = \\beta(g)
+$$
+👉 Coupling depends on energy scale $$\\mu$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Potential Behavior</h3>
+<p>Generic interaction potential:
+$$
+V(r) \\propto g^2 \\cdot f(r)
+$$
+Example (Yukawa-type):
+$$
+V(r) \\sim \\frac{g^2}{r} e^{-m r}
+$$
+👉 Strength controlled by $$g^2$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 9. Final Mathematical Statement</h3>
+<p>Coupling constants are fundamental parameters that scale interaction strength, connecting symmetry structure to measurable force magnitudes.</p>
+
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Strength Scaling:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\mathcal{L}_{int} \\propto g \\quad , \\quad |\\mathcal{M}|^2 \\propto g^2$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Coupling constants quantify the strength of interactions, translating symmetry generators and charges into observable force magnitudes and measurable physical effects.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>COUPLING (g)</span><input type="number" id="g_in" class="digital-entry" value="60" oninput="syncVal(this.value, 'g_sl')"></div><input type="range" id="g_sl" min="10" max="100" step="1" value="60" oninput="syncVal(this.value, 'g_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">STRENGTH RULE</span><div style="text-align:center; font-size: 0.8rem;">Coupling Constant = Field–Matter Interaction Strength (bond magnitude)</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Strength is Structural</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">SM-g</span><span class="const-val">0.65</span></div><div class="const-item"><span class="const-label">SM-gs</span><span class="const-val">1.21</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-coupling);">CONSTANTS: SCALED</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Gauge Field<br>↓<br>Coupling Constant g<br>↓<br>Interaction Strength`,
+hierarchy: `<div style="color: var(--accent-coupling); font-weight: bold; font-size: 0.95rem;">Structure: Bond Magnitude</div>`,
+footer: "The strength of a force is an intrinsic constant of its symmetry group.",
+rightNote: `<div style="color: #10b981; line-height: 1.3; margin-top: 8px; padding: 10px; font-size: 0.9rem;">Couplings connect symmetry structure to physical interaction strengths (energy scales).<p>$\\text{Interaction Strength} \\propto g$</p><p><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">👉 This Module Establishes:<br>Gauge group → coupling constant → force scale</p></div>`
+},
+
+3: {
+title: "MIXING OF FIELDS",
+result: "Physical states are symmetry mixtures",
+resultSize: "0.80rem",
+
+brief: `<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Mixing of Fields — Physical States as Rotated Symmetry Eigenstates</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Starting Point (Context from Previous Modules)</h3>
+<p>Module 1 established: $$T^a |\\psi\\rangle = q_a |\\psi\\rangle$$ (charge as eigenvalue). Module 2 established: $$\\mathcal{L}_{int} \\propto g$$ (interaction strength via coupling). 👉 However, observed particles do not always align directly with symmetry eigenstates.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Core Question of This Module</h3>
+<p><strong>Why are observed (physical) states mixtures of symmetry states?</strong> What is the structural origin of mixing between different fields?</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Conceptual Development</h3>
+
+<p><strong>(A) Structural Setup:</strong> Fields are initially defined in a symmetry basis:
+$$
+|\\psi_1\\rangle, \\quad |\\psi_2\\rangle
+$$
+👉 These are eigenstates of symmetry generators.</p>
+
+<p><strong>(B) Observation:</strong> Physical particles correspond to different combinations:
+$$
+|\\phi_1\\rangle, \\quad |\\phi_2\\rangle
+$$
+👉 These are not identical to symmetry eigenstates.</p>
+
+<p><strong>(C) Mixing Transformation:</strong> Physical states arise via rotation:
+$$
+\\begin{pmatrix}
+|\\phi_1\\rangle \\\\
+|\\phi_2\\rangle
+\\end{pmatrix}
+=
+\\begin{pmatrix}
+\\cos \\theta & \\sin \\theta \\\\
+-\\sin \\theta & \\cos \\theta
+\\end{pmatrix}
+\\begin{pmatrix}
+|\\psi_1\\rangle \\\\
+|\\psi_2\\rangle
+\\end{pmatrix}
+$$
+👉 Mixing is a unitary rotation in state space.</p>
+
+<p><strong>(D) Physical Meaning:</strong> The mixing angle $$\\theta$$ determines how strongly states are hybridized. 👉 Different values produce different observable particles.</p>
+
+<p><strong>(E) Example (Electroweak Mixing):</strong>
+$$
+A = B \\cos \\theta_W + W^3 \\sin \\theta_W
+$$
+$$
+Z = -B \\sin \\theta_W + W^3 \\cos \\theta_W
+$$
+👉 Photon and Z-boson arise as mixtures of symmetry fields.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Key Structural Insight</h3>
+<p>$$
+\\text{Symmetry Eigenstates} \\;\\longrightarrow\\; \\text{Rotation (Mixing)} \\;\\longrightarrow\\; \\text{Physical States}
+$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Mathematical Anchor (Light)</h3>
+<p>Mixing matrix:
+$$
+U(\\theta) =
+\\begin{pmatrix}
+\\cos \\theta & \\sin \\theta \\\\
+-\\sin \\theta & \\cos \\theta
+\\end{pmatrix}
+$$
+Orthogonality:
+$$
+U^\\dagger U = I
+$$
+👉 Mixing preserves normalization and probabilities.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Physical Interpretation</h3>
+<p><strong>No mixing ($$\\theta = 0$$):</strong> Physical states = symmetry states.<br>
+<strong>With mixing ($$\\theta \\neq 0$$):</strong> Observed particles are hybrid combinations.<br>
+👉 Reality is not aligned with pure symmetry basis, but rotated structure.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Graph Interpretation Paragraph (MANDATORY)</h3>
+<p>The graph represents state vectors in a two-dimensional symmetry space. The axes correspond to original symmetry eigenstates (e.g., $$B$$ and $$W^3$$). The rotated vector represents the physical state (e.g., photon or Z boson). The angle between axes and vector is the mixing angle $$\\theta_W$$. 👉 The visualization demonstrates: <strong>physical particles are rotated projections of symmetry-defined states</strong>.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Role of This Module</h3>
+<p>This module introduces: Mixing as structural rotation, Distinction between symmetry and physical bases, and Mechanism of observed particle identity. 👉 It explains why reality appears as hybrid combinations.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 9. WHAT THIS MODULE ACHIEVES (FINAL LINE)</h3>
+<p style="margin-bottom: 0;">👉 This module establishes: $$\\boxed{ \\text{Symmetry eigenstates} \\;\\longrightarrow\\; \\text{mixing rotation} \\;\\longrightarrow\\; \\text{observed physical states} }$$</p>
+
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Mixing Transformation:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$|\\phi_i\\rangle = U_{ij}(\\theta) |\\psi_j\\rangle$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Mixing represents a rotation in state space, transforming symmetry eigenstates into physical particles, revealing that observed reality is a hybrid structure emerging from underlying symmetries.</p>
+</div>
+</div>`,
+
+math: `<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: Mixing as Unitary Rotation in Field Space</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Starting Mathematical Object</h3>
+<p>Symmetry eigenstates:
+$$
+|\\psi_1\\rangle, \\quad |\\psi_2\\rangle
+$$
+Physical states:
+$$
+|\\phi_1\\rangle, \\quad |\\phi_2\\rangle
+$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Core Definition</h3>
+<p>Mixing transformation:
+$$
+|\\phi_i\\rangle = U_{ij} |\\psi_j\\rangle
+$$
+👉 Physical states are linear combinations of symmetry eigenstates.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Rotation Matrix (Two-State System)</h3>
+<p>Unitary rotation:
+$$
+U(\\theta) =
+\\begin{pmatrix}
+\\cos \\theta & \\sin \\theta \\\\
+-\\sin \\theta & \\cos \\theta
+\\end{pmatrix}
+$$
+Explicit form:
+$$
+\\begin{pmatrix}
+|\\phi_1\\rangle \\\\
+|\\phi_2\\rangle
+\\end{pmatrix}
+=
+U(\\theta)
+\\begin{pmatrix}
+|\\psi_1\\rangle \\\\
+|\\psi_2\\rangle
+\\end{pmatrix}
+$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Unitarity Condition</h3>
+<p>
+$$
+U^\\dagger U = I
+$$
+👉 Probability and normalization are preserved under mixing.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Inverse Transformation</h3>
+<p>
+$$
+|\\psi_i\\rangle = U^{-1}_{ij} |\\phi_j\\rangle = U^\\dagger_{ij} |\\phi_j\\rangle
+$$
+👉 Symmetry basis can be recovered from physical basis.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Electroweak Mixing Example</h3>
+<p>
+$$
+\\begin{pmatrix}
+A \\\\
+Z
+\\end{pmatrix}
+=
+\\begin{pmatrix}
+\\cos \\theta_W & \\sin \\theta_W \\\\
+-\\sin \\theta_W & \\cos \\theta_W
+\\end{pmatrix}
+\\begin{pmatrix}
+B \\\\
+W^3
+\\end{pmatrix}
+$$
+👉 Photon and Z boson emerge from symmetry mixing.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Mass Matrix Diagonalization</h3>
+<p>General mass matrix:
+$$
+\\mathcal{L}_{mass} = \\psi_i^\\dagger M_{ij} \\psi_j
+$$
+Diagonalization:
+$$
+U^\\dagger M U = M_{diag}
+$$
+👉 Physical states correspond to mass eigenstates.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Multi-State Generalization</h3>
+<p>
+$$
+|\\phi_i\\rangle = U_{ij} |\\psi_j\\rangle, \\quad U \\in U(n)
+$$
+👉 Mixing extends to higher-dimensional state spaces.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 9. Final Mathematical Statement</h3>
+<p>Mixing is a unitary transformation that rotates symmetry eigenstates into physical eigenstates, preserving probabilities while redefining observable particle identities.</p>
+
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Unitary Mixing:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$|\\phi\\rangle = U |\\psi\\rangle, \\quad U^\\dagger U = I$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Mixing transforms symmetry-defined states into physically observable particles through unitary rotations, revealing that physical reality emerges from structured combinations of fundamental symmetry configurations.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>MIXING ANGLE (θ)</span><input type="number" id="m_in" class="digital-entry" value="28" oninput="syncVal(this.value, 'm_sl')"></div><input type="range" id="m_sl" min="0" max="90" step="1" value="28" oninput="syncVal(this.value, 'm_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">ROTATION RULE</span><div style="text-align:center; font-size: 0.8rem;">Observation = Rotated Symmetry State</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">Reality is a Hybrid State</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Angle</span><span class="const-val">θ_W</span></div><div class="const-item"><span class="const-label">Type</span><span class="const-val">MIXING</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-mixing);">STATES: HYBRIDIZED</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Symmetry Eigenstates<br>↓<br>Mixing Matrix (Weinberg Rotation θᵂ)<br>↓<br>Physical (Mass) Eigenstates`,
+hierarchy: `<div style="color: var(--accent-mixing); font-weight: bold; margin-bottom: 2px; font-size: 1.00rem;">Mixing: Structural Rotation</div>`,
+footer: "Physical states are rotated mixtures of symmetry eigenstates.",
+rightNote: `<div style="color: #ec4899; line-height: 1.3; margin-top: 5px; padding: 5px; font-size: 0.8rem;">Mixing allows particles of one type to transform into another (e.g., quark flavor change).<p>$A = B \\cos\\theta_W + W^3 \\sin\\theta_W$<br>$Z = -B \\sin\\theta_W + W^3 \\cos\\theta_W$</p><p><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">👉 This Module Establishes:<br>Symmetry states → mixing → observed particles</p></div>`
+},
+
+4: {
+title: "INTERACTION HIERARCHY",
+result: "The emergent order of forces",
+resultSize: "0.85rem",
+
+brief: `<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Interaction Hierarchy — Emergent Order of Forces</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Starting Point (Context from Previous Modules)</h3>
+<p>Module 1 established: charge as eigenvalue $$q$$. Module 2 established: coupling constant $$g$$ defines strength. Module 3 established: mixing transforms symmetry states into physical states. 👉 Now the question is: <strong>why do forces appear in a hierarchy of strengths and ranges?</strong></p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Core Question of This Module</h3>
+<p><strong>What determines the ordering of interactions (strong, electromagnetic, weak)?</strong> Why are some forces dominant while others are suppressed?</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Conceptual Development</h3>
+
+<p><strong>(A) Structural Setup:</strong> Each interaction is characterized by:
+$$
+\\text{Interaction} = g \\cdot q
+$$
+👉 But interactions differ not only in coupling strength, but also in range.</p>
+
+<p><strong>(B) Mediator Mass:</strong> Force range is determined by the mass of the exchange particle:
+$$
+\\text{Range} \\sim \\frac{1}{m}
+$$
+👉 Massless mediator → long-range force; massive mediator → short-range force.</p>
+
+<p><strong>(C) Combined Effect:</strong> Interaction behavior depends on both:
+$$
+\\text{Strength} \\propto g, \\quad \\text{Range} \\propto \\frac{1}{m}
+$$
+👉 Forces are ordered by combined magnitude and reach.</p>
+
+<p><strong>(D) Emergent Hierarchy:</strong>
+$$
+\\text{Strong} > \\text{Electromagnetic} > \\text{Weak}
+$$
+👉 This ordering emerges from coupling constants and mediator masses.</p>
+
+<p><strong>(E) Structural Interpretation:</strong> Forces are not fundamentally different types, but different regimes of the same structural interaction framework.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Key Structural Insight</h3>
+<p>$$
+\\text{Coupling Strength} + \\text{Mediator Mass} \\;\\longrightarrow\\; \\text{Interaction Hierarchy}
+$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Mathematical Anchor (Light)</h3>
+<p>Yukawa-type potential:
+$$
+V(r) \\sim \\frac{g^2}{r} e^{-m r}
+$$
+👉 Shows dependence on both $$g$$ and $$m$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Physical Interpretation</h3>
+<p><strong>Strong force:</strong> Large $$g$$, short range (confinement).<br>
+<strong>Electromagnetic:</strong> Moderate $$g$$, infinite range ($$m = 0$$).<br>
+<strong>Weak force:</strong> Small effective strength, very short range (large $$m$$).<br>
+👉 Observable hierarchy arises from these parameters.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Graph Interpretation Paragraph (MANDATORY)</h3>
+<p>The graph represents interaction strength across different forces. The X-axis labels interaction sectors (strong, electromagnetic, weak), while the Y-axis represents interaction strength (log scale). Bar heights indicate relative magnitudes determined by coupling constants and mediator properties. 👉 The visualization demonstrates: <strong>forces form an ordered spectrum governed by structural parameters, not arbitrary differences</strong>.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Role of This Module</h3>
+<p>This module introduces: Hierarchical organization of forces, Dependence on coupling and mediator mass, and Unified structural interpretation of interactions. 👉 It explains why nature exhibits an ordered spectrum of forces.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 9. WHAT THIS MODULE ACHIEVES (FINAL LINE)</h3>
+<p style="margin-bottom: 0;">👉 This module establishes: $$\\boxed{ \\text{coupling strength} + \\text{mediator mass} \\;\\longrightarrow\\; \\text{interaction hierarchy} }$$</p>
+
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Force Ordering:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$V(r) \\sim \\frac{g^2}{r} e^{-m r}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The hierarchy of forces emerges from the interplay of coupling strength and mediator mass, revealing that all interactions are variations of a unified structural framework differing only in scale and range.</p>
+</div>
+</div>`,
+
+math: `<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: Interaction Hierarchy from Coupling and Mediator Mass</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Starting Mathematical Object</h3>
+<p>Coupling constant: $$g$$. Mediator mass: $$m$$. Interaction potential: $$V(r)$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Core Definition</h3>
+<p>Interaction strength:
+$$
+\\text{Strength} \\propto g
+$$
+Interaction range:
+$$
+\\text{Range} \\sim \\frac{1}{m}
+$$
+👉 Both parameters jointly define force behavior.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Yukawa Potential (General Form)</h3>
+<p>
+$$
+V(r) = \\frac{g^2}{4\\pi r} e^{-m r}
+$$
+👉 Encodes both coupling strength and finite range.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Limiting Cases</h3>
+<p>
+<strong>Massless mediator ($$m = 0$$):</strong>
+$$
+V(r) = \\frac{g^2}{4\\pi r}
+$$
+(long-range interaction)</p>
+
+<p>
+<strong>Massive mediator ($$m \\gg 0$$):</strong>
+$$
+V(r) \\rightarrow 0 \\quad \\text{as} \\quad r \\rightarrow \\infty
+$$
+(short-range interaction)</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Relative Strength Comparison</h3>
+<p>Interaction amplitude:
+$$
+\\mathcal{M} \\propto g
+$$
+Cross-section:
+$$
+\\sigma \\propto g^4
+$$
+👉 Stronger coupling leads to higher interaction probability.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Effective Coupling (Running)</h3>
+<p>
+$$
+\\alpha = \\frac{g^2}{4\\pi}
+$$
+Scale dependence:
+$$
+\\mu \\frac{d\\alpha}{d\\mu} = \\beta(\\alpha)
+$$
+👉 Interaction strength varies with energy scale.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Force Hierarchy Representation</h3>
+<p>
+$$
+\\alpha_s > \\alpha_{em} > \\alpha_w
+$$
+Corresponding ranges:
+$$
+\\frac{1}{m_s} < \\infty > \\frac{1}{m_w}
+$$
+👉 Combined ordering defines hierarchy.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Unified Interaction Expression</h3>
+<p>
+$$
+V(r) \\sim \\frac{(g q)^2}{r} e^{-m r}
+$$
+👉 Includes both charge and coupling contributions.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 9. Final Mathematical Statement</h3>
+<p>The hierarchy of forces emerges from the interplay between coupling constants and mediator masses, determining both interaction strength and effective range.</p>
+
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Hierarchy Law:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$V(r) \\sim \\frac{(g q)^2}{r} e^{-m r}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Interaction hierarchy is determined by the combined effect of coupling strength and mediator mass, producing a continuous spectrum of forces differing in magnitude and range rather than fundamental nature.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>DOMAIN SCALE</span><input type="number" id="h_in" class="digital-entry" value="50" oninput="syncVal(this.value, 'h_sl')"></div><input type="range" id="h_sl" min="1" max="100" step="1" value="50" oninput="syncVal(this.value, 'h_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">ORDER RULE</span><div style="text-align:center; font-size: 0.8rem;">Coupling Strength + Interaction Range → Force Hierarchy</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">Hierarchy is Emergent Power</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Max</span><span class="const-val">STRONG</span></div><div class="const-item"><span class="const-label">Min</span><span class="const-val">WEAK</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-hierarchy);">HIERARCHY: ORDERED</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.9rem;">Coupling Strength<br>↓<br>Exchange Particle Mass<br>↓<br>Effective Force Range<br>↓<br>Range ∝ 1 / m`,
+hierarchy: `<div style="color: var(--accent-hierarchy); font-weight: bold; font-size: 0.95rem;">Order: Gradient of Forces</div>`,
+footer: "The hierarchy of forces determines the structure and stability of matter.",
+rightNote: `<div style="color: #8b5cf6; line-height: 1.3; margin-top: 8px; padding: 10px; font-size: 0.9rem;">Forces are not different in kind, but in coupling strength and interaction range (scale and reach).<p><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">👉 This Module Establishes:<br>Coupling → interaction hierarchy</p></div>`
+},
+
+5: {
+title: "COMPLETE INTERACTION STRUCTURE",
+result: "The unified dynamic of the SM",
+resultSize: "0.85rem",
+
+brief: `<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Complete Interaction Structure — Unified Coupling Framework</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Starting Point (Context from Previous Modules)</h3>
+<p>Module 1 defined charge as eigenvalue $$q$$. Module 2 introduced coupling constants $$g$$. Module 3 established mixing via unitary transformation $$U$$. Module 4 showed hierarchy arising from $$g$$ and mediator mass $$m$$. 👉 Now the goal is to unify all into a single structural description of interaction.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Core Question of This Module</h3>
+<p><strong>What is the complete mathematical structure of interaction?</strong> How do charge, coupling, mixing, and hierarchy combine into a unified description of physical interactions?</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Conceptual Development</h3>
+
+<p><strong>(A) Structural Components:</strong> Interaction involves four elements:
+$$
+q, \\quad g, \\quad U, \\quad m
+$$
+👉 Each plays a distinct role in defining physical behavior.</p>
+
+<p><strong>(B) Effective Interaction Strength:</strong>
+$$
+\\text{Effective Interaction} = U \\cdot (g \\cdot q)
+$$
+👉 Mixing transforms symmetry-defined interaction into physical interaction.</p>
+
+<p><strong>(C) Spatial Behavior:</strong> Interaction propagates with range determined by mediator mass:
+$$
+V(r) \\sim \\frac{(g q)^2}{r} e^{-m r}
+$$
+👉 Spatial profile is controlled by $$m$$.</p>
+
+<p><strong>(D) Full Structural Expression:</strong>
+$$
+\\text{Interaction}(r) = U \\cdot \\left( \\frac{(g q)^2}{r} e^{-m r} \\right)
+$$
+👉 Combines structure, strength, mixing, and range.</p>
+
+<p><strong>(E) Unified Interpretation:</strong> All observed forces are manifestations of this same structural form with different parameter values.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Key Structural Insight</h3>
+<p>$$
+(q, g, U, m) \\;\\longrightarrow\\; \\text{complete interaction structure}
+$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Mathematical Anchor (Light)</h3>
+<p>Interaction Lagrangian (general form):
+$$
+\\mathcal{L}_{int} = g A_\\mu^a \\bar{\\psi} \\gamma^\\mu T^a \\psi
+$$
+With mixing:
+$$
+\\psi \\rightarrow U \\psi
+$$
+👉 Produces physical interaction terms.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Physical Interpretation</h3>
+<p><strong>Charge ($$q$$):</strong> determines interaction channel.<br>
+<strong>Coupling ($$g$$):</strong> sets strength scale.<br>
+<strong>Mixing ($$U$$):</strong> defines observed particle basis.<br>
+<strong>Mass ($$m$$):</strong> controls interaction range.<br>
+👉 Together they fully determine observable interactions.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Graph Interpretation Paragraph (MANDATORY)</h3>
+<p>The graph represents interaction structure in a multi-parameter space. Axes correspond to coupling strength $$g$$, charge $$q$$, and interaction scale (distance $$r$$ or inverse mass $$1/m$$). Points represent physical interactions emerging after mixing transformation $$U$$. 👉 The visualization demonstrates: <strong>interactions are unified structures parameterized by a small set of fundamental quantities</strong>.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Role of This Module</h3>
+<p>This module completes: Unified interaction framework, Integration of symmetry and dynamics, and Final structural form of forces. 👉 It prepares direct transition to observable physics (Stage 55).</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 9. WHAT THIS MODULE ACHIEVES (FINAL LINE)</h3>
+<p style="margin-bottom: 0;">👉 This module establishes: $$\\boxed{ (q, g, U, m) \\;\\longrightarrow\\; \\text{complete physical interaction structure} }$$</p>
+
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Unified Interaction:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\text{Interaction}(r) = U \\cdot \\left( \\frac{(g q)^2}{r} e^{-m r} \\right)$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">All physical interactions arise from a unified structural framework combining charge, coupling strength, mixing transformations, and mediator mass, producing the full diversity of observable forces.</p>
+</div>
+</div>`,
+
+math: `<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: Unified Interaction Structure (q, g, U, m)</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Starting Mathematical Object</h3>
+<p>Charge eigenvalue: $$q_a$$. Coupling constant: $$g$$. Mixing matrix: $$U$$. Mediator mass: $$m$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Core Definition</h3>
+<p>Eigenvalue relation:
+$$
+T^a |\\psi\\rangle = q_a |\\psi\\rangle
+$$
+Covariant derivative:
+$$
+D_\\mu = \\partial_\\mu - i g A_\\mu^a T^a
+$$
+👉 Interaction originates from symmetry generators and coupling.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Interaction Lagrangian</h3>
+<p>
+$$
+\\mathcal{L}_{int} = g A_\\mu^a \\bar{\\psi} \\gamma^\\mu T^a \\psi
+$$
+Eigenvalue form:
+$$
+\\mathcal{L}_{int} = g q_a A_\\mu^a \\bar{\\psi} \\gamma^\\mu \\psi
+$$
+👉 Effective coupling becomes $$g q_a$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Mixing Transformation</h3>
+<p>
+$$
+\\psi \\rightarrow U \\psi, \\quad U^\\dagger U = I
+$$
+Transformed interaction:
+$$
+\\mathcal{L}_{int} \\rightarrow g A_\\mu^a \\bar{\\psi} U^\\dagger \\gamma^\\mu T^a U \\psi
+$$
+👉 Physical interactions occur in rotated basis.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Effective Interaction Strength</h3>
+<p>
+$$
+\\mathcal{M} \\propto U (g q)
+$$
+Probability:
+$$
+|\\mathcal{M}|^2 \\propto (g q)^2
+$$
+👉 Mixing redistributes interaction strength across physical states.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Spatial Interaction Form</h3>
+<p>
+$$
+V(r) = \\frac{(g q)^2}{4\\pi r} e^{-m r}
+$$
+👉 Combines strength and range.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Unified Expression</h3>
+<p>
+$$
+\\text{Interaction}(r) = U \\cdot \\left( \\frac{(g q)^2}{4\\pi r} e^{-m r} \\right)
+$$
+👉 Includes symmetry, coupling, mixing, and propagation.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Multi-Component Generalization</h3>
+<p>
+$$
+\\text{Interaction}_i = U_{ij} \\cdot (g_j q_j)
+$$
+👉 Multiple interaction channels combine via mixing matrix.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 9. Final Mathematical Statement</h3>
+<p>All physical interactions are fully determined by the combined structure of charge eigenvalues, coupling constants, mixing transformations, and mediator masses.</p>
+
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Unified Interaction Law:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\text{Interaction}(r) = U \\cdot \\left( \\frac{(g q)^2}{4\\pi r} e^{-m r} \\right)$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The complete interaction structure is governed by charge eigenvalues, coupling constants, mixing transformations, and mediator masses, forming a unified mathematical framework underlying all physical forces.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>INTEGRATION (%)</span><input type="number" id="i_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'i_sl')"></div><input type="range" id="i_sl" min="0" max="100" step="1" value="100" oninput="syncVal(this.value, 'i_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">FINAL SYNTHESIS</span><div style="text-align:center; font-size: 0.8rem;">Interaction = Unified coupling structure</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">Connectivity is Absolute</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Status</span><span class="const-val">LOCKED</span></div><div class="const-item"><span class="const-label">Structure</span><span class="const-val">COMPLETE</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-structure);">STRUCTURE: FULLY REALIZED</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.9rem;">Symmetry Structure<br>↓<br>Coupling Constants (gᵢ)<br>↓<br>Observable Interaction Dynamics`,
+hierarchy: `<div style="color: var(--accent-structure); font-weight: bold; font-size: 1.00rem;">Structure: Fully coupled interaction network</div>`,
+footer: "The interaction structure forms the connectivity backbone of physical reality.",
+rightNote: `<div style="color: #2dd4bf; line-height: 1.3; margin-top: 8px; padding: 10px; font-size: 0.85rem;">All interactions are unified within the gauge–matter–coupling structure.<p><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">👉 This Module Establishes:<br>Total integration of interaction parameters</p></div>`
+}
+};
+
+function syncVal(val, id) {
+const sliderId = id.includes('_in') ? id.replace('_in', '_sl') : id;
+const inputId = id.includes('_sl') ? id.replace('_sl', '_in') : id;
+if(document.getElementById(sliderId)) document.getElementById(sliderId).value = val;
+if(document.getElementById(inputId)) document.getElementById(inputId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+document.getElementById('brief-box-content').innerHTML = content.brief;
+document.getElementById('math-box-content').innerHTML = content.math;
+document.getElementById('control-sliders').innerHTML = content.sliders;
+
+document.getElementById('active-module-title').innerText = content.title;
+const resultEl = document.getElementById('active-module-result');
+resultEl.innerText = content.result;
+resultEl.style.fontSize = content.resultSize || "0.65rem";
+
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('metrics-content').innerHTML = content.metricsContent;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+document.getElementById('structure-box-area').innerHTML = content.structure;
+document.getElementById('telemetry-area').innerHTML = content.telemetry;
+showScreen('briefing');
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() {
+showScreen('lab');
+setTimeout(() => { runLab(); window.dispatchEvent(new Event('resize')); }, 100);
+}
+
+function runLab() {
+const target = document.getElementById('plot-area');
+if (!target) return;
+let data = [];
+let layout = {
+paper_bgcolor: 'black', plot_bgcolor: 'black', margin: {t:60,b:10,l:10,r:10},
+showlegend: true, font: { family: 'sans-serif', size: 10 },
+legend: { font: { color: '#e5e7eb' }, x: 0.7, y: 0.9, bgcolor: 'rgba(0,0,0,0.5)' },
+scene: {
+xaxis: { gridcolor: '#222', color: '#94a3b8', title: "" },
+yaxis: { gridcolor: '#222', color: '#94a3b8', title: "" },
+zaxis: { gridcolor: '#222', color: '#94a3b8', title: "" },
+camera: { eye: { x: 1.5, y: 1.5, z: 1.2 } }
+}
+};
+
+if (currentTool === 1) { // CHARGE AS COUPLING
+let val = parseFloat(document.getElementById('c_sl')?.value || 10);
+let x = [0, 1, 1, 0, 0, 1, 1, 0];
+let y = [0, 0, 1, 1, 0, 0, 1, 1];
+let z = [0, 0, 0, 0, 1, 1, 1, 1];
+data.push({
+type: 'scatter3d', mode: 'markers',
+x: x.map(v => v * val), y: y.map(v => v * val), z: z.map(v => v * val),
+marker: { size: 10, color: '#f59e0b' }, name: 'Particle Eigenstate'
+});
+layout.title = { text: "CHARGE SPACE (EIGENVALUE CLUSTER)", font: { color: '#f59e0b' } };
+layout.scene.xaxis.title = "Weak Isospin (T³)";
+layout.scene.yaxis.title = "Hypercharge (Y)";
+layout.scene.zaxis.title = "Color Charge (SU(3) generator)";
+
+
+} else if (currentTool === 2) { // COUPLING POTENTIALS
+let g = parseFloat(document.getElementById('g_sl')?.value || 60) / 100;
+let r_vals = Array.from({length: 100}, (_, i) => (i + 1) / 10);
+data.push({
+type: 'scatter',
+x: r_vals,
+y: r_vals.map(v => Math.exp(-g * v)),
+line: { color: '#10b981', width: 3 },
+name: 'Interaction Decay Profile'
+});
+layout.title = { text: "COUPLING POTENTIALS (V)", font: { color: '#10b981' } };
+layout.xaxis = { title: { text: "Distance (r)", font: { color: '#eee' } }, gridcolor: '#222', zerolinecolor: '#444' };
+layout.yaxis = { title: { text: "Potential Decay V(r)", font: { color: '#eee' } }, gridcolor: '#222', zerolinecolor: '#444' };
+delete layout.scene; // 2D Plot
+
+
+} else if (currentTool === 3) { // MIXING ROTATIONS
+let angle = (parseFloat(document.getElementById('m_sl')?.value || 28) * Math.PI) / 180;
+data.push({
+type: 'scatter',
+x: [0, 1], y: [0, 0],
+name: 'Symmetry Axis (W³)',
+line: {color: '#eee', dash: 'dash'}
+});
+data.push({
+type: 'scatter',
+x: [0, Math.cos(angle)],
+y: [0, Math.sin(angle)],
+name: 'Physical State (Z/γ)',
+line: {color: '#ec4899', width: 4},
+mode: 'lines+markers'
+});
+layout.title = { text: "WEINBERG ANGLE ROTATION (θᵂ)", font: { color: '#ec4899' } };
+layout.xaxis = { title: { text: "Weak Isospin Axis (W³)", font: { color: '#eee' } }, range: [-1.2, 1.2], zeroline: true, gridcolor: '#222' };
+layout.yaxis = { title: { text: "Hypercharge Axis (B)", font: { color: '#eee' } }, range: [-1.2, 1.2], zeroline: true, gridcolor: '#222' };
+delete layout.scene;
+
+
+} else if (currentTool === 4) { // FORCE HIERARCHY
+let scale = parseFloat(document.getElementById('h_sl')?.value || 50);
+
+// Trace 1: Strong Force
+data.push({
+type: 'bar',
+x: ['Strong (gₛ)'],
+y: [100],
+marker: {color: '#ef4444'},
+name: 'Strong (gₛ)'
+});
+
+// Trace 2: Electromagnetic Force
+data.push({
+type: 'bar',
+x: ['EM (e)'],
+y: [scale],
+marker: {color: '#3b82f6'},
+name: 'Electromagnetic (g)'
+});
+
+// Trace 3: Weak Force
+data.push({
+type: 'bar',
+x: ['Weak (g)'],
+y: [scale / 100],
+marker: {color: '#8b5cf6'},
+name: 'Weak (gₓ)'
+});
+
+layout.title = { text: "FORCE HIERARCHY SCALE", font: { color: '#8b5cf6' } };
+layout.xaxis = { title: { text: "Interaction Sector", font: { color: '#eee' } } }, 
+layout.yaxis = {
+title: { text: "Interaction Strength (log₁₀ α)", font: { color: '#eee' } },
+type: 'log',
+gridcolor: '#222',
+dtick: 1 // Ensures clear markers for each power of 10
+};
+layout.showlegend = true; // Explicitly ensure legend is visible
+layout.barmode = 'group'; // Keeps bars aligned correctly on the X-axis
+delete layout.scene;
+
+
+} else if (currentTool === 5) { // INTEGRATED DYNAMIC
+let m = parseFloat(document.getElementById('i_sl')?.value || 100) / 100;
+let labels = ['g_s', 'g', 'g\'', 'θ_W', 'Q', 'V_CKM'];
+let r = labels.map((_, i) => (i + 1) * m);
+let theta = labels.map((_, i) => (i * 60));
+data.push({
+type: 'scatterpolar',
+r: r,
+theta: theta,
+mode: 'markers+text+lines',
+text: labels,
+fill: 'toself',
+marker: {size: 12, color: '#2dd4bf'},
+name: 'Structural Equilibrium'
+});
+layout.title = { text: "INTEGRATED COUPLING STRUCTURE", font: { color: '#2dd4bf' } };
+layout.polar = {
+bgcolor: 'black',
+radialaxis: {visible: true, title: { text: "Coupling Weight (gᵢ)", font: { color: '#eee' } }, gridcolor: '#222'},
+angularaxis: {color: '#94a3b8', gridcolor: '#222'}
+};
+delete layout.scene;
+}
+
+
+Plotly.react('plot-area', data, layout, {responsive: true, displayModeBar: false});
+}
+
+function resetLab() {
+if(currentTool===1) syncVal(10, 'c_sl');
+if(currentTool===2) syncVal(60, 'g_sl');
+if(currentTool===3) syncVal(28, 'm_sl');
+if(currentTool===4) syncVal(50, 'h_sl');
+if(currentTool===5) syncVal(100, 'i_sl');
+}
+
+window.onload = () => { showScreen('portal'); };
+</script>
+</body>
+</html>

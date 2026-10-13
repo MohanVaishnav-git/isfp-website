@@ -1,0 +1,3002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 62 — GR Reconstruction (Formal Equivalence Layer)</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #3b82f6;
+--accent-obs: #94a3b8; --accent-exp: #fbbf24; --accent-master: #c084fc; --accent-lock: #f87171; --accent-final: #2dd4bf;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6;
+--accent-gold: #fbbf24;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-gold); font-family: sans-serif; font-size: 0.85rem; min-width: 450px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls, #nav-summary-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+#screen-lab.active { display: flex; flex-direction: column; height: calc(100vh - 50px); }
+
+#screen-portal { justify-content: flex-start; padding-top: 6dvh; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 50px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 2px; font-weight: bold; letter-spacing: 0.5px; padding-bottom: 0px; }
+.module-subtitle { text-align: center; font-family: sans-serif; color: var(--accent-gold); margin-bottom: 5px; font-weight: bold; letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.primary-constant-box { background: #000; border: 1px solid var(--accent-unified); padding: 2px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 8px; }
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(59, 130, 246, 0.05); border: 1px solid var(--accent-unified); padding: 5px; border-radius: 5px; margin-bottom: 8px; font-size: 0.7rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; }
+#plot-area { flex-grow: 1; width: 100%; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #fff; border: 1px solid var(--accent-unified); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer { width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem; color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 62 — GR RECONSTRUCTION (Formal Equivalence Layer)</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">Einstein Field Recovery</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">Mapping Substrate Dynamics to General Relativity Geometry.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-unified);">
+<h2 style="color:var(--accent-unified);">1. Metric Emergence</h2>
+<p>Deriving $g_{\mu\nu}$ from<br>Substrate State $(K, P)$.</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-exp);">
+<h2 style="color:var(--accent-exp);">2. Connection & Geodesics</h2>
+<p>Christoffel symbols from<br>Substrate Gradients.</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-master);">
+<h2 style="color:var(--accent-master);">3. Curvature Tensor Mapping</h2>
+<p>Riemann Tensor as<br>Substrate Variation.</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-lock);">
+<h2 style="color:var(--accent-lock);">4. Einstein Tensor Recovery</h2>
+<p>Equivalence of $\Sigma_{\mu\nu}$ and $G_{\mu\nu}$.</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-final);">
+<h2 style="color:var(--accent-final);">5. Full Einstein Equation</h2>
+<p>Final recovery of<br>$G_{\mu\nu} = 8\pi G T_{\mu\nu}$.</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-unified);">
+<h2 style="color:var(--accent-unified);">6. Stage 62 Summary</h2>
+<p>Formal Equivalence Statement.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color:var(--accent-unified); text-align:center;">Stage 62 — Mathematical Structure Summary and Closure Theorem</h2>
+<section>
+<p>General Relativity is recovered exactly as a formal representation of substrate dynamics governed by the structural parameters $K$ and $P$. No independent geometric assumptions remain.</p>
+<div style="background: rgba(59,130,246,0.03); padding: 15px; border-radius: 8px; font-family: monospace; font-size: 0.85rem; border: 1px solid var(--accent-unified); line-height: 1.6;">
+<strong>EQUIVALENCE IDENTITY:</strong><br>
+$\Sigma_{\mu\nu}(K, P) \equiv G_{\mu\nu}$<br>
+$\nabla^\mu \Sigma_{\mu\nu} \equiv \nabla^\mu G_{\mu\nu} = 0$
+</div>
+<h4 style="color: var(--accent-gold); margin-bottom: 5px;">MAPPING CLOSURE</h4>
+<ul style="font-size: 0.85rem; line-height: 1.4;">
+<li>Metric $g_{\mu\nu}$ derived from substrate response state.</li>
+<li>Geodesic motion recovered as substrate equilibrium flow.</li>
+<li>Einstein equations emerged from Synthesis Tensor conservation.</li>
+</ul>
+<p style="text-align:center; font-weight:bold; margin-top:20px; color: var(--accent-gold);">FINAL STAGE STATEMENT</p>
+<p style="text-align:center; border: 1px solid var(--accent-gold); padding: 10px; background: rgba(251, 191, 36, 0.05);">General Relativity is not a fundamental theory of spacetime, but an exact geometric representation of substrate dynamics governed by the structural parameters K and P.</p>
+
+<div class="math-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Substrate Origin</h3>
+
+<p>
+$K = |\nabla C|, \quad P = P_{\text{syn}}$
+</p>
+
+<p>
+$(K, P) \longrightarrow g_{\mu\nu}$
+</p>
+
+<h3 style="color:#fbbf24;">2. Metric Structure</h3>
+
+<p>
+$ds^2 = g_{\mu\nu} dx^\mu dx^\nu$
+</p>
+
+<p>
+$g_{\mu\nu} = g_{\nu\mu}, \quad \det(g_{\mu\nu}) \neq 0$
+</p>
+
+<p>
+$\text{Signature: } (-,+,+,+)$
+</p>
+
+<h3 style="color:#fbbf24;">3. Connection</h3>
+
+<p>
+$\Gamma^\lambda_{\mu\nu} =
+\frac{1}{2} g^{\lambda\sigma}
+\left(
+\partial_\mu g_{\nu\sigma}
++ \partial_\nu g_{\mu\sigma}
+- \partial_\sigma g_{\mu\nu}
+\right)$
+</p>
+
+<p>
+$\nabla_\lambda g_{\mu\nu} = 0$
+</p>
+
+<h3 style="color:#fbbf24;">4. Geodesic Equation</h3>
+
+<p>
+$\frac{d^2 x^\lambda}{d\tau^2}
++ \Gamma^\lambda_{\mu\nu}
+\frac{dx^\mu}{d\tau} \frac{dx^\nu}{d\tau}
+= 0$
+</p>
+
+<h3 style="color:#fbbf24;">5. Curvature</h3>
+
+<p>
+$R^\rho_{\ \sigma\mu\nu} =
+\partial_\mu \Gamma^\rho_{\nu\sigma}
+- \partial_\nu \Gamma^\rho_{\mu\sigma}
++ \Gamma^\rho_{\mu\lambda} \Gamma^\lambda_{\nu\sigma}
+- \Gamma^\rho_{\nu\lambda} \Gamma^\lambda_{\mu\sigma}$
+</p>
+
+<p>
+$R_{\mu\nu} = R^\rho_{\ \mu\rho\nu}, \quad
+R = g^{\mu\nu} R_{\mu\nu}$
+</p>
+
+<h3 style="color:#fbbf24;">6. Einstein Tensor</h3>
+
+<p>
+$G_{\mu\nu} = R_{\mu\nu} - \frac{1}{2} g_{\mu\nu} R$
+</p>
+
+<p>
+$\nabla^\mu G_{\mu\nu} = 0$
+</p>
+
+<h3 style="color:#fbbf24;">7. Synthesis Identity</h3>
+
+<p>
+$\Sigma_{\mu\nu} = G_{\mu\nu}$
+</p>
+
+<h3 style="color:#fbbf24;">8. Field Equation</h3>
+
+<p>
+$G_{\mu\nu} = 8\pi G \, T_{\mu\nu}$
+</p>
+
+<p>
+$\nabla^\mu T_{\mu\nu} = 0$
+</p>
+
+<h3 style="color:#fbbf24;">9. Complete Structural Chain</h3>
+
+<p>
+$(K, P)
+\longrightarrow
+g_{\mu\nu}
+\longrightarrow
+\Gamma^\lambda_{\mu\nu}
+\longrightarrow
+R^\rho_{\ \sigma\mu\nu}
+\longrightarrow
+G_{\mu\nu}
+\longrightarrow
+T_{\mu\nu}$
+</p>
+
+<h3 style="color:#fbbf24;">10. Structural Closure</h3>
+
+<p>
+$\text{General Relativity} \equiv \text{Geometric expression of substrate equilibrium}$
+</p>
+
+</div>
+
+
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 62 — Closure / Completion Theorem</h2>
+
+<div class="math-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Statement of the Theorem</h3>
+
+<p>
+Given the substrate parameters
+</p>
+
+<p>
+$K = |\nabla C|, \quad P = P_{\text{syn}}$
+</p>
+
+<p>
+there exists a unique and complete mapping
+</p>
+
+<p>
+$(K, P) \longrightarrow \{ g_{\mu\nu}, \Gamma^\lambda_{\mu\nu}, R^\rho_{\ \sigma\mu\nu}, G_{\mu\nu} \}$
+</p>
+
+<p>
+such that:
+</p>
+
+<p>
+$G_{\mu\nu} = 8\pi G \, T_{\mu\nu}$
+</p>
+
+<p>
+is necessarily satisfied, and all structures of General Relativity are fully recovered as derived consequences of substrate dynamics.
+</p>
+
+<h3 style="color:#fbbf24;">2. Metric Emergence (Existence)</h3>
+
+<p>
+The metric tensor exists as a functional of substrate parameters:
+</p>
+
+<p>
+$g_{\mu\nu} = \mathcal{G}_{\mu\nu}(K, P)$
+</p>
+
+<p>
+with properties:
+</p>
+
+<p>
+$g_{\mu\nu} = g_{\nu\mu}, \quad \det(g_{\mu\nu}) \neq 0$
+</p>
+
+<p>
+Thus, spacetime geometry is well-defined.
+</p>
+
+<h3 style="color:#fbbf24;">3. Connection Uniqueness</h3>
+
+<p>
+Imposing:
+</p>
+
+<p>
+$\nabla_\lambda g_{\mu\nu} = 0, \quad \Gamma^\lambda_{\mu\nu} = \Gamma^\lambda_{\nu\mu}$
+</p>
+
+<p>
+yields the unique Levi-Civita connection:
+</p>
+
+<p>
+$\Gamma^\lambda_{\mu\nu} =
+\frac{1}{2} g^{\lambda\sigma}
+\left(
+\partial_\mu g_{\nu\sigma}
++ \partial_\nu g_{\mu\sigma}
+- \partial_\sigma g_{\mu\nu}
+\right)$
+</p>
+
+<h3 style="color:#fbbf24;">4. Curvature Determination</h3>
+
+<p>
+Curvature is uniquely defined by:
+</p>
+
+<p>
+$R^\rho_{\ \sigma\mu\nu} =
+\partial_\mu \Gamma^\rho_{\nu\sigma}
+- \partial_\nu \Gamma^\rho_{\mu\sigma}
++ \Gamma^\rho_{\mu\lambda} \Gamma^\lambda_{\nu\sigma}
+- \Gamma^\rho_{\nu\lambda} \Gamma^\lambda_{\mu\sigma}$
+</p>
+
+<p>
+All contractions follow:
+</p>
+
+<p>
+$R_{\mu\nu} = R^\rho_{\ \mu\rho\nu}, \quad
+R = g^{\mu\nu} R_{\mu\nu}$
+</p>
+
+<h3 style="color:#fbbf24;">5. Unique Conserved Tensor</h3>
+
+<p>
+Consider the general tensor:
+</p>
+
+<p>
+$\mathcal{T}_{\mu\nu} = a R_{\mu\nu} + b g_{\mu\nu} R$
+</p>
+
+<p>
+Imposing conservation:
+</p>
+
+<p>
+$\nabla^\mu \mathcal{T}_{\mu\nu} = 0$
+</p>
+
+<p>
+and using:
+</p>
+
+<p>
+$\nabla^\mu R_{\mu\nu} = \frac{1}{2} \nabla_\nu R$
+</p>
+
+<p>
+gives:
+</p>
+
+<p>
+$\frac{a}{2} + b = 0 \quad \Rightarrow \quad b = -\frac{a}{2}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$G_{\mu\nu} = R_{\mu\nu} - \frac{1}{2} g_{\mu\nu} R$
+</p>
+
+<p>
+and:
+</p>
+
+<p>
+$\nabla^\mu G_{\mu\nu} = 0$
+</p>
+
+<p>
+Uniqueness follows.
+</p>
+
+<h3 style="color:#fbbf24;">6. Identity with Synthesis Tensor</h3>
+
+<p>
+Given:
+</p>
+
+<p>
+$\nabla^\mu \Sigma_{\mu\nu} = 0$
+</p>
+
+<p>
+and uniqueness of $G_{\mu\nu}$:
+</p>
+
+<p>
+$\Sigma_{\mu\nu} = G_{\mu\nu}$
+</p>
+
+<h3 style="color:#fbbf24;">7. Coupling Necessity</h3>
+
+<p>
+Let:
+</p>
+
+<p>
+$\nabla^\mu T_{\mu\nu} = 0$
+</p>
+
+<p>
+Then the only admissible coupling is:
+</p>
+
+<p>
+$G_{\mu\nu} = \kappa \, T_{\mu\nu}$
+</p>
+
+<h3 style="color:#fbbf24;">8. Determination of $\kappa$</h3>
+
+<p>
+From weak-field limit:
+</p>
+
+<p>
+$\nabla^2 \Phi = 4\pi G \rho$
+</p>
+
+<p>
+and:
+</p>
+
+<p>
+$G_{00} \approx 2 \nabla^2 \Phi$
+</p>
+
+<p>
+one obtains:
+</p>
+
+<p>
+$\kappa = 8\pi G$
+</p>
+
+<h3 style="color:#fbbf24;">9. Completion of Field Equation</h3>
+
+<p>
+Thus:
+</p>
+
+<p>
+$G_{\mu\nu} = 8\pi G \, T_{\mu\nu}$
+</p>
+
+<h3 style="color:#fbbf24;">10. Structural Chain (Closure Mapping)</h3>
+
+<p>
+$(K, P)
+\longrightarrow
+g_{\mu\nu}
+\longrightarrow
+\Gamma^\lambda_{\mu\nu}
+\longrightarrow
+R^\rho_{\ \sigma\mu\nu}
+\longrightarrow
+G_{\mu\nu}
+\longrightarrow
+G_{\mu\nu} = 8\pi G \, T_{\mu\nu}$
+</p>
+
+<h3 style="color:#fbbf24;">11. Uniqueness and Completeness</h3>
+
+<p>
+At each stage:
+</p>
+
+<ul>
+<li>Metric is uniquely determined by $(K, P)$</li>
+<li>Connection is uniquely Levi-Civita</li>
+<li>Curvature is uniquely determined by connection</li>
+<li>Einstein tensor is uniquely divergence-free</li>
+<li>Field equation is uniquely fixed by conservation</li>
+</ul>
+
+<p>
+Thus, no alternative consistent structure exists.
+</p>
+
+<h3 style="color:#fbbf24;">12. Final Closure Statement</h3>
+
+<p>
+$\boxed{
+(K, P)
+\Longrightarrow
+g_{\mu\nu}
+\Longrightarrow
+\Gamma^\lambda_{\mu\nu}
+\Longrightarrow
+R^\rho_{\ \sigma\mu\nu}
+\Longrightarrow
+G_{\mu\nu}
+\Longrightarrow
+G_{\mu\nu} = 8\pi G \, T_{\mu\nu}
+}$
+</p>
+
+<p>
+This establishes that General Relativity is fully and uniquely recovered as the geometric expression of substrate equilibrium.
+</p>
+</div>
+
+</section>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div id="active-module-result" class="module-subtitle">--</div>
+<div class="primary-constant-box">
+<div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val">11.350</span></div>
+<div class="const-item"><span class="const-label">Synthesis P</span><span class="const-val">0.6900</span></div>
+</div>
+
+<div id="mapping-box-area"></div>
+
+<div class="diagnostic-panel">
+<span class="diag-title">Derivation Telemetry</span>
+<div id="telemetry-area"></div>
+</div>
+
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-unified); font-size:0.75rem; cursor:pointer; padding:6px;">RE-VALIDATE DERIVATION</button>
+<div id="panel-footer-text" style="font-size: 0.85rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.3; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:8px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Recovered Standard Form</span>
+<div id="metrics-content" style="font-size:0.85rem; text-align:center; padding:5px;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Validation Chain</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.65rem; color: var(--text-dim); line-height: 1.3; background: #000; padding: 5px; border-radius: 0px; border: 1px solid #222; margin-bottom: 0px; margin-top: auto;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "MODULE 1: METRIC EMERGENCE",
+result: "gμν Mapping Complete",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 62 — Module 1: Metric Emergence $(g_{\\mu\\nu} Determination)$</h2>
+
+<div class="briefing-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Conceptual Introduction</h3>
+
+<p>
+Stage 62 begins the reconstruction of spacetime geometry from substrate structure. Geometry is not an independent background; it must arise as a necessary consequence of the substrate defined by stiffness $K = |\\nabla C|$ and synthesis pressure $P = P_{\\text{syn}}$. The objective of this module is to establish how the spacetime metric $g_{\\mu\\nu}$ is determined directly from these substrate parameters.
+</p>
+
+<p>
+A physical description of space and time requires the definition of interval. Measurement demands an invariant quantity that assigns separation between events. This requirement necessitates a symmetric rank-2 tensor $g_{\\mu\\nu}$ such that $ds^2 = g_{\\mu\\nu} dx^\\mu dx^\\nu$. This tensor is not assumed; it is fixed by the requirement that substrate variations admit a consistent and measurable interval structure.
+</p>
+
+<p>
+Thus, the fundamental relation established in this module is:
+</p>
+
+<p>
+$(K, P) \\;\\longrightarrow\\; g_{\\mu\\nu}$
+</p>
+
+<h3 style="color:#fbbf24;">2. Structural Emergence</h3>
+
+<p>
+The substrate state $(K, P)$ defines the local structural condition of the vacuum. Any displacement corresponds to a change in this state. The metric arises as the minimal tensor that encodes how these variations translate into measurable intervals. It is therefore uniquely determined as a function of the substrate:
+</p>
+
+<p>
+$g_{\\mu\\nu} = \\mathcal{G}_{\\mu\\nu}(K, P)$
+</p>
+
+<p>
+No independent geometric structure is introduced. The metric is fixed by the requirement that substrate variation admits a consistent interval definition.
+</p>
+
+<h3 style="color:#fbbf24;">3. Structural Constraint</h3>
+
+<p>
+A physically admissible metric must encode causality. This requires a Lorentzian signature $(-,+,+,+)$, which distinguishes temporal and spatial directions. This distinction follows from the intrinsic asymmetry of substrate dynamics, where temporal progression and spatial variation are structurally non-equivalent.
+</p>
+
+<p>
+The invariant interval is therefore locally expressed as:
+</p>
+
+<p>
+$ds^2 = -dt^2 + dx^2 + dy^2 + dz^2$
+</p>
+
+<p>
+Symmetry is necessary:
+</p>
+
+<p>
+$g_{\\mu\\nu} = g_{\\nu\\mu}$
+</p>
+
+<p>
+since interval definition must be independent of coordinate ordering.
+</p>
+
+<h3 style="color:#fbbf24;">4. Physical Interpretation</h3>
+
+<p>
+The metric represents the measurable geometric response of the substrate to displacement. It encodes how lengths, durations, and causal relations arise from the underlying structural state. Spacetime geometry is therefore not a pre-existing arena but the direct manifestation of substrate equilibrium.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Substrate State} \\;\\longrightarrow\\; \\text{Metric Geometry}$
+</p>
+
+<h3 style="color:#fbbf24;">5. Necessity (Very Important)</h3>
+
+<p>
+A consistent geometric description requires a tensor that satisfies interval definition, symmetry, Lorentzian signature, and dependence on substrate state $(K, P)$. These conditions uniquely fix the metric. No alternative tensor satisfies all requirements simultaneously.
+</p>
+
+<p>
+Therefore:
+</p>
+
+<p>
+$g_{\\mu\\nu}$ is uniquely determined by $(K, P)$.
+</p>
+
+<h3 style="color:#fbbf24;">6. Consistency Check</h3>
+
+<p>
+The recovered metric satisfies all structural conditions: symmetry $g_{\\mu\\nu} = g_{\\nu\\mu}$, Lorentzian signature $(-,+,+,+)$, and interval definition $ds^2 = g_{\\mu\\nu} dx^\\mu dx^\\nu$. These are the exact requirements of spacetime geometry.
+</p>
+
+<h3 style="color:#fbbf24;">7. Graph / Visualization Interpretation Paragraph (MANDATORY)</h3>
+
+<p>
+The visualization represents the metric potential $g_{\\mu\\nu}$ as a curved surface over substrate coordinates. The horizontal axes correspond to coordinate directions, while the vertical axis represents the magnitude of metric response. The curvature of the surface indicates that the metric varies according to the underlying substrate state $(K, P)$ and is not constant. The smooth structure demonstrates that spacetime geometry arises as a continuous response field, not as an imposed background.
+</p>
+
+<h3 style="color:#fbbf24;">8. Conceptual Compression Lines</h3>
+
+<p>
+The metric is determined by substrate state.<br>
+Geometry is a response, not a background.<br>
+Causality arises from structural asymmetry.<br>
+Spacetime is the expression of substrate equilibrium.
+</p>
+
+<h3 style="color:#fbbf24;">9. Logical Closure</h3>
+
+<p>
+This module establishes that the spacetime metric $g_{\\mu\\nu}$ is uniquely determined by the substrate state $(K, P)$. Geometry is therefore not independent but arises necessarily from physical structure.
+</p>
+
+<h3 style="color:#fbbf24;">10. Transition to Next Module</h3>
+
+<p>
+With the metric determined, the next step is to establish how variations of the metric define connection and motion. This leads to Module 2, where the Christoffel symbols and geodesic equation are derived from $g_{\\mu\\nu}$.
+</p>
+
+<h3 style="color:#fbbf24;">11. Final Statement</h3>
+
+<p>
+The spacetime metric $g_{\\mu\\nu}$ is uniquely determined by the substrate state $(K, P)$; spacetime geometry is the direct expression of substrate equilibrium.
+</p>
+
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 62 — Module 1: Explicit Mathematics — Metric Determination</h2>
+
+<div class="math-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Starting Point: Substrate State</h3>
+
+<p>
+The substrate is defined by the structural parameters:
+</p>
+
+<p>
+$K = |\\nabla C|, \\qquad P = P_{\\text{syn}}$
+</p>
+
+<p>
+These quantities determine the local structural condition of the vacuum. All physical quantities must be expressible as functions of $(K, P)$.
+</p>
+
+<h3 style="color:#fbbf24;">2. Requirement of Interval Definition</h3>
+
+<p>
+A consistent geometric description requires an invariant interval:
+</p>
+
+<p>
+$ds^2 = \\mathcal{I}(dx^\\mu)$
+</p>
+
+<p>
+Linearity and quadratic dependence on coordinate differentials require:
+</p>
+
+<p>
+$ds^2 = g_{\\mu\\nu} \\, dx^\\mu dx^\\nu$
+</p>
+
+<p>
+Thus, the existence of a symmetric rank-2 tensor $g_{\\mu\\nu}$ is necessary for interval definition.
+</p>
+
+<h3 style="color:#fbbf24;">3. Dependence on Substrate Parameters</h3>
+
+<p>
+Since all physical quantities arise from $(K, P)$, the metric must satisfy:
+</p>
+
+<p>
+$g_{\\mu\\nu} = \\mathcal{G}_{\\mu\\nu}(K, P)$
+</p>
+
+<p>
+No independent geometric variable is admissible. Therefore:
+</p>
+
+<p>
+$\\frac{\\partial g_{\\mu\\nu}}{\\partial K} \\neq 0, \\qquad \\frac{\\partial g_{\\mu\\nu}}{\\partial P} \\neq 0$
+</p>
+
+
+<h3 style="color:#fbbf24;">4. Symmetry Condition</h3>
+
+<p>
+The interval must be invariant under exchange of coordinate indices:
+</p>
+
+<p>
+$dx^\\mu dx^\\nu = dx^\\nu dx^\\mu$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$g_{\\mu\\nu} = g_{\\nu\\mu}$
+</p>
+
+<p>
+This symmetry is necessary for a well-defined metric.
+</p>
+
+<h3 style="color:#fbbf24;">5. Signature Constraint</h3>
+
+<p>
+A physically admissible interval must distinguish temporal and spatial directions. This requires a Lorentzian signature:
+</p>
+
+<p>
+$(-,+,+,+)$
+</p>
+
+<p>
+Thus, locally:
+</p>
+
+<p>
+$ds^2 = -dt^2 + dx^2 + dy^2 + dz^2$
+</p>
+
+<p>
+This condition is necessary for causal structure.
+</p>
+
+<h3 style="color:#fbbf24;">6. Uniqueness Condition</h3>
+
+<p>
+The metric must simultaneously satisfy:
+</p>
+
+<ul>
+<li>Quadratic interval definition</li>
+<li>Symmetry: $g_{\\mu\\nu} = g_{\\nu\\mu}$</li>
+<li>Dependence on $(K, P)$</li>
+<li>Lorentzian signature</li>
+</ul>
+
+<p>
+These constraints uniquely fix the metric structure. No alternative tensor satisfies all conditions.
+</p>
+
+<h3 style="color:#fbbf24;">7. Structural Mapping</h3>
+
+<p>
+The complete mapping is:
+</p>
+
+<p>
+$(K, P) \\;\\longrightarrow\\; g_{\\mu\\nu}$
+</p>
+
+<p>
+Thus, geometry is determined entirely by substrate state.
+</p>
+
+<h3 style="color:#fbbf24;">8. Limit Case: Uniform Substrate</h3>
+
+<p>
+If the substrate is uniform:
+</p>
+
+<p>
+$\\nabla K = 0, \\qquad \\nabla P = 0$
+</p>
+
+<p>
+then:
+</p>
+
+<p>
+$g_{\\mu\\nu} = \\eta_{\\mu\\nu}$
+</p>
+
+<p>
+where:
+</p>
+
+<p>
+$\\eta_{\\mu\\nu} = \\text{diag}(-1, +1, +1, +1)$
+</p>
+
+<p>
+This corresponds to flat spacetime.
+</p>
+
+<h3 style="color:#fbbf24;">9. Structural Interpretation</h3>
+
+<p>
+The metric is the direct encoding of substrate variation into geometric form. Variations in $(K, P)$ correspond to variations in $g_{\\mu\\nu}$. Thus:
+</p>
+
+<p>
+$\\delta g_{\\mu\\nu} \\sim \\delta K, \\delta P$
+</p>
+
+<p>
+Geometry is therefore a measurable manifestation of substrate dynamics.
+</p>
+
+<h3 style="color:#fbbf24;">10. Structural Conclusion</h3>
+
+<p>
+The spacetime metric $g_{\\mu\\nu}$ is uniquely determined by the substrate parameters $(K, P)$ under the constraints of interval definition, symmetry, and Lorentzian signature. No independent geometric structure is admissible.
+</p>
+
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>SUBSTRATE DENSITY</span><input type="number" id="m_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'm_sl')"></div><input type="range" id="m_sl" min="0" max="200" step="1" value="100" oninput="syncVal(this.value, 'm_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">(K, P) uniquely determine $g_{\\mu\\nu}$</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">MAPPING STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Formal Equivalence Achieved</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-unified);">MAP: (K, P) uniquely determine $g_{\\mu\\nu}$<br>SIGNATURE: Lorentzian (-,+,+,+) uniquely recovered ($ds^2 = -dt^2 + dx^2 + dy^2 + dz^2$)<br>SYMMETRY:  $g_{\\mu\\nu} = g_{\\nu\\mu}$ Necessarily Satisfied</span>`,
+metricsContent: `$$ds^2 = g_{\\mu\\nu} dx^\mu dx^\nu$$`,
+hierarchy: `Metric Emergence`,
+footer: "Metric $g_{\\mu\\nu}$ is uniquely determined by the substrate state (K, P).",
+rightNote: `<div style="color: #94a3b8; line-height: 1.3; margin: 5px; font-size: 0.85rem;">Spacetime geometry is uniquely determined by substrate dynamics; no independent geometric structure exists.<p><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">👉 This Module Establishes:<br>The spacetime metric $g_{\\mu\\nu}$ is uniquely fixed by the substrate state (K, P); no alternative metric structure is admissible.</p></div>`
+},
+
+
+2: {
+title: "MODULE 2: CONNECTION & GEODESICS",
+result: "Christoffel Symbols Derived",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 62 — Module 2: Connection and Geodesics (Christoffel Symbols and Equation of Motion)</h2>
+
+<div class="briefing-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Conceptual Introduction</h3>
+
+<p>
+With the spacetime metric $g_{\\mu\\nu}$ established as the direct expression of substrate state $(K, P)$, the next structural requirement is to determine how motion occurs within this geometry. A metric alone defines intervals, but it does not specify how trajectories evolve. A rule is required that determines how vectors change along a path and how equilibrium motion is defined.
+</p>
+
+<p>
+This requirement leads to the introduction of connection. The connection provides the law of transport consistent with the metric structure and defines the notion of straightness in curved geometry. In this module, this structure emerges as the Christoffel symbols $\\Gamma^\\lambda_{\\mu\\nu}$, which determine how motion proceeds in spacetime.
+</p>
+
+<p>
+Thus, the central mapping established is:
+</p>
+
+<p>
+$\\partial g_{\\mu\\nu} \\;\\longrightarrow\\; \\Gamma^\\lambda_{\\mu\\nu}$
+</p>
+
+<h3 style="color:#fbbf24;">2. Structural Emergence</h3>
+
+<p>
+The connection arises from the requirement that the metric be preserved under parallel transport. This condition enforces metric compatibility:
+</p>
+
+<p>
+$\\nabla_\\lambda g_{\\mu\\nu} = 0$
+</p>
+
+<p>
+Together with the absence of intrinsic torsion, this uniquely determines the Levi-Civita connection:
+</p>
+
+<p>
+$\\Gamma^\\lambda_{\\mu\\nu} = \\frac{1}{2} g^{\\lambda\\sigma} \\left( \\partial_\\mu g_{\\nu\\sigma} + \\partial_\\nu g_{\\mu\\sigma} - \\partial_\\sigma g_{\\mu\\nu} \\right)$
+</p>
+
+<p>
+Thus, the connection is not independently introduced; it is uniquely fixed by the metric, which itself is determined by $(K, P)$.
+</p>
+
+<h3 style="color:#fbbf24;">3. Structural Constraint</h3>
+
+<p>
+A physically admissible connection must satisfy two conditions: it must preserve the metric (metric compatibility) and must not introduce intrinsic torsion. These conditions are not optional; they are necessary for consistent definition of lengths and angles under transport.
+</p>
+
+<p>
+Therefore, the Levi-Civita connection is uniquely selected:
+</p>
+
+<p>
+$\\Gamma^\\lambda_{\\mu\\nu} \\text{ is torsion-free and metric-compatible}$
+</p>
+
+<p>
+No alternative connection satisfies both conditions simultaneously.
+</p>
+
+<h3 style="color:#fbbf24;">4. Physical Interpretation</h3>
+
+<p>
+The connection encodes how the substrate responds to variation across spacetime. It determines how directions change when transported and therefore defines the structure of motion. It is the mathematical expression of how substrate equilibrium guides trajectories.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Metric Variation} \\;\\longrightarrow\\; \\text{Connection} \\;\\longrightarrow\\; \\text{Motion}$
+</p>
+
+<h3 style="color:#fbbf24;">5. Necessity (Very Important)</h3>
+
+<p>
+A consistent theory of motion requires a rule that determines how trajectories evolve without introducing external forces. This rule must arise from geometry itself. The only such rule consistent with the metric structure is the geodesic equation:
+</p>
+
+<p>
+$\\frac{d^2 x^\\lambda}{d\\tau^2} + \\Gamma^\\lambda_{\\mu\\nu} \\frac{dx^\\mu}{d\\tau} \\frac{dx^\\nu}{d\\tau} = 0$
+</p>
+
+<p>
+This equation defines motion as the natural path determined by the connection. No additional force law is required.
+</p>
+
+<h3 style="color:#fbbf24;">6. Consistency Check</h3>
+
+<p>
+The derived connection satisfies metric compatibility and torsion-free conditions. The resulting geodesic equation matches the standard form of motion in curved spacetime. Thus, the structure is fully consistent with established geometry.
+</p>
+
+<h3 style="color:#fbbf24;">7. Graph / Visualization Interpretation Paragraph (MANDATORY)</h3>
+
+<p>
+The visualization represents a geodesic path plotted over an affine parameter $\\tau$. The horizontal axis corresponds to the evolution parameter, while the vertical axis represents spatial coordinate variation. The oscillatory curve illustrates how trajectories evolve under the influence of the connection $\\Gamma^\\lambda_{\\mu\\nu}$. The smooth continuity of the curve reflects the deterministic nature of geodesic motion, where the path is uniquely fixed by the underlying metric structure derived from $(K, P)$.
+</p>
+
+<h3 style="color:#fbbf24;">8. Conceptual Compression Lines</h3>
+
+<p>
+Connection arises from metric variation.<br>
+Motion is determined by geometry.<br>
+Geodesics define equilibrium paths.<br>
+No force law is required.
+</p>
+
+<h3 style="color:#fbbf24;">9. Logical Closure</h3>
+
+<p>
+This module establishes that the connection $\\Gamma^\\lambda_{\\mu\\nu}$ is uniquely determined from the metric and that motion follows the geodesic equation. Thus, dynamics arise directly from geometry.
+</p>
+
+<h3 style="color:#fbbf24;">10. Transition to Next Module</h3>
+
+<p>
+With connection and motion established, the next step is to determine how variations of the connection produce curvature. This leads to Module 3, where the Riemann curvature tensor is derived.
+</p>
+
+<h3 style="color:#fbbf24;">11. Final Statement</h3>
+
+<p>
+The connection $\\Gamma^\\lambda_{\\mu\\nu}$ is uniquely determined by the metric $g_{\\mu\\nu}$, and particle motion is governed by the geodesic equation; dynamics emerge as a direct consequence of substrate-derived geometry.
+</p>
+
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 62 — Module 2: Explicit Mathematics — Connection and Geodesics</h2>
+
+<div class="math-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Starting Point: Metric from Substrate</h3>
+
+<p>
+From Module 1, the spacetime metric is determined by the substrate state:
+</p>
+
+<p>
+$g_{\\mu\\nu} = \\mathcal{G}_{\\mu\\nu}(K, P)$
+</p>
+
+<p>
+Thus, all geometric quantities must be derived from $g_{\\mu\\nu}$.
+</p>
+
+<h3 style="color:#fbbf24;">2. Requirement of Covariant Transport</h3>
+
+<p>
+A consistent geometric framework requires a derivative operator that preserves tensor structure under coordinate transformations. This leads to the definition of the covariant derivative:
+</p>
+
+<p>
+$\\nabla_\\lambda V^\\mu = \\partial_\\lambda V^\\mu + \\Gamma^\\mu_{\\lambda\\nu} V^\\nu$
+</p>
+
+<p>
+where $\\Gamma^\\mu_{\\lambda\\nu}$ is the connection.
+</p>
+
+<h3 style="color:#fbbf24;">3. Metric Compatibility Condition</h3>
+
+<p>
+The metric must be preserved under parallel transport:
+</p>
+
+<p>
+$\\nabla_\\lambda g_{\\mu\\nu} = 0$
+</p>
+
+<p>
+Expanding:
+</p>
+
+<p>
+$\\partial_\\lambda g_{\\mu\\nu} - \\Gamma^\\sigma_{\\lambda\\mu} g_{\\sigma\\nu} - \\Gamma^\\sigma_{\\lambda\\nu} g_{\\mu\\sigma} = 0$
+</p>
+
+<h3 style="color:#fbbf24;">4. Torsion-Free Condition</h3>
+
+<p>
+The connection must be symmetric in lower indices:
+</p>
+
+<p>
+$\\Gamma^\\lambda_{\\mu\\nu} = \\Gamma^\\lambda_{\\nu\\mu}$
+</p>
+
+<p>
+This ensures absence of intrinsic torsion.
+</p>
+
+<h3 style="color:#fbbf24;">5. Solution: Levi-Civita Connection</h3>
+
+<p>
+Combining metric compatibility and torsion-free condition yields:
+</p>
+
+<p>
+$\\Gamma^\\lambda_{\\mu\\nu} = \\frac{1}{2} g^{\\lambda\\sigma} \\left( \\partial_\\mu g_{\\nu\\sigma} + \\partial_\\nu g_{\\mu\\sigma} - \\partial_\\sigma g_{\\mu\\nu} \\right)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\partial g_{\\mu\\nu} \\;\\longrightarrow\\; \\Gamma^\\lambda_{\\mu\\nu}$
+</p>
+
+<h3 style="color:#fbbf24;">6. Geodesic Equation</h3>
+
+<p>
+The trajectory of a particle is defined by parallel transport of its tangent vector:
+</p>
+
+<p>
+$\\frac{d V^\\lambda}{d\\tau} + \\Gamma^\\lambda_{\\mu\\nu} V^\\mu V^\\nu = 0$
+</p>
+
+<p>
+With $V^\\mu = \\frac{dx^\\mu}{d\\tau}$:
+</p>
+
+<p>
+$\\frac{d^2 x^\\lambda}{d\\tau^2} + \\Gamma^\\lambda_{\\mu\\nu} \\frac{dx^\\mu}{d\\tau} \\frac{dx^\\nu}{d\\tau} = 0$
+</p>
+
+<h3 style="color:#fbbf24;">7. Structural Mapping</h3>
+
+<p>
+The complete chain is:
+</p>
+
+<p>
+$(K, P) \\;\\longrightarrow\\; g_{\\mu\\nu} \\;\\longrightarrow\\; \\Gamma^\\lambda_{\\mu\\nu} \\;\\longrightarrow\\; \\text{Geodesic Motion}$
+</p>
+
+<h3 style="color:#fbbf24;">8. Limit Case: Flat Spacetime</h3>
+
+<p>
+If the metric is constant:
+</p>
+
+<p>
+$\\partial_\\lambda g_{\\mu\\nu} = 0$
+</p>
+
+<p>
+then:
+</p>
+
+<p>
+$\\Gamma^\\lambda_{\\mu\\nu} = 0$
+</p>
+
+<p>
+and the geodesic equation reduces to:
+</p>
+
+<p>
+$\\frac{d^2 x^\\lambda}{d\\tau^2} = 0$
+</p>
+
+<p>
+corresponding to straight-line motion.
+</p>
+
+<h3 style="color:#fbbf24;">9. Structural Interpretation</h3>
+
+<p>
+The connection encodes how metric variations determine motion. Since $g_{\\mu\\nu}$ depends on $(K, P)$, the connection and geodesics are fully determined by substrate structure:
+</p>
+
+<p>
+$\\Gamma^\\lambda_{\\mu\\nu} = \\Gamma^\\lambda_{\\mu\\nu}(K, P)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Motion} \\sim \\text{Substrate Geometry}$
+</p>
+
+<h3 style="color:#fbbf24;">10. Structural Conclusion</h3>
+
+<p>
+The connection $\\Gamma^\\lambda_{\\mu\\nu}$ is uniquely determined from the metric $g_{\\mu\\nu}$ through metric compatibility and torsion-free conditions, and particle motion follows the geodesic equation. No external force law is required; dynamics arise directly from geometry.
+</p>
+
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>GRADIENT STRENGTH</span><input type="number" id="c_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'c_sl')"></div><input type="range" id="c_sl" min="0" max="200" step="1" value="100" oninput="syncVal(this.value, 'c_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">$\\partial g_{\\mu\\nu} \\text{ uniquely determine } \\Gamma^\\lambda_{\\mu\\nu}$</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">FLOW STATUS</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Geodesic Equation Uniquely Determined</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-exp);">CALC: ∂gμν → Γλμν<br>LEVI-CIVITA CONNECTION uniquely determined (torsion-free, metric-compatible)<br>GEODESIC FLOW uniquely determined by Γλμν</p></span>`,
+metricsContent: `$$\\frac{d^2 x^\\lambda}{d\\tau^2} + \\Gamma^\\lambda_{\\mu\\nu} \\dot{x}^\\mu \\dot{x}^\\nu = 0$$`,
+hierarchy: `Connection Recovery`,
+footer: "Geodesic equation uniquely recovered from Γλμν.",
+rightNote: `<div style="color: #94a3b8; line-height: 1.3; margin: 5px; text-align: center; font-size: 0.77rem;">Geodesics are uniquely determined by Γλμν as the paths satisfying the geodesic equation.<p>Only geodesics satisfy the equation of motion.</p><p><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">👉 This Module Establishes:<br>Particle motion is uniquely fixed by the geodesic equation derived from Γλμν; no force law is required.</p></div>`
+},
+
+3: {
+title: "MODULE 3: CURVATURE MAPPING",
+result: "Riemann Tensor Recovered",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 62 — Module 3: Curvature Mapping (Riemann Tensor Determination)</h2>
+
+<div class="briefing-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Conceptual Introduction</h3>
+
+<p>
+With the metric $g_{\\mu\\nu}$ determining spacetime structure and the connection $\\Gamma^\\lambda_{\\mu\\nu}$ governing motion, the next structural requirement is to determine how geometry itself varies across spacetime. Motion defined by geodesics reflects local equilibrium, but the deviation of nearby geodesics reveals deeper structure. This deviation encodes curvature.
+</p>
+
+<p>
+Curvature is therefore not an abstract geometric property but the measurable manifestation of non-uniformity in the substrate defined by $(K, P)$. This module establishes how second-order variations of the metric give rise to the Riemann curvature tensor.
+</p>
+
+<p>
+The fundamental mapping established is:
+</p>
+
+<p>
+$\\partial^2 g_{\\mu\\nu} \\;\\longrightarrow\\; R^\\rho_{\\ \\sigma\\mu\\nu}$
+</p>
+
+<h3 style="color:#fbbf24;">2. Structural Emergence</h3>
+
+<p>
+The connection $\\Gamma^\\lambda_{\\mu\\nu}$ encodes first-order variation of the metric. Curvature arises when the connection itself varies across spacetime. This is captured by the commutator of covariant derivatives acting on a vector field:
+</p>
+
+<p>
+$[\\nabla_\\mu, \\nabla_\\nu] V^\\rho = R^\\rho_{\\ \\sigma\\mu\\nu} V^\\sigma$
+</p>
+
+<p>
+Thus, the Riemann tensor $R^\\rho_{\\ \\sigma\\mu\\nu}$ measures the failure of second covariant derivatives to commute. It encodes the intrinsic curvature of spacetime.
+</p>
+
+<h3 style="color:#fbbf24;">3. Structural Constraint</h3>
+
+<p>
+The curvature tensor must be constructed entirely from the connection and its derivatives. Substituting the Levi-Civita connection, the Riemann tensor is uniquely determined as:
+</p>
+
+<p>
+$R^\\rho_{\\ \\sigma\\mu\\nu} = \\partial_\\mu \\Gamma^\\rho_{\\nu\\sigma} - \\partial_\\nu \\Gamma^\\rho_{\\mu\\sigma} + \\Gamma^\\rho_{\\mu\\lambda} \\Gamma^\\lambda_{\\nu\\sigma} - \\Gamma^\\rho_{\\nu\\lambda} \\Gamma^\\lambda_{\\mu\\sigma}$
+</p>
+
+<p>
+No alternative construction satisfies covariance, tensorial character, and dependence solely on the metric-derived connection.
+</p>
+
+<h3 style="color:#fbbf24;">4. Structural Development</h3>
+
+<p>
+The Riemann tensor contains complete information about curvature. Its contractions yield the Ricci tensor:
+</p>
+
+<p>
+$R_{\\mu\\nu} = R^\\rho_{\\ \\mu\\rho\\nu}$
+</p>
+
+<p>
+and the Ricci scalar:
+</p>
+
+<p>
+$R = g^{\\mu\\nu} R_{\\mu\\nu}$
+</p>
+
+<p>
+Thus, the full curvature structure is hierarchically derived from the metric:
+</p>
+
+<p>
+$g_{\\mu\\nu} \\;\\longrightarrow\\; \\Gamma^\\lambda_{\\mu\\nu} \\;\\longrightarrow\\; R^\\rho_{\\ \\sigma\\mu\\nu} \\;\\longrightarrow\\; R_{\\mu\\nu} \\;\\longrightarrow\\; R$
+</p>
+
+<h3 style="color:#fbbf24;">5. Physical Interpretation</h3>
+
+<p>
+Curvature represents the non-uniformity of the substrate. Regions where $(K, P)$ vary give rise to non-zero curvature. Thus, curvature is not a property of empty space but the expression of structural variation in the substrate.
+</p>
+
+<p>
+Geodesic deviation provides the physical manifestation of curvature. The relative acceleration of nearby trajectories is determined by the Riemann tensor, directly linking curvature to observable effects.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Substrate Variation} \\;\\longrightarrow\\; \\text{Curvature}$
+</p>
+
+<h3 style="color:#fbbf24;">6. Necessity (Very Important)</h3>
+
+<p>
+A consistent description of spacetime must account for how geometry changes across regions. This requires a tensor constructed from second derivatives of the metric that is covariant and captures intrinsic curvature. The Riemann tensor uniquely satisfies these requirements.
+</p>
+
+<p>
+Therefore:
+</p>
+
+<p>
+$R^\\rho_{\\ \\sigma\\mu\\nu}$ is uniquely determined by $g_{\\mu\\nu}$.
+</p>
+
+<h3 style="color:#fbbf24;">7. Consistency Check</h3>
+
+<p>
+The derived Riemann tensor satisfies all required symmetries and identities, including antisymmetry in indices and the Bianchi identities. Its contractions yield the Ricci tensor and scalar consistent with standard geometric formulation. Thus, the curvature structure matches exactly the established theory.
+</p>
+
+<h3 style="color:#fbbf24;">8. Graph / Visualization Interpretation Paragraph (MANDATORY)</h3>
+
+<p>
+The visualization represents curvature as a surface defined over substrate coordinates. The horizontal axes correspond to substrate variables, while the vertical axis represents curvature magnitude. The peaks and depressions indicate regions of high and low curvature, corresponding to variations in $(K, P)$. The non-uniform structure of the surface demonstrates that curvature arises from second-order variations in the substrate, not from an imposed geometric background.
+</p>
+
+<h3 style="color:#fbbf24;">9. Conceptual Compression Lines</h3>
+
+<p>
+Curvature arises from second-order variation.<br>
+Riemann tensor encodes geometric deviation.<br>
+Geometry reflects substrate non-uniformity.<br>
+Curvature is not imposed; it emerges.
+</p>
+
+<h3 style="color:#fbbf24;">10. Logical Closure</h3>
+
+<p>
+This module establishes that the Riemann curvature tensor is uniquely determined from the metric through second-order variation. Curvature is therefore a necessary consequence of substrate structure.
+</p>
+
+<h3 style="color:#fbbf24;">11. Transition to Next Module</h3>
+
+<p>
+With curvature determined, the next step is to identify the divergence-free tensor constructed from curvature that governs gravitational dynamics. This leads to Module 4, where the Einstein tensor is derived.
+</p>
+
+<h3 style="color:#fbbf24;">12. Final Statement</h3>
+
+<p>
+The Riemann curvature tensor $R^\\rho_{\\ \\sigma\\mu\\nu}$ is uniquely determined by second derivatives of the metric $g_{\\mu\\nu}$; curvature is the direct expression of substrate non-uniformity.
+</p>
+
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 62 — Module 3: Explicit Mathematics — Riemann Curvature Determination</h2>
+
+<div class="math-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Starting Point: Connection from Metric</h3>
+
+<p>
+From Module 2, the Levi-Civita connection is uniquely determined from the metric:
+</p>
+
+<p>
+$\\Gamma^\\lambda_{\\mu\\nu} = \\frac{1}{2} g^{\\lambda\\sigma} \\left( \\partial_\\mu g_{\\nu\\sigma} + \\partial_\\nu g_{\\mu\\sigma} - \\partial_\\sigma g_{\\mu\\nu} \\right)$
+</p>
+
+<p>
+Thus, the connection encodes first-order variation of $g_{\\mu\\nu}$.
+</p>
+
+<h3 style="color:#fbbf24;">2. Requirement of Curvature Measure</h3>
+
+<p>
+A consistent geometric structure requires a measure of how vectors change under successive parallel transport. This is captured by the commutator of covariant derivatives acting on a vector $V^\\rho$:
+</p>
+
+<p>
+$[\\nabla_\\mu, \\nabla_\\nu] V^\\rho$
+</p>
+
+<p>
+Expanding:
+</p>
+
+<p>
+$[\\nabla_\\mu, \\nabla_\\nu] V^\\rho = \\nabla_\\mu (\\nabla_\\nu V^\\rho) - \\nabla_\\nu (\\nabla_\\mu V^\\rho)$
+</p>
+
+<h3 style="color:#fbbf24;">3. Evaluation of the Commutator</h3>
+
+<p>
+Using the definition of covariant derivative:
+</p>
+
+<p>
+$\\nabla_\\nu V^\\rho = \\partial_\\nu V^\\rho + \\Gamma^\\rho_{\\nu\\sigma} V^\\sigma$
+</p>
+
+<p>
+Applying $\\nabla_\\mu$:
+</p>
+
+<p>
+$\\nabla_\\mu (\\nabla_\\nu V^\\rho) = \\partial_\\mu (\\nabla_\\nu V^\\rho) + \\Gamma^\\rho_{\\mu\\lambda} (\\nabla_\\nu V^\\lambda)$
+</p>
+
+<p>
+Subtracting the reversed term yields:
+</p>
+
+<p>
+$[\\nabla_\\mu, \\nabla_\\nu] V^\\rho = R^\\rho_{\\ \\sigma\\mu\\nu} V^\\sigma$
+</p>
+
+<h3 style="color:#fbbf24;">4. Riemann Tensor Definition</h3>
+
+<p>
+The Riemann curvature tensor is therefore defined as:
+</p>
+
+<p>
+$R^\\rho_{\\ \\sigma\\mu\\nu} = \\partial_\\mu \\Gamma^\\rho_{\\nu\\sigma} - \\partial_\\nu \\Gamma^\\rho_{\\mu\\sigma} + \\Gamma^\\rho_{\\mu\\lambda} \\Gamma^\\lambda_{\\nu\\sigma} - \\Gamma^\\rho_{\\nu\\lambda} \\Gamma^\\lambda_{\\mu\\sigma}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\partial^2 g_{\\mu\\nu} \\;\\longrightarrow\\; R^\\rho_{\\ \\sigma\\mu\\nu}$
+</p>
+
+<h3 style="color:#fbbf24;">5. Contraction to Ricci Tensor</h3>
+
+<p>
+Contracting the first and third indices:
+</p>
+
+<p>
+$R_{\\mu\\nu} = R^\\rho_{\\ \\mu\\rho\\nu}$
+</p>
+
+<p>
+This yields the Ricci tensor, which encodes trace curvature.
+</p>
+
+<h3 style="color:#fbbf24;">6. Ricci Scalar</h3>
+
+<p>
+Further contraction with the metric:
+</p>
+
+<p>
+$R = g^{\\mu\\nu} R_{\\mu\\nu}$
+</p>
+
+<p>
+This yields the scalar curvature.
+</p>
+
+<h3 style="color:#fbbf24;">7. Structural Mapping</h3>
+
+<p>
+The complete curvature hierarchy is:
+</p>
+
+<p>
+$(K, P) \\;\\longrightarrow\\; g_{\\mu\\nu} \\;\\longrightarrow\\; \\Gamma^\\lambda_{\\mu\\nu} \\;\\longrightarrow\\; R^\\rho_{\\ \\sigma\\mu\\nu} \\;\\longrightarrow\\; R_{\\mu\\nu} \\;\\longrightarrow\\; R$
+</p>
+
+<h3 style="color:#fbbf24;">8. Limit Case: Flat Geometry</h3>
+
+<p>
+If:
+</p>
+
+<p>
+$\\partial_\\lambda g_{\\mu\\nu} = 0$
+</p>
+
+<p>
+then:
+</p>
+
+<p>
+$\\Gamma^\\lambda_{\\mu\\nu} = 0$
+</p>
+
+<p>
+and:
+</p>
+
+<p>
+$R^\\rho_{\\ \\sigma\\mu\\nu} = 0$
+</p>
+
+<p>
+Thus, flat spacetime corresponds to zero curvature.
+</p>
+
+<h3 style="color:#fbbf24;">9. Structural Interpretation</h3>
+
+<p>
+The Riemann tensor encodes second-order variations of the metric. Since $g_{\\mu\\nu}$ depends on $(K, P)$, curvature directly reflects substrate non-uniformity:
+</p>
+
+<p>
+$R^\\rho_{\\ \\sigma\\mu\\nu} = R^\\rho_{\\ \\sigma\\mu\\nu}(K, P)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Curvature} \\sim \\text{Second-order substrate variation}$
+</p>
+
+<h3 style="color:#fbbf24;">10. Structural Conclusion</h3>
+
+<p>
+The Riemann curvature tensor is uniquely determined from the Levi-Civita connection and encodes second-order variation of the metric. No alternative curvature structure satisfies covariance and metric dependence simultaneously. Curvature is therefore a necessary consequence of substrate-derived geometry.
+</p>
+
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>VAR INTENSITY</span><input type="number" id="r_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'r_sl')"></div><input type="range" id="r_sl" min="0" max="200" step="1" value="100" oninput="syncVal(this.value, 'r_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">$\\partial^2 g_{\\mu\\nu} \\;\\rightarrow\\; R^\\rho_{\\ \\sigma\\mu\\nu}$</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">TENSOR STATUS</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Full Riemann Mapping Completed</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-master);">MAP: $\\partial^2 g_{\\mu\\nu} \\;\\rightarrow\\; R^\\rho_{\\ \\sigma\\mu\\nu}$<br>CONTRACTION: $R_{\\mu\\nu}$ uniquely determined from $R^\\rho_{\\sigma\\mu\\nu}$<br>SCALAR: R uniquely determined from $R_{\\mu\\nu}$</p></span>`,
+metricsContent: `$$R_{\\mu\\nu} - \\frac{1}{2} g_{\\mu\\nu} R$$`,
+hierarchy: `Riemann Mapping`,
+footer: "Riemann curvature tensor uniquely recovered from second derivatives of $g_{\\mu\\nu}$.",
+rightNote: `<div style="color: #94a3b8; line-height: 1.2; margin: 5px; font-size: 0.77rem;">Curvature is uniquely determined by second derivatives of $g_{\\mu\\nu}$.<p><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">👉 This Module Establishes:<br>Riemann curvature $R^\\rho_{\\sigma\\mu\\nu}$ is uniquely fixed by $∂²g_{\\mu\\nu}$; no alternative curvature structure is admissible.</p></div>`
+},
+
+4: {
+title: "MODULE 4: EINSTEIN TENSOR RECOVERY",
+result: "Σμν ≡ Gμν Identity",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 62 — Module 4: Einstein Tensor Recovery ($Σ_{\\mu\\nu}$ = $G_{\\mu\\nu}$ Identity)</h2>
+
+<div class="briefing-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Conceptual Introduction</h3>
+
+<p>
+With the Riemann curvature tensor $R^\\rho_{\\ \\sigma\\mu\\nu}$ established as the complete measure of geometric variation arising from the substrate-defined metric, the next structural requirement is to identify the specific tensor that governs physical dynamics. While curvature encodes geometric information, not all curvature tensors are physically admissible. A further constraint must be imposed that selects the physically meaningful geometric object.
+</p>
+
+<p>
+This constraint arises from conservation. A physically consistent description requires that the governing tensor must satisfy a divergence-free condition, ensuring compatibility with conservation of energy and momentum. Therefore, the problem addressed in this module is:
+</p>
+
+<p>
+Which tensor constructed from curvature is uniquely divergence-free and therefore physically admissible?
+</p>
+
+<p>
+This leads to the emergence of the Einstein tensor $G_{\\mu\\nu}$ and establishes its identity with the synthesis tensor:
+</p>
+
+<p>
+$\\Sigma_{\\mu\\nu} = G_{\\mu\\nu}$
+</p>
+
+<h3 style="color:#fbbf24;">2. Structural Emergence</h3>
+
+<p>
+From Module 3, curvature is fully described by the Riemann tensor and its contractions. The first contraction yields the Ricci tensor:
+</p>
+
+<p>
+$R_{\\mu\\nu} = R^\\rho_{\\ \\mu\\rho\\nu}$
+</p>
+
+<p>
+Further contraction produces the scalar curvature:
+</p>
+
+<p>
+$R = g^{\\mu\\nu} R_{\\mu\\nu}$
+</p>
+
+<p>
+These quantities provide the building blocks for constructing a second-rank tensor suitable for physical description. The most general symmetric rank-2 tensor constructed from these quantities is a linear combination of $R_{\\mu\\nu}$ and $g_{\\mu\\nu} R$.
+</p>
+
+<h3 style="color:#fbbf24;">3. Structural Constraint</h3>
+
+<p>
+The governing tensor must satisfy the conservation condition:
+</p>
+
+<p>
+$\\nabla^\\mu T_{\\mu\\nu} = 0$
+</p>
+
+<p>
+This condition arises as a structural necessity from the consistency of the theory. Therefore, the geometric tensor that replaces $T_{\\mu\\nu}$ on the geometric side must also satisfy:
+</p>
+
+<p>
+$\\nabla^\\mu \\Sigma_{\\mu\\nu} = 0$
+</p>
+
+<p>
+This requirement eliminates arbitrary combinations of curvature tensors. Only a specific combination satisfies this constraint.
+</p>
+
+<h3 style="color:#fbbf24;">4. Structural Development</h3>
+
+<p>
+The unique tensor constructed from curvature that satisfies the divergence-free condition is:
+</p>
+
+<p>
+$G_{\\mu\\nu} = R_{\\mu\\nu} - \\frac{1}{2} g_{\\mu\\nu} R$
+</p>
+
+<p>
+This tensor satisfies:
+</p>
+
+<p>
+$\\nabla^\\mu G_{\\mu\\nu} = 0$
+</p>
+
+<p>
+identically, as a consequence of the Bianchi identities. No additional assumptions are required.
+</p>
+
+<p>
+Thus, the Einstein tensor is uniquely selected as the physically admissible geometric object.
+</p>
+
+<h3 style="color:#fbbf24;">5. Physical Interpretation</h3>
+
+<p>
+The Einstein tensor represents the divergence-free contraction of curvature and therefore encodes the physically consistent geometric content of spacetime. It captures the part of curvature that is compatible with conservation laws.
+</p>
+
+<p>
+Within the synthesis framework, the tensor $\\Sigma_{\\mu\\nu}$ represents the internal structural stress-energy of the substrate. The requirement of conservation imposes:
+</p>
+
+<p>
+$\\nabla^\\mu \\Sigma_{\\mu\\nu} = 0$
+</p>
+
+<p>
+Thus, both $\\Sigma_{\\mu\\nu}$ and $G_{\\mu\\nu}$ satisfy the same structural condition. Since $G_{\\mu\\nu}$ is the unique divergence-free curvature tensor, it follows that:
+</p>
+
+<p>
+$\\Sigma_{\\mu\\nu} = G_{\\mu\\nu}$
+</p>
+
+<p>
+This is not a correspondence but an identity.
+</p>
+
+
+<h3 style="color:#fbbf24;">6. Necessity (Very Important)</h3>
+
+<p>
+A physically admissible tensor must satisfy divergence-free conservation. The space of tensors constructed from curvature is restricted by this requirement. The Einstein tensor is the only tensor that satisfies:
+</p>
+
+<p>
+\begin{itemize}
+<li>Dependence on curvature</li>
+<li>Covariance</li>
+<li>Symmetry</li>
+<li>Divergence-free condition</li>
+\end{itemize}
+</p>
+
+<p>
+Therefore, the identification:
+</p>
+
+<p>
+$\\Sigma_{\\mu\\nu} = G_{\\mu\\nu}$
+</p>
+
+<p>
+is necessary and unique.
+</p>
+
+<h3 style="color:#fbbf24;">7. Consistency Check</h3>
+
+<p>
+The Einstein tensor satisfies the conservation identity:
+</p>
+
+<p>
+$\\nabla^\\mu G_{\\mu\\nu} = 0$
+</p>
+
+<p>
+This matches exactly the required conservation condition for the synthesis tensor:
+</p>
+
+<p>
+$\\nabla^\\mu \\Sigma_{\\mu\\nu} = 0$
+</p>
+
+<p>
+Thus, the identity is fully consistent with both geometric structure and physical conservation.
+</p>
+
+<h3 style="color:#fbbf24;">8. Graph / Visualization Interpretation Paragraph (MANDATORY)</h3>
+
+<p>
+The visualization presents a comparative representation of the synthesis tensor $\\Sigma_{\\mu\\nu}$ and the Einstein tensor $G_{\\mu\\nu}$ under the conservation constraint. The horizontal axis distinguishes the two tensor constructions, while the vertical axis represents normalized equivalence. The identical heights of the bars demonstrate that both tensors satisfy the same conservation condition and are therefore structurally identical. This graphical identity confirms that the divergence-free requirement uniquely selects $G_{\\mu\\nu}$, and thus enforces $\\Sigma_{\\mu\\nu} = G_{\\mu\\nu}$.
+</p>
+
+<h3 style="color:#fbbf24;">9. Conceptual Compression Lines</h3>
+
+<p>
+Only divergence-free tensors are admissible.<br>
+Einstein tensor is uniquely selected.<br>
+Curvature reduces to conserved form.<br>
+Synthesis tensor equals Einstein tensor.
+</p>
+
+<h3 style="color:#fbbf24;">10. Logical Closure</h3>
+
+<p>
+This module establishes that the Einstein tensor is the unique divergence-free tensor constructed from curvature and that it is identical to the synthesis tensor. The geometric structure of spacetime is therefore fully determined at the level of conserved quantities.
+</p>
+
+<h3 style="color:#fbbf24;">11. Transition to Next Module</h3>
+
+<p>
+With the geometric side fully established, the next step is to introduce matter coupling and derive the complete field equation relating geometry to sources. This leads to Module 5, where the Einstein field equation is recovered.
+</p>
+
+<h3 style="color:#fbbf24;">12. Final Statement</h3>
+
+<p>
+The Einstein tensor $G_{\\mu\\nu}$ is the unique divergence-free contraction of curvature and is identical to the synthesis tensor $\\Sigma_{\\mu\\nu}$; conserved geometry is therefore fully determined by substrate structure.
+</p>
+
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 62 — Module 4: Explicit Mathematics — Einstein Tensor Determination and Identity</h2>
+
+<div class="math-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Starting Point: Curvature Hierarchy</h3>
+
+<p>
+From Module 3, curvature is fully determined by the metric through:
+</p>
+
+<p>
+$g_{\\mu\\nu} \\;\\longrightarrow\\; \\Gamma^\\lambda_{\\mu\\nu} \\;\\longrightarrow\\; R^\\rho_{\\ \\sigma\\mu\\nu}$
+</p>
+
+<p>
+The contractions yield:
+</p>
+
+<p>
+$R_{\\mu\\nu} = R^\\rho_{\\ \\mu\\rho\\nu}, \\qquad R = g^{\\mu\\nu} R_{\\mu\\nu}$
+</p>
+
+<p>
+These form the complete curvature basis for constructing rank-2 tensors.
+</p>
+
+<h3 style="color:#fbbf24;">2. General Tensor Construction</h3>
+
+<p>
+The most general symmetric rank-2 tensor constructed from curvature is a linear combination:
+</p>
+
+<p>
+$\\mathcal{T}_{\\mu\\nu} = a \\, R_{\\mu\\nu} + b \\, g_{\\mu\\nu} R$
+</p>
+
+<p>
+where $a$ and $b$ are constants to be determined.
+</p>
+
+<h3 style="color:#fbbf24;">3. Divergence Requirement</h3>
+
+<p>
+Physical consistency requires the tensor to satisfy the conservation condition:
+</p>
+
+<p>
+$\\nabla^\\mu \\mathcal{T}_{\\mu\\nu} = 0$
+</p>
+
+<p>
+Taking the covariant divergence:
+</p>
+
+<p>
+$\\nabla^\\mu \\mathcal{T}_{\\mu\\nu} = a \\, \\nabla^\\mu R_{\\mu\\nu} + b \\, \\nabla^\\mu (g_{\\mu\\nu} R)$
+</p>
+
+<p>
+Using metric compatibility $\\nabla^\\mu g_{\\mu\\nu} = 0$:
+</p>
+
+<p>
+$\\nabla^\\mu (g_{\\mu\\nu} R) = \\nabla_\\nu R$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\nabla^\\mu \\mathcal{T}_{\\mu\\nu} = a \\, \\nabla^\\mu R_{\\mu\\nu} + b \\, \\nabla_\\nu R$
+</p>
+
+<h3 style="color:#fbbf24;">4. Bianchi Identity Constraint</h3>
+
+<p>
+The contracted Bianchi identity provides:
+</p>
+
+<p>
+$\\nabla^\\mu R_{\\mu\\nu} = \\frac{1}{2} \\nabla_\\nu R$
+</p>
+
+<p>
+Substituting:
+</p>
+
+<p>
+$\\nabla^\\mu \\mathcal{T}_{\\mu\\nu} = a \\left( \\frac{1}{2} \\nabla_\\nu R \\right) + b \\, \\nabla_\\nu R$
+</p>
+
+<p>
+Simplifying:
+</p>
+
+<p>
+$\\nabla^\\mu \\mathcal{T}_{\\mu\\nu} = \\left( \\frac{a}{2} + b \\right) \\nabla_\\nu R$
+</p>
+
+<h3 style="color:#fbbf24;">5. Determination of Coefficients</h3>
+
+<p>
+For conservation:
+</p>
+
+<p>
+$\\nabla^\\mu \\mathcal{T}_{\\mu\\nu} = 0$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\frac{a}{2} + b = 0 \\quad \\Rightarrow \\quad b = -\\frac{a}{2}$
+</p>
+
+<p>
+Choosing normalization $a = 1$:
+</p>
+
+<p>
+$b = -\\frac{1}{2}$
+</p>
+
+<h3 style="color:#fbbf24;">6. Einstein Tensor</h3>
+
+<p>
+Substituting coefficients:
+</p>
+
+<p>
+$G_{\\mu\\nu} = R_{\\mu\\nu} - \\frac{1}{2} g_{\\mu\\nu} R$
+</p>
+
+<p>
+This tensor satisfies:
+</p>
+
+<p>
+$\\nabla^\\mu G_{\\mu\\nu} = 0$
+</p>
+
+<p>
+identically.
+</p>
+
+<h3 style="color:#fbbf24;">7. Uniqueness Result</h3>
+
+<p>
+The coefficients $(a, b)$ are uniquely fixed by the conservation condition. Therefore:
+</p>
+
+<p>
+$G_{\\mu\\nu}$ is the unique divergence-free symmetric rank-2 tensor constructed from curvature.
+</p>
+
+<h3 style="color:#fbbf24;">8. Structural Mapping</h3>
+
+<p>
+The complete mapping is:
+</p>
+
+<p>
+$(K, P) \\;\\longrightarrow\\; g_{\\mu\\nu} \\;\\longrightarrow\\; \\Gamma^\\lambda_{\\mu\\nu} \\;\\longrightarrow\\; R^\\rho_{\\ \\sigma\\mu\\nu} \\;\\longrightarrow\\; G_{\\mu\\nu}$
+</p>
+
+<h3 style="color:#fbbf24;">9. Identification with Synthesis Tensor</h3>
+
+<p>
+The synthesis tensor $\\Sigma_{\\mu\\nu}$ satisfies the structural conservation condition:
+</p>
+
+<p>
+$\\nabla^\\mu \\Sigma_{\\mu\\nu} = 0$
+</p>
+
+<p>
+Since $G_{\\mu\\nu}$ is the unique tensor satisfying:
+</p>
+
+<ul>
+<li>Dependence on curvature</li>
+<li>Covariance</li>
+<li>Symmetry</li>
+<li>Divergence-free condition</li>
+</ul>
+
+<p>
+it follows that:
+</p>
+
+<p>
+$\\Sigma_{\\mu\\nu} = G_{\\mu\\nu}$
+</p>
+
+<h3 style="color:#fbbf24;">10. Limit Case: Flat Geometry</h3>
+
+<p>
+If:
+</p>
+
+<p>
+$R^\\rho_{\\ \\sigma\\mu\\nu} = 0$
+</p>
+
+<p>
+then:
+</p>
+
+<p>
+$R_{\\mu\\nu} = 0, \\quad R = 0$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$G_{\\mu\\nu} = 0$
+</p>
+
+<p>
+which corresponds to absence of curvature and trivial geometry.
+</p>
+
+<h3 style="color:#fbbf24;">11. Structural Interpretation</h3>
+
+<p>
+The Einstein tensor represents the conserved geometric content of curvature. Since it is derived entirely from $g_{\\mu\\nu}$ and its derivatives, and $g_{\\mu\\nu}$ depends on $(K, P)$, it follows that:
+</p>
+
+<p>
+$G_{\\mu\\nu} = G_{\\mu\\nu}(K, P)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Conserved Geometry} \\sim \\text{Substrate Structure}$
+</p>
+
+<h3 style="color:#fbbf24;">12. Structural Conclusion</h3>
+
+<p>
+The Einstein tensor $G_{\\mu\\nu}$ is uniquely determined as the divergence-free contraction of curvature and is identical to the synthesis tensor $\\Sigma_{\\mu\\nu}$. No alternative tensor satisfies all required conditions. Conserved geometric structure is therefore completely fixed by substrate-derived curvature.
+</p>
+
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>IDENTITY LOCK</span><input type="number" id="e_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'e_sl')"></div><input type="range" id="e_sl" min="0" max="100" step="1" value="100" oninput="syncVal(this.value, 'e_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Synthesis Tensor = Einstein Tensor<br>($\\Sigma_{\\mu\\nu}$ = $G_{\\mu\\nu}$)</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">CONSERVATION</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">∇^μ Σμν = 0 Matches GR</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-lock);">CHECK: Contraction Rρσμν → Rμν → R completed; ∇μΣμν = 0<br>IDENTITY: Gμν uniquely fixed<br>CONSERVATION: ∇μ Σμν = 0 necessarily satisfied</span>`,
+metricsContent: `$G_{\\mu\\nu} = R_{\\mu\\nu} - \\frac{1}{2} g_{\\mu\\nu} R$`,
+hierarchy: `Tensor Identity`,
+footer: "Σμν = Gμν uniquely established.",
+rightNote: `<div style="color: #94a3b8; line-height: 1.3; margin: 10px; text-align:center; font-size: 0.85rem;">∇μGμν = 0 holds identically as a geometric identity.<p>Only divergence-free tensors are admissible.</p><p><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">👉 This Module Establishes:<br>Gμν is uniquely fixed by curvature and satisfies ∇μGμν = 0; hence Σμν = Gμν.</p></div>`
+},
+
+5: {
+title: "MODULE 5: FULL EINSTEIN EQUATION",
+result: "Field Equation Recovery",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 62 — Module 5: Field Equation Recovery (Full Einstein Equation)</h2>
+
+<div class="briefing-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Conceptual Introduction</h3>
+
+<p>
+With Modules 1 through 4, the geometric structure of spacetime has been completely reconstructed. The metric $g_{\\mu\\nu}$ has been derived from substrate parameters $(K, P)$, the connection $\\Gamma^\\lambda_{\\mu\\nu}$ has been uniquely determined, curvature has been fully established through $R^\\rho_{\\ \\sigma\\mu\\nu}$, and the Einstein tensor $G_{\\mu\\nu}$ has been identified as the unique divergence-free geometric tensor.
+</p>
+
+<p>
+At this stage, geometry is complete but still self-contained. The remaining question is:
+</p>
+
+<p>
+<strong>How does this geometry interact with physical matter?</strong>
+</p>
+
+<p>
+This module establishes the final step: the coupling of conserved geometry to conserved matter, resulting in the full Einstein field equation.
+</p>
+
+<h3 style="color:#fbbf24;">2. Structural Position of the Field Equation</h3>
+
+<p>
+From the previous module, the Einstein tensor satisfies:
+</p>
+
+<p>
+$\\nabla^\\mu G_{\\mu\\nu} = 0$
+</p>
+
+<p>
+This expresses conservation of geometric structure. For a consistent physical theory, the matter source tensor $T_{\\mu\\nu}$ must also satisfy:
+</p>
+
+<p>
+$\\nabla^\\mu T_{\\mu\\nu} = 0$
+</p>
+
+<p>
+Thus, the only admissible coupling is between two divergence-free tensors:
+</p>
+
+<p>
+$\\text{Geometry} \\;\\longleftrightarrow\\; \\text{Matter}$
+</p>
+
+<h3 style="color:#fbbf24;">3. Necessity of Coupling</h3>
+
+<p>
+A fundamental structural principle follows:
+</p>
+
+<p>
+<strong>Only conserved sources can couple to conserved geometry.</strong>
+</p>
+
+<p>
+Since $G_{\\mu\\nu}$ is divergence-free, any consistent source must also be divergence-free. Therefore, the coupling must take the form:
+</p>
+
+<p>
+$G_{\\mu\\nu} \\propto T_{\\mu\\nu}$
+</p>
+
+<p>
+This is not an assumption but a necessity imposed by conservation.
+</p>
+
+<h3 style="color:#fbbf24;">4. Determination of the Coupling Constant</h3>
+
+<p>
+To convert proportionality into equality, a constant of proportionality is introduced:
+</p>
+
+<p>
+$G_{\\mu\\nu} = \\kappa \\, T_{\\mu\\nu}$
+</p>
+
+<p>
+Dimensional consistency and empirical matching require:
+</p>
+
+<p>
+$\\kappa = 8\\pi G$
+</p>
+
+<p>
+Thus, the full field equation becomes:
+</p>
+
+<p>
+$G_{\\mu\\nu} = 8\\pi G \\, T_{\\mu\\nu}$
+</p>
+
+<p>
+This equation is therefore not postulated, but structurally required.
+</p>
+
+<h3 style="color:#fbbf24;">5. Structural Origin from Substrate</h3>
+
+<p>
+Within the synthesis framework, both geometry and matter arise from the substrate characterized by $(K, P)$. The metric is determined by substrate density, and the Einstein tensor encodes conserved geometric structure.
+</p>
+
+<p>
+Similarly, the matter tensor $T_{\\mu\\nu}$ represents structured excitations or distributions within the same substrate.
+</p>
+
+<p>
+Thus, the field equation represents internal equilibrium:
+</p>
+
+<p>
+$\\text{Substrate Geometry} \\;\\longleftrightarrow\\; \\text{Substrate Matter Distribution}$
+</p>
+
+<p>
+This removes the conceptual separation between geometry and matter.
+</p>
+
+<h3 style="color:#fbbf24;">6. Physical Interpretation</h3>
+
+<p>
+The Einstein field equation expresses the balance between curvature and matter. Curvature is not an independent entity but a response of the substrate to matter distribution.
+</p>
+
+<p>
+Thus:
+</p>
+
+<ul>
+<li>$G_{\\mu\\nu}$ represents geometric response</li>
+<li>$T_{\\mu\\nu}$ represents matter distribution</li>
+<li>The equation enforces equilibrium between the two</li>
+</ul>
+
+<p>
+This gives the equation a direct physical meaning: it is a statement of structural balance.
+</p>
+
+<h3 style="color:#fbbf24;">7. Consistency Check</h3>
+
+<p>
+Taking the divergence of both sides:
+</p>
+
+<p>
+$\\nabla^\\mu G_{\\mu\\nu} = 8\\pi G \\, \\nabla^\\mu T_{\\mu\\nu}$
+</p>
+
+<p>
+Since:
+</p>
+
+<p>
+$\\nabla^\\mu G_{\\mu\\nu} = 0$
+</p>
+
+<p>
+it follows that:
+</p>
+
+<p>
+$\\nabla^\\mu T_{\\mu\\nu} = 0$
+</p>
+
+<p>
+Thus, conservation of matter is not imposed separately but follows from the structure of the equation.
+</p>
+
+<h3 style="color:#fbbf24;">8. Graph / Visualization Interpretation Paragraph (MANDATORY)</h3>
+
+<p>
+The visualization associated with this module depicts a radial curvature profile centered around a source. The horizontal axis represents radial distance $r$, while the vertical axis represents curvature strength, corresponding to components of $G_{\\mu\\nu}$.
+</p>
+
+<p>
+The sharp peak at the center indicates strong curvature near the matter source, while the smooth decay outward represents the weakening of curvature with distance.
+</p>
+
+<p>
+This profile visually encodes the field equation: curvature responds directly to the presence of matter. The shape of the curve reflects the equilibrium condition between geometric response and matter distribution.
+</p>
+
+<p>
+Thus, the graph is not merely illustrative; it represents the functional relationship imposed by the field equation.
+</p>
+
+<h3 style="color:#fbbf24;">9. Conceptual Compression Lines</h3>
+
+<p>
+Only conserved sources couple to conserved geometry.<br>
+Einstein tensor is uniquely divergence-free.<br>
+Matter tensor must satisfy the same condition.<br>
+Field equation expresses equilibrium between geometry and matter.
+</p>
+
+<h3 style="color:#fbbf24;">10. Logical Closure</h3>
+
+<p>
+This module completes the reconstruction of General Relativity. The Einstein field equation is derived as the unique coupling between conserved geometry and conserved matter.
+</p>
+
+<p>
+No arbitrary assumptions are introduced; the equation follows from structural necessity.
+</p>
+
+<h3 style="color:#fbbf24;">11. Transition to Next Module</h3>
+
+<p>
+With the field equation established, the next step is to analyze its implications, including solutions, limits, and physical predictions.
+</p>
+
+<p>
+This leads to the study of specific geometries and observable consequences of curvature.
+</p>
+
+<h3 style="color:#fbbf24;">12. Final Statement</h3>
+
+<p>
+The Einstein field equation $G_{\\mu\\nu} = 8\\pi G \\, T_{\\mu\\nu}$ is the unique equilibrium condition coupling conserved geometry to conserved matter, arising necessarily from substrate structure.
+</p>
+
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 62 — Module 5: Explicit Mathematics — Full Einstein Field Equation Recovery</h2>
+
+<div class="math-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Starting Point: Conserved Geometry</h3>
+
+<p>
+From Module 4, the Einstein tensor is uniquely determined:
+</p>
+
+<p>
+$G_{\\mu\\nu} = R_{\\mu\\nu} - \\frac{1}{2} g_{\\mu\\nu} R$
+</p>
+
+<p>
+and satisfies the conservation condition:
+</p>
+
+<p>
+$\\nabla^\\mu G_{\\mu\\nu} = 0$
+</p>
+
+<p>
+This represents conserved geometric structure.
+</p>
+
+<h3 style="color:#fbbf24;">2. Requirement for Matter Source</h3>
+
+<p>
+Let $T_{\\mu\\nu}$ denote the matter stress-energy tensor. Physical consistency requires:
+</p>
+
+<p>
+$\\nabla^\\mu T_{\\mu\\nu} = 0$
+</p>
+
+<p>
+Thus, both geometry and matter are divergence-free tensors.
+</p>
+
+<h3 style="color:#fbbf24;">3. General Coupling Structure</h3>
+
+<p>
+The most general linear coupling between geometry and matter is:
+</p>
+
+<p>
+$G_{\\mu\\nu} = \\kappa \\, T_{\\mu\\nu}$
+</p>
+
+<p>
+where $\\kappa$ is a constant to be determined.
+</p>
+
+<p>
+Taking the divergence of both sides:
+</p>
+
+<p>
+$\\nabla^\\mu G_{\\mu\\nu} = \\kappa \\, \\nabla^\\mu T_{\\mu\\nu}$
+</p>
+
+<p>
+Using conservation:
+</p>
+
+<p>
+$0 = \\kappa \\cdot 0$
+</p>
+
+<p>
+Thus, the coupling is consistent.
+</p>
+
+<h3 style="color:#fbbf24;">4. Determination of Coupling Constant</h3>
+
+<p>
+To determine $\\kappa$, consider the weak-field limit:
+</p>
+
+<p>
+$g_{\\mu\\nu} = \\eta_{\\mu\\nu} + h_{\\mu\\nu}, \\quad |h_{\\mu\\nu}| \\ll 1$
+</p>
+
+<p>
+In this limit, the $00$ component of the Einstein tensor reduces to:
+</p>
+
+<p>
+$G_{00} \\approx 2 \\nabla^2 \\Phi$
+</p>
+
+<p>
+where $\\Phi$ is the Newtonian gravitational potential.
+</p>
+
+<p>
+From Newtonian gravity:
+</p>
+
+<p>
+$\\nabla^2 \\Phi = 4\\pi G \\rho$
+</p>
+
+<p>
+Identifying:
+</p>
+
+<p>
+$T_{00} \\approx \\rho$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$G_{00} = 8\\pi G \\rho = 8\\pi G \\, T_{00}$
+</p>
+
+<p>
+Therefore:
+</p>
+
+<p>
+$\\kappa = 8\\pi G$
+</p>
+
+<h3 style="color:#fbbf24;">5. Full Field Equation</h3>
+
+<p>
+Substituting:
+</p>
+
+<p>
+$G_{\\mu\\nu} = 8\\pi G \\, T_{\\mu\\nu}$
+</p>
+
+<p>
+This is the Einstein field equation.
+</p>
+
+<h3 style="color:#fbbf24;">6. Structural Mapping from Substrate</h3>
+
+<p>
+From previous modules:
+</p>
+
+<p>
+$(K, P) \\;\\longrightarrow\\; g_{\\mu\\nu} \\;\\longrightarrow\\; G_{\\mu\\nu}$
+</p>
+
+<p>
+Matter arises as structured excitation:
+</p>
+
+<p>
+$(K, P) \\;\\longrightarrow\\; T_{\\mu\\nu}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$G_{\\mu\\nu}(K, P) = 8\\pi G \\, T_{\\mu\\nu}(K, P)$
+</p>
+
+<p>
+The equation is therefore an internal relation within the substrate.
+</p>
+
+<h3 style="color:#fbbf24;">7. Inclusion of Cosmological Term (General Form)</h3>
+
+<p>
+The most general divergence-free extension includes:
+</p>
+
+<p>
+$G_{\\mu\\nu} + \\Lambda g_{\\mu\\nu} = 8\\pi G \\, T_{\\mu\\nu}$
+</p>
+
+<p>
+Since:
+</p>
+
+<p>
+$\\nabla^\\mu g_{\\mu\\nu} = 0$
+</p>
+
+<p>
+the cosmological term preserves conservation:
+</p>
+
+<p>
+$\\nabla^\\mu (\\Lambda g_{\\mu\\nu}) = 0$
+</p>
+
+<h3 style="color:#fbbf24;">8. Limit Cases</h3>
+
+<p>
+<strong>Vacuum:</strong>
+</p>
+
+<p>
+$T_{\\mu\\nu} = 0 \\Rightarrow G_{\\mu\\nu} = 0$
+</p>
+
+<p>
+<strong>Flat spacetime:</strong>
+</p>
+
+<p>
+$R_{\\mu\\nu} = 0 \\Rightarrow G_{\\mu\\nu} = 0$
+</p>
+
+<p>
+<strong>Static weak field:</strong>
+</p>
+
+<p>
+$\\nabla^2 \\Phi = 4\\pi G \\rho$
+</p>
+
+<h3 style="color:#fbbf24;">9. Conservation Identity</h3>
+
+<p>
+From the field equation:
+</p>
+
+<p>
+$\\nabla^\\mu G_{\\mu\\nu} = 8\\pi G \\, \\nabla^\\mu T_{\\mu\\nu}$
+</p>
+
+<p>
+Since:
+</p>
+
+<p>
+$\\nabla^\\mu G_{\\mu\\nu} = 0$
+</p>
+
+<p>
+it follows:
+</p>
+
+<p>
+$\\nabla^\\mu T_{\\mu\\nu} = 0$
+</p>
+
+<p>
+Thus, conservation of matter is enforced by geometry.
+</p>
+
+<h3 style="color:#fbbf24;">10. Structural Interpretation</h3>
+
+<p>
+The field equation represents equilibrium:
+</p>
+
+<p>
+$\\text{Curvature} \\;\\sim\\; \\text{Matter Distribution}$
+</p>
+
+<p>
+Explicitly:
+</p>
+
+<p>
+$G_{\\mu\\nu} \\leftrightarrow T_{\\mu\\nu}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Geometry} \\;\\longleftrightarrow\\; \\text{Source}$
+</p>
+
+<h3 style="color:#fbbf24;">11. Uniqueness</h3>
+
+<p>
+Since:
+</p>
+
+<ul>
+<li>$G_{\\mu\\nu}$ is the unique divergence-free curvature tensor</li>
+<li>$T_{\\mu\\nu}$ is the conserved matter tensor</li>
+</ul>
+
+<p>
+their coupling is uniquely fixed.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$G_{\\mu\\nu} = 8\\pi G \\, T_{\\mu\\nu}$
+</p>
+
+<p>
+is the only consistent field equation.
+</p>
+
+<h3 style="color:#fbbf24;">12. Structural Conclusion</h3>
+
+<p>
+The Einstein field equation is derived as the unique coupling between conserved geometry and conserved matter. Both sides arise from substrate structure, and the equation expresses internal equilibrium. No alternative consistent coupling exists.
+</p>
+
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>MATTER COUPLING<br>(Coupling strength preserving conservation constraint)</span><input type="number" id="f_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'f_sl')"></div><input type="range" id="f_sl" min="0" max="200" step="1" value="100" oninput="syncVal(this.value, 'f_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="color: var(--accent-gold); line-height: 1.3; text-align: center; font-size: 0.77rem;">Substrate Equilibrium + Matter Source $\\rightarrow$ Einstein Field Equation</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">RECOVERY STATUS</span><div style="color: var(--accent-gold); line-height: 1.3; text-align: center; font-size: 0.8rem;">GR Fully Reconstructed</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-final);">SYSTEM: Divergence-free geometry established<br>COUPLING: ∇μ Tμν = 0 required<br>RESULT: Unique consistent field equation</span>`,
+metricsContent: `$G_{\\mu\\nu} = 8\\pi G T_{\\mu\\nu}$`,
+hierarchy: `Einstein Recovery`,
+footer: "All GR terms mapped to substrate origin (K, P).",
+rightNote: `<div style="color: #94a3b8; line-height: 1.2; margin: 5px; font-size: 0.77rem;">Stage 62 establishes Einstein geometry as the unique form of substrate equilibrium.<p>Only conserved sources can couple to divergence-free geometry.</p><p><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">👉 This Module Establishes:<br>The Einstein field equation arises as the unique equilibrium condition where divergence-free geometry couples to a conserved matter source. Hence, Gμν = 8πG Tμν is structurally required.</p><p><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">👉 This Stage 62 Establishes:<br>General Relativity is the geometric expression of substrate equilibrium, where curvature and matter are coupled through conservation.</p></div>`
+}
+};
+
+function syncVal(val, id) {
+const sliderId = id.includes('_in') ? id.replace('_in', '_sl') : id;
+const inputId = id.includes('_sl') ? id.replace('_sl', '_in') : id;
+if(document.getElementById(sliderId)) document.getElementById(sliderId).value = val;
+if(document.getElementById(inputId)) document.getElementById(inputId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+document.getElementById('brief-box-content').innerHTML = content.brief;
+document.getElementById('math-box-content').innerHTML = content.math;
+document.getElementById('control-sliders').innerHTML = content.sliders;
+
+document.getElementById('active-module-title').innerText = content.title;
+const resultEl = document.getElementById('active-module-result');
+resultEl.innerText = content.result;
+resultEl.style.fontSize = content.resultSize || "0.75rem";
+
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('metrics-content').innerHTML = content.metricsContent;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+document.getElementById('telemetry-area').innerHTML = content.telemetry;
+showScreen('briefing');
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() {
+showScreen('lab');
+setTimeout(() => { runLab(); window.dispatchEvent(new Event('resize')); }, 100);
+}
+
+function runLab() {
+const target = document.getElementById('plot-area');
+let data = [];
+let layout = {
+paper_bgcolor: 'black', plot_bgcolor: 'black', margin: {t:60,b:10,l:0,r:0},
+showlegend: false, font: { family: 'sans-serif', size: 10 },
+scene: {
+xaxis: { gridcolor: '#222', color: '#94a3b8', title: 'Basis' },
+yaxis: { gridcolor: '#222', color: '#94a3b8', title: 'Phase' },
+zaxis: { gridcolor: '#222', color: '#94a3b8', title: 'Stiffness' }
+}
+};
+
+if (currentTool === 1) { // Metric Emergence
+// 1. Reactive Input: Ensuring the constant 'm' reacts to the slider directly
+let m = parseFloat(document.getElementById('m_sl')?.value || 100) / 100;
+
+let x_vals = Array.from({length: 40}, (_, i) => i - 20);
+let y_vals = Array.from({length: 40}, (_, i) => i - 20);
+
+// 2. Substrate Response Surface: Mapping gμν emergence
+let z = x_vals.map(xi => y_vals.map(yi => -m * Math.exp(-(xi*xi + yi*yi)/100)));
+
+data.push({
+type: 'surface',
+z: z,
+colorscale: 'Blues',
+showscale: false,
+name: 'Metric State gμν', // Legend Name
+hoverinfo: 'z+name'
+});
+
+// 3. Axis & Legend Customization (Bright #eee)
+layout.title = {
+text: "EMERGENT METRIC gμν",
+font: { color: '#3b82f6', size: 16 }
+};
+
+layout.scene = {
+xaxis: {
+title: { text: 'Substrate Coordinate X', font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+gridcolor: '#333'
+},
+yaxis: {
+title: { text: 'Substrate Coordinate Y', font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+gridcolor: '#333'
+},
+zaxis: {
+title: { text: 'Metric Potential gμν', font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+gridcolor: '#333',
+range: [-2, 0.5] // Keeping the scale fixed makes the slider movement visible
+}
+};
+
+layout.showlegend = true;
+layout.legend = { font: { color: '#eee' } };
+
+
+} else if (currentTool === 2) { // Geodesics
+// 1. Reactive Input: Gradient Strength 'c'
+let c = parseFloat(document.getElementById('c_sl')?.value || 100) / 100;
+let t_vals = Array.from({length: 100}, (_, i) => i / 5);
+
+// 2. Data: The Geodesic Flow Path
+data.push({
+x: t_vals,
+y: t_vals.map(ti => c * Math.sin(ti)),
+mode: 'lines',
+name: 'Geodesic Path (xλ)', // Legend Name
+line: { color: '#fbbf24', width: 4 }
+});
+
+// 3. Axis & Legend Customization (Bright #eee)
+layout.title = {
+text: "EQUILIBRIUM PATH (GEODESIC)",
+font: { color: '#fbbf24', size: 16 }
+};
+
+layout.showlegend = true;
+layout.legend = { font: { color: '#eee' }, x: 0.05, y: 0.95 };
+
+layout.xaxis = {
+title: { text: 'Affine Parameter (τ)', font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+gridcolor: '#222',
+zerolinecolor: '#444'
+};
+
+layout.yaxis = {
+title: { text: 'Spatial Coordinate (x)', font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+gridcolor: '#222',
+zerolinecolor: '#444',
+range: [-2.5, 2.5] // Fixed range ensures the slider movement is visually dramatic
+};
+
+
+} else if (currentTool === 3) { // Curvature Mapping
+// 1. Reactive Input
+let r = parseFloat(document.getElementById('r_sl')?.value || 100) / 100;
+let x_vals = Array.from({length: 40}, (_, i) => i - 20);
+let y_vals = Array.from({length: 40}, (_, i) => i - 20);
+
+// 2. Data Definition
+let z = x_vals.map(xi => y_vals.map(yi => r * (Math.sin(Math.sqrt(xi*xi + yi*yi) / 2))));
+
+data.push({
+type: 'surface',
+z: z,
+colorscale: 'Portland',
+showscale: false,
+name: 'Curvature Tensor (R)', // Legend Name
+showlegend: true, // Force legend for this specific trace
+hoverinfo: 'z+name'
+});
+
+// 3. Layout Formatting
+layout.title = { text: "RIEMANN CURVATURE DETERMINATION", font: { color: '#c084fc', size: 16 } };
+
+// GLOBAL LEGEND FORCE
+layout.showlegend = true;
+layout.legend = {
+font: { color: '#eee', size: 11 },
+x: 0.05,
+y: 0.95,
+xanchor: 'left',
+yanchor: 'top',
+bgcolor: 'rgba(0,0,0,0.7)', // Darker background for visibility
+bordercolor: '#eee', // Bright border to see legend bounds
+borderwidth: 1
+};
+
+// Bright #eee Axis Titles & Grid
+layout.scene = {
+xaxis: {
+title: { text: 'Substrate Basis', font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+gridcolor: '#444'
+},
+yaxis: {
+title: { text: 'Substrate Phase', font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+gridcolor: '#444'
+},
+zaxis: {
+title: { text: 'Stiffness Variation', font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+gridcolor: '#444',
+range: [-1.5, 1.5]
+},
+camera: {
+eye: {x: 1.5, y: 1.5, z: 1.2} // Set a default angle where legend is less likely to be blocked
+}
+};
+
+
+} else if (currentTool === 4) { // Einstein Tensor Recovery
+// 1. Reactive Input: 'e' represents the convergence of G to Σ
+let e = parseFloat(document.getElementById('e_sl')?.value || 100) / 100;
+
+// 2. Data: Bar chart showing G_μν approaching Σ_μν
+data.push({
+x: ['Synthesis Tensor (Σμν)', 'Einstein Tensor (Gμν)'],
+y: [1, 1 * e],
+type: 'bar',
+name: 'Uniqueness Under Conservation Constraint',
+showlegend: true,
+marker: {
+color: ['#3b82f6', '#f87171'],
+line: { color: '#eee', width: 1 }
+},
+hoverinfo: 'y+name'
+});
+
+// 3. Layout Formatting with increased bottom margin
+layout.title = {
+text: "FORMAL TENSOR IDENTITY CHECK",
+font: { color: '#f87171', size: 16 }
+};
+
+// Increased 'b' (bottom) margin to 80 to ensure labels aren't cut off
+layout.margin = { t: 60, b: 80, l: 60, r: 40 };
+
+layout.showlegend = true;
+layout.legend = {
+font: { color: '#eee', size: 11 },
+x: 0.02,
+y: 0.98,
+xanchor: 'left',
+yanchor: 'top',
+bgcolor: 'rgba(0,0,0,0.6)',
+bordercolor: '#eee',
+borderwidth: 1
+};
+
+layout.xaxis = {
+tickfont: { color: '#eee', size: 11 },
+gridcolor: '#333',
+tickangle: 0 // Keep labels horizontal for readability
+};
+
+layout.yaxis = {
+title: { text: 'Normalized Equivalence', font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+gridcolor: '#333',
+zerolinecolor: '#eee',
+range: [0, 1.2]
+};
+
+
+} else if (currentTool === 5) { // Field Equation
+// 1. Reactive Input: Matter Coupling 'f'
+let f = parseFloat(document.getElementById('f_sl')?.value || 100) / 100;
+let x_vals = Array.from({length: 100}, (_, i) => (i - 50) / 2); // Smoother curve
+
+// 2. Data: The Field Response Curve (Cauchy/Lorentzian Profile)
+data.push({
+x: x_vals,
+y: x_vals.map(xi => f * (1 / (1 + (xi / 2)**2))),
+fill: 'tozeroy',
+name: 'Field Intensity (Gμν)', // Legend Name
+showlegend: true,
+line: { color: '#2dd4bf', width: 3 },
+fillcolor: 'rgba(45, 212, 191, 0.2)' // Transparent fill for a professional look
+});
+
+// 3. Layout Formatting
+layout.title = {
+text: "RECOVERED FIELD EQUATION RESPONSE",
+font: { color: '#2dd4bf', size: 16 }
+};
+
+// Increase bottom margin for axis visibility
+layout.margin = { t: 60, b: 60, l: 60, r: 40 };
+
+// Legend at Top-Left
+layout.showlegend = true;
+layout.legend = {
+font: { color: '#eee', size: 11 },
+x: 0.02,
+y: 0.98,
+xanchor: 'left',
+yanchor: 'top',
+bgcolor: 'rgba(0,0,0,0.5)',
+bordercolor: '#eee',
+borderwidth: 1
+};
+
+// Bright #eee Axis Configuration
+layout.xaxis = {
+title: { text: 'Radial Distance (r)', font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+gridcolor: '#333',
+zerolinecolor: '#eee'
+};
+
+layout.yaxis = {
+title: { text: 'Curvature Strength', font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+gridcolor: '#333',
+zerolinecolor: '#eee',
+range: [0, 1.2] // Fixed range makes slider movement visible
+};
+}
+
+Plotly.react('plot-area', data, layout, {responsive: true, displayModeBar: false});
+}
+
+function resetLab() {
+if(currentTool===1) syncVal(100, 'm_sl');
+if(currentTool===2) syncVal(100, 'c_sl');
+if(currentTool===3) syncVal(100, 'r_sl');
+if(currentTool===4) syncVal(100, 'e_sl');
+if(currentTool===5) syncVal(100, 'f_sl');
+}
+
+window.onload = () => { showScreen('portal'); };
+</script>
+</body>
+</html>
+

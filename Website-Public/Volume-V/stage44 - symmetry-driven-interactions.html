@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 44 — Symmetry-Driven Interactions</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #00ffcc;
+--accent-field: #60a5fa; --accent-strength: #f87171; --accent-dynamics: #fbbf24; --accent-coupling: #a78bfa; --accent-force: #4ade80;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-unified); font-family: sans-serif; font-size: 0.85rem; min-width: 350px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls, #nav-summary-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+#screen-lab.active { display: flex; flex-direction: column; height: calc(100vh - 50px); }
+
+#screen-portal { justify-content: flex-start; padding-top: 4dvh; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 50px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.primary-constant-box { background: #000; border: 1px solid var(--accent-unified); padding: 6px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 8px; }
+.secondary-structure-box { background: rgba(0, 255, 204, 0.05); border: 1px dashed var(--accent-unified); padding: 6px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 12px; }
+
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(0, 255, 204, 0.05); border: 1px solid var(--accent-unified); padding: 5px; border-radius: 5px; margin-bottom: 8px; font-size: 0.7rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; }
+#plot-area { flex-grow: 1; width: 100%; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #000; border: 1px solid var(--accent-unified); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer { width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem; color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 44 — SYMMETRY-DRIVEN INTERACTIONS</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">Symmetry-Driven Interactions Portal</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">The inevitable transition from local symmetry to physical force.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-field);">
+<h2 style="color:var(--accent-field);">1. Gauge Field Realization</h2>
+<p>Physical Structure: $\boxed{ A_\mu = A_\mu^a T^a }$</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-strength);">
+<h2 style="color:var(--accent-strength);">2. Gauge Field Strength (Curvature)</h2>
+<p>Origin of Interaction: $\boxed{ F_{\mu\nu} = [D_\mu, D_\nu] }$</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-dynamics);">
+<h2 style="color:var(--accent-dynamics);">3. Gauge Field Dynamics</h2>
+<p>Action & Propagation: $\boxed{ \mathcal{L} = -\frac{1}{4}F^2 }$</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-coupling);">
+<h2 style="color:var(--accent-coupling);">4. Matter-Gauge Coupling</h2>
+<p>Consistent Evolution: $\boxed{ D_\mu \Psi = (\partial_\mu + iA_\mu)\Psi }$</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-force);">
+<h2 style="color:var(--accent-force);">5. Structural Meaning of Forces</h2>
+<p>Symmetry Manifestation: $\boxed{ U(1) \times SU(2) \times SU(3) }$</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-unified);">
+<h2 style="color:var(--accent-unified);">6. Stage 44 Summary</h2>
+<p>The Consequence of Consistency.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Mathematical Structure & Completion (Closure) Theorem</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Full Structural Chain</h3>
+<p>Stage 44 establishes a complete and closed mathematical chain where every step follows necessarily from the previous one: Local symmetry $\rightarrow$ gauge field (connection) $\rightarrow$ field strength (curvature) $\rightarrow$ dynamics (action) $\rightarrow$ matter coupling $\rightarrow$ interaction classification.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Core Mathematical Objects</h3>
+<p>The entire structure is built on five fundamental objects:</p>
+<ul style="list-style-type: none; padding-left: 0;">
+<li><strong>• Gauge Field (Connection):</strong> $A_\mu = A_\mu^a T^a$ — Defines how internal states connect across spacetime.</li>
+<li><strong>• Covariant Derivative:</strong> $D_\mu = \partial_\mu + i g A_\mu$ — Defines symmetry-consistent change.</li>
+<li><strong>• Field Strength (Curvature):</strong> $F_{\mu\nu} = \partial_\mu A_\nu - \partial_\nu A_\mu + i g [A_\mu , A_\nu]$ — Defines the intrinsic structure of the field.</li>
+<li><strong>• Action (Dynamics):</strong> $\mathcal{L} = -1/4 Tr(F_{\mu\nu} F^{\mu\nu})$ — Defines the evolution of the field.</li>
+<li><strong>• Coupling Term:</strong> $\mathcal{L}_{int} = g \bar{\Psi} \gamma^\mu A_\mu^a T^a \Psi$ — Defines the interaction with matter.</li>
+</ul>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Logical Necessity</h3>
+<p>Each element is not assumed; it is forced by the requirement of local symmetry. Symmetry requires a covariant derivative, which requires a gauge field, which produces curvature, generating dynamics and enforcing coupling, finally yielding the interaction. There is no arbitrary insertion.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Emergence of Interaction</h3>
+<p>Interaction is defined as the combination of non-zero curvature and coupling. Curvature provides the structure, and coupling transfers that structure to matter. Interaction is not an external addition.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Classification of Forces</h3>
+<p>The force type is determined strictly by the symmetry algebra:</p>
+<ul style="list-style-type: none; padding-left: 20px; color: #f472b6;">
+<li>$U(1) \rightarrow$ Abelian $\rightarrow$ No self-interaction (Electromagnetic)</li>
+<li>$SU(2) \rightarrow$ Weak interaction</li>
+<li>$SU(3) \rightarrow$ Strong interaction</li>
+</ul>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Structural Identity</h3>
+<p>The complete identity of interaction is the sequence: Connection $\rightarrow$ curvature $\rightarrow$ dynamics $\rightarrow$ coupling $\rightarrow$ force.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. No Free Parameters in Structure</h3>
+<p>Symmetry fixes the number of fields, the interaction form, and the self-interaction structure. Within this framework, only the coupling strength remains a free parameter.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Completion (Closure) Statement</h3>
+<p>All components form a closed mathematical system: fields, dynamics, interaction, and classification are all fully defined. No further structural elements are required.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Final Structural Insight</h3>
+<p>Symmetry is not just invariance; it is the generator of physical reality.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Final Statement</h3>
+<p>Stage 44 establishes that interaction is not a separate physical input, but a mathematically necessary outcome of local symmetry, fully determined by connection, curvature, dynamics, and coupling within a closed and self-consistent structure.</p>
+
+<div style="margin-top: 30px; padding: 20px; border: 1px solid #38bdf8; background: rgba(56, 189, 248, 0.05); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.1rem; text-align: center; margin-bottom: 15px;">THEOREM: Closure of Gauge Structure and Emergence of Interactions (Stage 44)</h2>
+<p>Let $\Psi(x) \in \mathbb{C}^N$ be a multi-component field defined on spacetime, transforming under a local symmetry group $G$. If the field admits local transformations $\Psi(x) \rightarrow U(x)\Psi(x)$ and the theory requires invariance, a connection field $A_\mu(x)$ must be introduced.</p>
+
+<h4 style="color: #f472b6; margin-top: 15px;">(A) Covariant structure is enforced</h4>
+<p>Ordinary derivatives fail: $\partial_\mu (U(x)\Psi) \neq U(x)\partial_\mu \Psi$. Hence a covariant derivative is required: $D_\mu = \partial_\mu + i g A_\mu$.</p>
+
+<h4 style="color: #f472b6; margin-top: 15px;">(B) Curvature is uniquely defined</h4>
+<p>The commutator of covariant derivatives defines the gauge curvature: $[D_\mu, D_\nu] = i g F_{\mu\nu}$.</p>
+
+<h4 style="color: #f472b6; margin-top: 15px;">(C) Dynamics is necessarily generated</h4>
+<p>A gauge-invariant action governs propagation and energy: $\mathcal{L}_{gauge} \propto \text{Tr}(F_{\mu\nu}F^{\mu\nu})$.</p>
+
+<h4 style="color: #f472b6; margin-top: 15px;">(D) Matter coupling is required for consistency</h4>
+<p>Consistent evolution requires $D_\mu \Psi = (\partial_\mu + i g A_\mu)\Psi$, forcing matter to couple to the gauge field.</p>
+
+<h4 style="color: #f472b6; margin-top: 15px;">(E) Interaction structure is fixed by symmetry</h4>
+<p>The algebra of $G$ determines the number of fields and self-interaction structure ($U(1) \rightarrow$ EM, $SU(2) \rightarrow$ Weak, $SU(3) \rightarrow$ Strong).</p>
+
+<div style="text-align: center; margin-top: 20px; font-weight: bold; color: #38bdf8;">
+Conclusion: Local symmetry forces connection, curvature, dynamics, and coupling.
+</div>
+
+<div style="text-align: center; margin-top: 15px; font-family: 'Courier New', monospace; color: #f472b6;">
+Local symmetry $\Rightarrow$ $D_\mu$ $\Rightarrow$ $F_{\mu\nu}$ $\Rightarrow$ $\mathcal{L} \propto F^2$ $\Rightarrow$ Coupled dynamics
+</div>
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 30px; text-align: center;">Ultimate Insight of Stage 44</h3>
+<p style="text-align: center; font-style: italic; margin-bottom: 0;">Interaction is not an addition to symmetry — it is the fully realized consequence of local symmetry when consistency, dynamics, and coupling are enforced together.</p>
+</div>
+</section>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div class="primary-constant-box">
+<div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val">11.350</span></div>
+<div class="const-item"><span class="const-label">Synthesis P</span><span class="const-val">0.6900</span></div>
+</div>
+<div class="secondary-structure-box">
+<div class="const-item"><span class="const-label">Field Status</span><span id="display-status" class="const-val">ACTIVE</span></div>
+<div class="const-item"><span class="const-label">Interaction Type</span><span id="display-force" class="const-val">GAUGE</span></div>
+</div>
+<div id="mapping-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Interaction Telemetry</span>
+<span id="epoch-label" style="font-family:monospace; font-size:0.85rem; color:var(--accent-unified);">FIELD COUPLING ACTIVE</span>
+</div>
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-unified); font-size:0.75rem; cursor:pointer; padding:6px;">RESET FIELD</button>
+<div id="panel-footer-text" style="font-size: 0.75rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.3; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:10px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:6px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Physical Interaction Logic</span>
+<div id="metrics-content" style="font-size:0.65rem; font-family:monospace; line-height:1.3;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Structural Result</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.65rem; color: var(--text-dim); line-height: 1.4; background: #000; padding: 10px; border-radius: 0px; border: 1px solid #222; margin-top: auto;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "GAUGE FIELD REALIZATION",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Gauge Field Realization</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Starting Point: Local Symmetry Requirement</h3>
+<p>According to this framework, from Stage 43, local symmetry requires consistency at every spacetime point. However, the ordinary derivative fails to preserve this symmetry under local transformations. Therefore, a compensating structure is required.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Introduction of Gauge Field</h3>
+<p>According to this framework, to restore local symmetry, a new field is introduced: $A_\\mu(x)$. This field is defined at every spacetime point, carries an internal symmetry index, and acts across spacetime. This is the gauge field.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Role of the Gauge Field</h3>
+<p>According to this framework, the gauge field modifies how change is measured. The ordinary derivative is replaced by the covariant derivative:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$D_\\mu = \\partial_\\mu + i g A_\\mu$$
+$$D_\\mu \\Psi = (\\partial_\\mu + i g A_\\mu)\\Psi$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Key Meaning</h3>
+<p>According to this framework, the gauge field is not optional. It is a mathematical and physical requirement to maintain local symmetry across the substrate.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Interpretation as Connection</h3>
+<p>According to this framework, the gauge field represents a connection between neighboring spacetime points and provides a rule for comparing internal states. It defines how internal symmetry is preserved during motion.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Physical Realization</h3>
+<p>According to this framework, at this stage, the gauge field exists everywhere in spacetime. It carries symmetry information and actively connects internal states. It is a real physical entity.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Structural Meaning</h3>
+<p>According to this framework, $A_\\mu$ represents the connection (structure), while $D_\\mu$ represents the consistent change (operation). Symmetry is enforced through structure.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Conceptual Shift</h3>
+<p>According to this framework, interaction is not introduced externally; it is built into the very definition of how fields change across the substrate.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Role of This Module</h3>
+<p>According to this framework, this module establishes the gauge field as a real spacetime field, the connection as a physical structure, and the covariant derivative as the correct operator for dynamics.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Visual Interpretation (Graph Meaning)</h3>
+<p>According to this framework, the central visualization represents the distribution of the gauge field across spacetime. The grid corresponds to spacetime points, while the vertical structures represent field values. Variation across the grid shows that the field forms a continuous structural network. This is not interaction yet—it is the underlying connection structure on which interaction will arise.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">11. Structural Position</h3>
+<p>According to this framework, this module establishes the chain of necessity: Local Symmetry $\\rightarrow$ Gauge Field $\\rightarrow$ Physical Connection.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Final Statement</h3>
+<p style="margin-bottom: 0;">According to this framework, the gauge field emerges as the necessary spacetime-dependent connection that restores local symmetry and establishes the physical structure required for interaction.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 1 Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Structural Requirement:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\partial_\\mu \\rightarrow D_\\mu = \\partial_\\mu + i g A_\\mu$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The Gauge Field $A_\\mu$ acts as the physical connection across the substrate, ensuring that local symmetry is preserved during field evolution.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematical Formulation: Gauge Field Realization</h2>
+
+<div class="math-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Local Symmetry Transformation</h3>
+<p>According to this framework, the field transforms locally at every spacetime point:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\Psi(x) \\rightarrow \\Psi'(x) = U(x)\\Psi(x)$$
+$$\\text{where: } U(x) = e^{i \\theta^a(x) T^a}$$
+</div>
+<p>The transformation depends explicitly on the spacetime coordinate $x$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Failure of Ordinary Derivative</h3>
+<p>According to this framework, applying the ordinary derivative $\\partial_\\mu \\Psi(x)$ leads to a mismatch under transformation:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\partial_\\mu \\Psi \\rightarrow U(x)\\partial_\\mu \\Psi + (\\partial_\\mu U(x))\\Psi$$
+</div>
+<p>The extra term $(\\partial_\\mu U(x))\\Psi$ breaks the covariance of the derivative.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Necessity of Gauge Field</h3>
+<p>According to this framework, to cancel this mismatch, we introduce the gauge field $A_\\mu(x)$:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$A_\\mu(x) = A_\\mu^a(x) T^a$$
+</div>
+<p>The gauge field carries the internal symmetry structure required to restore balance.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Covariant Derivative</h3>
+<p>According to this framework, we define a modified derivative that restores consistency:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$D_\\mu = \\partial_\\mu + i g A_\\mu$$
+$$D_\\mu \\Psi = (\\partial_\\mu + i g A_\\mu)\\Psi$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Gauge Field Transformation</h3>
+<p>According to this framework, requiring $D_\\mu \\Psi \\rightarrow U(x) D_\\mu \\Psi$ forces the gauge field to transform as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$A_\\mu \\rightarrow A'_\\mu = U A_\\mu U^{-1} - \\frac{i}{g} (\\partial_\\mu U) U^{-1}$$
+</div>
+<p>This transformation property cancels the mismatch from the ordinary derivative.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Covariance Condition</h3>
+<p>According to this framework, the covariant derivative ensures that the derivative of the field transforms exactly like the field itself: $D_\\mu \\Psi \\rightarrow U(x) D_\\mu \\Psi$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Structural Interpretation</h3>
+<p>According to this framework, the covariant derivative is interpreted as $D_\\mu = \\partial_\\mu + (\\text{connection})$. The gauge field acts as the connection in internal space.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Parallel Transport</h3>
+<p>According to this framework, the evolution of the field between neighboring points depends on the gauge connection:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\Psi(x + dx) = \\Psi(x) + D_\\mu \\Psi dx^\\mu$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Minimal Coupling</h3>
+<p>According to this framework, interaction is introduced through the replacement $\\partial_\\mu \\rightarrow D_\\mu = \\partial_\\mu + i g A_\\mu$. This is the principle of minimal coupling through the connection.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Mathematical Flow</h3>
+<p style="text-align: center; color: #f472b6;">
+$$\\text{Local symmetry} \\rightarrow \\text{derivative mismatch} \\rightarrow \\text{introduce } A_\\mu \\rightarrow \\text{define } D_\\mu \\rightarrow \\text{restore covariance}$$
+</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Final Mathematical Statement</h3>
+<p style="margin-bottom: 0;">According to this framework, the gauge field $A_\\mu(x)$, introduced to restore local symmetry, defines the covariant derivative and acts as the connection that ensures consistent transformation of fields across spacetime.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 1 Mathematical Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Restored Covariance:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$[D_\\mu \\Psi]' = U(x) [D_\\mu \\Psi]$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The introduction of the connection $A_\\mu$ allows the physical laws of change to remain invariant under local symmetry transformations.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>GAUSE FIELD INTENSITY</span><input type="number" id="a_in" class="digital-entry" value="1.0" oninput="syncVal(this.value, 'a_sl')"></div><input type="range" id="a_sl" min="0" max="2" step="0.1" value="1.0" oninput="syncVal(this.value, 'a_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">GAUGE CONNECTION FIELD</span><div style="text-align:center; font-size: 0.9rem;">$A_\\mu = A_\\mu^a(x)\\, T^a$<br>Fundamental connection field carrying internal symmetry</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">CORE IDEA</span><div style="text-align:center; font-size: 0.8rem;">Gauge field = Real physical carrier of symmetry</div>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Gauge field A_μ(x)<br>↓<br>Defined over spacetime<br>↓<br>Carries symmetry index ‘a’<br>↓<br>Actively connects internal states`,
+hierarchy: `<div style="color: var(--accent-field); font-weight: bold;">Field Realized</div>`,
+footer: "The gauge field is established as a real, dynamically active entity within the substrate structure.",
+rightNote: `<div style="color: #00ffcc; line-height: 1.4; font-size: 0.85rem;">Gauge fields are real physical connections that enforce symmetry across spacetime.`
+},
+
+2: {
+title: "GAUGE FIELD STRENGTH (CURVATURE)",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Gauge Field Strength (Curvature)</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Starting Point: Gauge Field Realized</h3>
+<p>From Module 1, the Gauge field $A_\\mu(x)$ is established as a real spacetime field. It acts as a connection maintaining local symmetry. The structure is now defined.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Next Question</h3>
+<p>Once the gauge field exists, we must ask: What is the intrinsic structure of the gauge field? It cannot remain arbitrary—it must have measurable content.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Emergence of Field Strength</h3>
+<p>According to this framework, the structure of the gauge field is captured by $F_{\\mu\\nu}$. This quantity measures how the gauge field changes across spacetime. It is the field strength.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Key Meaning</h3>
+<p>Field strength measures the variation of the gauge field across spacetime.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Interpretation as Curvature</h3>
+<p>Field strength represents the failure of consistency when moving across spacetime, non-trivial structure in internal space, and deviation from uniform connection. It is the curvature of the gauge field.</p>
+<p style="text-align: center; color: #f472b6; font-weight: bold;">
+$$\\text{Gauge field} \\rightarrow \\text{Curvature} \\rightarrow \\text{Interaction}$$
+</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Condition for Interaction</h3>
+<p>According to this framework, the defining condition is that non-zero field strength implies the presence of interaction. If field strength is zero, no interaction exists; if field strength is non-zero, interaction exists.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Structural Meaning</h3>
+<p>$A_\\mu$ represents the connection (structure), while $F_{\\mu\\nu}$ represents curvature (dynamics). Dynamics emerges from structure.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Physical Interpretation</h3>
+<p>Curvature encodes interaction, measures the failure of parallel transport, and determines how fields influence each other. Interaction is encoded geometrically.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Role of This Module</h3>
+<p>This module establishes field strength as measurable structure, curvature as physical reality, and interaction as a consequence of non-zero curvature.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Visual Interpretation (Graph Meaning)</h3>
+<p>The central visualization represents local gauge curvature across spacetime. The grid represents spacetime points, and vertical arrows represent the magnitude of field strength at each point. Variation in arrow height shows non-uniform curvature. This demonstrates that the field is not flat, curvature exists at each point, and interaction is distributed across spacetime. The visualization directly encodes: Non-zero curvature = presence of interaction.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">11. Structural Position</h3>
+<p>According to this framework, this module establishes the sequence: Gauge field $\\rightarrow$ Curvature $\\rightarrow$ Interaction.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Final Statement</h3>
+<p style="margin-bottom: 0;">Gauge field strength represents the intrinsic curvature of the gauge connection, and non-zero curvature defines the presence and structure of interaction across spacetime.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 2 Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Geometric Identity:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$F_{\\mu\\nu} \\neq 0 \\implies \\text{Interaction}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Force is not an external addition but the geometric manifestation of the connection's curvature across the spacetime manifold.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematical Formulation: Gauge Field Strength (Curvature)</h2>
+
+<div class="math-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Starting Point: Covariant Derivative</h3>
+<p>From Module 1, the gauge field is already embedded in the derivative: $D_\\mu = \\partial_\\mu + i g A_\\mu$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Defining Field Strength</h3>
+<p>According to this framework, field strength arises from the non-commutativity of covariant derivatives:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$[D_\\mu , D_\\nu] \\Psi = i g F_{\\mu\\nu} \\Psi$$
+</div>
+<p>This commutator defines $F_{\\mu\\nu}$ as the measure of geometric failure in parallel transport.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Explicit Expression</h3>
+<p>Expanding the commutator yields the full gauge field strength:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$F_{\\mu\\nu} = \\partial_\\mu A_\\nu - \\partial_\\nu A_\\mu + i g [A_\\mu , A_\\nu]$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Key Meaning</h3>
+<p>Field strength captures how the gauge field changes across spacetime, representing the intrinsic density of the connection.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Abelian Case (U(1))</h3>
+<p>In Abelian symmetry, $[A_\\mu , A_\\nu] = 0$. Therefore, $F_{\\mu\\nu} = \\partial_\\mu A_\\nu - \\partial_\\nu A_\\mu$. This indicates the absence of self-interaction.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Non-Abelian Case (SU(2), SU(3))</h3>
+<p>For non-Abelian symmetry, the additional term $i g [A_\\mu , A_\\nu]$ represents the self-interaction of gauge fields, a central feature of the framework's structural dynamics.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Component Form</h3>
+<p>The gauge field $A_\\mu = A_\\mu^a T^a$ and field strength $F_{\\mu\\nu} = F_{\\mu\\nu}^a T^a$ are expressed in component form as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$F_{\\mu\\nu}^a = \\partial_\\mu A_\\nu^a - \\partial_\\nu A_\\mu^a - g f^{abc} A_\\mu^b A_\\nu^c$$
+</div>
+<p>The structure constants $f^{abc}$ define the nature of the interaction.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Transformation Property</h3>
+<p>Under local symmetry, the field strength transforms covariantly: $F_{\\mu\\nu} \\rightarrow F'_{\\mu\\nu} = U(x) F_{\\mu\\nu} U^{-1}(x)$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Gauge-Invariant Quantity</h3>
+<p>The scalar quantity $Tr(F_{\\mu\\nu} F^{\\mu\\nu})$ remains invariant under transformation, defining the basis for physical observables.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Physical Condition</h3>
+<p>According to this framework, $F_{\\mu\\nu} = 0$ represents no interaction (a flat connection), while $F_{\\mu\\nu} \\neq 0$ confirms that an interaction is present in the curved structure.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">11. Mathematical Flow</h3>
+<p style="text-align: center; color: #f472b6;">
+$$\\text{Covariant derivative} \\rightarrow \\text{commutator} \\rightarrow \\text{field strength} \\rightarrow \\text{curvature} \\rightarrow \\text{interaction}$$
+</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Final Mathematical Statement</h3>
+<p style="margin-bottom: 0;">Field strength $F_{\\mu\\nu}$, defined through the commutator of covariant derivatives, encodes the curvature of the gauge field, and non-zero curvature represents the presence of physical interaction.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 2 Mathematical Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Curvature Definition:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$F_{\\mu\\nu} = \\frac{1}{i g} [D_\\mu, D_\\nu]$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Interaction is mathematically identical to the curvature of the gauge connection across the internal space of the substrate.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>GAUGE CURVATURE $F_{\\mu\\nu}$</span><input type="number" id="f_in" class="digital-entry" value="0.5" oninput="syncVal(this.value, 'f_sl')"></div><input type="range" id="f_sl" min="0" max="1" step="0.05" value="0.5" oninput="syncVal(this.value, 'f_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">NON-ZERO CURVATURE</span><div style="text-align:center; font-size: 0.9rem;">$F_{\\mu\\nu} \\neq 0 \\;\\Rightarrow\\; \\text{Interaction (physical)}$</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">CORE IDEA</span><div style="text-align:center; font-size: 0.8rem;">Interaction = Non-zero Gauge Curvature</div>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Measures failure of parallel transport<br>↓<br>Encodes internal gauge curvature<br>↓<br>F_μν ≠ 0 ⇒ Interaction present`,
+hierarchy: `<div style="color: var(--accent-strength); font-weight: bold;">Interaction Structurally Identified</div>`,
+footer: "The mathematical identification of interaction through non-zero gauge curvature.",
+rightNote: `<div style="color: #00ffcc; line-height: 1.4; font-size: 0.85rem;">Gauge curvature defines and generates interaction.`
+},
+
+3: {
+title: "GAUGE FIELD DYNAMICS",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Gauge Field Dynamics</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Starting Point: Curvature Established</h3>
+<p>From Module 2, the field strength $F_{\\mu\\nu}$ defines curvature, and non-zero curvature implies the presence of interaction. Structure and interaction are now identified.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Next Question</h3>
+<p>Once curvature exists, the key question is: Does the gauge field evolve dynamically in spacetime? A static field is not sufficient; it must possess intrinsic dynamics.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Requirement of Dynamics</h3>
+<p>According to this framework, a physical field must propagate through spacetime, carry energy and momentum, and evolve according to governing principles. The gauge field must be dynamical.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Action Principle</h3>
+<p>Dynamics is governed by the action principle, specifically the Lagrangian density:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\mathcal{L} = -\\frac{1}{4} Tr(F_{\\mu\\nu} F^{\\mu\\nu})$$
+</div>
+<p>This defines the mathematical path through which the field evolves.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Key Meaning</h3>
+<p>According to this framework, gauge field dynamics are fundamentally determined by its curvature properties.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Propagation of Field</h3>
+<p>The gauge field moves through spacetime, changes with time, and transmits influence. It is not a static background; it propagates.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Self-Interaction (Non-Abelian Case)</h3>
+<p>For non-Abelian symmetry, gauge fields interact with themselves. This arises naturally from the commutator term in $F_{\\mu\\nu}$, meaning dynamics includes intrinsic self-interaction.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Physical Interpretation</h3>
+<p>According to this framework, the gauge field becomes a fully physical entity: a carrier of interaction, energy, and momentum.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Structural Meaning</h3>
+<p>$F_{\\mu\\nu}$ represents curvature, while the Lagrangian represents dynamics. Dynamics emerges directly from the curvature structure.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Role of This Module</h3>
+<p>This module establishes that the gauge field is dynamically active, field evolution is governed by action, and interaction propagates through these dynamics.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">11. Visual Interpretation (Graph Meaning)</h3>
+<p>The central visualization represents the propagation of the gauge field through spacetime. The curve shows the evolution of the field over coordinates, with a continuous trajectory indicating propagation. The non-linear shape reflects interaction and self-coupling. This demonstrates that the field is not static; its evolution encodes active dynamical behavior.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">12. Structural Position</h3>
+<p>According to this framework, the structural sequence is: Curvature $\\rightarrow$ Dynamics $\\rightarrow$ Propagation.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Final Statement</h3>
+<p style="margin-bottom: 0;">Gauge field dynamics arise from its curvature through the action principle, establishing the field as an active, propagating, energy-carrying entity that governs the evolution of interactions across spacetime.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 3 Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Dynamical Emergence:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\delta \\int \\mathcal{L} d^4x = 0$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The gauge field is not a passive container but an active participant, evolving to satisfy the principle of stationary action across the substrate.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematical Formulation: Gauge Field Dynamics</h2>
+
+<div class="math-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Starting Point: Field Strength Known</h3>
+<p>From Module 2, the curvature of the gauge field is defined as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$F_{\\mu\\nu} = \\partial_\\mu A_\\nu - \\partial_\\nu A_\\mu + i g [A_\\mu , A_\\nu]$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Gauge Field Action</h3>
+<p>According to this framework, dynamics is defined through the action $S = \\int d^4x \\mathcal{L}$, where the Lagrangian density is:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\mathcal{L} = -\\frac{1}{4} Tr(F_{\\mu\\nu} F^{\\mu\\nu})$$
+</div>
+<p>Field evolution is governed by the minimization of this action.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Key Meaning</h3>
+<p>The dynamics of the gauge field is fundamentally determined by its field strength and the geometric constraints of the substrate.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Variation of Action</h3>
+<p>To obtain the equations of motion, we apply the principle of least action: $\\delta S = 0$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Equation of Motion</h3>
+<p>According to this framework, this variation results in the fundamental dynamical equation:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$D_\\mu F^{\\mu\\nu} = 0$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Definition of Covariant Derivative on Field Strength</h3>
+<p>To ensure gauge consistency, the covariant derivative acting on the field strength is defined as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$D_\\mu F^{\\mu\\nu} = \\partial_\\mu F^{\\mu\\nu} + i g [A_\\mu , F^{\\mu\\nu}]$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Abelian Case (U(1))</h3>
+<p>In the Abelian case, the commutator vanishes $[A_\\mu , F^{\\mu\\nu}] = 0$, leading to $\\partial_\\mu F^{\\mu\\nu} = 0$. This indicates that there is no self-interaction.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Non-Abelian Case (SU(2), SU(3))</h3>
+<p>For non-Abelian symmetry, the term $i g [A_\\mu , F^{\\mu\\nu}]$ remains, accounting for the self-interaction of gauge fields within the dynamical evolution.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Energy-Momentum Content</h3>
+<p>According to this framework, the gauge field carries energy and momentum through the stress-energy tensor:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$T_{\\mu\\nu} \\sim F_{\\mu\\alpha} F_\\nu^{\\alpha} - \\frac{1}{4} g_{\\mu\\nu} F^2$$
+</div>
+<p>This confirms the field as a physically energetic entity.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Propagation Condition</h3>
+<p>A non-zero $F_{\\mu\\nu}$ evolves according to $D_\\mu F^{\\mu\\nu} = 0$, ensuring the field propagates through spacetime as a dynamical wave.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">11. Mathematical Flow</h3>
+<p style="text-align: center; color: #f472b6;">
+$$\\text{Field strength} \\rightarrow \\text{action} \\rightarrow \\text{variation} \\rightarrow \\text{equation of motion} \\rightarrow \\text{propagation}$$
+</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Final Mathematical Statement</h3>
+<p style="margin-bottom: 0;">Gauge field dynamics are governed by the action constructed from field strength, and the resulting equations of motion describe the propagation and self-interaction of the field across spacetime.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 3 Mathematical Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Yang-Mills Dynamics:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$D_\\mu F^{\\mu\\nu} = 0$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The field propagates not as a static line, but as a self-interacting wave that carries the structural influence of the symmetry group.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>PROPAGATION Ω</span><input type="number" id="w_in" class="digital-entry" value="1.0" oninput="syncVal(this.value, 'w_sl')"></div><input type="range" id="w_sl" min="0.1" max="5" step="0.1" value="1.0" oninput="syncVal(this.value, 'w_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">DYNAMICAL FLOW</span><div style="text-align:center; font-size: 0.9rem;">Field dynamics governed by action principle</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">CORE IDEA</span><div style="text-align:center; font-size: 0.8rem;">Gauge field is intrinsically physical — not an auxiliary construct</div>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Gauge field propagates through spacetime<br>↓<br>Exhibits intrinsic self-interaction (Non-Abelian structure)<br>↓<br>Carries and transports energy-momentum`,
+hierarchy: `<div style="color: var(--accent-dynamics); font-weight: bold;">Gauge Field Dynamics Fully Active</div>`,
+footer: "Dynamics established; the field is an active and intrinsic component of the substrate.",
+rightNote: `<div style="color: #00ffcc; line-height: 1.4; font-size: 0.85rem;">Gauge fields possess intrinsic energy and momentum.`
+},
+
+4: {
+title: "MATTER-GAUGE COUPLING",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Matter–Gauge Coupling</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Starting Point: Gauge Field Dynamics Active</h3>
+<p>From Module 3, the gauge field is dynamic, propagating and carrying energy. Interaction is now encoded directly within these field dynamics. The field is physically active.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Next Question</h3>
+<p>Once the field is dynamic, the key question is: How does matter interact with the gauge field? This requires a formal mechanism for connection.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Principle of Coupling</h3>
+<p>According to this framework, matter interacts with the gauge field through the covariant derivative:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$D_\\mu\\Psi = (\\partial_\\mu + i g A_\\mu)\\Psi$$
+</div>
+<p>This expression defines the coupling between the matter field and the gauge structure.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Key Meaning</h3>
+<p>Matter does not require an external force; instead, interaction arises naturally from its coupling with the gauge field.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Structural Interpretation</h3>
+<p>The matter field ($\\Psi$) and the gauge field ($A_\\mu$) are unified through the structure of $D_\\mu$. Interaction is not an add-on but is embedded in the very structure of change.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Physical Effect on Matter</h3>
+<p>Due to this coupling, the motion of matter is modified. Its evolution follows gauge-consistent paths, ensuring that internal symmetry is preserved as matter responds dynamically to the field.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. No External Force Concept</h3>
+<p>According to this framework, force is not imposed externally. It emerges as a consequence of the matter field's interaction with the underlying gauge structure.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Interaction Mechanism</h3>
+<p>The gauge field influences the evolution of matter, which follows a field-defined structure. The coupling strength ($g$) determines the intensity of this interaction.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Role of This Module</h3>
+<p>This module establishes matter–field coupling as the fundamental mechanism of interaction, demonstrating motion as a gauge-consistent evolution.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Visual Interpretation (Graph Meaning)</h3>
+<p>The central visualization represents matter–gauge coupling across spacetime. The base grid represents spacetime, the surface represents the presence of the matter field, and the vertical structures represent gauge field influence. The deformation in the interaction region shows the coupling effect. This demonstrates that matter exists within the gauge field and its behavior is shaped by the field structure. Interaction emerges from the overlap of these two entities.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">11. Structural Position</h3>
+<p>According to this framework, the sequence is: Gauge field $\\rightarrow$ Dynamics $\\rightarrow$ Coupling $\\rightarrow$ Interaction with matter.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Final Statement</h3>
+<p style="margin-bottom: 0;">Matter–gauge coupling arises through the covariant derivative, where interaction is not externally imposed but emerges as a natural structural response of matter to the gauge field across spacetime.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 4 Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Coupling Logic:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\mathcal{L}_{int} = \\bar{\\Psi} \\gamma^\\mu (i g A_\\mu) \\Psi$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Matter is "threaded" through the gauge field; its trajectory is the result of maintaining symmetry while moving through the curved connection.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematical Formulation: Matter–Gauge Coupling</h2>
+
+<div class="math-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Starting Point: Matter Field</h3>
+<p>Let the matter field be defined over spacetime as: $\\Psi(x)$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Local Symmetry Requirement</h3>
+<p>Under a local transformation, the matter field must transform consistently at every spacetime point: $\\Psi(x) \\rightarrow \\Psi'(x) = U(x) \\Psi(x)$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Introduction of Covariant Derivative</h3>
+<p>According to this framework, to maintain local symmetry, we introduce the covariant derivative: $D_\\mu \\Psi = (\\partial_\\mu + i g A_\\mu)\\Psi$. This establishes the formal coupling between the matter and gauge fields.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Key Meaning</h3>
+<p>The gauge field is not an external influence but enters directly into the mathematical evolution of the matter field.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Matter Lagrangian with Coupling</h3>
+<p>The kinetic term in the Lagrangian is modified to include the connection:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\mathcal{L} = \\bar{\\Psi} i \\gamma^\\mu D_\\mu \\Psi$$
+$$\\text{Expanding: } \\mathcal{L} = \\bar{\\Psi} i \\gamma^\\mu (\\partial_\\mu + i g A_\\mu) \\Psi$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Interaction Term</h3>
+<p>From the expansion of the Lagrangian, the interaction term emerges as: $\\mathcal{L}_{int} = -g \\bar{\\Psi} \\gamma^\\mu A_\\mu \\Psi$. This term represents the physical matter–gauge interaction.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Coupling Constant</h3>
+<p>The parameter $g$ represents the coupling strength, which determines the intensity of the interaction within the substrate.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Equation of Motion for Matter</h3>
+<p>According to this framework, the matter evolution is governed by the Dirac-type equation coupled to the gauge field:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$(i \\gamma^\\mu D_\\mu - m) \\Psi = 0$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Current Definition</h3>
+<p>We define the matter current as: $J^\\mu = \\bar{\\Psi} \\gamma^\\mu \\Psi$. This acts as the source term for the gauge interaction.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Interaction Structure</h3>
+<p>The gauge field $A_\\mu$ couples directly to the matter current $J^\\mu$, facilitating the exchange of information across the manifold.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">11. Mathematical Flow</h3>
+<p style="text-align: center; color: #f472b6;">
+$$\\text{Local symmetry} \\rightarrow \\text{covariant derivative} \\rightarrow \\text{modified Lagrangian} \\rightarrow \\text{interaction term} \\rightarrow \\text{coupled dynamics}$$
+</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Final Mathematical Statement</h3>
+<p style="margin-bottom: 0;">Matter–gauge coupling arises through the covariant derivative, where the interaction term in the Lagrangian directly couples the gauge field to the matter current, making interaction an intrinsic part of matter evolution.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 4 Mathematical Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Minimal Coupling:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\partial_\\mu \\rightarrow D_\\mu = \\partial_\\mu + i g A_\\mu$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The interaction is not an external addition but is mathematically enforced by the replacement of the partial derivative with the covariant connection.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>COUPLING STRENGTH</span><input type="number" id="c_in" class="digital-entry" value="1.0" oninput="syncVal(this.value, 'c_sl')"></div><input type="range" id="c_sl" min="0" max="2" step="0.1" value="1.0" oninput="syncVal(this.value, 'c_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">FORCE CONCEPT</span><div style="text-align:center; font-size: 0.9rem;">No external force required — interaction arises from coupling</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">CORE IDEA</span><div style="text-align:center; font-size: 0.8rem;">Matter responds to gauge field structure</div>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Matter dynamically responds to the gauge field<br>↓<br>Motion becomes gauge-consistent<br>↓<br>Interaction emerges as a natural consequence of coupling`,
+hierarchy: `<div style="color: var(--accent-coupling); font-weight: bold;">Matter–Gauge Coupling Structurally Established</div>`,
+footer: "Matter–field interaction arises as a natural structural response to gauge coupling.",
+rightNote: `<div style="color: #00ffcc; line-height: 1.4; font-size: 0.85rem;">Evolution proceeds in full gauge-consistent form.`
+},
+
+5: {
+title: "STRUCTURAL FORCES",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Structural Forces (Symmetry → Interaction Classification)</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Starting Point: Coupling Established</h3>
+<p>From Module 4, matter–gauge coupling is defined. Interaction emerges directly from this coupling, and no external force is required. The interaction mechanism is now complete.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Next Question</h3>
+<p>Once interaction is established, the key question is: What determines the specific type of interaction? This requires a look at the underlying group structure.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Role of Symmetry</h3>
+<p>According to this framework, the answer lies in symmetry structure. Different symmetry groups produce different interactions, and each symmetry defines a distinct interaction sector.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Classification of Forces</h3>
+<p>Different symmetry groups correspond to the fundamental forces of nature:</p>
+<ul style="list-style-type: none; padding-left: 20px; color: #f472b6;">
+<li>$U(1) \\rightarrow$ Electromagnetic (Photon)</li>
+<li>$SU(2) \\rightarrow$ Weak ($W, Z$ bosons)</li>
+<li>$SU(3) \\rightarrow$ Strong (Gluons)</li>
+</ul>
+<p>Forces are thus structurally classified by their group generators.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Key Meaning</h3>
+<p>Symmetry fundamentally determines the interaction type; the force is the physical "language" of the symmetry group.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. No Arbitrary Forces</h3>
+<p>According to this framework, forces cannot be defined arbitrarily. They must arise as a necessary consequence of the underlying symmetry structure of the substrate.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Structural Interpretation</h3>
+<p>The logical chain is now complete: Symmetry group $\\rightarrow$ internal structure $\\rightarrow$ Gauge field (connection) $\\rightarrow$ Field strength (curvature) $\\rightarrow$ Coupling $\\rightarrow$ Interaction. The final outcome is the specific force type.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Hierarchy of Interactions</h3>
+<p>Simpler symmetry leads to simpler interaction, while higher symmetry leads to a richer interaction structure. Interaction complexity follows the depth of the symmetry group.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Role of This Module</h3>
+<p>This module establishes the classification of interactions, the mapping of symmetry to physical forces, and the structural origin of the Standard Model forces.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Visual Interpretation (Graph Meaning)</h3>
+<p>The central visualization represents the symmetry-based classification of interactions. The triangular structure represents the symmetry space, where each axis corresponds to a symmetry dimension. The volume represents the strength and structure of the interaction. This demonstrates that different regions correspond to different symmetry groups. The change in shape and color (via the slider) encodes the transition between $U(1)$, $SU(2)$, and $SU(3)$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">11. Structural Position</h3>
+<p>According to this framework, this module completes the entire arc: Symmetry $\\rightarrow$ Gauge field $\\rightarrow$ Curvature $\\rightarrow$ Dynamics $\\rightarrow$ Coupling $\\rightarrow$ Force classification.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Final Statement</h3>
+<p style="margin-bottom: 0;">Symmetry structure uniquely determines the nature of interaction, and all fundamental forces emerge as direct consequences of underlying gauge symmetry groups.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 5 Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Force Unification:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$G_{SM} = SU(3) \\times SU(2) \\times U(1)$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The variety of forces in the universe is not a collection of separate rules, but a single structural principle expressed through different degrees of internal freedom.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematical Formulation: Structural Forces (Symmetry → Interaction Classification)</h2>
+
+<div class="math-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Gauge Group Structure</h3>
+<p>The interaction is defined by a specific symmetry group $G$, such as $U(1)$, $SU(2)$, or $SU(3)$. Each group determines the type of gauge field and the resulting interaction.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Gauge Field Definition</h3>
+<p>For a given group, the gauge field is expressed as: $A_\\mu = A_\\mu^a T^a$. Here, $T^a$ represents the generators of the group, and $a$ runs over the total number of generators. The number of generators determines the field components.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Covariant Derivative</h3>
+<p>According to this framework, the covariant derivative for a general group is defined as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$D_\\mu = \\partial_\\mu + i g A_\\mu^a T^a$$
+</div>
+<p>This ensures that the coupling is intrinsically tied to the group structure.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Field Strength</h3>
+<p>The field strength $F_{\\mu\\nu} = \\partial_\\mu A_\\nu - \\partial_\\nu A_\\mu + i g [A_\\mu , A_\\nu]$ depends directly on the commutator of the gauge fields.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Abelian Case (U(1))</h3>
+<p>In the Abelian case, the generators commute ($[T, T] = 0$), so $[A_\\mu , A_\\nu] = 0$. This leads to $F_{\\mu\\nu} = \\partial_\\mu A_\\nu - \\partial_\\nu A_\\mu$, resulting in no self-interaction and a single gauge boson (the photon).</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Non-Abelian Case (SU(2), SU(3))</h3>
+<p>According to this framework, non-Abelian generators do not commute: $[T^a , T^b] = i f^{abc} T^c$. This results in a non-zero commutator $[A_\\mu , A_\\nu] \\neq 0$ and the component form:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$F_{\\mu\\nu}^a = \\partial_\\mu A_\\nu^a - \\partial_\\nu A_\\mu^a - g f^{abc} A_\\mu^b A_\\nu^c$$
+</div>
+<p>This structure leads to self-interaction and multiple gauge bosons.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Number of Gauge Fields</h3>
+<p>The number of force-carrying fields follows the symmetry dimension:</p>
+<ul style="list-style-type: none; padding-left: 20px; color: #f472b6;">
+<li>$U(1) \\rightarrow 1 \\text{ generator } \\rightarrow 1 \\text{ field}$</li>
+<li>$SU(2) \\rightarrow 3 \\text{ generators } \\rightarrow 3 \\text{ fields}$</li>
+<li>$SU(3) \\rightarrow 8 \\text{ generators } \\rightarrow 8 \\text{ fields}$</li>
+</ul>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Interaction Term</h3>
+<p>The matter coupling in the Lagrangian is given by: $\\mathcal{L}_{int} = g \\bar{\\Psi} \\gamma^\\mu A_\\mu^a T^a \\Psi$. The interaction structure depends entirely on the group generators.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Group Determines Dynamics</h3>
+<p>The commutation structure of the symmetry group determines the interaction structure and the overall dynamics of the sector.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Mathematical Flow</h3>
+<p style="text-align: center; color: #f472b6;">
+$$\\text{Symmetry group} \\rightarrow \\text{generators} \\rightarrow \\text{gauge field components} \\rightarrow \\text{field strength structure} \\rightarrow \\text{interaction type}$$
+</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Final Mathematical Statement</h3>
+<p style="margin-bottom: 0;">The structure of the symmetry group, through its generators and commutation relations, determines the form of the gauge field, its field strength, and the resulting interaction, establishing all fundamental forces as direct consequences of underlying symmetry.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 5 Mathematical Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Symmetry Classification:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\text{Dim}(G) = \\text{Number of Gauge Bosons}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The dimensionality of the internal symmetry space dictates the complexity of the physical interaction and the count of its mediator fields.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>SYMMETRY DEPTH</span><input type="number" id="s_in" class="digital-entry" value="1" oninput="syncVal(this.value, 's_sl')"></div><input type="range" id="s_sl" min="1" max="3" step="1" value="1" oninput="syncVal(this.value, 's_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">FORCE TYPES</span><div style="text-align:center; font-size: 0.9rem;">Photon (U(1)), W/Z (SU(2)), Gluons (SU(3))</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">CORE IDEA</span><div style="text-align:center; font-size: 0.8rem;">Symmetry fundamentally determines interaction</div>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Distinct symmetry structures<br>↓<br>Distinct interaction sectors<br>↓<br>No arbitrary definition of force is permitted`,
+hierarchy: `<div style="color: var(--accent-force); font-weight: bold;">Fundamental Interactions Structurally Classified</div>`,
+footer: "Direct bridge to Standard Model interactions via the Synthesis Framework.",
+rightNote: `<div style="color: #00ffcc; line-height: 1.4; font-size: 0.85rem;">Underlying symmetry structure uniquely determines interaction type.`
+}
+};
+
+
+function syncVal(val, id) {
+const sliderId = id.includes('_in') ? id.replace('_in', '_sl') : id;
+const inputId = id.includes('_sl') ? id.replace('_sl', '_in') : id;
+if(document.getElementById(sliderId)) document.getElementById(sliderId).value = val;
+if(document.getElementById(inputId)) document.getElementById(inputId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+document.getElementById('brief-box-content').innerHTML = content.brief;
+document.getElementById('math-box-content').innerHTML = content.math;
+document.getElementById('control-sliders').innerHTML = content.sliders;
+document.getElementById('active-module-title').innerText = content.title;
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('metrics-content').innerHTML = content.metricsContent;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+showScreen('briefing');
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() {
+showScreen('lab');
+setTimeout(() => { runLab(); window.dispatchEvent(new Event('resize')); }, 100);
+}
+
+function runLab() {
+const target = document.getElementById('plot-area');
+if (!target) return;
+let data = [];
+
+// REDUCED RANGE FROM 5 TO 3.5 TO INCREASE VISUAL SIZE
+let layout = {
+paper_bgcolor: 'black', plot_bgcolor: 'black', margin: {t:60,b:10,l:0,r:0},
+showlegend: true, font: { family: 'sans-serif', size: 10 },
+legend: { font: { color: '#94a3b8' }, x: 0, y: 1 },
+scene: {
+xaxis: { visible: false, range: [-3.5, 3.5] },
+yaxis: { visible: false, range: [-3.5, 3.5] },
+zaxis: { visible: false, range: [-3.5, 3.5] },
+camera: { eye: { x: 1.5, y: 1.5, z: 1.1 } },
+aspectmode: 'cube'
+}
+};
+
+if (currentTool === 1) { // GAUGE FIELD REALIZATION
+let a = parseFloat(document.getElementById('a_sl')?.value || 1.0);
+let gx=[], gy=[], gz=[];
+// Reduced range from (-3, 3) to (-2, 2) for a more compact, focused lattice
+for(let i=-2; i<=2; i+=0.4){
+for(let j=-2; j<=2; j+=0.4){
+gx.push(i);
+gy.push(j);
+gz.push(Math.sin(i*a)*Math.cos(j*a)*0.5);
+}
+}
+data.push({
+type: 'scatter3d',
+mode: 'markers',
+x: gx,
+y: gy,
+z: gz,
+marker: { size: 4, color: '#60a5fa', opacity: 0.8 },
+name: 'Gauge Connection A_μ(x)'
+});
+
+// SURGICAL CORRECTION: ALIGNED AXIS NAMING AND COMPACT SPACING
+layout.scene = {
+xaxis: {
+title: { text: 'Spacetime x₁', standoff: 20, font: { color: '#94a3b8', size: 12 } },
+showgrid: true, zeroline: false, gridcolor: 'rgba(255,255,255,0.1)'
+},
+yaxis: {
+title: { text: 'Spacetime x₂', standoff: 20, font: { color: '#94a3b8', size: 12 } },
+showgrid: true, zeroline: false, gridcolor: 'rgba(255,255,255,0.1)'
+},
+zaxis: {
+title: { text: 'Field Intensity A_μ', standoff: 25, font: { color: '#60a5fa', size: 12 } },
+showgrid: true, zeroline: false, gridcolor: 'rgba(255,255,255,0.1)'
+},
+aspectmode: 'manual',
+aspectratio: { x: 1, y: 1, z: 0.8 },
+camera: { eye: { x: 1.6, y: 1.6, z: 1.3 } }
+};
+
+layout.margin = { l: 60, r: 60, b: 60, t: 80 };
+layout.title = { text: "GAUGE FIELD STRUCTURE", font: { color: '#60a5fa' } };
+
+
+} else if (currentTool === 2) { // FIELD STRENGTH (CURVATURE)
+let f = parseFloat(document.getElementById('f_sl')?.value || 0.5);
+let x=[], y=[], z=[], u=[], v=[], w=[];
+for(let i=-2; i<=2; i+=0.8){
+for(let j=-2; j<=2; j+=0.8){
+x.push(i);
+y.push(j);
+z.push(0);
+u.push(Math.sin(i*f));
+v.push(Math.cos(j*f));
+w.push(f);
+}
+}
+data.push({
+type: 'cone',
+x: x, y: y, z: z,
+u: u, v: v, w: w,
+colorscale: 'Reds',
+showscale: false,
+name: 'Curvature F_μν',
+sizemode: 'absolute',
+sizeref: 2.0
+});
+
+// SURGICAL CORRECTION: OPTIMIZED SPACING AND AXIS NAMING
+layout.scene = {
+xaxis: {
+title: { text: 'Spacetime x₁', standoff: 20, font: { color: '#94a3b8', size: 12 } },
+showgrid: true, gridcolor: 'rgba(255,255,255,0.1)'
+},
+yaxis: {
+title: { text: 'Spacetime x₂', standoff: 20, font: { color: '#94a3b8', size: 12 } },
+showgrid: true, gridcolor: 'rgba(255,255,255,0.1)'
+},
+zaxis: {
+title: { text: 'Curvature F_μν', standoff: 25, font: { color: '#f87171', size: 12 } },
+showgrid: true, gridcolor: 'rgba(255,255,255,0.1)'
+},
+aspectmode: 'manual',
+aspectratio: { x: 1, y: 1, z: 0.8 }, // Provides a stable 3D perspective
+camera: { eye: { x: 1.5, y: 1.5, z: 1.2 } } // Positions the camera to see all labels
+};
+
+layout.margin = { l: 60, r: 60, b: 60, t: 80 }; // Increases padding for clear text
+layout.title = { text: "LOCAL GAUGE CURVATURE F_μν", font: { color: '#f87171' } };
+
+
+} else if (currentTool === 3) { // GAUGE FIELD DYNAMICS
+let p = parseFloat(document.getElementById('w_sl')?.value || 1.0);
+let tx=[], ty=[], tz=[];
+for(let t=0; t<20; t+=0.1){
+tx.push(t*Math.cos(t*p)*0.1);
+ty.push(t*Math.sin(t*p)*0.1);
+tz.push(Math.sin(t*p)*0.5);
+}
+data.push({
+type: 'scatter3d',
+mode: 'lines',
+x: tx, y: ty, z: tz,
+line: { width: 6, color: '#facc15' }, // Strong yellow for dynamics
+name: 'Propagating Dynamics'
+});
+
+// SURGICAL CORRECTION: DYNAMIC SPACING AND AXIS NAMING
+layout.scene = {
+xaxis: { title: { text: 'Spacetime x₁', standoff: 20, font: { color: '#94a3b8', size: 12 } } },
+yaxis: { title: { text: 'Spacetime x₂', standoff: 20, font: { color: '#94a3b8', size: 12 } } },
+zaxis: { title: { text: 'Spacetime x₃', standoff: 20, font: { color: '#94a3b8', size: 12 } } },
+aspectmode: 'manual',
+aspectratio: { x: 1, y: 1, z: 1 }, // Equal aspect for 3D propagation
+camera: { eye: { x: 1.8, y: 1.8, z: 1.5 } }
+};
+
+layout.margin = { l: 60, r: 60, b: 60, t: 80 };
+layout.title = { text: "GAUGE FIELD DYNAMICS", font: { color: '#facc15' } };
+
+
+} else if (currentTool === 4) { // MATTER-GAUGE COUPLING
+let c = parseFloat(document.getElementById('c_sl')?.value || 1.0);
+
+// Matter Field Representation
+data.push({
+type: 'mesh3d',
+x: [0, 2, 1], y: [0, 0, 2], z: [0, 0, 0],
+color: '#a78bfa',
+opacity: 0.8,
+name: 'Matter Field Ψ'
+});
+
+// Coupling Representation (The D_μ Loop)
+let cx=[], cy=[], cz=[];
+for(let a=0; a<Math.PI*2; a+=0.2){
+cx.push(Math.cos(a)*c*2);
+cy.push(Math.sin(a)*c*2);
+cz.push(0.5);
+}
+data.push({
+type: 'scatter3d',
+mode: 'lines',
+x: cx, y: cy, z: cz,
+line: { color: '#fff', width: 4, dash: 'dot' },
+name: 'Coupling D_μ'
+});
+
+// SURGICAL CORRECTION: AXIS NAMING AND PERSPECTIVE FOR COUPLING
+layout.scene = {
+xaxis: {
+title: { text: 'Spacetime x₁', standoff: 20, font: { color: '#94a3b8', size: 12 } },
+showgrid: true, gridcolor: 'rgba(255,255,255,0.1)'
+},
+yaxis: {
+title: { text: 'Spacetime x₂', standoff: 20, font: { color: '#94a3b8', size: 12 } },
+showgrid: true, gridcolor: 'rgba(255,255,255,0.1)'
+},
+zaxis: {
+title: { text: 'Coupling D_μ', standoff: 25, font: { color: '#a78bfa', size: 12 } },
+showgrid: true, gridcolor: 'rgba(255,255,255,0.1)'
+},
+aspectmode: 'manual',
+aspectratio: { x: 1, y: 1, z: 0.8 },
+camera: { eye: { x: 1.8, y: 1.8, z: 1.5 } } // Slightly higher angle to see the dotted loop
+};
+
+layout.margin = { l: 60, r: 60, b: 60, t: 80 };
+layout.title = { text: "MATTER-GAUGE COUPLING", font: { color: '#a78bfa' } };
+
+
+} else if (currentTool === 5) { // STRUCTURAL FORCES
+let s = parseInt(document.getElementById('s_sl')?.value || 1);
+let colors = ['', '#38bdf8', '#fbbf24', '#4ade80'];
+let names = ['', 'U(1) ELECTROMAGNETISM', 'SU(2) WEAK FORCE', 'SU(3) STRONG FORCE'];
+
+// Larger geometric representation (The Symmetry Volume)
+data.push({
+type: 'mesh3d',
+x: [0, 3, 0, 0], y: [0, 0, 3, 0], z: [0, 0, 0, 3],
+alphahull: 0,
+color: colors[s],
+name: names[s],
+opacity: 0.8
+});
+
+// SURGICAL CORRECTION: AXIS NAMING FOR FUNDAMENTAL FORCES
+layout.scene = {
+xaxis: {
+title: { text: 'Substrate Dimension x₁', standoff: 20, font: { color: '#94a3b8', size: 12 } },
+showgrid: true, gridcolor: 'rgba(255,255,255,0.1)'
+},
+yaxis: {
+title: { text: 'Substrate Dimension x₂', standoff: 20, font: { color: '#94a3b8', size: 12 } },
+showgrid: true, gridcolor: 'rgba(255,255,255,0.1)'
+},
+zaxis: {
+title: { text: 'Symmetry Volume (Force Intensity)', standoff: 25, font: { color: colors[s], size: 12 } },
+showgrid: true, gridcolor: 'rgba(255,255,255,0.1)'
+},
+aspectmode: 'manual',
+aspectratio: { x: 1, y: 1, z: 1 }, // Equal aspect for the tetrahedron symmetry
+camera: { eye: { x: 2.0, y: 2.0, z: 1.5 } }
+};
+
+layout.margin = { l: 60, r: 60, b: 60, t: 80 };
+layout.title = { text: names[s], font: { color: colors[s], size: 16 } };
+}
+
+Plotly.react('plot-area', data, layout, {responsive: true, displayModeBar: false});
+}
+
+function resetLab() {
+if(currentTool===1) syncVal(1.0, 'a_sl');
+if(currentTool===2) syncVal(0.5, 'f_sl');
+if(currentTool===3) syncVal(1.0, 'w_sl');
+if(currentTool===4) syncVal(1.0, 'c_sl');
+if(currentTool===5) syncVal(1, 's_sl');
+}
+
+// LAND ON PORTAL BY DEFAULT
+window.onload = () => {
+showScreen('portal');
+};
+</script>
+</body>
+</html>

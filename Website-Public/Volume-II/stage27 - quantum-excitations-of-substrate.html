@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 27 — Quantum Excitations of the Substrate</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-particle: #00ffff;
+--accent-emerald: #10b981; --accent-amber: #f59e0b; --accent-magenta: #d946ef; --text-main: #e5e7eb;
+--text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-particle); font-family: sans-serif; font-size: 0.85rem; min-width: 350px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; height: calc(100vh - 50px); box-sizing: border-box; }
+.screen.active { display: flex; }
+
+#screen-portal { justify-content: flex-start; padding-top: 15px; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-particle); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 40px 40px; margin: 0px 40px 40px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); height: 100%; overflow-y: auto;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0px auto; grid-template-columns: 320px 1fr 320px; gap: 10px; height: 98%; padding-top: 0px; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 95%; box-sizing: border-box; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.constant-display-box {
+background: #111; border: 1px solid var(--accent-particle); padding: 6px; border-radius: 8px;
+display: flex; justify-content: space-around; margin-bottom: 10px;
+}
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-particle); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(0, 255, 255, 0.05); border: 1px solid #006666; padding: 8px; border-radius: 8px; margin-bottom: 8px; font-size: 0.6rem; }
+.def-title { color: var(--accent-particle); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid #006666; text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-particle); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-particle); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; height: 95%; position: relative; overflow: hidden; }
+
+.viz-overlay-group { position: absolute; bottom: 20px; left: 20px; pointer-events: none; z-index: 100; font-family: monospace; display: none; }
+.viz-overlay-item { display: block; background: rgba(0,0,0,0.6); border-left: 2px solid var(--accent-particle); padding: 4px 10px; margin-top: 5px; border-radius: 0 4px 4px 0; }
+.overlay-label { font-size: 0.5rem; color: var(--text-dim); text-transform: uppercase; display: block; }
+.overlay-val { font-size: 0.85rem; color: var(--accent-particle); font-weight: bold; }
+
+.grid-label-group { position: absolute; top: 15px; right: 25px; text-align: right; pointer-events: none; opacity: 0.8; z-index: 100; }
+.grid-label-main { font-size: 0.55rem; color: var(--accent-particle); letter-spacing: 2px; font-family: sans-serif; font-weight: bold; display: block; }
+.grid-label-sub { font-size: 0.45rem; color: var(--text-dim); font-family: sans-serif; text-transform: uppercase; display: block; margin-top: 2px; }
+
+.btn-nav-brief { background: var(--accent-particle); color: #000; border: none; padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.btn-action { width: 100%; margin-top: 8px; background: transparent; border: 1px solid #333; color: var(--text-dim); font-size: 0.62rem; text-transform: uppercase; cursor: pointer; padding: 6px; }
+.btn-exit-lab { width: 100%; margin-top: 8px; background: transparent; border: 1px solid #333; color: var(--accent-blue); font-size: 0.62rem; text-transform: uppercase; cursor: pointer; padding: 6px; }
+
+.stats-sub-panel { font-family: monospace; font-size: 0.62rem; color: var(--text-dim); line-height: 1.5; padding-top: 8px; border-top: 1px solid #222; margin-top: 8px; }
+.stats-sub-panel b { color: var(--accent-particle); }
+
+.isfp-footer {
+width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem;
+color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 27 — QUANTUM EXCITATIONS OF THE SUBSTRATE</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-brief" id="launch-lab-btn" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<h1 style="font-size: 2.0rem; margin: 20px 0 5px 0;">Substrate Quantum Dynamics</h1>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-particle);">
+<h2 style="color:var(--accent-particle);">1. Vacuum Oscillation Spectrum</h2>
+<p>Substrate Elastic Modes & Field Excitation ($\omega^2 = K k^2$).</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-emerald);">
+<h2 style="color:var(--accent-emerald);">2. Localized Quantum Packet</h2>
+<p>Particle-Wave Duality & Coherent Energy Transport.</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-amber);">
+<h2 style="color:var(--accent-amber);">3. Quantum Vacuum Fluctuations</h2>
+<p>Zero-Point Oscillations & Substrate Micro-Dynamics.</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-magenta);">
+<h2 style="color:var(--accent-magenta);">4. Particle Creation Threshold</h2>
+<p>Emergence of Persistent Modes from Energy Concentration.</p>
+</div>
+</div>
+
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box" id="brief-box-content"></div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div id="constant-header-area">
+<div class="constant-display-box">
+<div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val">11.350</span></div>
+<div class="const-item"><span class="const-label">Pressure P</span><span class="const-val">0.6900</span></div>
+</div>
+</div>
+
+<div id="mapping-box-area"></div>
+
+<div class="diagnostic-panel">
+<span class="diag-title">Telemetry Metric</span>
+<span id="epoch-label" style="font-family:monospace; font-size:0.85rem; color:var(--accent-particle);">STANDBY</span>
+</div>
+
+<div id="control-sliders"></div>
+
+<button onclick="resetCalibration()" class="btn-action">RESET CALIBRATION</button>
+
+<div id="panel-footer-text" style="font-size: 0.62rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.4; margin-top: auto;"></div>
+
+<button onclick="showScreen('briefing')" class="btn-exit-lab">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div class="grid-label-group">
+<span id="canvas-main-label" class="grid-label-main">SUBSTRATE FIELD TELEMETRY</span>
+<span id="canvas-sub-label" class="grid-label-sub">Quantum Modal Analysis</span>
+</div>
+
+<div id="shear-viz-overlay" class="viz-overlay-group">
+<div class="viz-overlay-item">
+<span id="overlay-label-1" class="overlay-label">--</span>
+<span id="overlay-val-1" class="overlay-val">--</span>
+</div>
+<div class="viz-overlay-item">
+<span id="overlay-label-2" class="overlay-label">--</span>
+<span id="overlay-val-2" class="overlay-val" style="color:var(--accent-blue);">--</span>
+</div>
+</div>
+
+<div id="plot-area" style="width:100%; height:100%;"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+
+<div class="diagnostic-panel">
+<span class="diag-title">Quantum Metrics</span>
+<div id="metrics-content" style="font-size:0.75rem; font-family:monospace; line-height:1.7;"></div>
+<div class="stats-sub-panel" id="stats-metadata"></div>
+</div>
+
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-particle);">
+<span class="diag-title">Causal Hierarchy</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.75rem; line-height: 1.4;"></p>
+</div>
+
+<div id="panel-right-note" style="font-size: 0.75rem; color: var(--text-dim); line-height: 1.4; background: #000; padding: 10px; border-radius: 8px; border: 1px solid #222; margin-top: auto;"></div>
+</div>
+</div>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "Vacuum Oscillation Spectrum",
+brief: `<div style="padding: 20px 40px; line-height: 1.6; font-family: Georgia, serif; color: var(--text-main); text-align: justify;">
+<h2 style="text-align: center; color: var(--accent-photon); margin-bottom: 20px;">Detailed Briefing: Vacuum Oscillation Spectrum</h2>
+
+<h3 style="color: var(--accent-photon); font-size: 1.1rem;">Purpose of the Module</h3>
+<p>This module introduces the oscillatory dynamics of the vacuum substrate at quantum scales. It demonstrates that the substrate medium, characterized by its structural stiffness and synthesis pressure, supports a spectrum of oscillatory modes. The simulator shows how small perturbations of the substrate propagate as wave-like excitations whose frequency and energy are determined by the intrinsic mechanical structure of the vacuum medium. The module therefore provides a visual representation of how the substrate field can sustain modal oscillations and how these oscillations form the dynamical spectrum of the vacuum medium.</p>
+
+<h3 style="color: var(--accent-photon); font-size: 1.1rem;">Vacuum Substrate Parameters</h3>
+<p>The module displays the two equilibrium parameters that characterize the structural properties of the vacuum substrate.</p>
+
+<p><strong>Vacuum Stiffness</strong><br>
+K = 11.350</p>
+<p>This parameter represents the elastic rigidity of the vacuum medium. It determines how strongly the substrate resists deformation and therefore governs the propagation speed and frequency of oscillatory disturbances within the substrate field.</p>
+
+<p><strong>Synthesis Pressure</strong><br>
+P = 0.6900</p>
+<p>This parameter represents the intrinsic stabilizing pressure that maintains equilibrium within the vacuum structure while allowing localized oscillatory excitations to occur within the substrate medium.</p>
+
+<p>Together these parameters define the structural environment in which quantum-scale oscillations of the substrate propagate.</p>
+
+<h3 style="color: var(--accent-photon); font-size: 1.1rem;">Oscillation Relation</h3>
+<p>The module introduces the dispersion relation</p>
+<p style="text-align:center; font-size:1.1rem;">$\\omega = \\sqrt{K} \\cdot k$</p>
+<p>where</p>
+<ul>
+<li>$\\omega$ represents the angular frequency of the oscillation</li>
+<li>k represents the spatial wavenumber of the excitation</li>
+<li>K represents the stiffness of the vacuum substrate</li>
+</ul>
+
+<p>This relation shows that the frequency of the oscillation is determined by the stiffness of the substrate and the spatial scale of the disturbance.</p>
+
+<h3 style="color: var(--accent-photon); font-size: 1.1rem;">Phase Velocity</h3>
+<p>From the dispersion relation the propagation speed of the oscillatory mode becomes</p>
+<p style="text-align:center; font-size:1.1rem;">$v_p = \\omega / k = \\sqrt{K}$</p>
+<p>This indicates that disturbances in the substrate propagate with a velocity determined directly by the stiffness of the medium. The vacuum therefore behaves as an elastic field whose internal rigidity governs the dynamics of its oscillatory modes.</p>
+
+<h3 style="color: var(--accent-photon); font-size: 1.1rem;">Telemetry Metric</h3>
+<p>The telemetry panel displays the frequency of the oscillatory excitation.</p>
+<p style="text-align:center; color:var(--accent-photon);">Frequency: $\\omega$ = 2.6458</p>
+<p>This value represents the angular frequency of the current oscillation mode produced by the selected wavenumber.</p>
+
+<h3 style="color: var(--accent-photon); font-size: 1.1rem;">Adjustable Parameters</h3>
+<p><strong>Wavenumber (k)</strong><br>
+Value shown: 0.79</p>
+<p>This parameter determines the spatial scale of the oscillatory disturbance. Increasing the wavenumber produces oscillations with shorter wavelengths and correspondingly higher frequencies.</p>
+
+<p><strong>Amplitude (A)</strong><br>
+Value shown: 1.00</p>
+<p>This parameter controls the magnitude of the substrate displacement. It determines the height of the oscillation pattern without altering the underlying frequency relation.</p>
+
+<p>By adjusting these parameters the user can explore how variations in wavelength and amplitude influence the oscillatory behavior of the substrate medium.</p>
+
+<h3 style="color: var(--accent-photon); font-size: 1.1rem;">Graphical Visualization</h3>
+<p>The central display presents a three-dimensional surface representing the oscillatory displacement of the vacuum substrate. The surface alternates between regions of positive and negative displacement, shown by a color gradient across the surface.</p>
+
+<p>The pattern illustrates a normal oscillation mode of the substrate field. As the wavenumber increases, the oscillations become more closely spaced, reflecting the shorter wavelength of the disturbance. Adjusting the amplitude modifies the height of the oscillation peaks and troughs while preserving the underlying modal structure.</p>
+
+<h3 style="color: var(--accent-photon); font-size: 1.1rem;">Quantum Metrics</h3>
+<p>The telemetry panel displays diagnostic quantities describing the oscillation mode of the substrate.</p>
+<ul>
+<li>Frequency: $\\omega$ = 2.6458</li>
+<li>Wavenumber: k = 0.79</li>
+<li>Energy: E = 3.500</li>
+</ul>
+
+<p>These values describe the dynamical state of the oscillatory excitation supported by the substrate field.</p>
+
+<h3 style="color: var(--accent-photon); font-size: 1.1rem;">Causal Hierarchy</h3>
+<p>The causal hierarchy panel summarizes the sequence of physical processes represented in the simulation.</p>
+<p><strong>Substrate Stiffness (K)</strong><br>
+determines the mechanical rigidity of the vacuum medium.</p>
+<p><strong>Oscillatory Disturbance (k)</strong><br>
+introduces a spatial perturbation within the substrate.</p>
+<p><strong>Modal Frequency ($\\omega$)</strong><br>
+emerges from the interaction between stiffness and spatial scale.</p>
+
+<h3 style="color: var(--accent-photon); font-size: 1.1rem;">Conceptual Interpretation</h3>
+<p>Within the framework the vacuum is treated as a structured medium possessing stiffness and synthesis pressure. When a small perturbation is introduced into the substrate field, the medium responds by supporting oscillatory modes whose properties are governed by its structural parameters. The vacuum therefore behaves as a dynamical field capable of sustaining modal oscillations across spatial scales.</p>
+
+<p>It is possible that stable localized modes of this spectrum could correspond to <strong>particle-like structures</strong>. This is a serious possibility within the framework.</p>
+
+<h3 style="color: var(--accent-photon); font-size: 1.1rem;">Scientific Significance</h3>
+<p>The oscillation spectrum represents the dynamical degrees of freedom of the vacuum substrate. By visualizing these oscillatory modes, the module demonstrates how disturbances propagate through the substrate field and how the structural stiffness of the vacuum determines the frequency spectrum of these excitations. The simulation therefore provides an intuitive representation of how the vacuum medium can sustain quantum-scale oscillations governed by its intrinsic structural properties.</p>
+</div>`,
+
+
+sliders: `
+<div class="control-item">
+<div class="label-group"><span>Wavenumber (k)</span><input type="number" id="k_input" class="digital-entry" step="0.1" value="2.0" oninput="syncVal(this.value, 'k_slider')"></div>
+<input type="range" id="k_slider" min="0.5" max="10.0" step="0.1" value="2.0" oninput="syncVal(this.value, 'k_input')">
+</div>
+<div class="control-item">
+<div class="label-group"><span>Amplitude (A)</span><input type="number" id="amp_input" class="digital-entry" step="0.1" value="1.0" oninput="syncVal(this.value, 'amp_slider')"></div>
+<input type="range" id="amp_slider" min="0.1" max="5.0" step="0.1" value="1.0" oninput="syncVal(this.value, 'amp_input')">
+</div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Oscillation Law</span><div style="text-align:center; padding: 4px 0; font-size: 1.00rem;">$\\omega = \\sqrt{K} \\cdot k$</div></div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Phase Velocity</span><div style="text-align:center; padding: 4px 0; font-size: 1.00rem;">$v_p = \\omega / k = \\sqrt{K}$</div></div>`,
+hierarchy: "Substrate Stiffness (K)<br>↓<br>Modal Frequency (ω)<br>↓<br>Field Oscillation",
+footer: "<b>Forensic Note:</b> The substrate supports a spectrum of modes defined by its elastic K lattice.",
+rightNote: "<b>Calibration:</b> Adjust Wavenumber k to explore high-frequency modal stability."
+},
+2: {
+title: "Localized Quantum Packet",
+brief: `<div style="padding: 20px 40px; line-height: 1.6; font-family: Georgia, serif; color: var(--text-main); text-align: justify;">
+<h2 style="text-align: center; color: var(--accent-packet); margin-bottom: 20px;">Detailed Briefing: Localized Quantum Packet</h2>
+
+<h3 style="color: var(--accent-packet); font-size: 1.1rem;">Purpose of the Module</h3>
+<p>This module illustrates how oscillatory excitations of the vacuum substrate can form localized wave packets. While the previous module demonstrated the continuous oscillation spectrum of the substrate, this module shows how multiple oscillatory modes combine to produce a spatially localized excitation. The simulator visualizes how energy within the substrate can concentrate into a coherent packet whose propagation and structure are determined by the stiffness of the vacuum medium. The module therefore demonstrates how oscillatory field modes can combine to produce localized excitations within the substrate field.</p>
+
+<h3 style="color: var(--accent-packet); font-size: 1.1rem;">Vacuum Substrate Parameters</h3>
+<p>The module displays the two equilibrium parameters that characterize the structural properties of the vacuum substrate.</p>
+
+<p><strong>Vacuum Stiffness</strong><br>
+K = 11.350</p>
+<p>This parameter represents the elastic rigidity of the vacuum medium. It determines how oscillatory disturbances propagate through the substrate and therefore governs the velocity and dispersion properties of localized excitations.</p>
+
+<p><strong>Synthesis Pressure</strong><br>
+P = 0.6900</p>
+<p>This parameter represents the stabilizing pressure that maintains equilibrium within the substrate structure while localized excitations propagate through the medium.</p>
+
+<p>Together these parameters define the physical environment in which localized oscillatory packets evolve.</p>
+
+<h3 style="color: var(--accent-packet); font-size: 1.1rem;">Wave Packet Envelope</h3>
+<p>The module introduces the Gaussian envelope relation</p>
+<p style="text-align:center; font-size:1.1rem;">$E(x) = A \\cdot e^{-x^2 / \\sigma^2}$</p>
+<p>where</p>
+<ul>
+<li>E(x) represents the spatial amplitude distribution of the packet</li>
+<li>A represents the oscillation amplitude</li>
+<li>σ represents the width of the packet</li>
+</ul>
+
+<p>This envelope function describes how the oscillatory field is confined within a finite spatial region. The Gaussian profile ensures that the excitation remains concentrated around a central location while gradually decreasing toward the surrounding region.</p>
+
+<h3 style="color: var(--accent-packet); font-size: 1.1rem;">Telemetry Metric</h3>
+<p>The telemetry panel displays the coherence state of the wave packet.</p>
+<p style="text-align:center; color:var(--accent-packet);">Status: COHERENT</p>
+<p>This indicates that the oscillatory components of the packet remain phase-aligned, producing a stable localized excitation.</p>
+
+<h3 style="color: var(--accent-packet); font-size: 1.1rem;">Adjustable Parameters</h3>
+<p><strong>Width (σ)</strong><br>
+Value shown: 1.5</p>
+<p>This parameter determines the spatial extent of the wave packet. Increasing the width spreads the excitation over a larger region, while decreasing the width concentrates the oscillation into a more localized structure.</p>
+
+<p><strong>Momentum (k)</strong><br>
+Value shown: 5.0</p>
+<p>This parameter represents the central wavenumber of the oscillatory components forming the packet. It determines the internal oscillation frequency and propagation behavior of the excitation.</p>
+
+<p>By adjusting these parameters the user can explore how spatial localization and oscillatory frequency influence the structure of the packet.</p>
+
+<h3 style="color: var(--accent-packet); font-size: 1.1rem;">Graphical Visualization</h3>
+<p>The central display presents a spatial waveform representing the localized excitation of the substrate field. The oscillatory pattern is concentrated near the center of the display, forming a coherent wave packet. The oscillations decrease gradually away from the center according to the Gaussian envelope, illustrating how the excitation remains localized within a finite region.</p>
+
+<p>The central peak represents the region of highest energy concentration within the substrate, while the surrounding oscillations indicate the spatial modulation of the wave packet.</p>
+
+<h3 style="color: var(--accent-packet); font-size: 1.1rem;">Group Velocity</h3>
+<p>The right panel displays the group velocity relation</p>
+<p style="text-align:center; font-size:1.1rem;">$v_g = d\\omega / dk = \\sqrt{K}$</p>
+<p>This relation describes the propagation speed of the wave packet through the substrate. The group velocity determines how the localized excitation moves through the medium and is determined by the stiffness of the vacuum substrate.</p>
+
+<h3 style="color: var(--accent-packet); font-size: 1.1rem;">Quantum Metrics</h3>
+<p>The telemetry panel displays diagnostic quantities describing the structure of the localized packet.</p>
+<ul>
+<li>Width: σ = 1.50</li>
+<li>K-Vector: k = 5.0</li>
+<li>Dispersion: LOW</li>
+</ul>
+
+<p>These metrics describe the spatial confinement of the packet and the degree to which its oscillatory components remain concentrated within the localized structure.</p>
+
+<h3 style="color: var(--accent-packet); font-size: 1.1rem;">Causal Hierarchy</h3>
+<p>The causal hierarchy panel summarizes the sequence of physical processes represented in the simulation.</p>
+<p><strong>Field Coherence</strong><br>
+maintains phase alignment among oscillatory modes.</p>
+<p><strong>Energy Localization</strong><br>
+concentrates oscillatory energy within a finite spatial region.</p>
+<p><strong>Particle Packet</strong><br>
+emerges as a localized excitation of the substrate field.</p>
+
+<h3 style="color: var(--accent-packet); font-size: 1.1rem;">Conceptual Interpretation</h3>
+<p>Within the framework the vacuum substrate supports oscillatory field modes whose behavior is governed by its structural stiffness. When multiple oscillatory modes combine with a coherent phase relation, they produce a localized wave packet within the substrate field. The Gaussian envelope confines the oscillation within a finite region while the internal oscillations propagate through the medium with the group velocity determined by the substrate stiffness.</p>
+
+<p>This module therefore demonstrates how the oscillatory spectrum of the vacuum substrate can organize into localized excitations that propagate through the substrate medium.</p>
+
+<h3 style="color: var(--accent-packet); font-size: 1.1rem;">Scientific Significance</h3>
+<p>The oscillation spectrum represents the dynamical degrees of freedom of the vacuum substrate. By visualizing these oscillatory modes, the module demonstrates how disturbances propagate through the substrate field and how the structural stiffness of the vacuum determines the frequency spectrum of these excitations. The simulation therefore provides an intuitive representation of how the vacuum medium can sustain quantum-scale oscillations governed by its intrinsic structural properties.</p>
+</div>`,
+
+sliders: `
+<div class="control-item">
+<div class="label-group"><span>Width (&sigma;)</span><input type="number" id="sigma_input" class="digital-entry" step="0.1" value="1.5" oninput="syncVal(this.value, 'sigma_slider')"></div>
+<input type="range" id="sigma_slider" min="0.5" max="5.0" step="0.1" value="1.5" oninput="syncVal(this.value, 'sigma_input')">
+</div>
+<div class="control-item">
+<div class="label-group"><span>Momentum (k)</span><input type="number" id="packet_k_input" class="digital-entry" step="0.5" value="5.0" oninput="syncVal(this.value, 'packet_k_slider')"></div>
+<input type="range" id="packet_k_slider" min="1.0" max="20.0" step="0.5" value="5.0" oninput="syncVal(this.value, 'packet_k_input')">
+</div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Envelope Form</span><div style="text-align:center; padding: 4px 0; font-size: 0.9rem;">$E(x) = A \\cdot e^{-x^2/\\sigma^2}$</div></div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Group Velocity</span><div style="text-align:center; padding: 4px 0; font-size: 0.9rem;">$v_g = d\\omega/dk = \\sqrt{K}$</div></div>`,
+hierarchy: "Field Coherence<br>↓<br>Energy Localization<br>↓<br>Particle Packet",
+footer: "<b>Forensic Note:</b> Localization σ inversely correlates with momentum uncertainty.",
+rightNote: "<b>Calibration:</b> Reduce width σ to increase particle-like localization."
+},
+3: {
+title: "Quantum Vacuum Fluctuations",
+brief: `<div style="padding: 20px 40px; line-height: 1.6; font-family: Georgia, serif; color: var(--text-main); text-align: justify;">
+<h2 style="text-align: center; color: var(--accent-fluctuation); margin-bottom: 20px;">Detailed Briefing: Quantum Vacuum Fluctuations</h2>
+
+<h3 style="color: var(--accent-fluctuation); font-size: 1.1rem;">Purpose of the Module</h3>
+<p>This module illustrates the microscopic fluctuations of the vacuum substrate that arise from its intrinsic quantum-scale dynamics. Even in the absence of external disturbances, the substrate does not remain perfectly static but exhibits small random oscillations associated with the ground state energy of the field. The simulator visualizes how these fluctuations appear as rapid microscopic variations in the substrate field amplitude. The module therefore demonstrates how the vacuum medium exhibits continuous micro-scale activity arising from its internal oscillatory spectrum.</p>
+
+<h3 style="color: var(--accent-fluctuation); font-size: 1.1rem;">Vacuum Substrate Parameters</h3>
+<p>The module displays the two equilibrium parameters that characterize the structural properties of the vacuum substrate.</p>
+
+<p><strong>Vacuum Stiffness</strong><br>
+K = 11.350</p>
+<p>This parameter represents the elastic rigidity of the vacuum medium and determines how strongly the substrate resists deformation. The stiffness governs the frequency spectrum of oscillatory modes that contribute to vacuum fluctuations.</p>
+
+<p><strong>Synthesis Pressure</strong><br>
+P = 0.6900</p>
+<p>This parameter represents the intrinsic stabilizing pressure that maintains equilibrium within the vacuum structure. The pressure provides the background stability against which microscopic oscillatory fluctuations occur.</p>
+
+<p>Together these parameters define the structural state of the vacuum substrate within which quantum fluctuations arise.</p>
+
+<h3 style="color: var(--accent-fluctuation); font-size: 1.1rem;">Zero-Point Energy</h3>
+<p>The module introduces the ground state energy relation</p>
+<p style="text-align:center; font-size:1.1rem;">$E_0 = \\sum \\frac{1}{2}\\hbar\\omega$</p>
+<p>where</p>
+<ul>
+<li>$E_0$ represents the zero-point energy of the field</li>
+<li>$\\hbar$ represents the reduced Planck constant</li>
+<li>$\\omega$ represents the frequency of an oscillation mode</li>
+</ul>
+
+<p>This relation describes the residual energy present in the ground state of an oscillatory system. Even when no external excitation is applied, each oscillatory mode retains a minimum energy equal to half a quantum of energy. The superposition of these contributions produces a background energy associated with the vacuum field.</p>
+
+<h3 style="color: var(--accent-fluctuation); font-size: 1.1rem;">Telemetry Metric</h3>
+<p>The telemetry panel displays the activity of the substrate fluctuations.</p>
+<p style="text-align:center; color:var(--accent-fluctuation);">Status: Micro-Jitter Active</p>
+<p>This indicates that the vacuum substrate is undergoing microscopic oscillatory fluctuations generated by the zero-point energy of its internal modes.</p>
+
+<h3 style="color: var(--accent-fluctuation); font-size: 1.1rem;">Adjustable Parameters</h3>
+<p><strong>Energy Scale</strong><br>
+Value shown: 1.0</p>
+<p>This parameter controls the amplitude scale of the vacuum fluctuations displayed in the simulation. Increasing the energy scale increases the magnitude of the microscopic oscillations represented in the visualization.</p>
+
+<p>By adjusting this parameter the user can explore how the magnitude of vacuum fluctuations varies with the energy scale of the substrate excitations.</p>
+
+<h3 style="color: var(--accent-fluctuation); font-size: 1.1rem;">Graphical Visualization</h3>
+<p>The central display presents a time-varying bar pattern representing the instantaneous amplitude of substrate fluctuations. Each vertical bar represents a small deviation of the field amplitude from its equilibrium state. Positive bars indicate upward deviations while negative bars indicate downward deviations.</p>
+
+<p>The pattern varies rapidly over time, illustrating the random microscopic oscillations of the substrate field. These fluctuations arise from the combined contributions of many oscillatory modes whose phases vary dynamically.</p>
+
+<h3 style="color: var(--accent-fluctuation); font-size: 1.1rem;">Substrate Field Telemetry</h3>
+<p>The telemetry panel displays diagnostic quantities describing the fluctuation spectrum.</p>
+<ul>
+<li>Average Fluctuation: 0.500</li>
+<li>Zero-Point Density: 1.618</li>
+</ul>
+
+<p>These values represent the statistical magnitude of the vacuum fluctuations and the density of oscillatory modes contributing to the ground state energy.</p>
+
+<h3 style="color: var(--accent-fluctuation); font-size: 1.1rem;">Spectral Density</h3>
+<p>The right panel displays the spectral density relation</p>
+<p style="text-align:center; font-size:1.1rem;">$\\rho(\\omega) \\propto \\omega^2$</p>
+<p>This relation describes how the density of oscillatory modes varies with frequency. Higher frequency modes contribute increasingly to the fluctuation spectrum of the vacuum field.</p>
+
+<h3 style="color: var(--accent-fluctuation); font-size: 1.1rem;">Quantum Metrics</h3>
+<p><strong>Scale:</strong> 1.00<br>
+<strong>Mode Density:</strong> $\\frac{8\\pi\\nu^2}{c^3}$<br>
+<strong>Stability:</strong> <span style="color: #ff4444;">UNSTABLE</span></p>
+
+<p>The stability indicator refers to the instantaneous dynamical behavior of the fluctuation field. In this context “unstable” does not imply that the vacuum structure itself is physically unstable. Instead it indicates that the instantaneous configuration of the substrate field is continuously changing due to the superposition of many oscillatory modes.</p>
+
+<p>Because the phases of these modes vary in time, the local field amplitude never remains fixed. The vacuum therefore exhibits persistent microscopic jitter rather than a static equilibrium configuration. The underlying substrate structure remains stable, while the field amplitudes fluctuate dynamically around the equilibrium state.</p>
+
+<h3 style="color: var(--accent-fluctuation); font-size: 1.1rem;">Causal Hierarchy</h3>
+<p>The causal hierarchy panel summarizes the sequence of physical processes represented in the simulation.</p>
+<p><strong>Ground State</strong><br>
+represents the lowest energy configuration of the substrate field.</p>
+<p><strong>Zitterbewegung</strong><br>
+represents rapid microscopic oscillations associated with quantum-scale dynamics.</p>
+<p><strong>Substrate Jitter</strong><br>
+represents the observable fluctuation pattern produced by the superposition of internal oscillatory modes.</p>
+
+<h3 style="color: var(--accent-fluctuation); font-size: 1.1rem;">Conceptual Interpretation</h3>
+<p>Within the framework the vacuum substrate is treated as a structured medium possessing intrinsic oscillatory degrees of freedom. Even in its ground state the substrate contains residual energy arising from the collective contribution of its oscillation modes. These modes generate microscopic fluctuations of the field amplitude, producing a dynamic background of quantum-scale oscillations within the vacuum medium.</p>
+
+<h3 style="color: var(--accent-fluctuation); font-size: 1.1rem;">Scientific Significance</h3>
+<p>Quantum vacuum fluctuations represent one of the fundamental dynamical properties of quantum fields. The presence of zero-point energy implies that the vacuum state contains persistent microscopic oscillations even in the absence of external excitations. By visualizing these fluctuations within the substrate medium, this module illustrates how the internal oscillatory spectrum of the vacuum can produce a dynamic microscopic background of energy fluctuations. The simulation therefore provides an intuitive representation of how the ground state of the substrate field exhibits continuous microscopic activity arising from its intrinsic oscillatory modes.</p>
+</div>`,
+
+sliders: `
+<div class="control-item">
+<div class="label-group"><span>Energy Scale</span><input type="number" id="vac_e_input" class="digital-entry" step="0.1" value="1.0" oninput="syncVal(this.value, 'vac_e_slider')"></div>
+<input type="range" id="vac_e_slider" min="0.1" max="5.0" step="0.1" value="1.0" oninput="syncVal(this.value, 'vac_e_input')">
+</div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Zero-Point Energy</span><div style="text-align:center; padding: 4px 0; font-size: 1.00rem;">$E_0 = \\sum \\frac{1}{2}\\hbar\\omega$</div></div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Spectral Density</span><div style="text-align:center; padding: 4px 0; font-size: 1.00rem;">$\\rho(\\omega) \\propto \\omega^2$</div></div>`,
+hierarchy: "Ground State<br>↓<br>Zitterbewegung<br>↓<br>Substrate Jitter",
+footer: "<b>Forensic Note:</b> Vacuum fluctuations are the microscopic limit of Synthesis Pressure P.",
+rightNote: "<b>Calibration:</b> Increase Energy Scale to visualize higher amplitude jitter."
+},
+4: {
+title: "Particle Creation Threshold",
+brief: `<div style="padding: 20px 40px; line-height: 1.6; font-family: Georgia, serif; color: var(--text-main); text-align: justify;">
+<h2 style="text-align: center; color: var(--accent-threshold); margin-bottom: 20px;">Detailed Briefing: Particle Creation Threshold</h2>
+
+<h3 style="color: var(--accent-threshold); font-size: 1.1rem;">Purpose of the Module</h3>
+<p>This module illustrates how sufficiently strong excitations of the vacuum substrate can produce persistent localized modes that behave as particle-like structures. The simulator demonstrates the threshold behavior that occurs when the energy injected into the substrate exceeds the stability limit required for sustained modal excitation. The module therefore visualizes how transient oscillations of the substrate can either dissipate or stabilize depending on whether the excitation energy crosses the creation threshold.</p>
+
+<h3 style="color: var(--accent-threshold); font-size: 1.1rem;">Vacuum Substrate Parameters</h3>
+<p>The module displays the two equilibrium parameters that characterize the structural properties of the vacuum substrate.</p>
+
+<p><strong>Vacuum Stiffness</strong><br>
+K = 11.350</p>
+<p>This parameter represents the elastic rigidity of the vacuum medium and determines how strongly the substrate resists deformation. The stiffness controls the oscillatory response of the substrate when energy is injected into the system.</p>
+
+<p><strong>Synthesis Pressure</strong><br>
+P = 0.6900</p>
+<p>This parameter represents the intrinsic stabilizing pressure that maintains equilibrium within the vacuum structure. The pressure contributes to the stabilization of oscillatory modes and determines how the substrate responds to energetic perturbations.</p>
+
+<p>Together these parameters define the structural environment in which localized excitations of the substrate may form.</p>
+
+<h3 style="color: var(--accent-threshold); font-size: 1.1rem;">Creation Threshold</h3>
+<p>The module introduces the threshold condition</p>
+<p style="text-align:center; font-size:1.1rem;">$E_{crit} \\propto K \\cdot P$</p>
+<p>where</p>
+<ul>
+<li>$E_{crit}$ represents the minimum excitation energy required to produce a persistent localized oscillation in the substrate</li>
+<li>K represents the vacuum stiffness</li>
+<li>P represents the synthesis pressure</li>
+</ul>
+
+<p>This relation indicates that the threshold energy required to sustain a stable excitation depends on the structural rigidity and internal pressure of the vacuum substrate. When the injected energy is below this threshold, oscillations dissipate. When the threshold is exceeded, stable localized excitation may form.</p>
+
+<h3 style="color: var(--accent-threshold); font-size: 1.1rem;">Telemetry Metric</h3>
+<p style="text-align:center; color:var(--accent-threshold);">Status: Transient Excitation</p>
+<p>This telemetry status indicates that the substrate is currently experiencing a temporary oscillatory disturbance produced by injected energy. The oscillation has not yet stabilized into a persistent localized mode.</p>
+
+<h3 style="color: var(--accent-threshold); font-size: 1.1rem;">Adjustable Parameter</h3>
+<p><strong>Energy Input</strong><br>
+Value shown: 0.5</p>
+<p>This parameter controls the amount of energy injected into the substrate field. Increasing this value increases the amplitude of the excitation and determines whether the oscillatory mode decays or becomes sustained.</p>
+
+<p>By adjusting this parameter the user can explore how different levels of injected energy influence the stability of substrate excitations.</p>
+
+<h3 style="color: var(--accent-threshold); font-size: 1.1rem;">Graphical Visualization</h3>
+<p>The central display presents the oscillatory response of the substrate field as a function of time. The waveform represents the amplitude of the excited substrate mode.</p>
+
+<p>The oscillation begins with a relatively large amplitude and gradually decreases over time. This behavior illustrates the damping of a transient excitation that has not reached the stability threshold. The decay of the waveform demonstrates how energy injected into the substrate redistributes and dissipates when the excitation energy is insufficient to sustain a persistent localized mode.</p>
+
+<h3 style="color: var(--accent-threshold); font-size: 1.1rem;">Substrate Field Telemetry</h3>
+<ul>
+<li>Creation Index: 0.50</li>
+<li>Stability: 0.000</li>
+</ul>
+
+<p>These values represent the current energetic state of the excitation. The creation index indicates how close the injected energy is to the threshold required for persistent excitation, while the stability metric measures the degree to which the oscillation maintains its amplitude over time.</p>
+
+<h3 style="color: var(--accent-threshold); font-size: 1.1rem;">Stability Index</h3>
+<p>The right panel displays the relation</p>
+<p style="text-align:center; font-size:1.1rem;">$S = \\frac{E}{m c^2}$</p>
+<p>where</p>
+<ul>
+<li>S represents the stability index of the excitation</li>
+<li>E represents the injected excitation energy</li>
+<li>m represents the effective mass of the localized excitation</li>
+<li>c represents the speed of light</li>
+</ul>
+
+<h3 style="color: var(--accent-threshold); font-size: 1.1rem;">Quantum Metrics</h3>
+<p><strong>Input Energy:</strong> E = 0.50<br>
+<strong>Mass:</strong> m = 0<br>
+<strong>Status:</strong> <span style="color: #ff4444;">DECAYING</span></p>
+
+<p>The status indicator describes the dynamical behavior of the excited substrate mode. The label “DECAYING” indicates that the oscillatory excitation is losing amplitude with time and gradually returning toward equilibrium.</p>
+
+<p>This occurs because the injected energy remains below the threshold required for persistent excitation. As a result, the oscillation disperses into the surrounding substrate modes and the localized disturbance gradually disappears. The decay therefore represents the relaxation of the substrate back toward its equilibrium configuration.</p>
+
+<h3 style="color: var(--accent-threshold); font-size: 1.1rem;">Causal Hierarchy</h3>
+<p>The causal hierarchy panel summarizes the sequence of processes represented in the simulation.</p>
+<p><strong>Energy Injection</strong><br>
+introduces energy into the substrate field.</p>
+<p><strong>Modal Saturation</strong><br>
+describes the excitation of oscillatory modes within the substrate.</p>
+<p><strong>Persistent Excitation</strong><br>
+represents the condition in which a localized oscillatory structure becomes stable and self-sustaining when the threshold energy is exceeded.</p>
+
+<h3 style="color: var(--accent-threshold); font-size: 1.1rem;">Conceptual Interpretation</h3>
+<p>Within the framework the vacuum substrate behaves as a structured medium capable of supporting oscillatory excitations. When energy is injected into this medium, the substrate responds by generating oscillatory modes whose amplitude depends on the amount of injected energy. If the excitation energy is insufficient, the oscillation disperses and gradually fades. If the energy crosses the structural threshold determined by the substrate parameters, the excitation can stabilize into a persistent localized mode. Such stable modes represent structured excitations of the vacuum substrate.</p>
+
+<h3 style="color: var(--accent-threshold); font-size: 1.1rem;">Scientific Significance</h3>
+<p>The threshold behavior illustrated in this module represents a fundamental property of nonlinear oscillatory systems. In many physical systems, stable localized excitations appear only when the energy of the system exceeds a critical threshold. By visualizing the formation and decay of substrate excitations, this module demonstrates how localized energy structures can emerge from the oscillatory dynamics of the vacuum medium. The simulation therefore illustrates how particle-like structures can arise as stable excitations of an underlying substrate field when sufficient energy is present.</p>
+</div>`,
+
+sliders: `
+<div class="control-item">
+<div class="label-group"><span>Energy Input</span><input type="number" id="create_e_input" class="digital-entry" step="0.1" value="0.5" oninput="syncVal(this.value, 'create_e_slider')"></div>
+<input type="range" id="create_e_slider" min="0.1" max="2.0" step="0.1" value="0.5" oninput="syncVal(this.value, 'create_e_input')">
+</div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Creation Limit</span><div style="text-align:center; padding: 4px 0; font-size: 1.00rem;">$E_{crit} \\propto K \\cdot P$</div></div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Stability Index</span><div style="text-align:center; padding: 4px 0; font-size: 1.00rem;">$S = E / mc^2$</div></div>`,
+hierarchy: "Energy Injection<br>↓<br>Modal Saturation<br>↓<br>Persistent Excitation",
+footer: "<b>Forensic Note:</b> Particle emergence occurs when substrate modes phase-lock.",
+rightNote: "<b>Calibration:</b> Cross the threshold ($E > 1.0$) to trigger particle formation."
+}
+};
+
+function syncVal(val, targetId) {
+document.getElementById(targetId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+if(!content) return;
+document.getElementById('brief-box-content').innerHTML = content.brief;
+document.getElementById('control-sliders').innerHTML = content.sliders;
+document.getElementById('active-module-title').innerText = content.title;
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+showScreen('briefing');
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+}
+
+function launchLab() { showScreen('lab'); runLab(); if (window.MathJax) { MathJax.typesetPromise(); } }
+
+function resetCalibration() {
+if (currentTool === 1) {
+syncVal(2.0, 'k_slider');
+document.getElementById('k_input').value = 2.0;
+syncVal(1.0, 'amp_slider');
+document.getElementById('amp_input').value = 1.0;
+}
+if (currentTool === 2) {
+syncVal(1.5, 'sigma_slider');
+document.getElementById('sigma_input').value = 1.5;
+syncVal(5.0, 'packet_k_slider');
+document.getElementById('packet_k_input').value = 5.0;
+}
+if (currentTool === 3) {
+syncVal(1.0, 'vac_e_slider');
+document.getElementById('vac_e_input').value = 1.0;
+}
+if (currentTool === 4) {
+syncVal(0.5, 'create_e_slider');
+document.getElementById('create_e_input').value = 0.5;
+}
+}
+
+
+function runLab() {
+if (currentTool === 1) renderOscillations();
+if (currentTool === 2) renderPacket();
+if (currentTool === 3) renderFluctuations();
+if (currentTool === 4) renderCreation();
+}
+
+function renderOscillations() {
+document.getElementById('shear-viz-overlay').style.display = 'block';
+const k = parseFloat(document.getElementById('k_slider').value);
+const amp = parseFloat(document.getElementById('amp_slider').value);
+const K = 11.350;
+const omega = Math.sqrt(K) * k;
+
+document.getElementById('epoch-label').innerHTML = `Freq: ${omega.toFixed(2)} rad/s`;
+document.getElementById('overlay-label-1').innerText = "Modal Frequency (ω)";
+document.getElementById('overlay-val-1').innerText = omega.toFixed(3);
+document.getElementById('overlay-label-2').innerText = "Phase Vel (vp)";
+document.getElementById('overlay-val-2').innerText = Math.sqrt(K).toFixed(3);
+
+let x_vals = [], y_vals = [], z_vals = [];
+for(let x=-5; x<5; x+=0.5) {
+let row = [];
+for(let y=-5; y<5; y+=0.5) {
+row.push(amp * Math.sin(k * Math.sqrt(x*x + y*y)));
+}
+z_vals.push(row);
+x_vals.push(x);
+y_vals.push(x);
+}
+
+const trace = { z: z_vals, x: x_vals, y: y_vals, type: 'surface', colorscale: 'Cyan' };
+Plotly.newPlot('plot-area', [trace], {
+paper_bgcolor: 'black', scene: { xaxis: {visible:false}, yaxis: {visible:false}, zaxis: {range:[-5, 5]} },
+margin: {t:0, b:0, l:0, r:0}
+}, {displayModeBar: false});
+
+document.getElementById('metrics-content').innerHTML = `Frequency ω: ${omega.toFixed(3)}<br>Wavenumber k: ${k.toFixed(2)}<br>Energy: ${(0.5*omega*omega).toFixed(2)}`;
+}
+
+function renderPacket() {
+document.getElementById('shear-viz-overlay').style.display = 'block';
+const sigma = parseFloat(document.getElementById('sigma_slider').value);
+const k = parseFloat(document.getElementById('packet_k_slider').value);
+const K = 11.350;
+
+document.getElementById('epoch-label').innerHTML = `Status: COHERENT`;
+document.getElementById('overlay-label-1').innerText = "Group Velocity";
+document.getElementById('overlay-val-1').innerText = Math.sqrt(K).toFixed(3);
+document.getElementById('overlay-label-2').innerText = "Localization";
+document.getElementById('overlay-val-2').innerText = (1/sigma).toFixed(3);
+
+let x_range = [], y_packet = [];
+for(let x=-10; x<10; x+=0.1) {
+x_range.push(x);
+y_packet.push(Math.exp(-(x*x)/(sigma*sigma)) * Math.cos(k * x));
+}
+
+const trace = { x: x_range, y: y_packet, line: {color: '#10b981', width: 2} };
+Plotly.newPlot('plot-area', [trace], {
+paper_bgcolor: 'black', plot_bgcolor: 'black',
+xaxis: {gridcolor:'#222', range:[-10, 10]}, yaxis: {gridcolor:'#222', range:[-1.2, 1.2]}
+}, {displayModeBar: false});
+
+document.getElementById('metrics-content').innerHTML = `Width σ: ${sigma.toFixed(2)}<br>k-Vector: ${k.toFixed(1)}<br>Dispersion: LOW`;
+}
+
+function renderFluctuations() {
+document.getElementById('shear-viz-overlay').style.display = 'block';
+const scale = parseFloat(document.getElementById('vac_e_slider').value);
+
+document.getElementById('epoch-label').innerHTML = `Micro-Jitter Active`;
+document.getElementById('overlay-label-1').innerText = "Avg Fluctuation";
+document.getElementById('overlay-val-1').innerText = (scale * 0.5).toFixed(3);
+document.getElementById('overlay-label-2').innerText = "ZPE Density";
+document.getElementById('overlay-val-2').innerText = (scale * 1.618).toFixed(3);
+
+let x_vals = [], y_vals = [];
+for(let i=0; i<50; i++) {
+x_vals.push(i);
+y_vals.push((Math.random() - 0.5) * scale);
+}
+
+const trace = { x: x_vals, y: y_vals, type: 'bar', marker: {color: '#f59e0b'} };
+Plotly.newPlot('plot-area', [trace], {
+paper_bgcolor: 'black', plot_bgcolor: 'black',
+xaxis: {visible:false}, yaxis: {gridcolor:'#222', range:[-3, 3]}
+}, {displayModeBar: false});
+
+document.getElementById('metrics-content').innerHTML = `Scale: ${scale.toFixed(2)}<br>Mode Density: 8πν²/c³<br>Stability: UNSTABLE`;
+}
+
+function renderCreation() {
+document.getElementById('shear-viz-overlay').style.display = 'block';
+const e = parseFloat(document.getElementById('create_e_slider').value);
+const isStable = e > 1.0;
+
+document.getElementById('epoch-label').innerHTML = isStable ? "PARTICLE STABILIZED" : "TRANSIENT EXCITATION";
+document.getElementById('overlay-label-1').innerText = "Creation Index";
+document.getElementById('overlay-val-1').innerText = e.toFixed(2);
+document.getElementById('overlay-label-2').innerText = "Stability";
+document.getElementById('overlay-val-2').innerText = isStable ? "1.000" : "0.000";
+
+let t = [], val = [];
+for(let i=0; i<10; i+=0.1) {
+t.push(i);
+let base = isStable ? 1.0 : Math.exp(-i/2);
+val.push(base * Math.sin(10 * i));
+}
+
+const trace = { x: t, y: val, line: {color: '#d946ef', width: 3} };
+Plotly.newPlot('plot-area', [trace], {
+paper_bgcolor: 'black', plot_bgcolor: 'black',
+xaxis: {gridcolor:'#222'}, yaxis: {gridcolor:'#222', range:[-1.5, 1.5]}
+}, {displayModeBar: false});
+
+document.getElementById('metrics-content').innerHTML = `Input E: ${e.toFixed(2)}<br>Mass m: ${isStable ? '0.511 MeV' : '0'}<br>Status: ${isStable ? '<b>PERSISTENT</b>' : 'DECAYING'}`;
+}
+
+showScreen('portal');
+</script>
+</body>
+</html>

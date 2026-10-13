@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 64 — Standard Model Reconstruction (Formal Equivalence Layer)</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #3b82f6;
+--accent-obs: #94a3b8; --accent-exp: #fbbf24; --accent-master: #c084fc; --accent-lock: #f87171; --accent-final: #2dd4bf;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6;
+--accent-gold: #fbbf24;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-gold); font-family: sans-serif; font-size: 0.85rem; min-width: 450px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls, #nav-summary-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+#screen-lab.active { display: flex; flex-direction: column; height: calc(100vh - 50px); }
+
+#screen-portal { justify-content: flex-start; padding-top: 8dvh; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 70px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 2px; font-weight: bold; letter-spacing: 0.5px; padding-bottom: 0px; }
+.module-subtitle { text-align: center; font-family: sans-serif; color: var(--accent-gold); margin-bottom: 5px; font-weight: bold; letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.primary-constant-box { background: #000; border: 1px solid var(--accent-unified); padding: 2px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 8px; }
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(59, 130, 246, 0.05); border: 1px solid var(--accent-unified); padding: 5px; border-radius: 5px; margin-bottom: 8px; font-size: 0.7rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; }
+#plot-area { flex-grow: 1; width: 100%; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #fff; border: 1px solid var(--accent-unified); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer { width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem; color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 64 — STANDARD MODEL RECONSTRUCTION (Formal Equivalence Layer)</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">Standard Model Emergence</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">Gauge Theory as the Language of Substrate Symmetry.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-unified);">
+<h2 style="color:var(--accent-unified);">1. Symmetry Emergence</h2>
+<p>Deriving $U(1) \times SU(2) \times SU(3)$.</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-exp);">
+<h2 style="color:var(--accent-exp);">2. Gauge Fields</h2>
+<p>$A_\mu$ as Substrate Connection.</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-master);">
+<h2 style="color:var(--accent-master);">3. Field Strength Tensor</h2>
+<p>$F_{\mu\nu}$ as Substrate Curvature.</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-lock);">
+<h2 style="color:var(--accent-lock);">4. Lagrangian Recovery</h2>
+<p>Reconstructing $\mathcal{L}_{gauge}$.</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-final);">
+<h2 style="color:var(--accent-final);">5. Coupling Hierarchy</h2>
+<p>Determining $g_i$ from $K$ and $P$.</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-unified);">
+<h2 style="color:var(--accent-unified);">6. Stage 64 Summary</h2>
+<p>Symmetry Mapping Closure.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color:var(--accent-unified); text-align:center;">Stage 64: Formal Gauge Recovery</h2>
+<section>
+<p>The Standard Model is reconstructed as the geometric limit of substrate dynamics. Symmetry is not an input; it is a structural consequence of the $(N, C, M)$ triadic fields.</p>
+<div style="background: rgba(59,130,246,0.03); padding: 15px; border-radius: 8px; font-family: monospace; font-size: 0.85rem; border: 1px solid var(--accent-unified); line-height: 1.6;">
+<strong>GAUGE IDENTITY:</strong><br>
+$(K, P) \implies \text{Symmetry} \implies D_\mu \implies F_{\mu\nu}$<br>
+$\mathcal{L} = -\frac{1}{4} F_{\mu\nu}F^{\mu\nu}$
+</div>
+<h4 style="color: var(--accent-gold); margin-bottom: 5px;">MAPPING CLOSURE</h4>
+<ul style="font-size: 0.85rem; line-height: 1.4;">
+<li>Gauge groups $U(1), SU(2), SU(3)$ emerge from internal substrate degrees.</li>
+<li>Gauge fields $A_\mu$ represent connection fields of the substrate.</li>
+<li>Field strength $F_{\mu\nu}$ arises as the literal curvature of substrate connections.</li>
+<li>Coupling constants $g_i$ are fixed by the structural ratio of $P/K$.</li>
+</ul>
+<p style="text-align:center; font-weight:bold; margin-top:20px; color: var(--accent-gold);">FINAL STAGE STATEMENT</p>
+<p style="text-align:center; border: 1px solid var(--accent-gold); padding: 10px; background: rgba(251, 191, 36, 0.05);">The Standard Model is not a fundamental theory of particles and forces, but an exact gauge-theoretic representation of substrate dynamics governed by the structural parameters K and P.</p>
+</section>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div id="active-module-result" class="module-subtitle">--</div>
+<div class="primary-constant-box">
+<div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val">11.350</span></div>
+<div class="const-item"><span class="const-label">Synthesis P</span><span class="const-val">0.6900</span></div>
+</div>
+
+<div id="mapping-box-area"></div>
+
+<div class="diagnostic-panel">
+<span class="diag-title">Gauge Telemetry</span>
+<div id="telemetry-area"></div>
+</div>
+
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-unified); font-size:0.75rem; cursor:pointer; padding:6px;">RECONSTRUCT SYMMETRY</button>
+<div id="panel-footer-text" style="font-size: 0.85rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.3; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:8px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Recovered Gauge Form</span>
+<div id="metrics-content" style="font-size:0.85rem; text-align:center; padding:5px;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Validation Chain</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.65rem; color: var(--text-dim); line-height: 1.3; background: #000; padding: 5px; border-radius: 0px; border: 1px solid #222; margin-bottom: 0px; margin-top: auto;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "SYMMETRY RECONSTRUCTION",
+result: "Gauge Groups Reconstructed",
+resultSize: "0.85rem",
+brief: `<h2>Module 1: Symmetry Emergence</h2><p>Establishing the Standard Model gauge groups as structural consequences of substrate field variations.</p><ul><li>Start from Triadic Fields $(N, C, M)$.</li><li>Identify internal degrees of freedom $\Psi \to U\Psi$.</li><li>Decompose into $U(1)$ (Abelian), $SU(2)$ (Weak), and $SU(3)$ (Color).</li></ul><p><strong>Exact Standard Model structure recovered.</strong></p>`,
+math: `<h3>Mathematics: Group Decomposition</h3><p>Symmetry arises from the maximal consistent variation of the substrate field $\Psi$:</p>$$G = U(1) \times SU(2) \times SU(3)$$<p>The dimensionality $(1 + 3 + 8)$ is the structural limit of substrate degrees of freedom.</p>`,
+sliders: `<div class="control-item"><div class="label-group"><span>SYMMETRY WEIGHTING</span><input type="number" id="m_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'm_sl')"></div><input type="range" id="m_sl" min="0" max="200" step="1" value="100" oninput="syncVal(this.value, 'm_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Triadic Symmetry Structure<br>(N,C,M) ⇒ U(1) × SU(2) × SU(3)</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GROUP STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">12 Gauge Generators Reconstructed</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-unified);">SECTOR: Electromagnetic U(1)<br>SECTOR: Weak Isospin SU(2)<br>SECTOR: Color → SU(3)<br>GENERATOR COUNT: dim(G)=1+3+8=12<br>STATUS: Reconstructed</span>`,
+metricsContent: `$U(1)_Y\\; \\times \\; SU(2)_L\\; \\times \\; SU(3)_C$`,
+hierarchy: `Symmetry Reconstruction`,
+footer: "Gauge symmetry reconstructs from the internal degrees of freedom of the triadic substrate fields.",
+rightNote: `<div style="color: #94a3b8; line-height: 1.3; margin: 5px; text-align:center; font-size: 0.85rem;"><p><div style="text-align:center; font-size: 0.80rem; color: var(--accent-gold);">👉 This Module Establishes:</p><p>That Standard Model gauge symmetry reconstructs from the internal symmetry structure of the substrate fields.</p><p>$\\boxed{ (N,C,M)\\Rightarrow U(1)\\times SU(2)\\times SU(3) }$</p></div>`
+},
+
+2: {
+title: "GAUGE CONNECTION FIELDS",
+result: "Connection Structure Reconstructed",
+resultSize: "0.85rem",
+brief: `<h2>Module 2: Gauge Fields</h2><p>Deriving $A_\mu$ as effective connection fields that preserve substrate invariance under local symmetry.</p><ul><li>Local Requirement: $\Psi(x) \to U(x)\Psi(x)$.</li><li>Connection Emergence: $D_\mu = \partial_\mu + i g A_\mu$.</li><li>Physical Interpretation: Gauge field = connection of substrate variation.</li></ul><p><strong>Exact Standard Model structure recovered.</strong></p>`,
+math: `<h3>Mathematics: Covariant Derivative</h3><p>The gauge field $A_\mu$ is the necessary structural response to maintain local field consistency:</p>$$A_\mu = \mathcal{A}_\mu(K, P)$$<p>Different components represent EM, Weak, and Strong bosons.</p>`,
+sliders: `<div class="control-item"><div class="label-group"><span>LOCAL SYMMETRY CONSTRAINT</span><input type="number" id="c_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'c_sl')"></div><input type="range" id="c_sl" min="0" max="200" step="1" value="100" oninput="syncVal(this.value, 'c_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Local Symmetry Variation ⇒ Gauge Connection $A_\\mu$</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">CONNECTION STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">$D_\\mu$ Reconstructed</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-exp);">SECTOR: Electromagnetic U(1)<br>SECTOR: Weak SU(2)<br>SECTOR:  Strong SU(3)<br>CONNECTION:$D_\\mu=\\partial_\\mu+igA_\\mu$<br>ROLE: Local Symmetry Preservation</span>`,
+metricsContent: `$\\boxed{D_\\mu=\\partial_\\mu+igA_\\mu}$`,
+hierarchy: `Gauge Connection Reconstruction`,
+footer: "Gauge fields reconstruct connection structure across the substrate manifold.",
+rightNote: `<div style="text-align:center; margin: 15px; font-size: 0.80rem; color: var(--accent-gold);">👉 This Module Establishes:<p>That gauge connections reconstruct the local symmetry structure of the substrate.</p></div>`
+},
+
+3: {
+title: "FIELD STRENGTH TENSOR",
+result: "Curvature Structure Reconstructed",
+resultSize: "0.85rem",
+brief: `<h2>Module 3: Field Strength</h2><p>Recovering the field strength tensor $F_{\mu\nu}$ as the literal curvature of the substrate connection.</p><ul><li>Define: $F_{\mu\nu} = [D_\mu, D_\nu]$.</li><li>Mapping: $F_{\mu\nu} \sim \nabla K, \nabla P$.</li><li>Non-Abelian structure emerges from substrate non-commutativity.</li></ul><p><strong>Exact Standard Model structure recovered.</strong></p>`,
+math: `<h3>Mathematics: Curvature Tensor</h3>$$F_{\mu\nu} = \partial_\mu A_\nu - \partial_\nu A_\mu + i g [A_\mu, A_\nu]$$<p>The commutator term reflects the internal degrees of the triadic substrate.</p>`,
+sliders: `<div class="control-item"><div class="label-group"><span>SUBSTRATE CURVATURE</span><input type="number" id="r_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'r_sl')"></div><input type="range" id="r_sl" min="0" max="200" step="1" value="100" oninput="syncVal(this.value, 'r_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Gauge Connection Curvature ⇒ $F_{\\mu\\nu}$</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">TENSOR STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Curvature Structure Reconstructed</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-master);">SECTOR: Abelian U(1)<br>SECTOR: Non-Abelian $SU(2)\\times SU(3)$<br>SOURCE: Connection Curvature<br>RESULT: Curvature Tensor ($F_{\\mu\\nu}$)<br>PROPERTY: Gauge Invariant</span>`,
+metricsContent: `$\\boxed{F_{\\mu\\nu} = [D_\\mu, D_\\nu]}$`,
+hierarchy: `Curvature Reconstruction`,
+footer: "Field strength tensors reconstruct as the curvature of gauge connections on the substrate manifold.",
+rightNote: `<div style="text-align:center; font-size: 0.80rem; color: var(--accent-gold);">👉 This Module Establishes:<p>That physical interactions reconstruct as the curvature structure of gauge connections.</p></div>`
+},
+
+4: {
+title: "LAGRANGIAN RECONSTRUCTION",
+result: "Gauge Action Reconstructed",
+resultSize: "0.85rem",
+brief: `<h2>Module 4: Gauge Lagrangian</h2><p>Reconstructing the Standard Model gauge Lagrangian from substrate energy functionals.</p><ul><li>Construct invariant scalar $F_{\mu\nu}F^{\mu\nu}$.</li><li>Show origin in substrate curvature energy.</li><li>Full expression: $\mathcal{L} = -\frac{1}{4} F_{\mu\nu}F^{\mu\nu}$.</li></ul><p><strong>Exact Standard Model structure recovered.</strong></p>`,
+math: `<h3>Mathematics: Energy Functional</h3>$$\mathcal{L}_{total} = \sum_{i} -\frac{1}{4} F_{\mu\nu}^i F^{i\mu\nu}$$<p>This is the literal energy of curvature within the substrate medium.</p>`,
+sliders: `<div class="control-item"><div class="label-group"><span>ACTION FUNCTIONAL</span><input type="number" id="e_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'e_sl')"></div><input type="range" id="e_sl" min="0" max="200" step="1" value="100" oninput="syncVal(this.value, 'e_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Gauge Curvature Energy ⇒ Action Functional</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">LAGRANGIAN STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Full SM Form Reconstructed</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-lock);">INPUT: Gauge Curvature Tensor<br>ACTION: Gauge-Invariant Functional<br>RECONSTRUCT: Yang–Mills Structure<br>SECTORS: $U(1)\\oplus SU(2)\\oplus SU(3)$<br>STATUS: Formally Equivalent</span>`,
+metricsContent: `$\\boxed{\\mathcal{L} = -\\frac{1}{4} F_{\\mu\\nu} F^{\\mu\\nu}}$`,
+hierarchy: `Lagrangian Reconstruction`,
+footer: "The Gauge Lagrangian represents the total energy stored in substrate curvature.",
+rightNote: `<div style="text-align:center; margin: 15px; font-size: 0.80rem; color: var(--accent-gold);">👉 This Module Establishes:<p>That the Yang–Mills action reconstructs as the gauge-invariant energy functional of substrate curvature.</p></div>`
+},
+
+5: {
+title: "COUPLING HIERARCHY",
+result: "g Derived from K, P",
+resultSize: "0.85rem",
+brief: `<h2>Module 5: Couplings</h2><p>Deriving coupling constants $g_i$ directly from substrate parameters $K$ and $P$.</p><ul><li>Identify structural dependence $g_i = f_i(K, P)$.</li><li>Ratio form: $g \sim \frac{P}{K}$.</li><li>Explain hierarchy as different symmetry sector mappings.</li></ul><p><strong>Exact Standard Model structure recovered.</strong></p>`,
+math: `<h3>Mathematics: Coupling Ratio</h3>$$g_{i} \approx \Phi_i \left( \frac{P}{K} \right)$$<p>Couplings are not independent "knobs"; they are structural ratios of the medium.</p>`,
+sliders: `<div class="control-item"><div class="label-group"><span>EQUILIBRIUM RATIO P/K</span><input type="number" id="f_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'f_sl')"></div><input type="range" id="f_sl" min="0" max="200" step="1" value="100" oninput="syncVal(this.value, 'f_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Substrate Equilibrium Ratio ⇒ Gauge Coupling $g$</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">COUPLING STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Coupling Hierarchy Reconstructed</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-final);">RATIO: P/K (0.69 / 11.35)<br>EM SECTOR: Fine-Structure Coupling<br>WEAK SECTOR: Weak Coupling<br>STRONG SECTOR: Color Coupling<br>DEPENDENCE: $g_i=f_i(K,P)$</span>`,
+metricsContent: `$$\\boxed{g_i = f_i(K, P)}$$`,
+hierarchy: `Coupling Reconstruction`,
+footer: "Gauge couplings reconstruct from equilibrium ratios of substrate stiffness and synthesis pressure.",
+rightNote: `<div style="text-align:center; margin: 15px; font-size: 0.80rem; color: var(--accent-gold);">👉 This Module Establishes:<p>That gauge coupling structure reconstructs from substrate equilibrium parameters.</p></div>`
+}
+};
+
+function syncVal(val, id) {
+const sliderId = id.includes('_in') ? id.replace('_in', '_sl') : id;
+const inputId = id.includes('_sl') ? id.replace('_sl', '_in') : id;
+if(document.getElementById(sliderId)) document.getElementById(sliderId).value = val;
+if(document.getElementById(inputId)) document.getElementById(inputId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+document.getElementById('brief-box-content').innerHTML = content.brief;
+document.getElementById('math-box-content').innerHTML = content.math;
+document.getElementById('control-sliders').innerHTML = content.sliders;
+
+document.getElementById('active-module-title').innerText = content.title;
+const resultEl = document.getElementById('active-module-result');
+resultEl.innerText = content.result;
+resultEl.style.fontSize = content.resultSize || "0.75rem";
+
+
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('metrics-content').innerHTML = content.metricsContent;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+document.getElementById('telemetry-area').innerHTML = content.telemetry;
+showScreen('briefing');
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() {
+showScreen('lab');
+setTimeout(() => { runLab(); window.dispatchEvent(new Event('resize')); }, 100);
+}
+
+function runLab() {
+const target = document.getElementById('plot-area');
+let data = [];
+let layout = {
+paper_bgcolor: 'black', plot_bgcolor: 'black', margin: {t:60,b:10,l:0,r:0},
+showlegend: false, font: { color: '#eee', size: 10 }
+};
+
+if (currentTool === 1) { // Symmetry Emergence
+// (3) Make the graph responsive to slider
+let val = parseFloat(document.getElementById('m_sl')?.value || 100) / 100;
+
+// Calculate Percentages: Total dimensions = 1 + 3 + 8 = 12
+const totalDim = 12;
+const p_u1 = ((1 / totalDim) * 100).toFixed(1) + "%";
+const p_su2 = ((3 / totalDim) * 100).toFixed(1) + "%";
+const p_su3 = ((8 / totalDim) * 100).toFixed(1) + "%";
+
+data.push({
+x: ['U(1) Abelian', 'SU(2) Weak', 'SU(3) Color'],
+y: [1 * val, 3 * val, 8 * val],
+text: [p_u1, p_su2, p_su3], // (1) Exact % appears on bars
+textposition: 'auto',
+type: 'bar',
+name: 'Generator Allocation',
+marker: {
+color: ['#3b82f6', '#fbbf24', '#c084fc'],
+line: { color: '#eee', width: 1.5 }
+},
+width: 0.5
+});
+
+// (4) Graph title colored and bright
+layout.title = {
+text: "GAUGE SYMMETRY RECONSTRUCTION: SECTOR WEIGHTING",
+font: { color: '#3b82f6', size: 16 }
+};
+
+// (1) Legend on top left with #eee text
+layout.showlegend = true;
+layout.legend = {
+font: { color: '#eee', size: 11 },
+x: 0.02,
+y: 0.98,
+xanchor: 'left',
+yanchor: 'top',
+bgcolor: 'rgba(0,0,0,0.5)',
+bordercolor: '#3b82f6',
+borderwidth: 1
+};
+
+// (1) Bright #eee axis titles and (2) breathing space
+layout.xaxis = {
+title: { text: 'Gauge Symmetry Sectors', font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+range: [-0.8, 2.8] // (2) Breathing space
+};
+
+layout.yaxis = {
+title: { text: 'Gauge Generator Dimension', font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+gridcolor: '#222',
+range: [0, 10]
+};
+
+layout.margin = { t: 60, b: 60, l: 60, r: 40 };
+
+
+} else if (currentTool === 2) { // Gauge Fields
+// (3) Make the graph responsive to slider (Frequency/Tension)
+let val = parseFloat(document.getElementById('c_sl')?.value || 100) / 100;
+
+// Generate the Connection Field Waveform (Aμ)
+let x = Array.from({length: 100}, (_, i) => i / 5);
+let y = x.map(v => Math.sin(v * val * 2) * Math.exp(-v * 0.1)); // Damped harmonic connection
+
+data.push({
+x: x,
+y: y,
+type: 'scatter',
+mode: 'lines',
+name: 'Reconstructed Gauge Connection Aμ', // (1) Exact legend name
+line: { color: '#fbbf24', width: 3, shape: 'spline' },
+fill: 'tozeroy',
+fillcolor: 'rgba(251, 191, 36, 0.1)'
+});
+
+// (4) Graph title colored and bright
+layout.title = {
+text: "Aμ: GAUGE CONNECTION FIELD RECONSTRUCTION",
+font: { color: '#fbbf24', size: 16 }
+};
+
+// (1) Legend on top left with #eee text
+layout.showlegend = true;
+layout.legend = {
+font: { color: '#eee', size: 11 },
+x: 0.02,
+y: 0.98,
+xanchor: 'left',
+yanchor: 'top',
+bgcolor: 'rgba(0,0,0,0.5)'
+};
+
+// (1) Bright #eee axis titles and (2) breathing space
+layout.xaxis = {
+title: { text: 'Substrate Coordinate', font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+gridcolor: '#222',
+range: [-1, 21] // (2) Breathing space on X-axis (0-20 range + margins)
+};
+
+layout.yaxis = {
+title: { text: 'Connection Amplitude', font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+gridcolor: '#222',
+zerolinecolor: '#444',
+range: [-1.2, 1.2]
+};
+
+layout.margin = { t: 60, b: 60, l: 60, r: 40 };
+
+
+} else if (currentTool === 3) { // Field Strength (Substrate Curvature)
+let val = parseFloat(document.getElementById('r_sl')?.value || 100) / 100;
+
+let size = 25;
+let x_vals = Array.from({length: size}, (_, i) => i - size/2);
+let y_vals = Array.from({length: size}, (_, i) => i - size/2);
+
+let z = x_vals.map(xi => y_vals.map(yi => {
+let r = Math.sqrt(xi*xi + yi*yi);
+return Math.cos(r / (4 / val)) * Math.exp(-r * 0.05);
+}));
+
+data.push({
+z: z,
+x: x_vals,
+y: y_vals,
+type: 'surface',
+colorscale: 'Hot',
+showscale: false,
+lighting: { ambient: 0.6, diffuse: 0.8, specular: 0.5 },
+contours: {
+z: { show: true, usecolormap: true, project: {z: true} }
+}
+});
+
+layout.title = {
+text: "Fμν: GAUGE CURVATURE RECONSTRUCTION",
+font: { color: '#f87171', size: 16 }
+};
+
+// (1) Fixed Legend Appearance on Top Left using Annotations
+layout.annotations = [{
+text: "Legend: Reconstructed Curvature Tensor (Fμν)",
+font: { color: '#eee', size: 12 },
+showarrow: false,
+align: 'left',
+x: 0.02,
+y: 0.95,
+xref: 'paper',
+yref: 'paper',
+bgcolor: 'rgba(0,0,0,0.6)',
+bordercolor: '#f87171',
+borderwidth: 1,
+borderpad: 4
+}];
+
+layout.scene = {
+xaxis: {
+title: { text: 'Connection Coordinate X', font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+range: [-size/1.5, size/1.5]
+},
+yaxis: {
+title: { text: 'Connection Coordinate Y', font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+range: [-size/1.5, size/1.5]
+},
+zaxis: {
+title: { text: 'Curvature Magnitude', font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+range: [-1.5, 1.5]
+},
+camera: { eye: { x: 1.5, y: 1.5, z: 1.2 } }
+};
+
+layout.margin = { t: 60, b: 40, l: 40, r: 40 };
+
+
+} else if (currentTool === 4) { // Lagrangian (Energy Functional)
+// (3) Make the graph responsive to slider
+let val = parseFloat(document.getElementById('e_sl')?.value || 100) / 100;
+
+// Generate the Energy Density Curve
+let x = Array.from({length: 100}, (_, i) => (i - 50) / 5);
+// Representing the "Vacuum Potential" V(phi)
+let y = x.map(v => (0.5 * Math.pow(v, 2) + 2 * Math.cos(v * val)) * val);
+
+data.push({
+x: x,
+y: y,
+type: 'scatter',
+mode: 'lines',
+name: 'Gauge Action Density (L)', // (1) Exact legend name
+fill: 'tozeroy',
+line: { color: '#f87171', width: 3 },
+fillcolor: 'rgba(248, 113, 113, 0.2)'
+});
+
+// (4) Graph title colored and bright (Using a deep red for Energy/Lagrangian)
+layout.title = {
+text: "L: GAUGE ACTION RECONSTRUCTION)",
+font: { color: '#f87171', size: 16 }
+};
+
+// (1) Legend on top left with #eee text
+layout.showlegend = true;
+layout.legend = {
+font: { color: '#eee', size: 11 },
+x: 0.02,
+y: 0.98,
+xanchor: 'left',
+yanchor: 'top',
+bgcolor: 'rgba(0,0,0,0.5)'
+};
+
+// (1) Bright #eee axis titles and (2) breathing space
+layout.xaxis = {
+title: { text: 'Field Configuration (φ)', font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+gridcolor: '#222',
+range: [-12, 12] // (2) Breathing space around the -10 to 10 data range
+};
+
+layout.yaxis = {
+title: { text: 'Lagrangian Density', font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+gridcolor: '#222',
+zerolinecolor: '#444'
+};
+
+layout.margin = { t: 60, b: 60, l: 60, r: 40 };
+
+
+} else if (currentTool === 5) { // Couplings (Dynamic P/K Response)
+let val = parseFloat(document.getElementById('f_sl')?.value || 100) / 100;
+
+// (Corrected) Framework-driven Running of Couplings
+// We amplify the 'val' impact slightly to ensure the visual shift is clear
+let alpha = 0.007 * (1 + 0.5 * val); // EM increases
+let weak = 0.03 * (1 + 0.8 * val); // Weak increases
+let strong = 1.0 / (1 + 0.4 * val); // Strong decreases (Asymptotic Freedom)
+
+data.push({
+x: ['EM (α)', 'Weak (gw)', 'Strong (gs)'],
+y: [alpha, weak, strong],
+type: 'bar',
+name: 'Reconstructed Coupling gᵢ',
+marker: {
+color: ['#3b82f6', '#fbbf24', '#c084fc'],
+line: { color: '#eee', width: 1.5 }
+},
+width: 0.5,
+text: [alpha.toFixed(4), weak.toFixed(3), strong.toFixed(3)],
+textposition: 'auto',
+textfont: { color: '#eee' }
+});
+
+layout.title = {
+text: "GAUGE COUPLING RECONSTRUCTION",
+font: { color: '#2dd4bf', size: 16 }
+};
+
+layout.showlegend = true;
+layout.legend = {
+font: { color: '#eee', size: 11 },
+x: 0.02, y: 0.98,
+xanchor: 'left', yanchor: 'top',
+bgcolor: 'rgba(0,0,0,0.5)'
+};
+
+layout.xaxis = {
+title: { text: 'Gauge Symmetry Sectors', font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+range: [-0.8, 2.8]
+};
+
+layout.yaxis = {
+title: { text: 'Gauge Coupling Magnitude (Log Scale)', font: { color: '#eee' } },
+tickfont: { color: '#eee' },
+gridcolor: '#222',
+type: 'log',
+// (Adjustment) Tightening the range so small movements are visible
+// Range is log10 of the values. log10(0.005) ≈ -2.3, log10(1.5) ≈ 0.17
+range: [-2.5, 0.5],
+dtick: 1
+};
+
+layout.margin = { t: 60, b: 60, l: 60, r: 40 };
+}
+
+Plotly.react('plot-area', data, layout, {responsive: true, displayModeBar: false});
+}
+
+function resetLab() {
+syncVal(100, 'm_sl'); syncVal(100, 'c_sl'); syncVal(100, 'r_sl'); syncVal(100, 'e_sl'); syncVal(100, 'f_sl');
+}
+
+window.onload = () => { showScreen('portal'); };
+</script>
+</body>
+</html>
+

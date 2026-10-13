@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 55 — Observable Physics</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #3b82f6;
+--accent-proc: #f59e0b; --accent-scat: #10b981; --accent-decay: #ef4444; --accent-prob: #8b5cf6; --accent-real: #2dd4bf;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6;
+--accent-gold: #fbbf24;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-real); font-family: sans-serif; font-size: 0.85rem; min-width: 450px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls, #nav-summary-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+#screen-lab.active { display: flex; flex-direction: column; height: calc(100vh - 50px); }
+
+#screen-portal { justify-content: flex-start; padding-top: 5dvh; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 50px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 2px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; padding-bottom: 0px; }
+.module-subtitle { text-align: center; font-family: sans-serif; color: var(--accent-gold); margin-bottom: 12px; font-weight: bold; letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.primary-constant-box { background: #000; border: 1px solid var(--accent-unified); padding: 2px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 8px; }
+.secondary-structure-box { background: rgba(59, 130, 246, 0.05); border: 1px dashed var(--accent-unified); padding: 3px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 12px; }
+
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(59, 130, 246, 0.05); border: 1px solid var(--accent-unified); padding: 5px; border-radius: 5px; margin-bottom: 8px; font-size: 0.7rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; }
+#plot-area { flex-grow: 1; width: 100%; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #fff; border: 1px solid var(--accent-unified); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer { width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem; color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 55 — OBSERVABLE PHYSICS</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">Observable Physics</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">The manifestation of interaction dynamics into measurable reality.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-proc);">
+<h2 style="color:var(--accent-proc);">1. From Fields to Processes</h2>
+<p>Initial/Final States.<br>Field interactions → physical events.</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-scat);">
+<h2 style="color:var(--accent-scat);">2. Scattering Theory</h2>
+<p>The S-Matrix Mechanism.<br>Encoding interaction dynamics.</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-decay);">
+<h2 style="color:var(--accent-decay);">3. Decay Processes</h2>
+<p>Evolution of Unstable States.<br>Life-times and decay channels.</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-prob);">
+<h2 style="color:var(--accent-prob);">4. Probability & Measurement</h2>
+<p>Squaring the Amplitude.<br>Transition from potential to outcome.</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-real);">
+<h2 style="color:var(--accent-real);">5. Experimental Reality</h2>
+<p>The Measurable Signature.<br>Completion of the theoretical structure.</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-unified);">
+<h2 style="color:var(--accent-unified);">6. Stage 55 Summary</h2>
+<p>Observables: The Final Realization.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Summary — Mathematical Structure of Stage 55: Observable Physics</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Fundamental Mathematical Flow</h3>
+<p>The complete transformation established in Stage 55 is:</p>
+<p style="text-align:center;">$$
+\boxed{
+\text{Fields} \rightarrow \text{Interactions} \rightarrow \text{Processes} \rightarrow \text{Amplitudes} \rightarrow \text{Probabilities} \rightarrow \text{Observables}
+}
+$$</p>
+<p>👉 This is the mathematical realization of physical reality.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Transition Amplitude Layer</h3>
+<p>$$\mathcal{M}_{fi} = \langle f | S | i \rangle, \quad S = 1 + iT$$</p>
+<p>👉 Encodes interaction structure and state transition.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Probability Layer</h3>
+<p>$$P_{fi} = |\mathcal{M}_{fi}|^2$$</p>
+<p>👉 Establishes intrinsic probabilistic nature of outcomes.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Observable Process Layer</h3>
+<p><b>Scattering:</b> $$\sigma \propto |\mathcal{M}_{fi}|^2$$</p>
+<p><b>Decay:</b> $$\Gamma \propto |\mathcal{M}_{fi}|^2, \quad \tau = \frac{1}{\Gamma}$$</p>
+<p>👉 Defines measurable interaction strength and stability.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Experimental Realization Layer</h3>
+<p>Event rate: $$R = \mathcal{L} \cdot \sigma$$</p>
+<p>Total events: $$N = \mathcal{L} \cdot \sigma \cdot T$$</p>
+<p>👉 Detector-level measurable quantities.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Unified Mathematical Mapping</h3>
+<p style="text-align:center;">$$
+\boxed{
+\text{Observable} = \mathcal{F}(|\mathcal{M}|^2)
+}
+$$</p>
+<p>More explicitly:</p>
+<p style="text-align:center;">$$
+\boxed{
+N = \mathcal{L} \cdot T \cdot \int |\mathcal{M}_{fi}|^2 \, d\Phi
+}
+$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Detailed Closure Theorem of Stage 55</h3>
+
+<p><b>Statement:</b></p>
+<p>
+All experimentally observable physical quantities arise as statistical realizations of squared transition amplitudes derived from interaction processes.
+</p>
+
+<p><b>Formal Mathematical Form:</b></p>
+<p>Let:</p>
+<ul>
+<li>$$|i\rangle$$ = initial state</li>
+<li>$$|f\rangle$$ = final state</li>
+<li>$$S$$ = scattering operator</li>
+<li>$$\mathcal{M}_{fi} = \langle f | S | i \rangle$$</li>
+</ul>
+
+<p>Then:</p>
+<p style="text-align:center;">$$
+\boxed{
+\text{Observable Quantity} =
+\mathcal{L} \cdot T \cdot \int |\langle f | S | i \rangle|^2 \, d\Phi
+}
+$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Structural Interpretation</h3>
+
+<p><b>(1) Completeness</b></p>
+<p>All measurable physics reduces to:</p>
+<p>$$|\mathcal{M}|^2$$</p>
+
+<p><b>(2) Non-Observability of Fields</b></p>
+<p>Fields, operators, and amplitudes are not directly measurable. Only:</p>
+<p>$$\text{Event distributions}$$</p>
+
+<p><b>(3) Probabilistic Realization</b></p>
+<p>Reality appears as:</p>
+<p>$$\text{Statistical ensemble of outcomes}$$</p>
+
+<p><b>(4) Detector Mediation</b></p>
+<p>$$|\mathcal{M}|^2 \rightarrow \sigma, \Gamma \rightarrow R \rightarrow N$$</p>
+
+<p><b>(5) Experimental Closure</b></p>
+<p>Agreement between:</p>
+<p>$$\text{Predicted } |\mathcal{M}|^2 \quad \text{and} \quad \text{Observed } N$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 9. Necessity of the Theorem</h3>
+
+<p>This theorem is structurally inevitable:</p>
+<ul>
+<li>Interactions define amplitudes</li>
+<li>Amplitudes define probabilities</li>
+<li>Probabilities define measurable frequencies</li>
+</ul>
+
+<p style="text-align:center;">$$
+\boxed{
+\text{Measurement is mathematically forced by interaction structure}
+}
+$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 10. Final Structural Closure</h3>
+
+<p style="text-align:center;">$$
+\boxed{
+\langle f|S|i\rangle
+\;\rightarrow\;
+|\mathcal{M}|^2
+\;\rightarrow\;
+\sigma, \Gamma
+\;\rightarrow\;
+R
+\;\rightarrow\;
+N
+}
+$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 11. Final Stage Completion Statement</h3>
+
+<p style="text-align:center;">$$
+\boxed{
+\text{Stage 55 completes the transformation of theoretical physics into experimentally measurable reality.}
+}
+$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 12. Philosophical Compression</h3>
+
+<p style="text-align:center;">$$
+\boxed{
+\text{Reality is not the amplitude — it is the measured manifestation of its square.}
+}
+$$</p>
+
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Full Mapping:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\text{Observable} = \mathcal{L} \cdot T \cdot \int |\mathcal{M}|^2 d\Phi$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">All measurable physical reality is a statistical manifestation of squared transition amplitudes integrated over the allowed kinematic domain, completing the bridge from theoretical structure to experimental observation.</p>
+</div>
+</div>
+</section>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div id="active-module-result" class="module-subtitle">--</div>
+<div class="primary-constant-box">
+<div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val">11.350</span></div>
+<div class="const-item"><span class="const-label">Synthesis P</span><span class="const-val">0.6900</span></div>
+</div>
+
+<div id="structure-box-area"></div>
+<div id="mapping-box-area"></div>
+
+<div class="diagnostic-panel">
+<span class="diag-title">Experiment Telemetry</span>
+<div id="telemetry-area"></div>
+</div>
+
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-unified); font-size:0.75rem; cursor:pointer; padding:6px;">RESET SYSTEM</button>
+<div id="panel-footer-text" style="font-size: 0.75rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.3; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:8px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Operational Logic</span>
+<div id="metrics-content" style="font-size:0.65rem; font-family:monospace; line-height:1.3;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Structural Outcome</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.65rem; color: var(--text-dim); line-height: 1.4; background: #000; padding: 5px; border-radius: 0px; border: 1px solid #222; margin-top: auto;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "FROM FIELDS TO PROCESSES",
+result: "Interactions manifest as physical events",
+resultSize: "0.80rem",
+
+brief: `<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: From Fields to Observable Events — Transition to Physical Processes</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Starting Point (Context from Previous Stage)</h3>
+<p>Stage 54 established the complete interaction structure: $$ (q, g, U, m) \\longrightarrow \\text{Interaction} $$. Interactions are now fully defined at the level of fields and their dynamics. 👉 However, interaction as a field-level description is still not directly observable.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Core Question of This Module</h3>
+<p><strong>How do continuous field interactions manifest as discrete observable events?</strong> More precisely: How does the transition occur from field evolution to measurable physical processes?</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Conceptual Development</h3>
+
+<p><strong>(A) Structural Setup:</strong> Fields evolve continuously according to equations of motion. Interaction is encoded in amplitudes and field operators. 👉 Yet, observation always records <strong>discrete events</strong> (clicks, detections, tracks).</p>
+
+<p><strong>(B) Transition Structure:</strong> Physical processes are described as transitions:
+$$
+|i\\rangle \\;\\longrightarrow\\; |f\\rangle
+$$
+mediated by an interaction operator:
+$$
+\\mathcal{O}
+$$</p>
+
+<p><strong>(C) Process Representation:</strong> Observable physics is not about fields themselves, but about transitions between states:
+$$
+\\langle f | \\mathcal{O} | i \\rangle
+$$
+👉 This quantity defines the <strong>transition amplitude</strong>.</p>
+
+<p><strong>(D) From Amplitude to Event:</strong> The probability of an event is:
+$$
+P_{i \\rightarrow f} = |\\langle f | \\mathcal{O} | i \\rangle|^2
+$$
+👉 Thus: Continuous field dynamics → probabilistic transitions → discrete outcomes.</p>
+
+<p><strong>(E) Event Realization:</strong> Measurement collapses the process into an observed event. 👉 What is recorded is not the field, but the <strong>result of a transition</strong>.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Key Structural Insight</h3>
+<p>
+$$
+\\text{Field Dynamics} \\;\\longrightarrow\\; \\text{Transition Amplitude} \\;\\longrightarrow\\; \\text{Observable Event}
+$$
+</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Mathematical Anchor (Light)</h3>
+<p>Initial state: $$|i\\rangle$$. Final state: $$|f\\rangle$$. Transition amplitude: $$\\mathcal{M} = \\langle f | \\mathcal{O} | i \\rangle$$. Probability: $$P = |\\mathcal{M}|^2$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Physical Interpretation</h3>
+<p>Experiments do not observe fields directly. They observe outcomes such as scattering, decay, or detection events. 👉 These correspond to transitions between quantum states. The field provides the underlying structure, but reality appears as <strong>event chains</strong>.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Graph Interpretation Paragraph (MANDATORY)</h3>
+<p>The graph represents transition amplitude as a function of time. The X-axis corresponds to time evolution, while the Y-axis represents the transition amplitude $$\\mathcal{M}(t)$$. Oscillatory behavior reflects interference between contributing processes. Peaks correspond to higher transition likelihood, while nodes indicate suppression. 👉 The visualization demonstrates how continuous field evolution produces structured probability patterns, which ultimately manifest as discrete observed events.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Role of This Module</h3>
+<p>This module introduces: the transition from field description to process description, the concept of transition amplitudes, and the emergence of observable events. 👉 It establishes the bridge between theoretical fields and experimental reality.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 9. WHAT THIS MODULE ACHIEVES (FINAL LINE)</h3>
+<p style="margin-bottom: 0;">👉 This module establishes: $$\\boxed{ \\text{Field Dynamics} \\;\\longrightarrow\\; \\text{Interaction Processes} \\;\\longrightarrow\\; \\text{Discrete Observable Events} }$$</p>
+
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Transition Structure:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\mathcal{M} = \\langle f | \\mathcal{O} | i \\rangle$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Observable reality emerges not from static fields but from transitions between states, where interaction amplitudes determine the probability of discrete measurable events.</p>
+</div>
+</div>`,
+
+math: `<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: Transition Amplitudes and Observable Events</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Starting Mathematical Object</h3>
+<p>Initial state: $$|i\\rangle$$. Final state: $$|f\\rangle$$. Interaction operator: $$\\mathcal{O}$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Core Definition</h3>
+<p>Transition amplitude:
+$$
+\\mathcal{M}_{fi} = \\langle f | \\mathcal{O} | i \\rangle
+$$
+👉 This encodes the probability amplitude for a physical process.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Time Evolution Structure</h3>
+<p>The interaction operator arises from time evolution:
+$$
+\\mathcal{O} = U(t, t_0) = e^{-i H (t - t_0)}
+$$
+where $$H$$ is the Hamiltonian.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Interaction Picture Expansion</h3>
+<p>Expanding in interaction picture:
+$$
+U(t, t_0) = 1 - i \\int_{t_0}^{t} dt' H_I(t') + \\cdots
+$$
+👉 Leads to perturbative interaction amplitudes.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Transition Probability</h3>
+<p>
+$$
+P_{i \\rightarrow f} = |\\mathcal{M}_{fi}|^2
+$$
+👉 Observable events correspond to squared amplitudes.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Differential Rate (General Form)</h3>
+<p>
+$$
+d\\Gamma \\propto |\\mathcal{M}_{fi}|^2 \\; d\\Phi
+$$
+where $$d\\Phi$$ is phase space.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Connection to Interaction Structure</h3>
+<p>From Stage 54:
+$$
+\\mathcal{M} \\propto U (g q)
+$$
+Thus:
+$$
+P \\propto |U (g q)|^2
+$$
+👉 Observable probabilities inherit full interaction structure.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Time-Dependent Amplitude</h3>
+<p>
+$$
+\\mathcal{M}(t) = \\langle f | e^{-i H t} | i \\rangle
+$$
+👉 Oscillatory behavior produces interference patterns.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 9. Final Mathematical Statement</h3>
+<p>Observable physics is governed by transition amplitudes between states, with probabilities determined by the squared magnitude of these amplitudes.</p>
+
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Transition Law:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$P_{i \\rightarrow f} = |\\langle f | \\mathcal{O} | i \\rangle|^2$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">All observable events arise from transition amplitudes between quantum states, where interaction structure determines the probability of physical outcomes.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>INTERACTION DENSITY</span><input type="number" id="p_in" class="digital-entry" value="50" oninput="syncVal(this.value, 'p_sl')"></div><input type="range" id="p_sl" min="0" max="100" step="1" value="50" oninput="syncVal(this.value, 'p_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.8rem;">Field dynamics → interaction process → discrete event</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Reality is an Event-Chain</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Phase</span><span class="const-val">TRANSITION</span></div><div class="const-item"><span class="const-label">Entity</span><span class="const-val">EVENT</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-proc);">PROCESS: ACTIVE</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Initial State |i⟩<br>↓<br>Interaction Operator (𝒪)<br>↓<br>Final State |f⟩`,
+hierarchy: `<div style="color: var(--accent-proc); font-weight: bold; font-size: 0.95rem;">Fields generating discrete observable events</div>`,
+footer: "Fields define potential; interaction processes realize observable events.",
+rightNote: `<div style="color: #f59e0b; line-height: 1.3; padding: 10px; font-size: 0.9rem;">Continuous field evolution manifests as discrete detector events.<p><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">👉 This Module Establishes:<br>Field dynamics → interaction processes → discrete observable events</p></div>`
+},
+
+2: {
+title: "SCATTERING THEORY",
+result: "The S-Matrix encodes collision dynamics",
+resultSize: "0.85rem",
+
+brief: `<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Scattering Processes — S-Matrix and Observable Transitions</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Starting Point (Context from Previous Module)</h3>
+<p>Module 1 established: $$\\mathcal{M} = \\langle f | \\mathcal{O} | i \\rangle$$ and $$P = |\\mathcal{M}|^2$$. Observable events arise from transition amplitudes. 👉 However, a systematic framework is required to describe all possible transitions in a unified way.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Core Question of This Module</h3>
+<p><strong>How are all physical transitions between initial and final states systematically described?</strong> More precisely: What is the universal operator that encodes all scattering and interaction processes?</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Conceptual Development</h3>
+
+<p><strong>(A) Structural Setup:</strong> Physical processes involve transitions between asymptotic states:
+$$
+|i\\rangle \\;\\longrightarrow\\; |f\\rangle
+$$
+where states are defined far before and after interaction.</p>
+
+<p><strong>(B) S-Matrix Definition:</strong> The complete transition operator is:
+$$
+S
+$$
+such that:
+$$
+S_{fi} = \\langle f | S | i \\rangle
+$$
+👉 This encodes all possible transitions.</p>
+
+<p><strong>(C) Decomposition:</strong> The S-matrix is written as:
+$$
+S = I + iT
+$$
+where $$I$$ represents no interaction, and $$T$$ represents the interaction part.</p>
+
+<p><strong>(D) Scattering Amplitude:</strong> The transition amplitude becomes:
+$$
+\\mathcal{M}_{fi} = \\langle f | T | i \\rangle
+$$
+👉 Thus, all observable processes are derived from the $$T$$ operator.</p>
+
+<p><strong>(E) Physical Meaning:</strong> The S-matrix connects initial and final observable states. 👉 It is the bridge between theoretical interaction and measurable scattering outcomes.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Key Structural Insight</h3>
+<p>
+$$
+\\text{Field Interaction} \\;\\longrightarrow\\; S \\text{-Matrix} \\;\\longrightarrow\\; \\text{Observable Scattering}
+$$
+</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Mathematical Anchor (Light)</h3>
+<p>$$S_{fi} = \\delta_{fi} + i (2\\pi)^4 \\delta^4(p_f - p_i) \\mathcal{M}_{fi}$$. Transition amplitude: $$\\mathcal{M}_{fi} = \\langle f | T | i \\rangle$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Physical Interpretation</h3>
+<p>Scattering experiments measure how particles enter and exit interactions. 👉 The S-matrix predicts probabilities of these outcomes. All collider experiments (e.g., particle collisions) are direct realizations of S-matrix elements.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Graph Interpretation Paragraph (MANDATORY)</h3>
+<p>The graph represents scattering amplitude or probability distribution as a function of energy or momentum. The X-axis corresponds to incoming energy or momentum transfer, while the Y-axis represents transition probability or cross-section. Peaks indicate resonances (enhanced interaction probability), while smooth regions correspond to background processes. 👉 The visualization demonstrates how interaction structure manifests as measurable scattering patterns.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Role of This Module</h3>
+<p>This module introduces: the S-matrix formalism, decomposition into identity and interaction parts, and the connection between amplitudes and measurable scattering processes. 👉 It formalizes the complete transition structure of observable physics.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 9. WHAT THIS MODULE ACHIEVES (FINAL LINE)</h3>
+<p style="margin-bottom: 0;">👉 This module establishes: $$\\boxed{ S = I + iT \\;\\longrightarrow\\; \\text{All Observable Scattering Processes} }$$</p>
+
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Scattering Structure:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$S = I + iT$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The S-matrix encodes all possible transitions between initial and final states, providing a complete mathematical framework for observable scattering phenomena.</p>
+</div>
+</div>`,
+
+math: `<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: S-Matrix and Scattering Amplitudes</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Starting Mathematical Object</h3>
+<p>Initial state: $$|i\\rangle$$. Final state: $$|f\\rangle$$. Scattering operator: $$S$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Core Definition</h3>
+<p>S-matrix element:
+$$
+S_{fi} = \\langle f | S | i \\rangle
+$$
+👉 Encodes transition probability amplitudes between asymptotic states.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Decomposition of S-Matrix</h3>
+<p>
+$$
+S = I + iT
+$$
+Thus:
+$$
+S_{fi} = \\delta_{fi} + i T_{fi}
+$$
+👉 Identity term = no interaction, $$T$$ term = interaction.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Transition Amplitude</h3>
+<p>
+$$
+\\mathcal{M}_{fi} = \\langle f | T | i \\rangle
+$$
+Thus:
+$$
+S_{fi} = \\delta_{fi} + i \\mathcal{M}_{fi}
+$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Relativistic Normalization</h3>
+<p>
+$$
+S_{fi} = \\delta_{fi} + i (2\\pi)^4 \\delta^4(p_f - p_i) \\mathcal{M}_{fi}
+$$
+👉 Enforces energy-momentum conservation.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Probability Relation</h3>
+<p>
+$$
+P_{i \\rightarrow f} = |S_{fi}|^2
+$$
+For interacting part:
+$$
+P \\propto |\\mathcal{M}_{fi}|^2
+$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Unitarity Condition</h3>
+<p>
+$$
+S^\\dagger S = I
+$$
+👉 Ensures probability conservation.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Connection to Interaction Structure</h3>
+<p>From Stage 54:
+$$
+\\mathcal{M} \\propto U (g q)
+$$
+Thus:
+$$
+S_{fi} \\sim \\delta_{fi} + i U (g q)
+$$
+👉 Scattering directly reflects coupling and mixing structure.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 9. Final Mathematical Statement</h3>
+<p>The S-matrix provides the complete mathematical framework for all physical scattering processes, connecting interaction structure to observable transitions.</p>
+
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Scattering Law:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$S_{fi} = \\delta_{fi} + i (2\\pi)^4 \\delta^4(p_f - p_i) \\mathcal{M}_{fi}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">All observable scattering processes are encoded in the S-matrix, where interaction amplitudes determine measurable transition probabilities.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>COLLISION IMPACT</span><input type="number" id="s_in" class="digital-entry" value="40" oninput="syncVal(this.value, 's_sl')"></div><input type="range" id="s_sl" min="0" max="100" step="1" value="40" oninput="syncVal(this.value, 's_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">DYNAMICS RULE</span><div style="text-align:center; font-size: 0.8rem;">Differential Cross-Section (dσ/dΩ)</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Collision reveals Internal Structure</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Mode</span><span class="const-val">SCATTER</span></div><div class="const-item"><span class="const-label">Result</span><span class="const-val">S-MATRIX</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-scat);">SCATTERING: RESOLVED</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">In-State Momentum (|i⟩)<br>↓<br>Matrix Transformation (S-matrix S)<br>↓<br>Out-State Momentum (|f⟩)`,
+hierarchy: `<div style="color: var(--accent-scat); font-weight: bold; font-size: 0.95rem;">S-matrix: encoding interaction structure</div>`,
+footer: "Internal structure is inferred from scattering distributions.",
+rightNote: `<div style="color: #10b981; line-height: 1.3; padding: 10px; font-size: 0.9rem;">Scattering processes probe the internal structure of physical systems.<p><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">👉 This Module Establishes:<br>Scattering processes → S-matrix mapping → differential cross-section → inference of internal structure</p></div>`
+},
+
+3: {
+title: "DECAY PROCESSES",
+result: "Stability vs. Transformation",
+resultSize: "0.85rem",
+
+brief: `<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Decay Processes — Temporal Irreversibility</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Starting Point (Context from Previous Module)</h3>
+<p>Module 2 established: $$S_{fi} = \\langle f | S | i \\rangle$$, where interaction amplitudes determine transition probabilities. 👉 However, this describes <strong>what can happen</strong>, not <strong>how systems evolve in time</strong>.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Core Question of This Module</h3>
+<p><strong>How do unstable states evolve in time?</strong> Why do particles decay? What determines their lifetime? Why is decay irreversible?</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Conceptual Development</h3>
+
+<p><strong>(A) Structural Setup:</strong> Consider an unstable state $$|\\psi\\rangle$$ with higher energy than available final states. 👉 Such states cannot remain indefinitely.</p>
+
+<p><strong>(B) Decay as Transition:</strong> Using S-matrix logic:
+$$
+|i\\rangle \\rightarrow |f\\rangle
+$$
+👉 Decay is simply a transition into energetically allowed states.</p>
+
+<p><strong>(C) Energy Condition:</strong>
+$$
+\\Delta E = m_i - \\sum m_f > 0
+$$
+👉 Excess energy drives decay (released as kinetic energy or radiation).</p>
+
+<p><strong>(D) Exponential Law:</strong> Survival probability:
+$$
+P(t) = e^{-\\Gamma t}
+$$
+👉 Indicates continuous probability leakage from initial state.</p>
+
+<p><strong>(E) Lifetime Definition:</strong>
+$$
+\\tau = \\frac{1}{\\Gamma}
+$$
+👉 Lifetime is inverse of decay rate.</p>
+
+<p><strong>(F) Structural Origin:</strong> From Stage 54:
+$$
+\\Gamma \\propto g^2
+$$
+👉 Stronger coupling → faster decay.</p>
+
+<p><strong>(G) Irreversibility:</strong> Decay proceeds from:
+$$
+\\text{Single state} \\rightarrow \\text{many accessible states}
+$$
+👉 Reverse process is statistically suppressed.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Key Structural Insight</h3>
+<p>$$
+\\text{Coupling structure} \\;\\longrightarrow\\; \\text{decay rate} \\;\\longrightarrow\\; \\text{temporal evolution}
+$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Mathematical Anchor (Light)</h3>
+<p>
+$$
+P(t) = e^{-\\Gamma t}, \\quad \\tau = \\frac{1}{\\Gamma}
+$$
+$$
+\\Gamma = \\sum_f |\\mathcal{M}_{fi}|^2 \\cdot \\rho_f
+$$
+👉 Decay rate depends on amplitude and available phase space.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Physical Interpretation</h3>
+<p><strong>Unstable particles:</strong> Short lifetimes, rapid decay (large $$\\Gamma$$). <strong>Stable particles:</strong> Extremely small or zero $$\\Gamma$$. 👉 Stability is not absolute—it is coupling-dependent.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Graph Interpretation Paragraph (MANDATORY)</h3>
+<p>The graph represents exponential decay behavior. The X-axis is time $$t$$, and the Y-axis is survival probability $$P(t)$$. The curve begins at $$P(0) = 1$$ and decreases exponentially toward zero. The slope is determined by $$\\Gamma$$: steeper curves indicate faster decay. 👉 The visualization demonstrates: <strong>Continuous temporal evolution of quantum states into lower-energy configurations</strong>.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Role of This Module</h3>
+<p>This module introduces: Time-dependent evolution of quantum states, Definition of lifetime and decay rate, and the origin of irreversibility. 👉 It connects interaction amplitudes to temporal processes.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 9. WHAT THIS MODULE ACHIEVES (FINAL LINE)</h3>
+<p style="margin-bottom: 0;">👉 This module establishes: $$\\boxed{ \\text{Interaction structure} \\;\\longrightarrow\\; \\text{decay rates} \\;\\longrightarrow\\; \\text{irreversible temporal evolution} }$$</p>
+
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Decay Law:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$P(t) = e^{-\\Gamma t}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Decay processes reveal the intrinsic time-directed nature of physical systems, where interaction strengths govern stability and the irreversible flow toward lower-energy configurations.</p>
+</div>
+</div>`,
+
+math: `<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: Decay Rates and Lifetime Structure</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Starting Mathematical Object</h3>
+<p>Unstable quantum state: $$|i\\rangle$$. Final states: $$|f\\rangle$$. Transition amplitude:
+$$
+\\mathcal{M}_{fi} = \\langle f | T | i \\rangle
+$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Core Definition (Decay Rate)</h3>
+<p>Total decay rate:
+$$
+\\Gamma = \\sum_f \\Gamma_{i \\rightarrow f}
+$$
+Partial decay rate:
+$$
+\\Gamma_{i \\rightarrow f} = \\frac{1}{2E_i} \\int d\\Phi_f \\, |\\mathcal{M}_{fi}|^2
+$$
+👉 Depends on amplitude and final-state phase space.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Phase Space Measure</h3>
+<p>
+$$
+d\\Phi_f = (2\\pi)^4 \\delta^4(p_i - p_f) \\prod_k \\frac{d^3p_k}{(2\\pi)^3 2E_k}
+$$
+👉 Encodes all kinematically allowed final configurations.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Exponential Decay Law</h3>
+<p>Time evolution of survival probability:
+$$
+P(t) = e^{-\\Gamma t}
+$$
+👉 Solution of:
+$$
+\\frac{dP}{dt} = -\\Gamma P
+$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Lifetime Definition</h3>
+<p>
+$$
+\\tau = \\frac{1}{\\Gamma}
+$$
+Mean lifetime:
+$$
+\\langle t \\rangle = \\tau
+$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Energy Width Relation</h3>
+<p>
+$$
+\\Delta E \\cdot \\tau \\sim 1
+$$
+Thus:
+$$
+\\Gamma = \\frac{1}{\\tau}
+$$
+👉 Width–lifetime duality.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Coupling Dependence</h3>
+<p>From interaction structure:
+$$
+\\mathcal{M} \\propto g
+$$
+Thus:
+$$
+\\Gamma \\propto g^2
+$$
+👉 Stronger coupling → faster decay.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Branching Ratios</h3>
+<p>
+$$
+BR_f = \\frac{\\Gamma_{i \\rightarrow f}}{\\Gamma}
+$$
+👉 Probability fraction into each channel.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 9. Final Mathematical Statement</h3>
+<p>Decay processes are governed by transition amplitudes and phase space, producing exponential time evolution characterized by a coupling-dependent decay rate.</p>
+
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Decay Structure:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\Gamma = \\sum_f \\frac{1}{2E_i} \\int d\\Phi_f \\, |\\mathcal{M}_{fi}|^2$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The decay rate emerges from the interplay between interaction strength and kinematic accessibility, translating microscopic amplitudes into macroscopic temporal evolution.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>DECAY RATE (Γ)</span><input type="number" id="d_in" class="digital-entry" value="30" oninput="syncVal(this.value, 'd_sl')"></div><input type="range" id="d_sl" min="1" max="100" step="1" value="30" oninput="syncVal(this.value, 'd_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">STABILITY RULE</span><div style="text-align:center; font-size: 0.8rem;">Mass difference → Energy Release (ΔE = Δm c²)</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">All things seek Equilibrium</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Type</span><span class="const-val">TRANSFORMATION</span></div><div class="const-item"><span class="const-label">Stat</span><span class="const-val">LIFETIME</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-decay);">DECAY: CALCULATED</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Unstable (Excited) State<br>↓<br>Decay via Interaction Channel (Weak / EM / Strong)<br>↓<br>Stable Daughter States`,
+hierarchy: `<div style="color: var(--accent-decay); font-weight: bold; font-size: 0.95rem;">Decay: Decay: Temporal Irreversibility of Unstable States</div>`,
+footer: "Stability is determined by mass hierarchy and available decay channels.",
+rightNote: `<div style="color: #ef4444; line-height: 1.3; padding: 5px; font-size: 0.80rem; margin-bottom: 0px;">Decay rates are determined by coupling constants (from Stage 54).<p><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">👉 This Module Establishes:<br>Decay processes → coupling-dependent decay rates → exponential lifetime behavior → temporal irreversibility</p></div>`
+},
+
+4: {
+title: "PROBABILITY & MEASUREMENT",
+result: "Quantized outcomes from squared amplitudes",
+resultSize: "0.80rem",
+
+brief: `<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Probability & Measurement — From Amplitude to Outcome</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Starting Point (Context from Previous Module)</h3>
+<p>Module 3 established decay rates: $$\\Gamma$$ and time evolution: $$P(t) = e^{-\\Gamma t}$$. 👉 However, experiments do not measure continuous amplitudes—they record <strong>discrete outcomes</strong>.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Core Question of This Module</h3>
+<p><strong>How do quantum amplitudes become measurable outcomes?</strong> What connects $$\\mathcal{M}$$ or $$S_{fi}$$ to actual detector counts?</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Conceptual Development</h3>
+
+<p><strong>(A) Structural Setup:</strong> Quantum states are described by wavefunctions:
+$$
+\\psi(x)
+$$
+👉 These encode <strong>probability amplitudes</strong>, not outcomes.</p>
+
+<p><strong>(B) Born Rule:</strong>
+$$
+P(x) = |\\psi(x)|^2
+$$
+👉 Probability density is obtained from squared amplitude.</p>
+
+<p><strong>(C) Measurement Mapping:</strong>
+$$
+\\text{Amplitude} \\;\\rightarrow\\; \\text{Probability} \\;\\rightarrow\\; \\text{Outcome}
+$$
+👉 Measurement converts possibility into actuality.</p>
+
+<p><strong>(D) Discreteness of Events:</strong> Detectors register:
+$$
+\\text{Counts} \\in \\mathbb{N}
+$$
+👉 Outcomes are inherently discrete even though amplitudes are continuous.</p>
+
+<p><strong>(E) Statistical Ensemble:</strong> Repeated measurements yield distribution:
+$$
+N(x) \\propto |\\psi(x)|^2
+$$
+👉 Experimental histograms reconstruct probability density.</p>
+
+<p><strong>(F) Connection to Scattering:</strong>
+$$
+\\sigma \\propto |\\mathcal{M}|^2
+$$
+👉 Cross sections arise from squared amplitudes.</p>
+
+<p><strong>(G) Collapse Interpretation:</strong> Measurement selects one outcome from:
+$$
+\\{x_i\\} \\sim P(x)
+$$
+👉 This is the transition from “Maybe” to “Is”.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Key Structural Insight</h3>
+<p>$$
+\\text{Amplitude} \\;\\longrightarrow\\; |\\text{Amplitude}|^2 \\;\\longrightarrow\\; \\text{observable statistics}
+$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Mathematical Anchor (Light)</h3>
+<p>
+$$
+P(x) = |\\psi(x)|^2
+$$
+$$
+\\int P(x) \\, dx = 1
+$$
+$$
+N(x) \\sim P(x)
+$$
+👉 Probability density governs measurable distributions.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Physical Interpretation</h3>
+<p>Quantum systems evolve deterministically at the level of amplitudes, but measurements produce probabilistic outcomes. 👉 Reality appears statistical because observation samples probability distributions.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Graph Interpretation Paragraph (MANDATORY)</h3>
+<p>The graph represents a probability distribution derived from $$|\\psi(x)|^2$$. The X-axis is the observable variable (position, energy, etc.), and the Y-axis is probability density. The peak indicates the most likely outcome, while the spread represents uncertainty. Repeated measurements produce a histogram matching this curve. 👉 The visualization demonstrates: <strong>Continuous probability structure yielding discrete statistical outcomes</strong>.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Role of This Module</h3>
+<p>This module introduces: The Born rule, the mapping from amplitudes to probabilities, and the emergence of statistical reality. 👉 It connects theoretical amplitudes to actual experimental data.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 9. WHAT THIS MODULE ACHIEVES (FINAL LINE)</h3>
+<p style="margin-bottom: 0;">👉 This module establishes: $$\\boxed{ \\text{Quantum amplitudes} \\;\\longrightarrow\\; \\text{probability densities} \\;\\longrightarrow\\; \\text{measured outcomes} }$$</p>
+
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Measurement Law:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$P(x) = |\\psi(x)|^2$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Measurement translates continuous quantum amplitudes into discrete observable events, establishing probability as the bridge between theory and reality.</p>
+</div>
+</div>`,
+
+math: `<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: Probability Density and Measurement Mapping</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Starting Mathematical Object</h3>
+<p>Quantum state described by wavefunction:
+$$
+\\psi(x,t)
+$$
+Normalized such that:
+$$
+\\int |\\psi(x,t)|^2 dx = 1
+$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Core Definition (Born Rule)</h3>
+<p>
+$$
+P(x,t) = |\\psi(x,t)|^2
+$$
+👉 Probability density of observing the system at position $$x$$ and time $$t$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Expectation Values</h3>
+<p>Observable average:
+$$
+\\langle O \\rangle = \\int \\psi^*(x,t) \\, \\hat{O} \\, \\psi(x,t) \\, dx
+$$
+For position:
+$$
+\\langle x \\rangle = \\int x |\\psi(x,t)|^2 dx
+$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Discrete Measurement Outcomes</h3>
+<p>For eigenstates $$|a_i\\rangle$$:
+$$
+P(a_i) = |\\langle a_i | \\psi \\rangle|^2
+$$
+👉 Measurement yields eigenvalues probabilistically.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Connection to Scattering Amplitudes</h3>
+<p>
+$$
+P_{i \\rightarrow f} = |S_{fi}|^2
+$$
+Using:
+$$
+S_{fi} = \\delta_{fi} + i\\mathcal{M}_{fi}
+$$
+Thus:
+$$
+P \\propto |\\mathcal{M}_{fi}|^2
+$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Event Counts (Experimental Mapping)</h3>
+<p>Number of detected events:
+$$
+N = \\mathcal{L} \\cdot \\sigma
+$$
+Where:
+$$
+\\sigma \\propto |\\mathcal{M}|^2
+$$
+👉 Luminosity $$\\mathcal{L}$$ converts probability into counts.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Probability Distribution Function</h3>
+<p>
+$$
+\\int_{a}^{b} P(x) \\, dx = \\text{Probability of outcome in } [a,b]
+$$
+👉 Continuous distributions yield discrete sampled outcomes.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Variance and Uncertainty</h3>
+<p>
+$$
+\\sigma_x^2 = \\langle x^2 \\rangle - \\langle x \\rangle^2
+$$
+Uncertainty relation:
+$$
+\\Delta x \\Delta p \\geq \\frac{\\hbar}{2}
+$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 9. Final Mathematical Statement</h3>
+<p>Measurement outcomes are governed by probability densities derived from quantum amplitudes, linking theoretical wavefunctions to experimentally observed statistical distributions.</p>
+
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Measurement Mapping:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$P = |\\psi|^2 \\sim |\\mathcal{M}|^2$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Quantum amplitudes become experimentally accessible through squared magnitudes, producing measurable probability distributions and event counts.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>UNCERTAINTY</span><input type="number" id="u_in" class="digital-entry" value="20" oninput="syncVal(this.value, 'u_sl')"></div><input type="range" id="u_sl" min="0" max="100" step="1" value="20" oninput="syncVal(this.value, 'u_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">COLLAPSE RULE</span><div style="text-align:center; font-size: 0.8rem;">Amplitude (ψ) → Probability (|ψ|²) → Measurement outcome</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">Observation is the Final Gate</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Mode</span><span class="const-val">STATISTICAL</span></div><div class="const-item"><span class="const-label">Entity</span><span class="const-val">OUTCOME</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-prob);">PROBABILITY: MAPPED</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Wavefunction Ψ<br>↓<br>Probability Density |Ψ|²<br>↓<br>Discrete Detector Event`,
+hierarchy: `<div style="color: var(--accent-prob); font-weight: bold; font-size: 0.95rem;">Measurement: realization of probabilistic outcomes</div>`,
+footer: "Measurement converts probabilistic amplitudes into definite outcomes.<br>The bridge from 'Maybe' to 'Is'.",
+rightNote: `<div style="color: #8b5cf6; line-height: 1.3; padding: 10px; font-size: 0.9rem;">Experiments measure discrete event counts governed by probability distributions.<p><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">👉 This Module Establishes:<br>Quantum Amplitudes → Probability Densities (|ψ|²) → Measurement Outcomes → Statistical Reality</p></div>`
+},
+
+5: {
+title: "EXPERIMENTAL REALITY",
+result: "Measurable signatures complete the framework",
+resultSize: "0.80rem",
+
+brief: `<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Experimental Closure — Theory Meets Reality</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Starting Point (Context from Previous Module)</h3>
+<p>Module 4 established: $$P(x) = |\\psi(x)|^2$$ and event counts $$N = \\mathcal{L} \\cdot \\sigma$$. 👉 The framework now connects amplitudes to measurable outcomes.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Core Question of This Module</h3>
+<p><strong>How is theory validated by experiment?</strong> When can a theoretical structure be said to be physically real?</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Conceptual Development</h3>
+
+<p><strong>(A) Structural Setup:</strong> Theoretical pipeline:
+$$
+\\text{Symmetry} \\rightarrow \\text{Interaction} \\rightarrow \\mathcal{M}
+$$</p>
+
+<p><strong>(B) Predictive Mapping:</strong>
+$$
+\\mathcal{M} \\rightarrow |\\mathcal{M}|^2 \\rightarrow \\sigma, \\Gamma
+$$
+👉 Theory produces quantitative predictions.</p>
+
+<p><strong>(C) Experimental Measurement:</strong>
+$$
+\\sigma \\rightarrow N = \\mathcal{L} \\cdot \\sigma
+$$
+$$
+\\Gamma \\rightarrow P(t) = e^{-\\Gamma t}
+$$
+👉 Experiments measure counts and decay curves.</p>
+
+<p><strong>(D) Data Comparison:</strong>
+$$
+\\text{Agreement} = \\frac{\\text{Measured}}{\\text{Predicted}} \\times 100\\%
+$$
+👉 Validates consistency between theory and observation.</p>
+
+<p><strong>(E) Multi-Observable Confirmation:</strong> Agreement across:
+<ul>
+<li>Cross sections $$\\sigma$$</li>
+<li>Decay rates $$\\Gamma$$</li>
+<li>Distributions $$P(x)$$</li>
+</ul>
+👉 Ensures robustness of the framework.</p>
+
+<p><strong>(F) Closure of Loop:</strong>
+$$
+\\text{Theory} \\rightarrow \\text{Prediction} \\rightarrow \\text{Measurement} \\rightarrow \\text{Verification}
+$$
+👉 The loop is complete.</p>
+
+<p><strong>(G) Structural Realization:</strong> When predictions match observations:
+$$
+\\text{Abstract structure} \\rightarrow \\text{physical reality}
+$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Key Structural Insight</h3>
+<p>$$
+\\text{Mathematical consistency} \\;\\longrightarrow\\; \\text{empirical verification} \\;\\longrightarrow\\; \\text{physical truth}
+$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Mathematical Anchor (Light)</h3>
+<p>
+$$
+N = \\mathcal{L} \\cdot \\sigma
+$$
+$$
+P(t) = e^{-\\Gamma t}
+$$
+$$
+P(x) = |\\psi(x)|^2
+$$
+👉 All observables derive from amplitude structure.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Physical Interpretation</h3>
+<p>Physics is not complete at the level of equations alone. 👉 It becomes real only when measurable quantities match predictions. Verification is the final step that transforms theory into established knowledge.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Graph Interpretation Paragraph (MANDATORY)</h3>
+<p>The bar chart represents agreement between theoretical predictions and experimental measurements across multiple observables (e.g., charge, mass, momentum, spin). The X-axis lists different physical quantities, while the Y-axis shows percentage agreement. Bars near 100% indicate strong validation. 👉 The visualization demonstrates: <strong>multi-dimensional confirmation of theoretical structure through experiment</strong>.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Role of This Module</h3>
+<p>This module completes: The full theory-to-experiment mapping, Validation of physical laws, and Closure of the scientific loop. 👉 It establishes when a framework becomes empirically real.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 9. WHAT THIS MODULE ACHIEVES (FINAL LINE)</h3>
+<p style="margin-bottom: 0;">👉 This module establishes: $$\\boxed{ \\text{Theory} \\;\\longrightarrow\\; \\text{prediction} \\;\\longrightarrow\\; \\text{measurement} \\;\\longrightarrow\\; \\text{experimental verification} }$$</p>
+
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Closure Principle:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\text{Theory} \\rightarrow \\text{Experiment} \\rightarrow \\text{Verification}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The ultimate validation of any physical framework lies in its ability to produce measurable predictions that match experimental data across multiple independent observables.</p>
+</div>
+</div>`,
+
+math: `<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: Experimental Realization of Observable Physics</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Starting Mathematical Object</h3>
+<p>Initial and final states: $$|i\\rangle, \\quad |f\\rangle$$. Transition amplitude defined by S-matrix: $$\\mathcal{M}_{fi} = \\langle f | S | i \\rangle$$, with $$S = 1 + iT$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Core Definition (Probability)</h3>
+<p>Probability of transition: $$P_{fi} = |\\mathcal{M}_{fi}|^2$$. 👉 All measurable outcomes originate from squared amplitudes.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Key Construction (Cross-Section)</h3>
+<p>Differential cross-section: $$d\\sigma \\propto |\\mathcal{M}_{fi}|^2$$. For scattering: $$\\frac{d\\sigma}{d\\Omega} = \\frac{|\\mathcal{M}_{fi}|^2}{64\\pi^2 s} \\cdot \\frac{|\\mathbf{p}_f|}{|\\mathbf{p}_i|}$$. 👉 Interaction strength becomes measurable via cross-section.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Event Rate (Detector Level)</h3>
+<p>Event rate: $$R = \\mathcal{L} \\cdot \\sigma$$, where $$\\mathcal{L}$$ is luminosity. 👉 Experimental signals depend on both interaction strength and particle flux.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Total Event Count</h3>
+<p>Total detected events over time $$T$$: $$N = \\mathcal{L} \\cdot \\sigma \\cdot T$$. 👉 Observable counts are proportional to squared amplitudes.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Decay Measurement Structure</h3>
+<p>Decay rate: $$\\Gamma \\propto |\\mathcal{M}_{fi}|^2$$. Time evolution: $$N(t) = N_0 e^{-\\Gamma t}$$. 👉 Lifetime: $$\\tau = \\frac{1}{\\Gamma}$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Differential Distribution</h3>
+<p>Measured distribution: $$\\frac{dN}{dx} = \\mathcal{L} \\cdot \\frac{d\\sigma}{dx}$$. Thus: $$\\frac{dN}{dx} \\propto |\\mathcal{M}(x)|^2$$. 👉 Experimental graphs directly reflect probability structure.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Integrated Observable Mapping</h3>
+<p>General observable quantity: $$N = \\mathcal{L} \\cdot T \\cdot \\int |\\mathcal{M}_{fi}|^2 \\, d\\Phi$$, where $$d\\Phi$$ is phase space. 👉 All measurable physics reduces to integrated probability.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 9. Final Mathematical Statement</h3>
+<p> Observable physics is the statistical realization of squared transition amplitudes through detector-level event counts.</p>
+
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Measurement Chain:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\langle f|S|i\\rangle \\rightarrow |\\mathcal{M}|^2 \\rightarrow \\sigma, \\Gamma \\rightarrow R \\rightarrow N$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The full structure of observable physics emerges as a transformation from amplitudes to probabilities and finally to measurable detector events, completing the bridge between theory and experiment.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>REALIZATION (%)</span><input type="number" id="r_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'r_sl')"></div><input type="range" id="r_sl" min="0" max="100" step="1" value="100" oninput="syncVal(this.value, 'r_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">FINAL SYNTHESIS</span><div style="text-align:center; font-size: 0.8rem;">Theory → Prediction → Measurement → Verified Reality</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">Verification is the Seal of Truth</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Status</span><span class="const-val">EXPERIMENTALLY VERIFIED</span></div><div class="const-item"><span class="const-label">STRUCTURE</span><span class="const-val">FULLY REALIZED</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-real);">REALITY: OBSERVED</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Symmetry Structure<br>↓<br>Interaction Dynamics<br>↓<br>Observable Signatures`,
+hierarchy: `<div style="color: var(--accent-real); font-weight: bold; font-size: 1.00rem;">Outcome: Theory experimentally confirmed</div>`,
+footer: "Observable physics closes the theory–experiment loop.",
+rightNote: `<div style="color: #2dd4bf; line-height: 1.3; padding: 5px; margin-bottom: 0px; font-size: 0.8rem;"><p><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">👉 This Module Establishes:<br>Theory → prediction → measurement → experimental verification → closure of the theory–experiment loop</p><p>👉 This Stage Establishes:<br>All prior stages (50 to 54) culminate in experimentally testable and verified predictions.</p></div>`
+}
+};
+
+function syncVal(val, id) {
+const sliderId = id.includes('_in') ? id.replace('_in', '_sl') : id;
+const inputId = id.includes('_sl') ? id.replace('_sl', '_in') : id;
+if(document.getElementById(sliderId)) document.getElementById(sliderId).value = val;
+if(document.getElementById(inputId)) document.getElementById(inputId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+document.getElementById('brief-box-content').innerHTML = content.brief;
+document.getElementById('math-box-content').innerHTML = content.math;
+document.getElementById('control-sliders').innerHTML = content.sliders;
+
+document.getElementById('active-module-title').innerText = content.title;
+const resultEl = document.getElementById('active-module-result');
+resultEl.innerText = content.result;
+resultEl.style.fontSize = content.resultSize || "0.65rem";
+
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('metrics-content').innerHTML = content.metricsContent;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+document.getElementById('structure-box-area').innerHTML = content.structure;
+document.getElementById('telemetry-area').innerHTML = content.telemetry;
+showScreen('briefing');
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() {
+showScreen('lab');
+setTimeout(() => { runLab(); window.dispatchEvent(new Event('resize')); }, 100);
+}
+
+function runLab() {
+const target = document.getElementById('plot-area');
+if (!target) return;
+let data = [];
+let layout = {
+paper_bgcolor: 'black', plot_bgcolor: 'black', margin: {t:60,b:10,l:40,r:10},
+showlegend: true, font: { family: 'sans-serif', size: 10, color: '#94a3b8' },
+legend: { font: { color: '#e5e7eb' }, x: 0.7, y: 0.9, bgcolor: 'rgba(0,0,0,0.5)' }
+};
+
+if (currentTool === 1) { // PROCESSES
+let density = parseFloat(document.getElementById('p_sl')?.value || 50) / 10;
+let x = [], y = [];
+for(let i=0; i<100; i++) {
+x.push(i);
+y.push(Math.sin(i/2) * Math.cos(i/density));
+}
+data.push({ type: 'scatter', x: x, y: y, line: { color: '#f59e0b', width: 2 }, name: 'Transition Amplitude' });
+layout.title = { text: "FIELD-TO-PROCESS TRANSITION", font: { color: '#f59e0b' } };
+layout.xaxis = { title: "Time (t)" }; layout.yaxis = { title: "Transition Amplitude" };
+delete layout.scene;
+
+
+} else if (currentTool === 2) { // SCATTERING (2D cross section)
+let impact = parseFloat(document.getElementById('s_sl')?.value || 40);
+let theta = Array.from({length: 100}, (_, i) => (i * Math.PI) / 50);
+let r = theta.map(t => impact / (Math.sin(t/2)**4 + 0.1));
+data.push({ type: 'scatterpolar', r: r, theta: theta.map(t => t*180/Math.PI), mode: 'lines', line: { color: '#10b981' }, name: 'Scattering Cross-Section (dσ/dΩ)' });
+layout.polar = { bgcolor: 'black', radialaxis: { visible: false } };
+layout.title = { text: "S-MATRIX ANGULAR DISTRIBUTION", font: { color: '#10b981' } };
+delete layout.scene;
+
+
+} else if (currentTool === 3) { // DECAY
+let rate = parseFloat(document.getElementById('d_sl')?.value || 30) / 50;
+let t = Array.from({length: 100}, (_, i) => i / 10);
+data.push({ type: 'scatter', x: t, y: t.map(v => Math.exp(-rate * v)), fill: 'tozeroy', line: { color: '#ef4444' }, name: 'Decay Probability' });
+layout.title = { text: "PARTICLE LIFETIME TRANSFORMATION", font: { color: '#ef4444' } };
+layout.xaxis = { title: "Time (τ)" }; layout.yaxis = { title: "Survival Probability (P(t) = e⁻ᵞᵗ)" };
+delete layout.scene;
+
+
+} else if (currentTool === 4) { // PROBABILITY
+let unc = parseFloat(document.getElementById('u_sl')?.value || 20) / 20;
+let x = Array.from({length: 200}, (_, i) => (i - 100) / 10);
+data.push({ type: 'scatter', x: x, y: x.map(v => Math.exp(-v*v / (2*unc*unc))), line: { color: '#8b5cf6' }, name: 'Probability Density |ψ|²  (P(x) = |ψ(x)|²)' });
+layout.title = { text: "MEASUREMENT OUTCOME DISTRIBUTION", font: { color: '#8b5cf6' } };
+layout.xaxis = { title: "Observable Value" }; layout.yaxis = { title: "Probability" };
+delete layout.scene;
+
+
+} else if (currentTool === 5) { // EXPERIMENTAL REALITY
+let real = parseFloat(document.getElementById('r_sl')?.value || 100);
+// Adjusting multipliers to ensure bars do not exceed the 'real' baseline (max 100)
+data.push({
+type: 'bar',
+x: ['Charge', 'Mass', 'Momentum', 'Spin'],
+y: [real, real * 0.85, real, real * 0.75],
+marker: { color: '#2dd4bf' },
+name: 'Measured Signatures'
+});
+layout.title = { text: "EXPERIMENTAL DATA OUTPUT", font: { color: '#2dd4bf' } };
+layout.yaxis = { title: "Agreement with Theory (%)", range: [0, 100] }; // Clamps the view to 100%
+delete layout.scene;
+}
+
+Plotly.react('plot-area', data, layout, {responsive: true, displayModeBar: false});
+}
+
+function resetLab() {
+if(currentTool===1) syncVal(50, 'p_sl');
+if(currentTool===2) syncVal(40, 's_sl');
+if(currentTool===3) syncVal(30, 'd_sl');
+if(currentTool===4) syncVal(20, 'u_sl');
+if(currentTool===5) syncVal(100, 'r_sl');
+}
+
+window.onload = () => { showScreen('portal'); };
+</script>
+</body>
+</html>

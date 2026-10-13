@@ -1,0 +1,3664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 58 — Cosmological Extension</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #3b82f6;
+--accent-lim: #94a3b8; --accent-medium: #60a5fa; --accent-curv: #c084fc; --accent-force: #f87171; --accent-total: #2dd4bf;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6;
+--accent-gold: #fbbf24;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-gold); font-family: sans-serif; font-size: 0.85rem; min-width: 450px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls, #nav-summary-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+#screen-lab.active { display: flex; flex-direction: column; height: calc(100vh - 50px); }
+
+#screen-portal { justify-content: flex-start; padding-top: 6dvh; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 50px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 2px; font-weight: bold; letter-spacing: 0.5px; padding-bottom: 0px; }
+.module-subtitle { text-align: center; font-family: sans-serif; color: var(--accent-gold); margin-bottom: 12px; font-weight: bold; letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.primary-constant-box { background: #000; border: 1px solid var(--accent-unified); padding: 2px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 8px; }
+.secondary-structure-box { background: rgba(59, 130, 246, 0.05); border: 1px dashed var(--accent-unified); padding: 3px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 12px; }
+
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(59, 130, 246, 0.05); border: 1px solid var(--accent-unified); padding: 5px; border-radius: 5px; margin-bottom: 8px; font-size: 0.7rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; }
+#plot-area { flex-grow: 1; width: 100%; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #fff; border: 1px solid var(--accent-unified); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer { width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem; color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 58 — COSMOLOGICAL EXTENSION</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">Cosmological Extension</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">Universal dynamics as large-scale manifestations of substrate properties.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-lim);">
+<h2 style="color:var(--accent-lim);">1. Standard Cosmology Limits</h2>
+<p>Descriptive Friedmann logic.<br>Parameters as inserted constants.</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-medium);">
+<h2 style="color:var(--accent-medium);">2. Substrate Expansion</h2>
+<p>Origin of cosmic flow.<br>Synthesis Pressure $P$ as the driver.</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-curv);">
+<h2 style="color:var(--accent-curv);">3. Emergent Energy Density</h2>
+<p>Vacuum Energy reinterpreted.<br>$\rho$ as a function of $K$ and $P$.</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-force);">
+<h2 style="color:var(--accent-force);">4. Geometry from Substrate</h2>
+<p>GR as emergent structural property.<br>Substrate configuration &equiv; Geometry.</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-total);">
+<h2 style="color:var(--accent-total);">5. Structure Formation</h2>
+<p>Instabilities in the medium.<br>Origin of large-scale structure.</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-unified);">
+<h2 style="color:var(--accent-unified);">6. Stage 58 Summary</h2>
+<p>Cosmology is Emergent Substrate Physics.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color:var(--accent-unified); text-align:center;">Stage 58 — Mathematical Structure Summary and Closure/Competion Theorem</h2>
+<section>
+<h3 style="color:#fbbf24;">1. Foundational Substrate Parameters</h3>
+
+<p>
+All cosmological quantities arise from:
+</p>
+
+<p>
+$K = |\nabla C|, \quad P = P_{\text{syn}}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\mathcal{S}(x) = (K(x), P(x))$
+</p>
+
+<h3 style="color:#fbbf24;">2. Cosmological Expansion (Module 2)</h3>
+
+<p>
+Expansion is driven by synthesis pressure:
+</p>
+
+<p>
+$H^2 \sim P$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\text{Substrate Pressure} \;\longrightarrow\; \text{Cosmic Expansion}$
+</p>
+
+<h3 style="color:#fbbf24;">3. Emergent Energy Density (Module 3)</h3>
+
+<p>
+Energy density arises from substrate configuration:
+</p>
+
+<p>
+$\rho \sim \frac{K^2}{P}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\text{Substrate Gradient} \;\longrightarrow\; \text{Energy Density}$
+</p>
+
+<h3 style="color:#fbbf24;">4. Geometry from Substrate (Module 4)</h3>
+
+<p>
+Metric emerges from substrate structure:
+</p>
+
+<p>
+$g_{\mu\nu} = \mathcal{G}_{\mu\nu}(K, P)$
+</p>
+
+<p>
+Curvature:
+</p>
+
+<p>
+$G_{\mu\nu} \sim \text{substrate response}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\text{Substrate Configuration} \;\longrightarrow\; \text{Spacetime Geometry}$
+</p>
+
+<h3 style="color:#fbbf24;">5. Structure Formation (Module 5)</h3>
+
+<p>
+Density perturbations:
+</p>
+
+<p>
+$\delta = \frac{2\delta K}{K} - \frac{\delta P}{P}$
+</p>
+
+<p>
+Growth equation:
+</p>
+
+<p>
+$\ddot{\delta} + 2H \dot{\delta} = 4\pi G \left(\frac{K^2}{P}\right) \delta$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\text{Substrate Variation} \;\longrightarrow\; \text{Cosmic Structure}$
+</p>
+
+<h3 style="color:#fbbf24;">6. Unified Structural Chain</h3>
+
+<p>
+Complete cosmological mapping:
+</p>
+
+<p>
+$(K, P) \;\longrightarrow\; \rho = \frac{K^2}{P} \;\longrightarrow\; H^2 \sim P \;\longrightarrow\; g_{\mu\nu} \;\longrightarrow\; \delta \;\longrightarrow\; \text{Structure}$
+</p>
+
+<h3 style="color:#fbbf24;">7. Structural Principle</h3>
+
+<p>
+Cosmology is not fundamental but emergent:
+</p>
+
+<p>
+$\text{Cosmology} = \mathcal{F}(K, P)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\text{Universe} = \text{Large-scale manifestation of substrate dynamics}$
+</p>
+
+<h3 style="color:#fbbf24;">8. Final Structural Closure</h3>
+
+<p>
+All cosmological quantities—expansion, energy density, geometry, and structure—are unified as functions of substrate parameters:
+</p>
+
+<p>
+$\boxed{
+(K, P) \;\longrightarrow\; \text{All Cosmological Phenomena}
+}$
+</p>
+</div>
+
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 58 — Closure / Completion Theorem: Cosmology as Emergent Substrate Dynamics</h2>
+
+<div class="math-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Statement of the Theorem</h3>
+
+<p>
+\textbf{Closure Theorem (Stage 58):}
+</p>
+
+<p>
+All cosmological phenomena—including expansion, energy density, spacetime geometry, and structure formation—are not fundamental entities but arise necessarily and completely as emergent manifestations of the substrate defined by:
+</p>
+
+<p>
+$K = |\nabla C|, \quad P = P_{\text{syn}}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\boxed{
+\text{Cosmology} = \mathcal{F}(K, P)
+}$
+</p>
+
+<p>
+No independent cosmological parameter exists outside the substrate description.
+</p>
+
+<h3 style="color:#fbbf24;">2. Foundational Premise</h3>
+
+<p>
+From Stage 56 and Stage 57:
+</p>
+
+<p>
+<ul>
+<li> All interactions arise from substrate dynamics,</li>
+<li> Gauge fields are effective descriptions,</li>
+<li> Physical quantities must be functions of $(K, P)$.</li>
+</ul>
+</p>
+
+<p>
+Thus, any consistent cosmological theory must satisfy:
+</p>
+
+<p>
+$\mathcal{O}_{\text{cosmo}} = \mathcal{F}(K, P)$
+</p>
+
+<h3 style="color:#fbbf24;">3. Derivation of Cosmological Quantities</h3>
+
+<p>
+Each cosmological observable is derived as follows:
+</p>
+
+<p>
+\textbf{(A) Expansion:}
+</p>
+
+<p>
+$H^2 \sim P$
+</p>
+
+<p>
+\textbf{(B) Energy Density:}
+</p>
+
+<p>
+$\rho \sim \frac{K^2}{P}$
+</p>
+
+<p>
+\textbf{(C) Geometry:}
+</p>
+
+<p>
+$g_{\mu\nu} = \mathcal{G}_{\mu\nu}(K, P)$
+</p>
+
+<p>
+\textbf{(D) Structure Formation:}
+</p>
+
+<p>
+$\delta = \frac{2\delta K}{K} - \frac{\delta P}{P}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\{H, \rho, g_{\mu\nu}, \delta\} \subset \mathcal{F}(K, P)$
+</p>
+
+<h3 style="color:#fbbf24;">4. Structural Mapping Chain</h3>
+
+<p>
+Complete cosmological chain:
+</p>
+
+<p>
+$(K, P) \;\longrightarrow\; \rho = \frac{K^2}{P} \;\longrightarrow\; H^2 \sim P \;\longrightarrow\; g_{\mu\nu} \;\longrightarrow\; \delta \;\longrightarrow\; \text{Cosmic Structure}$
+</p>
+
+<p>
+This mapping is continuous and closed.
+</p>
+
+<h3 style="color:#fbbf24;">5. Elimination of Independent Inputs</h3>
+
+<p>
+Standard cosmology requires:
+</p>
+
+<p>
+$\rho, \Lambda, \text{initial perturbations}$
+</p>
+
+<p>
+as independent inputs.
+</p>
+
+<p>
+From substrate formulation:
+</p>
+
+<p>
+$\rho = \frac{K^2}{P}, \quad \Lambda \sim P, \quad \delta = \frac{2\delta K}{K} - \frac{\delta P}{P}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\text{All inputs} \;\longrightarrow\; \text{derived from } (K, P)$
+</p>
+
+<p>
+No external parameter remains.
+</p>
+
+<h3 style="color:#fbbf24;">6. Necessity Condition</h3>
+
+<p>
+If substrate exists:
+</p>
+
+<p>
+$(K, P) \neq 0$
+</p>
+
+<p>
+Then:
+</p>
+
+<p>
+<ul>
+<li> Expansion must occur: $H^2 \sim P$</li>
+<li> Energy density must exist: $\rho \sim \frac{K^2}{P}$</li>
+<li> Geometry must emerge: $g_{\mu\nu}(K,P)$</li>
+<li> Structure must form if $\nabla K \neq 0$</li>
+</ul>
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\text{Cosmology is a necessary consequence of substrate existence.}$
+</p>
+
+<h3 style="color:#fbbf24;">7. Sufficiency Condition</h3>
+
+<p>
+Given $(K, P)$, all cosmological observables can be constructed:
+</p>
+
+<p>
+$\forall \mathcal{O}_{\text{cosmo}}, \quad \exists \mathcal{F}: \mathcal{O} = \mathcal{F}(K, P)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$(K, P) \Rightarrow \text{Complete Cosmological Description}$
+</p>
+
+<h3 style="color:#fbbf24;">8. Structural Closure</h3>
+
+<p>
+The mapping:
+</p>
+
+<p>
+$(K, P) \;\longrightarrow\; \{\rho, H, g_{\mu\nu}, \delta\}$
+</p>
+
+<p>
+is:
+</p>
+
+<p>
+<ul>
+<li> Complete (all observables included),</li>
+<li> Minimal (only $(K, P)$ required),</li>
+<li> Non-redundant (no independent parameters).</li>
+</ul>
+</p>
+
+<p>
+Thus, cosmology achieves structural closure.
+</p>
+
+<h3 style="color:#fbbf24;">9. Physical Interpretation</h3>
+
+<p>
+The universe is not an independently evolving geometric entity but a large-scale manifestation of substrate dynamics.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+\textbf{Expansion = substrate flow} \\
+\textbf{Energy = substrate tension} \\
+\textbf{Geometry = substrate shape} \\
+\textbf{Structure = substrate variation}
+</p>
+
+<h3 style="color:#fbbf24;">10. Consistency with Existing Physics</h3>
+
+<p>
+Standard cosmological equations remain valid as effective descriptions:
+</p>
+
+<p>
+$H^2 = \frac{8\pi G}{3}\rho + \frac{\Lambda}{3}$
+</p>
+
+<p>
+but now:
+</p>
+
+<p>
+$\rho, \Lambda \rightarrow \text{functions of } (K, P)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\text{Descriptive Cosmology} \subset \text{Substrate Cosmology}$
+</p>
+
+<h3 style="color:#fbbf24;">11. Conceptual Compression</h3>
+
+<p>
+Cosmology is not fundamental.\\
+All parameters are derived.\\
+No external inputs exist.\\
+The universe is substrate in manifestation.
+</p>
+
+<h3 style="color:#fbbf24;">12. Final Theorem (Boxed Closure)</h3>
+
+<p>
+$\boxed{
+(K, P) \;\longrightarrow\; \text{Complete Cosmological Reality}
+}$
+</p>
+
+<p>
+This completes Stage 58.
+</p>
+
+</div>
+
+</section>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div id="active-module-result" class="module-subtitle">--</div>
+<div class="primary-constant-box">
+<div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val">11.350</span></div>
+<div class="const-item"><span class="const-label">Synthesis P</span><span class="const-val">0.6900</span></div>
+</div>
+
+<div id="structure-box-area"></div>
+<div id="mapping-box-area"></div>
+
+<div class="diagnostic-panel">
+<span class="diag-title">Cosmic Telemetry</span>
+<div id="telemetry-area"></div>
+</div>
+
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-unified); font-size:0.75rem; cursor:pointer; padding:6px;">RESET COSMOS</button>
+<div id="panel-footer-text" style="font-size: 0.85rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.3; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:8px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Emergence Logic</span>
+<div id="metrics-content" style="font-size:0.65rem; font-family:monospace; line-height:1.3;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Structural Chain</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.65rem; color: var(--text-dim); line-height: 1.3; background: #000; padding: 5px; border-radius: 0px; border: 1px solid #222; margin-bottom: 0px; margin-top: auto;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "LIMITATIONS OF STANDARD COSMOLOGY",
+result: "Descriptive vs. Explanatory",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 58 — Module 1: Limitation of Standard Cosmology (Descriptive vs Structural Origin)</h2>
+
+<div class="briefing-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Conceptual Introduction</h3>
+
+<p>
+With Stage 57, the framework established that all interactions—gauge, force, and curvature—are emergent manifestations of substrate dynamics governed by $K = |\\nabla C|$ and $P = P_{\\text{syn}}$. Interaction was shown to be a response of the substrate, not an independent physical entity.
+</p>
+
+<p>
+The natural next step is to extend this understanding to the largest possible scale:
+</p>
+
+<p>
+<strong>Can cosmology itself be derived from substrate structure?</strong>
+</p>
+
+<p>
+Standard cosmology successfully describes the evolution of the universe using equations of expansion. However, it does so using parameters that are not structurally derived.
+</p>
+
+<p>
+Thus, this module establishes the foundational distinction:
+</p>
+
+<p>
+$\\text{Descriptive Cosmology} \\;\\longrightarrow\\; \\text{Structural Cosmology}$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">2. Structure of Standard Cosmology</h3>
+
+<p>
+In standard formulation, cosmology is based on the Friedmann equations, which describe the evolution of the scale factor $a(t)$:
+</p>
+
+<p>
+$H^2 = \\left(\\frac{\\dot{a}}{a}\\right)^2 \\sim \\rho + \\Lambda$
+</p>
+
+<p>
+Here, $H$ is the Hubble parameter, $\\rho$ is the energy density, and $\\Lambda$ is the cosmological constant.
+</p>
+
+<p>
+These equations accurately describe observational data, including expansion and large-scale structure.
+</p>
+
+<p>
+However, the quantities $\\rho$ and $\\Lambda$ are not derived within the theory. They are inserted as inputs based on observation.
+</p>
+
+<p>
+Thus, cosmology operates at the level of:
+</p>
+
+<p>
+$\\text{Observation} \\;\\longrightarrow\\; \\text{Parameter} \\;\\longrightarrow\\; \\text{Evolution Curve}$
+</p>
+
+<p>
+But it does not answer:
+</p>
+
+<p>
+<strong>What is the structural origin of these parameters?</strong>
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">3. Limitation of Descriptive Cosmology</h3>
+
+<p>
+The central limitation is that standard cosmology describes how the universe evolves, but not why it evolves in that way.
+</p>
+
+<p>
+The evolution curve $a(t)$ is constructed from parameters whose origin remains unexplained.
+</p>
+
+<p>
+This leads to a structural gap:
+</p>
+
+<p>
+$\\text{Evolution Law} \\neq \\text{Origin of Dynamics}$
+</p>
+
+<p>
+In particular:
+</p>
+
+<ul>
+<li>Energy density $\\rho$ is introduced, not derived</li>
+<li>Cosmological constant $\\Lambda$ is inserted externally</li>
+<li>Initial conditions are assumed rather than explained</li>
+</ul>
+
+<p>
+Thus, cosmology remains incomplete at the level of physical origin.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">4. Structural Insight from Substrate Framework</h3>
+
+<p>
+The substrate framework provides the missing foundation by identifying the fundamental parameters:
+</p>
+
+<p>
+$\\mathcal{S}(x) = (K(x), P(x))$
+</p>
+
+<p>
+These parameters are not inserted but derived from the underlying triadic field structure.
+</p>
+
+<p>
+This implies that cosmological quantities must be reinterpreted as:
+</p>
+
+<p>
+$\\rho \\;\\sim\\; \\frac{K^2}{P}, \\quad \\Lambda \\;\\sim\\; P$
+</p>
+
+<p>
+Thus, cosmology is no longer an independent domain, but a large-scale expression of substrate dynamics.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">5. Physical Interpretation</h3>
+
+<p>
+From the perspective of the substrate framework, the expansion of the universe is not driven by an externally introduced constant, but by synthesis pressure $P$.
+</p>
+
+<p>
+Similarly, energy density is not an independent quantity but reflects the internal configuration of the substrate through $K$ and $P$.
+</p>
+
+<p>
+Thus, cosmological evolution becomes:
+</p>
+
+<p>
+$\\text{Substrate Dynamics} \\;\\longrightarrow\\; \\text{Cosmic Expansion}$
+</p>
+
+<p>
+The universe is understood as a dynamical unfolding of substrate equilibrium.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">6. Necessity of Structural Origin (Very Important)</h3>
+
+<p>
+A fundamental principle follows:
+</p>
+
+<p>
+<strong>Cosmology requires structural origin, not just descriptive evolution.</strong>
+</p>
+
+<p>
+Without a structural basis:
+</p>
+
+<ul>
+<li>Parameters remain arbitrary</li>
+<li>Evolution lacks causal grounding</li>
+<li>The theory remains observationally fitted</li>
+</ul>
+
+<p>
+Therefore, a complete cosmology must derive its parameters from underlying physical structure.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">7. Consistency Check</h3>
+
+<p>
+This reinterpretation does not invalidate standard cosmology. The Friedmann equations remain valid as effective descriptions of large-scale behavior.
+</p>
+
+<p>
+What changes is their interpretation: they are no longer fundamental, but emergent from substrate dynamics.
+</p>
+
+<p>
+Thus, observational success is preserved, while conceptual completeness is achieved.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">8. Graph / Visualization Interpretation Paragraph (MANDATORY)</h3>
+
+<p>
+The visualization shows the standard evolution curve of the universe, with the scale factor $a(t)$ plotted against cosmic time.
+</p>
+
+<p>
+The curve represents a smooth, increasing function, indicating expansion. However, the graph is purely descriptive: it encodes how the universe evolves, not why it evolves.
+</p>
+
+<p>
+The straight trajectory highlights the limitation—there is no indication of the underlying mechanism generating this evolution.
+</p>
+
+<p>
+The absence of structural depth reflects that the parameters governing the curve are externally imposed.
+</p>
+
+<p>
+Thus, the graph illustrates a complete description without a causal origin.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">9. Conceptual Compression Lines</h3>
+
+<p>
+Standard cosmology describes evolution, but not origin.<br>
+Parameters are inserted, not derived.<br>
+Expansion curve is descriptive, not causal.<br>
+Cosmology requires substrate foundation.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">10. Logical Closure</h3>
+
+<p>
+This module establishes that standard cosmology is a descriptive framework lacking structural origin. The need for a substrate-based explanation of cosmological parameters is identified as a necessary extension.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">11. Transition to Next Module</h3>
+
+<p>
+Having identified the limitation of descriptive cosmology, the next step is to establish the mechanism of cosmic expansion as a direct consequence of substrate dynamics.
+</p>
+
+<p>
+This leads to Module 2, where synthesis pressure $P$ is introduced as the driver of cosmic expansion.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">12. Final Statement</h3>
+
+<p>
+Standard cosmology provides an accurate description of cosmic evolution, but the physical origin of expansion and energy density resides in the substrate defined by $K$ and $P$.
+</p>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 58 — Module 1: Explicit Mathematics — Limitation of Standard Cosmology</h2>
+
+<div class="math-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Starting Point: Standard Cosmological Formalism</h3>
+
+<p>
+Standard cosmology is based on the Friedmann equations derived from Einstein’s field equations under homogeneity and isotropy:
+</p>
+
+<p>
+$G_{\\mu\\nu} = 8\\pi G T_{\\mu\\nu} + \\Lambda g_{\\mu\\nu}$
+</p>
+
+<p>
+For a Friedmann–Lemaître–Robertson–Walker (FLRW) metric, this reduces to:
+</p>
+
+<p>
+$H^2 = \\left(\\frac{\\dot{a}}{a}\\right)^2 = \\frac{8\\pi G}{3}\\rho + \\frac{\\Lambda}{3}$
+</p>
+
+<p>
+This equation governs the evolution of the scale factor $a(t)$.
+</p>
+
+<h3 style="color:#fbbf24;">2. Structural Observation</h3>
+
+<p>
+The evolution equation depends on:
+</p>
+
+<ul>
+<li>$\\rho$ — energy density</li>
+<li>$\\Lambda$ — cosmological constant</li>
+</ul>
+
+<p>
+These parameters are not derived within the theory but inserted from observation.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\rho = \\text{input}, \\quad \\Lambda = \\text{input}$
+</p>
+
+<p>
+Therefore:
+</p>
+
+<p>
+$H^2 = \\mathcal{F}(\\rho, \\Lambda)$
+</p>
+
+<p>
+This indicates a descriptive formulation rather than a structural derivation.
+</p>
+
+<h3 style="color:#fbbf24;">3. Absence of Substrate Variables</h3>
+
+<p>
+In the standard cosmological equations, there is no dependence on substrate parameters:
+</p>
+
+<p>
+$K = |\\nabla C|, \\quad P = P_{\\text{syn}}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\frac{\\partial \\rho}{\\partial K} = 0, \\quad \\frac{\\partial \\rho}{\\partial P} = 0$
+</p>
+
+<p>
+$\\frac{\\partial \\Lambda}{\\partial K} = 0, \\quad \\frac{\\partial \\Lambda}{\\partial P} = 0$
+</p>
+
+<p>
+This shows that cosmological parameters are independent of the underlying substrate.
+</p>
+
+<h3 style="color:#fbbf24;">4. Cosmological Constant as an Input Parameter</h3>
+
+<p>
+The cosmological constant appears as:
+</p>
+
+<p>
+$\\Lambda = \\text{constant}$
+</p>
+
+<p>
+There is no internal derivation:
+</p>
+
+<p>
+$\\frac{\\partial \\Lambda}{\\partial x^\\mu} = 0$
+</p>
+
+<p>
+From the substrate framework:
+</p>
+
+<p>
+$\\Lambda \\sim P$
+</p>
+
+<p>
+Thus, standard cosmology omits the structural origin of cosmic expansion.
+</p>
+
+<h3 style="color:#fbbf24;">5. Energy Density Without Structural Origin</h3>
+
+<p>
+Energy density $\\rho$ is introduced phenomenologically:
+</p>
+
+<p>
+$\\rho = \\rho_{\\text{matter}} + \\rho_{\\text{radiation}} + \\rho_{\\text{vacuum}}$
+</p>
+
+<p>
+However, no structural relation is provided:
+</p>
+
+<p>
+$\\rho \\neq f(K, P)$
+</p>
+
+<p>
+From substrate formulation:
+</p>
+
+<p>
+$\\rho \\sim \\frac{K^2}{P}$
+</p>
+
+<p>
+Thus, standard cosmology lacks a structural basis for energy density.
+</p>
+
+<h3 style="color:#fbbf24;">6. Missing Structural Mapping</h3>
+
+<p>
+From the substrate framework, cosmological quantities must satisfy:
+</p>
+
+<p>
+$\\rho = f(K, P), \\quad \\Lambda = f(K, P), \\quad H = f(K, P)$
+</p>
+
+<p>
+However, standard cosmology provides:
+</p>
+
+<p>
+$\\rho, \\Lambda \\neq f(K, P)$
+</p>
+
+<p>
+Thus, the mapping:
+</p>
+
+<p>
+$(K, P) \\;\\longrightarrow\\; \\text{Cosmological Quantities}$
+</p>
+
+<p>
+is absent.
+</p>
+
+<h3 style="color:#fbbf24;">7. Structural Incompleteness Condition</h3>
+
+<p>
+A complete cosmological theory must express observables as:
+</p>
+
+<p>
+$\\mathcal{O}_{\\text{cosmo}} = \\mathcal{F}(K, P)$
+</p>
+
+<p>
+Standard cosmology instead gives:
+</p>
+
+<p>
+$\\mathcal{O}_{\\text{cosmo}} = \\mathcal{G}(\\rho, \\Lambda)$
+</p>
+
+<p>
+Since:
+</p>
+
+<p>
+$\\rho, \\Lambda \\not\\rightarrow (K, P)$
+</p>
+
+<p>
+the formulation remains structurally incomplete.
+</p>
+
+<h3 style="color:#fbbf24;">8. Effective Interpretation Mapping</h3>
+
+<p>
+To restore structural meaning, the following reinterpretation is required:
+</p>
+
+<p>
+$\\rho = \\mathcal{R}(K, P)$
+</p>
+
+<p>
+$\\Lambda = \\mathcal{L}(K, P)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$H^2 = \\mathcal{H}(K, P)$
+</p>
+
+<p>
+This establishes cosmology as a manifestation of substrate dynamics.
+</p>
+
+<h3 style="color:#fbbf24;">9. Limit Case: Pure Descriptive Cosmology</h3>
+
+<p>
+If only standard cosmological variables are considered:
+</p>
+
+<p>
+$K, P \\rightarrow \\text{absent}$
+</p>
+
+<p>
+Then:
+</p>
+
+<p>
+$H^2 = \\mathcal{G}(\\rho, \\Lambda)$
+</p>
+
+<p>
+This leads to:
+</p>
+
+<ul>
+<li>No origin of expansion</li>
+<li>No origin of energy density</li>
+<li>No structural basis for cosmological constants</li>
+</ul>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Standard Cosmology Alone} \\Rightarrow \\text{Descriptive but not foundational}$
+</p>
+
+<h3 style="color:#fbbf24;">10. Structural Conclusion</h3>
+
+<p>
+Standard cosmology provides a mathematically consistent description of cosmic evolution but lacks dependence on substrate parameters $K$ and $P$.
+</p>
+
+<p>
+Therefore, it cannot explain the origin of cosmological quantities.
+</p>
+
+<p>
+A complete formulation must extend:
+</p>
+
+<p>
+$\\mathcal{G}(\\rho, \\Lambda) \\;\\longrightarrow\\; \\mathcal{F}(K, P)$
+</p>
+
+<p>
+where expansion, energy density, and cosmological constants arise as emergent consequences of substrate dynamics.
+</p>
+
+</div>`,
+
+
+sliders: `<div class="control-item"><div class="label-group"><span>FIXED SCALE</span><input type="number" id="a_in" class="digital-entry" value="10" oninput="syncVal(this.value, 'a_sl')"></div><input type="range" id="a_sl" min="0" max="100" step="1" value="10" oninput="syncVal(this.value, 'a_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.8rem;">Observation &rarr; Descriptive Curve</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Standard cosmology describes evolution, not origin</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Type</span><span class="const-val">FRIEDMANN</span></div><div class="const-item"><span class="const-label">Basis</span><span class="const-val">OBSERVATION</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-lim);">MODE: STANDARD COSMIC DESCRIPTOR</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Observed Evolution<br>↓<br>Axiomatic Parameters<br>↓<br>Descriptive Cosmology`,
+hierarchy: `<div style="color: var(--accent-lim); font-weight: bold; font-size: 0.95rem;">Limit: Universe without Source</div>`,
+footer: "Cosmology must move from description to substrate explanation.",
+rightNote: `<div style="color: #94a3b8; line-height: 1.3; margin: 5px; font-size: 0.77rem;">Establishing the boundary where formal cosmology meets its limit.<p><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">👉 This Module Establishes:<br>Standard cosmology describes expansion but does not explain its origin; parameters remain externally inserted.</p></div>`
+},
+
+2: {
+title: "SUBSTRATE INTERPRETATION OF EXPANSION",
+result: "Expansion from Pressure P",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 58 — Module 2: Substrate Interpretation of Expansion (Expansion from Synthesis Pressure)</h2>
+
+<div class="briefing-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Starting Point (Context from Previous Module)</h3>
+
+<p>
+Module 1 established that standard cosmology is descriptively complete but structurally incomplete. The Friedmann equations successfully describe expansion, but the origin of energy density $\\rho$ and cosmological constant $\\Lambda$ remains unexplained.
+</p>
+
+<p>
+Thus, the central requirement emerged:
+</p>
+
+<p>
+$\\text{Cosmic Evolution} \\;\\longrightarrow\\; \\text{Requires Structural Origin}$
+</p>
+
+<p>
+This module provides that origin.
+</p>
+
+<h3 style="color:#fbbf24;">2. Core Question of This Module</h3>
+
+<p>
+<strong>What physically drives the expansion of the universe?</strong>
+</p>
+
+<p>
+Is expansion a property of spacetime geometry itself, or does it arise from a deeper physical mechanism?
+</p>
+
+<h3 style="color:#fbbf24;">3. Conceptual Development</h3>
+
+<p><strong>(A) Structural Setup:</strong> The substrate is defined by parameters:
+</p>
+
+<p>
+$K = |\\nabla C|, \\quad P = P_{\\text{syn}}$
+</p>
+
+<p>
+Here, $K$ represents resistance (stiffness), while $P$ represents synthesis pressure—the equilibrium-driving component of the substrate.
+</p>
+
+<p><strong>(B) Limitation of Geometric Interpretation:</strong> Standard cosmology treats expansion as a geometric property of the metric:
+</p>
+
+<p>
+$a(t) \\uparrow \\quad \\Rightarrow \\quad \\text{Space expands}$
+</p>
+
+<p>
+However, geometry alone does not provide a mechanism. It describes expansion but does not generate it.
+</p>
+
+<p><strong>(C) Substrate Response:</strong> Within the substrate framework, pressure $P$ represents a tendency toward equilibrium configuration. When this pressure acts across the substrate, it produces a directed flow:
+</p>
+
+<p>
+$P \\;\\longrightarrow\\; \\text{Substrate Relaxation} \\;\\longrightarrow\\; \\text{Expansion Flow}$
+</p>
+
+<p><strong>(D) Emergence of Expansion:</strong> Expansion is thus not imposed on space but arises as a dynamical response of the substrate:
+</p>
+
+<p>
+$\\text{Expansion} = \\text{Large-scale manifestation of substrate pressure}$
+</p>
+
+<p><strong>(E) Structural Chain:</strong> The full emergence sequence becomes:
+</p>
+
+<p>
+$P \\;\\longrightarrow\\; \\text{Substrate Flow} \\;\\longrightarrow\\; \\text{Metric Expansion}$
+</p>
+
+<h3 style="color:#fbbf24;">4. Key Structural Insight</h3>
+
+<p>
+$\\text{Synthesis Pressure} \\;\\longrightarrow\\; \\text{Cosmic Expansion}$
+</p>
+
+<h3 style="color:#fbbf24;">5. Mathematical Anchor (Light)</h3>
+
+<p>
+From structural mapping:
+</p>
+
+<p>
+$\\Lambda \\sim P$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$H^2 \\sim P + \\frac{K^2}{P}$
+</p>
+
+<p>
+indicating that expansion rate is governed by substrate parameters.
+</p>
+
+<h3 style="color:#fbbf24;">6. Physical Interpretation</h3>
+
+<p>
+Expansion is not a passive stretching of space but an active flow of the substrate driven by synthesis pressure.
+</p>
+
+<p>
+The universe expands because the substrate relaxes toward equilibrium under $P$.
+</p>
+
+<p>
+Thus, cosmic expansion is a dynamical process, not a geometric assumption.
+</p>
+
+<h3 style="color:#fbbf24;">7. Graph / Visualization Interpretation Paragraph (MANDATORY)</h3>
+
+<p>
+The visualization depicts a vector field spreading outward across a plane, representing substrate flow.
+</p>
+
+<p>
+The axes correspond to spatial directions, while the vectors indicate the direction and magnitude of expansion driven by pressure $P$.
+</p>
+
+<p>
+The uniform outward pattern signifies that expansion is not localized but a global response of the substrate.
+</p>
+
+<p>
+The density and orientation of vectors represent the strength of pressure-driven flow.
+</p>
+
+<p>
+This visualization demonstrates that expansion emerges from an underlying dynamical field rather than from static geometric scaling.
+</p>
+
+<h3 style="color:#fbbf24;">8. Role of This Module</h3>
+
+<p>
+This module establishes the physical origin of cosmic expansion as a consequence of substrate dynamics.
+</p>
+
+<p>
+It replaces the geometric assumption of expansion with a dynamical mechanism rooted in synthesis pressure.
+</p>
+
+<h3 style="color:#fbbf24;">9. WHAT THIS MODULE ACHIEVES (FINAL LINE)</h3>
+
+<p style="margin-bottom: 0;">
+👉 This module establishes: $$\\boxed{ \\text{Synthesis Pressure} \\;\\longrightarrow\\; \\text{Substrate Flow} \\;\\longrightarrow\\; \\text{Cosmic Expansion} }$$
+</p>
+
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Expansion Mechanism:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$P \\rightarrow \\text{Flow} \\rightarrow \\text{Expansion}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Cosmic expansion is not a property of geometry alone but the large-scale manifestation of synthesis pressure driving substrate flow toward equilibrium.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 58 — Module 2: Explicit Mathematics — Substrate Interpretation of Expansion</h2>
+
+<div class="math-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Starting Point: Friedmann Expansion Equation</h3>
+
+<p>
+Standard cosmology describes expansion using:
+</p>
+
+<p>
+$H^2 = \\left(\\frac{\\dot{a}}{a}\\right)^2 = \\frac{8\\pi G}{3}\\rho + \\frac{\\Lambda}{3}$
+</p>
+
+<p>
+This equation governs the evolution of the scale factor $a(t)$ but does not specify the origin of $\\rho$ and $\\Lambda$.
+</p>
+
+<h3 style="color:#fbbf24;">2. Substrate Parameters</h3>
+
+<p>
+From the substrate framework, the fundamental variables are:
+</p>
+
+<p>
+$K = |\\nabla C|, \\quad P = P_{\\text{syn}}$
+</p>
+
+<p>
+All physical quantities must be expressed as functions of $(K, P)$.
+</p>
+
+<h3 style="color:#fbbf24;">3. Structural Mapping of Cosmological Quantities</h3>
+
+<p>
+Energy density arises from substrate configuration:
+</p>
+
+<p>
+$\\rho = \\mathcal{R}(K, P) \\sim \\frac{K^2}{P}$
+</p>
+
+<p>
+Cosmological constant arises from synthesis pressure:
+</p>
+
+<p>
+$\\Lambda = \\mathcal{L}(K, P) \\sim P$
+</p>
+
+<p>
+Thus, the Friedmann equation becomes:
+</p>
+
+<p>
+$H^2 = \\frac{8\\pi G}{3} \\left(\\frac{K^2}{P}\\right) + \\frac{P}{3}$
+</p>
+
+<h3 style="color:#fbbf24;">4. Expansion as Substrate Flow</h3>
+
+<p>
+Define substrate velocity field:
+</p>
+
+<p>
+$v_i = \\frac{dx_i}{dt}$
+</p>
+
+<p>
+Expansion corresponds to divergence of this field:
+</p>
+
+<p>
+\$begin:math:display$
+\\\\nabla \\\\cdot \\\\vec\{v\} \= 3H
+\\$end:math:display$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$H = \\frac{1}{3} \\nabla \\cdot \\vec{v}$
+</p>
+
+<p>
+Expansion is therefore a measure of substrate flow divergence.
+</p>
+
+<h3 style="color:#fbbf24;">5. Pressure-Driven Flow Equation</h3>
+
+<p>
+Assume substrate flow is driven by pressure gradient:
+</p>
+
+<p>
+$v_i \\sim -\\nabla_i P$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+\$begin:math:display$
+\\\\nabla \\\\cdot \\\\vec\{v\} \\\\sim \-\\\\nabla\^2 P
+\\$end:math:display$
+</p>
+
+<p>
+Therefore:
+</p>
+
+<p>
+$H \\sim -\\frac{1}{3} \\nabla^2 P$
+</p>
+
+<p>
+Expansion emerges from spatial variation of synthesis pressure.
+</p>
+
+<h3 style="color:#fbbf24;">6. Homogeneous Limit</h3>
+
+<p>
+For cosmological homogeneity:
+</p>
+
+<p>
+$\\nabla P \\approx 0$
+</p>
+
+<p>
+But $P \\neq 0$, thus:
+</p>
+
+<p>
+$v_i \\neq 0$
+</p>
+
+<p>
+This leads to uniform expansion:
+</p>
+
+<p>
+$H = \\text{constant (global flow)}$
+</p>
+
+<p>
+Thus, expansion persists even without local gradients.
+</p>
+
+<h3 style="color:#fbbf24;">7. Structural Equation of Expansion</h3>
+
+<p>
+Combining contributions:
+</p>
+
+<p>
+$H^2 = \\alpha \\frac{K^2}{P} + \\beta P$
+</p>
+
+<p>
+where $\\alpha, \\beta$ are structural constants.
+</p>
+
+<p>
+This replaces the descriptive equation with a substrate-based formulation.
+</p>
+
+<h3 style="color:#fbbf24;">8. Limit Case: No Pressure</h3>
+
+<p>
+If:
+</p>
+
+<p>
+$P \\rightarrow 0$
+</p>
+
+<p>
+Then:
+</p>
+
+<p>
+$H \\rightarrow 0$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{No Pressure} \\Rightarrow \\text{No Expansion}$
+</p>
+
+<p>
+Expansion requires synthesis pressure as a necessary condition.
+</p>
+
+<h3 style="color:#fbbf24;">9. Structural Interpretation</h3>
+
+<p>
+Expansion is not metric-driven but flow-driven:
+</p>
+
+<p>
+$\\text{Metric Expansion} \\sim \\text{Projection of Substrate Flow}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$a(t) \\sim \\int v \\, dt$
+</p>
+
+<p>
+The scale factor is an integrated measure of substrate motion.
+</p>
+
+<h3 style="color:#fbbf24;">10. Structural Conclusion</h3>
+
+<p>
+Cosmic expansion arises from synthesis pressure $P$ driving substrate flow.
+</p>
+
+<p>
+The Hubble parameter is the divergence of this flow, and the Friedmann equation becomes a derived relation from $(K, P)$.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Expansion} = \\text{Substrate Flow}(P)$
+</p>
+
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>PRESSURE P FLOW</span><input type="number" id="p_in" class="digital-entry" value="50" oninput="syncVal(this.value, 'p_sl')"></div><input type="range" id="p_sl" min="0" max="100" step="1" value="50" oninput="syncVal(this.value, 'p_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.8rem;">Substrate Pressure P &rarr; Cosmic Expansion</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">The universe expands because the substrate flows</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Driver</span><span class="const-val">PRESSURE P</span></div><div class="const-item"><span class="const-label">Effect</span><span class="const-val">EXPANSION</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-medium);">MODE: CALCULATING SUBSTRATE FLOW</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Synthesis Pressure P<br>↓<br>Substrate Relaxation<br>↓<br>Cosmological Expansion`,
+hierarchy: `<div style="color: var(--accent-medium); font-weight: bold; font-size: 0.95rem;">Expansion: Origin in Substrate Pressure</div>`,
+footer: "Expansion is the universe-scale manifestation of substrate tension.",
+rightNote: `<div style="color: #60a5fa; line-height: 1.3; margin: 5px; font-size: 0.77rem;">Mapping cosmic flow to foundational substrate pressure.<p><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">👉 This Module Establishes:<br>Cosmic expansion emerges from synthesis pressure P as substrate flow, not from an imposed metric expansion.</p></div>`
+},
+
+3: {
+title: "ENERGY DENSITY FROM SUBSTRATE",
+result: "Derived Energy Density",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 58 — Module 3: Emergent Energy Density (Energy as Substrate Potential)</h2>
+
+<div class="briefing-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Starting Point (Context from Previous Module)</h3>
+
+<p>
+Module 2 established that cosmic expansion is not a geometric assumption but a dynamical consequence of substrate behavior. Specifically, synthesis pressure $P$ was identified as the driver of expansion, producing a global substrate flow that manifests as the expansion of the universe.
+</p>
+
+<p>
+This leads to the next fundamental question:
+</p>
+
+<p>
+<strong>What is the origin of energy density in the universe?</strong>
+</p>
+
+<p>
+In standard cosmology, energy density $\\rho$ is treated as a primary input. However, within the substrate framework, no physical quantity is fundamental unless it arises from $(K, P)$.
+</p>
+
+<p>
+Thus, this module addresses the structural origin of energy density.
+</p>
+
+<h3 style="color:#fbbf24;">2. Core Question of This Module</h3>
+
+<p>
+<strong>What is energy, and how does energy density arise from the substrate?</strong>
+</p>
+
+<p>
+Is energy an intrinsic property of matter and fields, or is it a manifestation of deeper structural properties?
+</p>
+
+<h3 style="color:#fbbf24;">3. Conceptual Development</h3>
+
+<p><strong>(A) Structural Setup:</strong> The substrate is defined by:
+</p>
+
+<p>
+$K = |\\nabla C|, \\quad P = P_{\\text{syn}}$
+</p>
+
+<p>
+These parameters describe resistance and equilibrium pressure within the underlying medium.
+</p>
+
+<p><strong>(B) Limitation of Standard Interpretation:</strong> In conventional physics, energy density is introduced as:
+</p>
+
+<p>
+$\\rho = \\text{energy per unit volume}$
+</p>
+
+<p>
+However, this definition is descriptive. It quantifies energy but does not explain what energy fundamentally is.
+</p>
+
+<p><strong>(C) Substrate Perspective:</strong> Within the substrate framework, energy must arise from structural properties. The key insight is:
+</p>
+
+<p>
+<strong>Energy is the stored tension within the substrate.</strong>
+</p>
+
+<p>
+This tension arises from deviations in substrate configuration—specifically from gradients and potential structures.
+</p>
+
+<p><strong>(D) Emergence of Energy Density:</strong> Energy density is therefore identified as a function of substrate parameters:
+</p>
+
+<p>
+$\\rho \\sim \\frac{K^2}{P}$
+</p>
+
+<p>
+Here, $K^2$ represents stored structural tension (stiffness energy), while division by $P$ reflects equilibrium normalization.
+</p>
+
+<p><strong>(E) Structural Chain:</strong> The emergence sequence becomes:
+</p>
+
+<p>
+$\\text{Substrate Structure} \\;\\longrightarrow\\; \\text{Potential Gradient} \\;\\longrightarrow\\; \\text{Energy Density}$
+</p>
+
+<h3 style="color:#fbbf24;">4. Key Structural Insight</h3>
+
+<p>
+$\\text{Substrate Potential} \\;\\longrightarrow\\; \\text{Energy Density}$
+</p>
+
+<h3 style="color:#fbbf24;">5. Mathematical Anchor (Light)</h3>
+
+<p>
+Stiffness energy density:
+</p>
+
+<p>
+$\\mathcal{E}_K \\sim (\\nabla C)^2 = K^2$
+</p>
+
+<p>
+Normalized by synthesis pressure:
+</p>
+
+<p>
+$\\rho = \\frac{K^2}{P}$
+</p>
+
+<p>
+Thus, energy density is derived, not assumed.
+</p>
+
+<h3 style="color:#fbbf24;">6. Physical Interpretation</h3>
+
+<p>
+Energy is not an independent substance but a measure of how much the substrate is locally strained or configured away from equilibrium.
+</p>
+
+<p>
+Regions of high energy correspond to strong gradients or curvature in the substrate potential.
+</p>
+
+<p>
+Thus, matter, radiation, and vacuum energy all represent different configurations of substrate tension.
+</p>
+
+<h3 style="color:#fbbf24;">7. Graph / Visualization Interpretation Paragraph (MANDATORY)</h3>
+
+<p>
+The visualization presents a three-dimensional surface representing substrate potential over spatial coordinates.
+</p>
+
+<p>
+The axes correspond to spatial directions, while the vertical dimension represents energy density.
+</p>
+
+<p>
+Peaks in the surface indicate regions of high energy density, corresponding to strong substrate gradients or concentrated structural tension.
+</p>
+
+<p>
+Valleys represent lower energy regions where the substrate is closer to equilibrium.
+</p>
+
+<p>
+The smooth variation of the surface demonstrates that energy is not discrete or intrinsic but emerges continuously from the underlying substrate configuration.
+</p>
+
+<p>
+This visualization makes clear that energy density is a geometric manifestation of substrate potential rather than an independent physical entity.
+</p>
+
+<h3 style="color:#fbbf24;">8. Role of This Module</h3>
+
+<p>
+This module establishes energy density as an emergent property of the substrate, derived from stiffness and synthesis pressure.
+</p>
+
+<p>
+It removes the need to treat energy as a fundamental input and instead grounds it in structural dynamics.
+</p>
+
+<h3 style="color:#fbbf24;">9. WHAT THIS MODULE ACHIEVES (FINAL LINE)</h3>
+
+<p style="margin-bottom: 0;">
+👉 This module establishes: $$\\boxed{ \\text{Substrate Potential} \\;\\longrightarrow\\; \\text{Energy Density} \\;\\sim\\; \\frac{K^2}{P} }$$
+</p>
+
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Energy Origin:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\rho \\sim \\frac{K^2}{P}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Energy density is not fundamental but arises as the stored structural tension of the substrate, determined by stiffness and normalized by synthesis pressure.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 58 — Module 3: Explicit Mathematics — Emergent Energy Density from Substrate Potential</h2>
+
+<div class="math-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Starting Point: Definition of Energy Density</h3>
+
+<p>
+In standard physics, energy density is defined as:
+</p>
+
+<p>
+$\\rho = \\frac{E}{V}$
+</p>
+
+<p>
+This definition is purely descriptive. It specifies how energy is measured but does not identify its structural origin.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\rho = \\text{measured quantity (not derived)}$
+</p>
+
+<h3 style="color:#fbbf24;">2. Substrate Variables</h3>
+
+<p>
+From the substrate framework, the fundamental quantities are:
+</p>
+
+<p>
+$K = |\\nabla C|, \\quad P = P_{\\text{syn}}$
+</p>
+
+<p>
+All physical observables must be expressed as functions of $(K, P)$:
+</p>
+
+<p>
+$\\mathcal{O} = \\mathcal{F}(K, P)$
+</p>
+
+<h3 style="color:#fbbf24;">3. Stiffness Energy Density</h3>
+
+<p>
+The conserving field $C$ defines structural gradients:
+</p>
+
+<p>
+$K = |\\nabla C|$
+</p>
+
+<p>
+The associated energy density arises from gradient structure:
+</p>
+
+<p>
+$\\mathcal{E}_K \\sim (\\nabla C)^2$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\mathcal{E}_K \\sim K^2$
+</p>
+
+<p>
+This represents stored tension within the substrate.
+</p>
+
+<h3 style="color:#fbbf24;">4. Role of Synthesis Pressure</h3>
+
+<p>
+Synthesis pressure $P$ represents equilibrium normalization:
+</p>
+
+<p>
+$P = P_{\\text{syn}}$
+</p>
+
+<p>
+Energy density must be normalized relative to this equilibrium scale.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\rho \\propto \\frac{\\mathcal{E}_K}{P}$
+</p>
+
+<p>
+Substituting:
+</p>
+
+<p>
+$\\rho \\sim \\frac{K^2}{P}$
+</p>
+
+<p>
+This gives the fundamental structural expression for energy density.
+</p>
+
+<h3 style="color:#fbbf24;">5. Dimensional Consistency</h3>
+
+<p>
+Let dimensions be:
+</p>
+
+<p>
+$[K] = L^{-1}, \\quad [P] = T^{-2}$
+</p>
+
+<p>
+Then:
+</p>
+
+<p>
+$\\left[\\frac{K^2}{P}\\right] = \\frac{L^{-2}}{T^{-2}} = L^{-2} T^{2}$
+</p>
+
+<p>
+With appropriate physical constants, this maps to energy density units.
+</p>
+
+<p>
+Thus, the structure is dimensionally consistent under physical scaling.
+</p>
+
+<h3 style="color:#fbbf24;">6. General Functional Form</h3>
+
+<p>
+More generally:
+</p>
+
+<p>
+$\\rho = \\alpha \\frac{K^2}{P}$
+</p>
+
+<p>
+where $\\alpha$ is a dimensionless structural constant.
+</p>
+
+<p>
+This represents the universal mapping:
+</p>
+
+<p>
+$(K, P) \\;\\longrightarrow\\; \\rho$
+</p>
+
+<h3 style="color:#fbbf24;">7. Energy Density as Potential Structure</h3>
+
+<p>
+Define substrate potential:
+</p>
+
+<p>
+$V(x) \\sim C(x)$
+</p>
+
+<p>
+Then:
+</p>
+
+<p>
+$\\nabla V \\sim \\nabla C$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\rho \\sim (\\nabla V)^2 / P$
+</p>
+
+<p>
+Energy density arises from spatial variation of substrate potential.
+</p>
+
+<h3 style="color:#fbbf24;">8. Local Energy Variation</h3>
+
+<p>
+For spatial variation:
+</p>
+
+<p>
+$\\delta \\rho \\sim \\frac{2K}{P} \\delta K - \\frac{K^2}{P^2} \\delta P$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\frac{\\partial \\rho}{\\partial K} \\sim \\frac{2K}{P}, \\quad \\frac{\\partial \\rho}{\\partial P} \\sim -\\frac{K^2}{P^2}$
+</p>
+
+<p>
+Energy density increases with stiffness and decreases with increasing synthesis pressure.
+</p>
+
+<h3 style="color:#fbbf24;">9. Cosmological Interpretation</h3>
+
+<p>
+Substituting into the Friedmann equation:
+</p>
+
+<p>
+$H^2 = \\frac{8\\pi G}{3} \\rho + \\frac{\\Lambda}{3}$
+</p>
+
+<p>
+Using:
+</p>
+
+<p>
+$\\rho \\sim \\frac{K^2}{P}, \\quad \\Lambda \\sim P$
+</p>
+
+<p>
+gives:
+</p>
+
+<p>
+$H^2 = \\frac{8\\pi G}{3} \\left(\\frac{K^2}{P}\\right) + \\frac{P}{3}$
+</p>
+
+<p>
+Thus, expansion and energy density share a common substrate origin.
+</p>
+
+<h3 style="color:#fbbf24;">10. Limit Cases</h3>
+
+<p>
+If:
+</p>
+
+<p>
+$K \\rightarrow 0$
+</p>
+
+<p>
+Then:
+</p>
+
+<p>
+$\\rho \\rightarrow 0$
+</p>
+
+<p>
+(No structural gradients → no energy)
+</p>
+
+<p>
+If:
+</p>
+
+<p>
+$P \\rightarrow \\infty$
+</p>
+
+<p>
+Then:
+</p>
+
+<p>
+$\\rho \\rightarrow 0$
+</p>
+
+<p>
+(Perfect equilibrium suppresses energy density)
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Energy} \\Rightarrow \\text{Deviation from equilibrium structure}$
+</p>
+
+<h3 style="color:#fbbf24;">11. Structural Conclusion</h3>
+
+<p>
+Energy density is not a fundamental quantity but emerges from substrate structure:
+</p>
+
+<p>
+$\\rho = \\alpha \\frac{K^2}{P}$
+</p>
+
+<p>
+It represents stored tension arising from gradients in the conserving field, normalized by synthesis pressure.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Energy Density} = \\text{Substrate Potential Structure}$
+</p>
+
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>DENSITY POTENTIAL</span><input type="number" id="d_in" class="digital-entry" value="40" oninput="syncVal(this.value, 'd_sl')"></div><input type="range" id="d_sl" min="0" max="100" step="1" value="40" oninput="syncVal(this.value, 'd_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.8rem;">Substrate (K, P) &rarr; Energy Density $\rho$</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Energy is the tension stored in the medium</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Source</span><span class="const-val">K-STIFFNESS</span></div><div class="const-item"><span class="const-label">Field</span><span class="const-val">DENSITY ρ</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-curv);">MODE: MAPPING VACUUM POTENTIAL</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Substrate Structure<br>↓<br>Potential Gradient<br>↓<br>Emergent Energy Density`,
+hierarchy: `<div style="color: var(--accent-curv); font-weight: bold; font-size: 0.95rem;">Density: Emergent Vacuum Potential</div>`,
+footer: "Vacuum energy is simply the structural potential of the substrate.",
+rightNote: `<div style="color: #c084fc; line-height: 1.3; margin: 5px; font-size: 0.77rem;">Remapping 'Dark Energy' to substrate structure.<p><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">👉 This Module Establishes:<br>Vacuum energy density is not fundamental but arises from the interaction of substrate parameters K and P.</p></div>`
+},
+
+4: {
+title: "GEOMETRY AS SUBSTRATE CURVATURE",
+result: "Structural Geometry",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 58 — Module 4: Geometry as Substrate Curvature (Emergent Spacetime Structure)</h2>
+
+<div class="briefing-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Conceptual Introduction</h3>
+
+<p>
+With Modules 1–3, this framework has established that cosmology is not an independent domain but a manifestation of substrate dynamics. Expansion arises from synthesis pressure $P$, and energy density emerges from substrate gradients governed by $K$ and $P$.
+</p>
+
+<p>
+A deeper structural question now arises:
+</p>
+
+<p>
+<strong>What is the origin of spacetime geometry itself?</strong>
+</p>
+
+<p>
+In standard physics, geometry is treated as a fundamental background or as an independently defined structure governed by Einstein’s equations. However, within the present framework, geometry must not be assumed—it must be derived.
+</p>
+
+<p>
+Thus, this module establishes the central transition:
+</p>
+
+<p>
+$\\text{Geometry as Given} \\;\\longrightarrow\\; \\text{Geometry as Emergent Structure}$
+</p>
+
+<h3 style="color:#fbbf24;">2. Structure of Standard Geometric Description</h3>
+
+<p>
+In general relativity, spacetime geometry is described by the metric tensor $g_{\\mu\\nu}$, and its curvature is encoded in the Einstein tensor:
+</p>
+
+<p>
+$G_{\\mu\\nu} = R_{\\mu\\nu} - \\frac{1}{2} R g_{\\mu\\nu}$
+</p>
+
+<p>
+The dynamics of geometry are governed by:
+</p>
+
+<p>
+$G_{\\mu\\nu} = 8\\pi G T_{\\mu\\nu}$
+</p>
+
+<p>
+This formulation successfully relates matter-energy content to spacetime curvature and has been experimentally verified.
+</p>
+
+<p>
+However, a fundamental limitation remains:
+</p>
+
+<p>
+<strong>The metric $g_{\\mu\\nu}$ is assumed, not derived.</strong>
+</p>
+
+<p>
+Thus, geometry is treated as a primary entity rather than a consequence of deeper structure.
+</p>
+
+<h3 style="color:#fbbf24;">3. Limitation of Independent Geometry</h3>
+
+<p>
+The standard formulation establishes a relation between curvature and energy but does not explain the origin of geometry itself.
+</p>
+
+<p>
+This leads to a structural gap:
+</p>
+
+<p>
+$\\text{Geometry} \\neq \\text{Explained Structure}$
+</p>
+
+<p>
+Specifically:
+</p>
+
+<ul>
+<li>The metric is introduced as a foundational object</li>
+<li>Curvature is defined geometrically but not physically grounded</li>
+<li>The medium that supports geometry is unspecified</li>
+</ul>
+
+<p>
+Thus, spacetime remains an abstract construct without underlying physical substrate.
+</p>
+
+<h3 style="color:#fbbf24;">4. Structural Insight from Substrate Framework</h3>
+
+<p>
+Within this framework, the substrate defined by $(K, P)$ is the fundamental physical reality. All observable phenomena—including interaction and energy—have already been shown to emerge from this substrate.
+</p>
+
+<p>
+Therefore, geometry must also arise from substrate configuration.
+</p>
+
+<p>
+This leads to the identification:
+</p>
+
+<p>
+$g_{\\mu\\nu} \\;\\sim\\; \\mathcal{G}_{\\mu\\nu}(K, P)$
+</p>
+
+<p>
+Thus, the metric is not fundamental but an emergent representation of substrate structure.
+</p>
+
+<p>
+Similarly, curvature becomes:
+</p>
+
+<p>
+$G_{\\mu\\nu} \\;\\sim\\; \\text{Response of substrate configuration to internal structure}$
+</p>
+
+<p>
+This reinterprets geometry as a manifestation of physical structure rather than an independent background.
+</p>
+
+<h3 style="color:#fbbf24;">5. Physical Interpretation</h3>
+
+<p>
+From the substrate perspective, geometry is the shape of the substrate itself.
+</p>
+
+<p>
+When the substrate is uniform, geometry appears flat. When the substrate is structured or deformed, geometry appears curved.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Substrate Configuration} \\;\\longrightarrow\\; \\text{Spacetime Geometry}$
+</p>
+
+<p>
+Curvature is therefore not an abstract mathematical property but a physical manifestation of structural variation within the substrate.
+</p>
+
+<p>
+This leads to a fundamental reinterpretation:
+</p>
+
+<p>
+Geometry is the visible form of invisible substrate structure.
+</p>
+
+<h3 style="color:#fbbf24;">6. Necessity of Structural Geometry (Very Important)</h3>
+
+<p>
+A fundamental principle follows:
+</p>
+
+<p>
+<strong>Geometry cannot exist without an underlying structure.</strong>
+</p>
+
+<p>
+Without a substrate:
+</p>
+
+<ul>
+<li>Curvature has no physical basis</li>
+<li>Metric has no origin</li>
+<li>Spacetime becomes purely abstract</li>
+</ul>
+
+<p>
+Thus, geometry must be derived from physical structure rather than assumed.
+</p>
+
+<p>
+This establishes substrate configuration as the necessary foundation of spacetime.
+</p>
+
+<h3 style="color:#fbbf24;">7. Consistency with General Relativity</h3>
+
+<p>
+This reinterpretation does not invalidate general relativity. The Einstein equations remain valid as effective descriptions of how geometry responds to energy.
+</p>
+
+<p>
+What changes is the interpretation:
+</p>
+
+<p>
+$\\text{Substrate Dynamics} \\;\\longrightarrow\\; \\text{Metric Geometry}$
+</p>
+
+<p>
+Thus, general relativity becomes an emergent theory describing the macroscopic behavior of substrate structure.
+</p>
+
+<p>
+All observational successes of GR are preserved, while its conceptual foundation is deepened.
+</p>
+
+<h3 style="color:#fbbf24;">8. Graph / Visualization Interpretation Paragraph (MANDATORY)</h3>
+
+<p>
+The visualization presents a curved geometric surface representing spacetime deformation.
+</p>
+
+<p>
+The horizontal axes correspond to structural coordinates of the substrate, while the vertical axis represents curvature or geometric response.
+</p>
+
+<p>
+The smooth, bowl-like deformation indicates how local variations in substrate configuration produce continuous curvature.
+</p>
+
+<p>
+The key feature is that the surface is not imposed externally—it emerges from the underlying structure.
+</p>
+
+<p>
+This demonstrates that geometry is not a pre-existing stage but a consequence of substrate configuration.
+</p>
+
+<p>
+Thus, the graph visually encodes:
+</p>
+
+<p>
+$\\text{Substrate Shape} \\;\\Rightarrow\\; \\text{Geometric Curvature}$
+</p>
+
+<h3 style="color:#fbbf24;">9. Conceptual Compression Lines</h3>
+
+<p>
+Geometry is not fundamental but emergent.<br>
+Metric arises from substrate configuration.<br>
+Curvature is structural response, not abstraction.<br>
+Spacetime is the visible form of substrate structure.
+</p>
+
+<h3 style="color:#fbbf24;">10. Logical Closure</h3>
+
+<p>
+This module establishes that spacetime geometry is not an independent entity but an emergent manifestation of substrate configuration.
+</p>
+
+<p>
+The metric tensor and curvature are reinterpreted as effective representations of underlying structural dynamics.
+</p>
+
+<p>
+Thus, geometry is fully integrated into the substrate framework.
+</p>
+
+<h3 style="color:#fbbf24;">11. Transition to Next Module</h3>
+
+<p>
+Having established geometry as a manifestation of substrate structure, the next step is to examine how these structures evolve and organize into large-scale cosmic formations.
+</p>
+
+<p>
+This leads to Module 5, where instabilities in the substrate give rise to structure formation in the universe.
+</p>
+
+<h3 style="color:#fbbf24;">12. Final Statement</h3>
+
+<p>
+Spacetime geometry is not a fundamental background but the emergent configuration of the substrate, arising from the structural dynamics governed by $K$ and $P$.
+</p>
+
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 58 — Module 4: Explicit Mathematics — Geometry as Substrate Curvature</h2>
+
+<div class="math-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Starting Point: Standard Geometric Formalism</h3>
+
+<p>
+In general relativity, spacetime geometry is described by the metric tensor:
+</p>
+
+<p>
+$g_{\\mu\\nu}$
+</p>
+
+<p>
+The curvature of spacetime is encoded in the Riemann tensor:
+</p>
+
+<p>
+$R^{\\rho}_{\\;\\sigma\\mu\\nu}$
+</p>
+
+<p>
+Contracting indices gives the Ricci tensor:
+</p>
+
+<p>
+$R_{\\mu\\nu} = R^{\\rho}_{\\;\\mu\\rho\\nu}$
+</p>
+
+<p>
+and the Ricci scalar:
+</p>
+
+<p>
+$R = g^{\\mu\\nu} R_{\\mu\\nu}$
+</p>
+
+<p>
+The Einstein tensor is defined as:
+</p>
+
+<p>
+$G_{\\mu\\nu} = R_{\\mu\\nu} - \\frac{1}{2} R g_{\\mu\\nu}$
+</p>
+
+<p>
+Einstein’s field equations are:
+</p>
+
+<p>
+$G_{\\mu\\nu} = 8\\pi G T_{\\mu\\nu}$
+</p>
+
+<p>
+These equations relate curvature to energy-momentum but do not derive the origin of the metric itself.
+</p>
+
+<h3 style="color:#fbbf24;">2. Structural Observation</h3>
+
+<p>
+The metric $g_{\\mu\\nu}$ is assumed as a fundamental object:
+</p>
+
+<p>
+$g_{\\mu\\nu} = \\text{given field}$
+</p>
+
+<p>
+Curvature tensors are constructed from derivatives of the metric:
+</p>
+
+<p>
+$R \\sim \\partial^2 g$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Geometry} \\;\\longrightarrow\\; \\text{Curvature} \\;\\longrightarrow\\; \\text{Dynamics}$
+</p>
+
+<p>
+However, there is no dependence on substrate variables $(K, P)$.
+</p>
+
+<h3 style="color:#fbbf24;">3. Absence of Substrate Variables</h3>
+
+<p>
+In standard GR:
+</p>
+
+<p>
+$\\frac{\\partial g_{\\mu\\nu}}{\\partial K} = 0, \\quad \\frac{\\partial g_{\\mu\\nu}}{\\partial P} = 0$
+</p>
+
+<p>
+Thus, geometry is independent of the underlying substrate.
+</p>
+
+<p>
+This implies:
+</p>
+
+<p>
+$g_{\\mu\\nu} \\neq f(K, P)$
+</p>
+
+<p>
+indicating a missing structural mapping.
+</p>
+
+<h3 style="color:#fbbf24;">4. Substrate Representation of Geometry</h3>
+
+<p>
+From the substrate framework, all observables must arise from:
+</p>
+
+<p>
+$K = |\\nabla C|, \\quad P = P_{\\text{syn}}$
+</p>
+
+<p>
+Thus, the metric must be expressed as:
+</p>
+
+<p>
+$g_{\\mu\\nu} = \\mathcal{G}_{\\mu\\nu}(K, P)$
+</p>
+
+<p>
+This defines geometry as a function of substrate configuration.
+</p>
+
+<h3 style="color:#fbbf24;">5. Curvature from Substrate Gradients</h3>
+
+<p>
+Since:
+</p>
+
+<p>
+$K = |\\nabla C|$
+</p>
+
+<p>
+second derivatives of the conserving field produce curvature:
+</p>
+
+<p>
+$\\nabla_{\\mu} \\nabla_{\\nu} C$
+</p>
+
+<p>
+Thus, curvature tensors must map to:
+</p>
+
+<p>
+$R_{\\mu\\nu} \\sim \\nabla_{\\mu} \\nabla_{\\nu} C$
+</p>
+
+<p>
+and:
+</p>
+
+<p>
+$R \\sim \\Box C$
+</p>
+
+<p>
+Thus, geometric curvature corresponds to second-order structural variation.
+</p>
+
+<h3 style="color:#fbbf24;">6. Relation to Synthesis Tensor</h3>
+
+<p>
+From the framework:
+</p>
+
+<p>
+$\\Sigma_{\\mu\\nu} = \\frac{1}{K}(\\nabla_{\\mu} \\nabla_{\\nu} R - g_{\\mu\\nu} \\Box R) - \\frac{P}{8\\pi G} g_{\\mu\\nu}$
+</p>
+
+<p>
+This shows that curvature terms arise directly from substrate derivatives.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$G_{\\mu\\nu} \\sim \\Sigma_{\\mu\\nu}$
+</p>
+
+<p>
+indicating that Einstein curvature is an emergent form of substrate response.
+</p>
+
+<h3 style="color:#fbbf24;">7. Metric as Effective Field</h3>
+
+<p>
+The metric can be expanded around a flat background:
+</p>
+
+<p>
+$g_{\\mu\\nu} = \\eta_{\\mu\\nu} + h_{\\mu\\nu}$
+</p>
+
+<p>
+Within this framework:
+</p>
+
+<p>
+$h_{\\mu\\nu} \\sim \\mathcal{H}_{\\mu\\nu}(K, P)$
+</p>
+
+<p>
+Thus, deviations from flat spacetime correspond to substrate deformation.
+</p>
+
+<h3 style="color:#fbbf24;">8. Energy–Geometry Consistency</h3>
+
+<p>
+From Module 3:
+</p>
+
+<p>
+$\\rho \\sim \\frac{K^2}{P}$
+</p>
+
+<p>
+Substituting into Einstein equation:
+</p>
+
+<p>
+$G_{\\mu\\nu} = 8\\pi G T_{\\mu\\nu}$
+</p>
+
+<p>
+gives:
+</p>
+
+<p>
+$G_{\\mu\\nu} \\sim 8\\pi G \\left(\\frac{K^2}{P}\\right)$
+</p>
+
+<p>
+Thus, curvature is directly determined by substrate parameters.
+</p>
+
+<h3 style="color:#fbbf24;">9. Limit Cases</h3>
+
+<p>
+If:
+</p>
+
+<p>
+$K \\rightarrow 0$
+</p>
+
+<p>
+Then:
+</p>
+
+<p>
+$R_{\\mu\\nu} \\rightarrow 0$
+</p>
+
+<p>
+Flat spacetime emerges.
+</p>
+
+<p>
+If:
+</p>
+
+<p>
+$P \\rightarrow \\infty$
+</p>
+
+<p>
+Then:
+</p>
+
+<p>
+$g_{\\mu\\nu} \\rightarrow \\eta_{\\mu\\nu}$
+</p>
+
+<p>
+Equilibrium suppresses curvature.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Curvature} \\Rightarrow \\text{Deviation from substrate equilibrium}$
+</p>
+
+<h3 style="color:#fbbf24;">10. Structural Mapping Summary</h3>
+
+<p>
+The complete mapping is:
+</p>
+
+<p>
+$(K, P) \\;\\longrightarrow\\; g_{\\mu\\nu} \\;\\longrightarrow\\; R_{\\mu\\nu} \\;\\longrightarrow\\; G_{\\mu\\nu}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Substrate Structure} \\Rightarrow \\text{Geometry} \\Rightarrow \\text{Gravitational Dynamics}$
+</p>
+
+<h3 style="color:#fbbf24;">11. Structural Conclusion</h3>
+
+<p>
+Geometry is not fundamental but arises from substrate configuration:
+</p>
+
+<p>
+$g_{\\mu\\nu} = \\mathcal{G}_{\\mu\\nu}(K, P)$
+</p>
+
+<p>
+Curvature corresponds to second-order variations of the conserving field:
+</p>
+
+<p>
+$R_{\\mu\\nu} \\sim \\nabla_{\\mu} \\nabla_{\\nu} C$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Spacetime Geometry} = \\text{Substrate Curvature}$
+</p>
+
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>GEOMETRIC SCALE</span><input type="number" id="g_in" class="digital-entry" value="60" oninput="syncVal(this.value, 'g_sl')"></div><input type="range" id="g_sl" min="0" max="100" step="1" value="60" oninput="syncVal(this.value, 'g_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.8rem;">Substrate Config &rarr; Spacetime Geometry</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Geometry is the shape of substrate structure</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Tensor</span><span class="const-val">G_&mu;&nu;</span></div><div class="const-item"><span class="const-label">Origin</span><span class="const-val">SUBSTRATE</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-force);">MODE: RESOLVING EINSTEIN TENSOR</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Structural Configuration<br>↓<br>Metric Deformation<br>↓<br>Emergent Geometry`,
+hierarchy: `<div style="color: var(--accent-force); font-weight: bold; font-size: 0.95rem;">Geometry: Manifestation of Substrate Shape</div>`,
+footer: "The universe has geometry because the substrate has structure.",
+rightNote: `<div style="color: #f87171; line-height: 1.3; margin: 5px; font-size: 0.77rem;">General Relativity as a structural consequence.<p><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">👉 This Module Establishes:<br>Space-time geometry is an emergent configuration of the substrate, not an independent background structure.</p></div>`
+},
+
+5: {
+title: "COSMOLOGICAL STRUCTURE FORMATION",
+result: "Emergence of Structure",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 58 — Module 5: Structure Formation as Substrate Instability (Genesis of Cosmic Structure)</h2>
+
+<div class="briefing-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Conceptual Introduction</h3>
+
+<p>
+With the development of Modules 1–4, this framework has established a complete substrate-based reinterpretation of cosmology. Expansion arises from synthesis pressure $P$, energy density emerges from structural gradients governed by $K$, and spacetime geometry itself is an emergent manifestation of substrate configuration.
+</p>
+
+<p>
+A deeper and final question at the cosmological level now arises:
+</p>
+
+<p>
+<strong>How do structures such as galaxies, clusters, and large-scale cosmic patterns emerge?</strong>
+</p>
+
+<p>
+Standard cosmology attributes structure formation to gravitational amplification of initial fluctuations. However, these fluctuations are introduced phenomenologically and lack a fundamental structural origin.
+</p>
+
+<p>
+Thus, this module establishes the final transition:
+</p>
+
+<p>
+$\\text{Descriptive Structure Formation} \\;\\longrightarrow\\; \\text{Structural Genesis of Form}$
+</p>
+
+<h3 style="color:#fbbf24;">2. Structure of Standard Formation Theory</h3>
+
+<p>
+In conventional cosmology, structure formation is described through perturbations in energy density:
+</p>
+
+<p>
+$\\delta = \\frac{\\delta \\rho}{\\rho}$
+</p>
+
+<p>
+These perturbations evolve under gravitational instability:
+</p>
+
+<p>
+$\\ddot{\\delta} + 2H \\dot{\\delta} \\sim 4\\pi G \\rho \\delta$
+</p>
+
+<p>
+This framework successfully models the growth of cosmic structures from small initial fluctuations.
+</p>
+
+<p>
+However, a fundamental limitation persists:
+</p>
+
+<p>
+<strong>The origin of the initial fluctuations is not structurally explained.</strong>
+</p>
+
+<p>
+Thus, structure formation remains descriptive rather than foundational.
+</p>
+
+<h3 style="color:#fbbf24;">3. Limitation of Descriptive Instability</h3>
+
+<p>
+The standard approach assumes:
+</p>
+
+<ul>
+<li>Initial density fluctuations are given</li>
+<li>Growth is governed by gravitational amplification</li>
+<li>Structure emerges from external initial conditions</li>
+</ul>
+
+<p>
+This leads to a structural gap:
+</p>
+
+<p>
+$\\text{Observed Structure} \\neq \\text{Derived Structural Origin}$
+</p>
+
+<p>
+Thus, the theory explains how structure evolves but not why it arises.
+</p>
+
+<h3 style="color:#fbbf24;">4. Structural Insight from Substrate Framework</h3>
+
+<p>
+Within this framework, energy density itself has already been derived as:
+</p>
+
+<p>
+$\\rho \\sim \\frac{K^2}{P}$
+</p>
+
+<p>
+Thus, variations in density correspond directly to variations in substrate parameters:
+</p>
+
+<p>
+$\\delta \\rho \\sim \\delta \\left(\\frac{K^2}{P}\\right)$
+</p>
+
+<p>
+This implies that fluctuations are not arbitrary but arise from intrinsic variations in substrate configuration.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Substrate Variation} \\;\\longrightarrow\\; \\text{Density Fluctuation}$
+</p>
+
+<p>
+Structure formation is therefore rooted in the fundamental behavior of the substrate.
+</p>
+
+<h3 style="color:#fbbf24;">5. Physical Interpretation</h3>
+
+<p>
+From the substrate perspective, the universe is not a uniform medium with imposed perturbations. It is a dynamic structure with intrinsic variations arising from its own internal configuration.
+</p>
+
+<p>
+Regions with higher stiffness $K$ correspond to higher energy density, while variations in synthesis pressure $P$ modulate equilibrium conditions.
+</p>
+
+<p>
+These variations naturally lead to:
+</p>
+
+<ul>
+<li>Localized gradients</li>
+<li>Instabilities in equilibrium</li>
+<li>Formation of structured regions</li>
+</ul>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Substrate Instability} \\;\\longrightarrow\\; \\text{Cosmic Structure Formation}$
+</p>
+
+<p>
+Gravity, in this context, is not the origin of structure but the manifestation of these underlying variations.
+</p>
+
+<h3 style="color:#fbbf24;">6. Necessity of Structural Instability (Very Important)</h3>
+
+<p>
+A fundamental principle follows:
+</p>
+
+<p>
+<strong>Structure requires instability within an underlying medium.</strong>
+</p>
+
+<p>
+Without intrinsic variations:
+</p>
+
+<ul>
+<li>No gradients can form</li>
+<li>No clustering can occur</li>
+<li>No structure can emerge</li>
+</ul>
+
+<p>
+Thus, the existence of cosmic structure implies that the substrate is not perfectly uniform but inherently dynamic and structured.
+</p>
+
+<p>
+This establishes instability as a necessary condition of structure formation.
+</p>
+
+<h3 style="color:#fbbf24;">7. Consistency with Observational Cosmology</h3>
+
+<p>
+This reinterpretation preserves the successful predictions of standard cosmology:
+</p>
+
+<ul>
+<li>Growth of perturbations</li>
+<li>Formation of galaxies and clusters</li>
+<li>Large-scale cosmic web structure</li>
+</ul>
+
+<p>
+What changes is the interpretation:
+</p>
+
+<p>
+$\\text{Substrate Variations} \\;\\longrightarrow\\; \\text{Effective Density Perturbations}$
+</p>
+
+<p>
+Thus, observed fluctuations are reinterpreted as emergent manifestations of deeper substrate dynamics.
+</p>
+
+<h3 style="color:#fbbf24;">8. Graph / Visualization Interpretation Paragraph (MANDATORY)</h3>
+
+<p>
+The visualization shows a fluctuating surface representing variations in substrate density or potential.
+</p>
+
+<p>
+The horizontal axes correspond to spatial coordinates, while the vertical axis represents fluctuation amplitude or density variation.
+</p>
+
+<p>
+The repeating peaks and valleys indicate regions of higher and lower substrate density, forming a structured pattern.
+</p>
+
+<p>
+These variations are not random but arise from the intrinsic dynamics of the substrate.
+</p>
+
+<p>
+The continuous surface demonstrates how local variations naturally evolve into structured formations.
+</p>
+
+<p>
+Thus, the graph visually encodes:
+</p>
+
+<p>
+$\\text{Substrate Fluctuation} \\;\\Rightarrow\\; \\text{Cosmic Structure}$
+</p>
+
+<h3 style="color:#fbbf24;">9. Conceptual Compression Lines</h3>
+
+<p>
+Structure is not imposed but emergent.<br>
+Fluctuations arise from substrate variation.<br>
+Instability generates form.<br>
+Cosmic structure is the large-scale expression of substrate dynamics.
+</p>
+
+<h3 style="color:#fbbf24;">10. Logical Closure</h3>
+
+<p>
+This module establishes that cosmic structure formation is not the result of externally imposed perturbations but arises from intrinsic variations and instabilities within the substrate.
+</p>
+
+<p>
+Density fluctuations, gravitational clustering, and large-scale organization are reinterpreted as emergent consequences of substrate dynamics governed by $K$ and $P$.
+</p>
+
+<p>
+Thus, structure formation is fully integrated into the substrate framework.
+</p>
+
+<h3 style="color:#fbbf24;">11. Transition to Summary Module</h3>
+
+<p>
+With the completion of Modules 1–5, the cosmological extension of the framework is structurally complete.
+</p>
+
+<p>
+The next module synthesizes all results into a unified understanding of cosmology as an emergent manifestation of substrate physics.
+</p>
+
+<h3 style="color:#fbbf24;">12. Final Statement</h3>
+
+<p>
+Cosmic structures such as galaxies, clusters, and large-scale patterns arise from intrinsic variations and instabilities within the substrate, making structure formation a necessary consequence of substrate dynamics rather than an externally imposed process.
+</p>
+
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 58 — Module 5: Explicit Mathematics — Structure Formation from Substrate Instability</h2>
+
+<div class="math-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Starting Point: Standard Perturbation Formalism</h3>
+
+<p>
+In standard cosmology, structure formation is described by density perturbations:
+</p>
+
+<p>
+$\\delta(x,t) = \\frac{\\delta \\rho(x,t)}{\\rho(t)}$
+</p>
+
+<p>
+The evolution equation for linear perturbations is:
+</p>
+
+<p>
+$\\ddot{\\delta} + 2H \\dot{\\delta} = 4\\pi G \\rho \\delta$
+</p>
+
+<p>
+This equation governs the growth of structures under gravitational instability.
+</p>
+
+<p>
+However, the origin of $\\delta$ is not derived but assumed.
+</p>
+
+<h3 style="color:#fbbf24;">2. Substrate Expression for Energy Density</h3>
+
+<p>
+From Module 3:
+</p>
+
+<p>
+$\\rho \\sim \\frac{K^2}{P}$
+</p>
+
+<p>
+Thus, density perturbations arise from variations in $(K, P)$:
+</p>
+
+<p>
+$\\delta \\rho = \\delta \\left(\\frac{K^2}{P}\\right)$
+</p>
+
+<h3 style="color:#fbbf24;">3. Expansion of Density Variations</h3>
+
+<p>
+Applying variation:
+</p>
+
+<p>
+$\\delta \\rho = \\frac{2K}{P} \\delta K - \\frac{K^2}{P^2} \\delta P$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\delta = \\frac{\\delta \\rho}{\\rho} = \\frac{2\\delta K}{K} - \\frac{\\delta P}{P}$
+</p>
+
+<p>
+This expresses perturbations directly in terms of substrate fluctuations.
+</p>
+
+<h3 style="color:#fbbf24;">4. Gradient-Induced Instability</h3>
+
+<p>
+Since:
+</p>
+
+<p>
+$K = |\\nabla C|$
+</p>
+
+<p>
+variations in stiffness arise from second derivatives:
+</p>
+
+<p>
+$\\delta K \\sim \\nabla^2 C$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\delta \\sim \\frac{2}{K} \\nabla^2 C - \\frac{\\delta P}{P}$
+</p>
+
+<p>
+This shows that spatial curvature of the substrate generates density fluctuations.
+</p>
+
+<h3 style="color:#fbbf24;">5. Substrate Evolution Equation</h3>
+
+<p>
+Let substrate dynamics be governed by:
+</p>
+
+<p>
+$\\frac{\\partial^2 C}{\\partial t^2} - v^2 \\nabla^2 C + \\gamma \\frac{\\partial C}{\\partial t} = \\mathcal{S}(K,P)$
+</p>
+
+<p>
+where:
+</p>
+
+<ul>
+<li>$v$ is propagation speed in substrate</li>
+<li>$\\gamma$ is damping</li>
+<li>$\\mathcal{S}(K,P)$ is source term</li>
+</ul>
+
+<p>
+This governs evolution of structural variations.
+</p>
+
+<h3 style="color:#fbbf24;">6. Instability Condition</h3>
+
+<p>
+Instability arises when perturbations grow:
+</p>
+
+<p>
+$\\delta(t) \\sim e^{\\lambda t}$
+</p>
+
+<p>
+Growth requires:
+</p>
+
+<p>
+$\\lambda > 0$
+</p>
+
+<p>
+From substrate dynamics:
+</p>
+
+<p>
+$\\lambda^2 + 2H \\lambda - 4\\pi G \\frac{K^2}{P} > 0$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\lambda = -H + \\sqrt{H^2 + 4\\pi G \\frac{K^2}{P}}$
+</p>
+
+<p>
+Instability occurs when substrate term dominates expansion damping.
+</p>
+
+<h3 style="color:#fbbf24;">7. Scale Dependence of Structure</h3>
+
+<p>
+Introduce wavenumber $k$:
+</p>
+
+<p>
+$\\delta(x,t) = \\delta_k e^{i k x}$
+</p>
+
+<p>
+Then:
+</p>
+
+<p>
+$\\nabla^2 C \\rightarrow -k^2 C$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\delta_k \\sim -\\frac{2k^2}{K} C_k - \\frac{\\delta P}{P}$
+</p>
+
+<p>
+Higher $k$ modes correspond to smaller-scale structures.
+</p>
+
+<h3 style="color:#fbbf24;">8. Effective Growth Equation</h3>
+
+<p>
+Substituting substrate expression into perturbation equation:
+</p>
+
+<p>
+$\\ddot{\\delta} + 2H \\dot{\\delta} = 4\\pi G \\left(\\frac{K^2}{P}\\right) \\delta$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Growth} \\sim \\frac{K^2}{P}$
+</p>
+
+<p>
+Structure formation rate is controlled by substrate parameters.
+</p>
+
+<h3 style="color:#fbbf24;">9. Nonlinear Regime</h3>
+
+<p>
+When $\\delta \\sim 1$, linear approximation breaks:
+</p>
+
+<p>
+$\\rho(x) = \\frac{K^2(x)}{P(x)}$
+</p>
+
+<p>
+Nonlinear clustering arises from local variation of $(K, P)$.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Nonlinear Structure} = \\text{Localized Substrate Configuration}$
+</p>
+
+<h3 style="color:#fbbf24;">10. Limit Cases</h3>
+
+<p>
+If:
+</p>
+
+<p>
+$K = \\text{constant}, \\quad P = \\text{constant}$
+</p>
+
+<p>
+Then:
+</p>
+
+<p>
+$\\delta = 0$
+</p>
+
+<p>
+No structure forms.
+</p>
+
+<p>
+If:
+</p>
+
+<p>
+$\\nabla K \\neq 0$
+</p>
+
+<p>
+Then:
+</p>
+
+<p>
+$\\delta \\neq 0$
+</p>
+
+<p>
+Structure emerges.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Structure} \\Rightarrow \\text{Non-uniform Substrate}$
+</p>
+
+<h3 style="color:#fbbf24;">11. Structural Mapping Summary</h3>
+
+<p>
+Complete mapping:
+</p>
+
+<p>
+$(K, P) \\;\\longrightarrow\\; \\rho = \\frac{K^2}{P} \\;\\longrightarrow\\; \\delta \\;\\longrightarrow\\; \\text{Structure}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Substrate Variation} \\Rightarrow \\text{Density Fluctuation} \\Rightarrow \\text{Cosmic Structure}$
+</p>
+
+<h3 style="color:#fbbf24;">12. Structural Conclusion</h3>
+
+<p>
+Density perturbations are not fundamental inputs but arise from variations in substrate parameters:
+</p>
+
+<p>
+$\\delta = \\frac{2\\delta K}{K} - \\frac{\\delta P}{P}$
+</p>
+
+<p>
+Structure formation is therefore a direct consequence of substrate instability and variation.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Cosmic Structure} = \\text{Emergent from Substrate Instability}$
+</p>
+
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>STRUCTURE GAIN</span><input type="number" id="u_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'u_sl')"></div><input type="range" id="u_sl" min="0" max="100" step="1" value="100" oninput="syncVal(this.value, 'u_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.8rem;">Substrate Fluctuation &rarr; Cosmic Structure</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">The universe is an organic whole of substrate variations</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Stage</span><span class="const-val">EXTENSION</span></div><div class="const-item"><span class="const-label">Scale</span><span class="const-val">UNIVERSAL</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-total);">SYSTEM: COSMOLOGICAL SECTOR UNIFIED</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Density Variations<br>+<br>Gravity Gradients<br>↓<br>Cosmological Structure Genesis`,
+hierarchy: `<div style="color: var(--accent-total); font-weight: bold; font-size: 0.95rem;">Synthesis: Cosmology as Large-Scale Substrate</div>`,
+footer: "Cosmological dynamics are the ultimate manifestation of substrate physics.",
+rightNote: `<div style="color: #2dd4bf; line-height: 1.3; margin: 5px; font-size: 0.77rem;">The final extension from local fields to the entire cosmos.<p><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">👉 This Module Establishes:<br>Large-scale structures originate from instabilities and variations within the substrate medium.</p></div>`
+}
+};
+
+function syncVal(val, id) {
+const sliderId = id.includes('_in') ? id.replace('_in', '_sl') : id;
+const inputId = id.includes('_sl') ? id.replace('_sl', '_in') : id;
+if(document.getElementById(sliderId)) document.getElementById(sliderId).value = val;
+if(document.getElementById(inputId)) document.getElementById(inputId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+document.getElementById('brief-box-content').innerHTML = content.brief;
+document.getElementById('math-box-content').innerHTML = content.math;
+document.getElementById('control-sliders').innerHTML = content.sliders;
+
+document.getElementById('active-module-title').innerText = content.title;
+const resultEl = document.getElementById('active-module-result');
+resultEl.innerText = content.result;
+resultEl.style.fontSize = content.resultSize || "0.75rem";
+
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('metrics-content').innerHTML = content.metricsContent;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+document.getElementById('structure-box-area').innerHTML = content.structure;
+document.getElementById('telemetry-area').innerHTML = content.telemetry;
+showScreen('briefing');
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() {
+showScreen('lab');
+setTimeout(() => { runLab(); window.dispatchEvent(new Event('resize')); }, 100);
+}
+
+function runLab() {
+const target = document.getElementById('plot-area');
+if (!target) return;
+let data = [];
+let layout = {
+paper_bgcolor: 'black', plot_bgcolor: 'black', margin: {t:60,b:10,l:0,r:0},
+showlegend: false, font: { family: 'sans-serif', size: 10 },
+scene: {
+xaxis: { gridcolor: '#222', color: '#94a3b8', title: 'Cosmic x' },
+yaxis: { gridcolor: '#222', color: '#94a3b8', title: 'Cosmic y' },
+zaxis: { gridcolor: '#222', color: '#94a3b8', title: 'Substrate State' }
+}
+};
+
+if (currentTool === 1) { // LIMITATIONS
+let a = parseFloat(document.getElementById('a_sl')?.value || 10) / 10;
+let t = Array.from({length: 50}, (_, i) => i / 10);
+let scaleFactor = t.map(ti => Math.pow(ti + a, 0.5));
+
+data.push({
+x: t, y: scaleFactor, mode: 'lines',
+line: { color: '#94a3b8', width: 4 },
+name: 'Descriptive Evolution a(t)'
+});
+layout.xaxis = { title: "Cosmic Time t", color: "#eee" };
+layout.yaxis = { title: "Scale Factor a(t)", color: "#eee" };
+layout.showlegend = true;
+layout.legend = { font: { color: '#eee' }, x: 0, y: 1, xanchor: 'left', yanchor: 'top', bgcolor: 'rgba(0,0,0,0)' };
+layout.title = { text: "STANDARD EVOLUTION CURVE", font: { color: '#94a3b8' } };
+
+
+} else if (currentTool === 2) { // EXPANSION
+
+let pSlider = document.getElementById('p_sl');
+let pRaw = parseFloat(pSlider.value);
+
+// --- Smooth scaling (never zero, never exploding) ---
+// Linear + slight nonlinear boost for better feel
+let scale = 0.2 + Math.pow(pRaw / 100, 1.2) * 1.1;
+
+let x = [], y = [], z = [], u = [], v = [], w = [];
+
+for (let i = 0; i < 10; i++) {
+for (let j = 0; j < 10; j++) {
+
+let xi = (i - 5) * 3;
+let yi = (j - 5) * 3;
+
+// --- Normalize direction ---
+let mag = Math.sqrt(xi * xi + yi * yi) + 0.0001;
+let dx = xi / mag;
+let dy = yi / mag;
+
+x.push(xi);
+y.push(yi);
+z.push(0);
+
+// --- Apply controlled magnitude ---
+u.push(dx * scale);
+v.push(dy * scale);
+
+// small vertical component for depth perception
+w.push(scale * 0.4);
+}
+}
+
+data.push({
+type: 'cone',
+x: x, y: y, z: z,
+u: u, v: v, w: w,
+
+colorscale: 'Blues',
+sizemode: 'absolute', // 🔴 IMPORTANT: prevents shrinking bug
+sizeref: 1.5, // 🔴 tuned for stable visibility
+anchor: 'tail',
+showscale: false,
+showlegend: true,
+name: 'Substrate Expansion'
+});
+
+layout.showlegend = true;
+layout.legend = {
+font: { color: '#eee' },
+x: 0,
+y: 1,
+xanchor: 'left',
+yanchor: 'top',
+bgcolor: 'rgba(0,0,0,0)'
+};
+
+layout.title = {
+text: `SUBSTRATE FLOW (Expansion) — P: ${pRaw}`,
+font: { color: '#60a5fa' }
+};
+
+layout.scene = {
+xaxis: { title: "Expansion Plane x", range: [-15, 15] },
+yaxis: { title: "Expansion Plane y", range: [-15, 15] },
+zaxis: { title: "Pressure Potential P", range: [-5, 5] },
+aspectmode: 'cube'
+};
+
+
+} else if (currentTool === 3) { // DENSITY
+let d = parseFloat(document.getElementById('d_sl')?.value || 40) / 20;
+let x = Array.from({length: 40}, (_, i) => i - 20);
+let y = Array.from({length: 40}, (_, i) => i - 20);
+let z = x.map(xi => y.map(yi => (Math.cos(xi/5) * Math.sin(yi/5)) * (d + 0.001)));
+data.push({ type: 'surface', z: z, colorscale: 'Viridis', showscale: false, showlegend: true, name: 'Derived Energy Density ρ' });
+layout.scene.zaxis.range = [-2, 2];
+layout.showlegend = true;
+layout.legend = { font: { color: '#eee' }, x: 0, y: 1, xanchor: 'left', yanchor: 'top', bgcolor: 'rgba(0,0,0,0)' };
+layout.title = { text: "SUBSTRATE POTENTIAL (Density)", font: { color: '#c084fc' } };
+layout.scene.xaxis.title = "Potential Coord x";
+layout.scene.yaxis.title = "Potential Coord y";
+layout.scene.zaxis.title = "Energy Density ρ";
+
+
+} else if (currentTool === 4) { // GEOMETRY
+let g = parseFloat(document.getElementById('g_sl')?.value || 60) / 30;
+let x = Array.from({length: 40}, (_, i) => i - 20);
+let y = Array.from({length: 40}, (_, i) => i - 20);
+let z = x.map(xi => y.map(yi => (xi*xi + yi*yi) * (g + 0.001) / 400));
+data.push({ type: 'surface', z: z, colorscale: 'Reds', showscale: false, showlegend: true, name: 'Spacetime Curvature Gᵤᵥ' });
+layout.scene.zaxis.range = [0, 2];
+layout.showlegend = true;
+layout.legend = { font: { color: '#eee' }, x: 0, y: 1, xanchor: 'left', yanchor: 'top', bgcolor: 'rgba(0,0,0,0)' };
+layout.title = { text: "EMERGENT COSMIC GEOMETRY", font: { color: '#f87171' } };
+layout.scene.xaxis.title = "Structural Coord x";
+layout.scene.yaxis.title = "Structural Coord y";
+layout.scene.zaxis.title = "Einstein Tensor Gᵤᵥ";
+
+
+} else if (currentTool === 5) { // STRUCTURE
+let u = parseFloat(document.getElementById('u_sl')?.value || 100) / 100;
+let x = Array.from({length: 40}, (_, i) => i - 20);
+let y = Array.from({length: 40}, (_, i) => i - 20);
+let z = x.map(xi => y.map(yi => u * (Math.sin(xi/2) * Math.cos(yi/2) + Math.random()*0.1)));
+data.push({ type: 'surface', z: z, colorscale: 'Tealgrn', showscale: false, showlegend: true, name: 'Cosmic Structure Web' });
+layout.scene.zaxis.range = [-1.5, 1.5];
+layout.showlegend = true;
+layout.legend = { font: { color: '#eee' }, x: 0, y: 1, xanchor: 'left', yanchor: 'top', bgcolor: 'rgba(0,0,0,0)' };
+layout.title = { text: "SUBSTRATE STRUCTURE GENESIS", font: { color: '#2dd4bf' } };
+layout.scene.xaxis.title = "Nodal Scale x";
+layout.scene.yaxis.title = "Nodal Scale y";
+layout.scene.zaxis.title = "Fluctuation δρ";
+}
+
+Plotly.react('plot-area', data, layout, {responsive: true, displayModeBar: false});
+}
+
+function resetLab() {
+if(currentTool===1) syncVal(10, 'a_sl');
+if(currentTool===2) syncVal(50, 'p_sl');
+if(currentTool===3) syncVal(40, 'd_sl');
+if(currentTool===4) syncVal(60, 'g_sl');
+if(currentTool===5) syncVal(100, 'u_sl');
+}
+
+window.onload = () => { showScreen('portal'); };
+</script>
+</body>
+</html>

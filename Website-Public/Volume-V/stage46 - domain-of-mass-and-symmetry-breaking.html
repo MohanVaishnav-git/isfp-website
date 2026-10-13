@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 46 — The Domain of Mass & Symmetry Breaking</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #f472b6;
+--accent-degeneracy: #38bdf8; --accent-instability: #fb7185; --accent-breaking: #facc15; --accent-mass: #4ade80; --accent-structure: #a78bfa;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-unified); font-family: sans-serif; font-size: 0.85rem; min-width: 450px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls, #nav-summary-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+#screen-lab.active { display: flex; flex-direction: column; height: calc(100vh - 50px); }
+
+#screen-portal { justify-content: flex-start; padding-top: 4dvh; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 50px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.primary-constant-box { background: #000; border: 1px solid var(--accent-unified); padding: 6px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 8px; }
+.secondary-structure-box { background: rgba(244, 114, 182, 0.05); border: 1px dashed var(--accent-unified); padding: 6px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 12px; }
+
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(244, 114, 182, 0.05); border: 1px solid var(--accent-unified); padding: 5px; border-radius: 5px; margin-bottom: 8px; font-size: 0.7rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; }
+#plot-area { flex-grow: 1; width: 100%; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #000; border: 1px solid var(--accent-unified); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer { width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem; color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 46 — MASS AS THE IMPRINT OF BROKEN SYMMETRY</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">Symmetry Breaking & Mass Emergence</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">Why perfect symmetry must break to realize a structured reality.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-degeneracy);">
+<h2 style="color:var(--accent-degeneracy);">1. Degeneracy of States</h2>
+<p>Indeterminacy: $\boxed{ \mathcal{V}(\phi) = \mathcal{V}(|\phi|) }$</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-instability);">
+<h2 style="color:var(--accent-instability);">2. Dynamical Instability</h2>
+<p>The Tipping Point: $\boxed{ \mu^2 < 0 }$</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-breaking);">
+<h2 style="color:var(--accent-breaking);">3. Spontaneous Breaking</h2>
+<p>State Selection: $\boxed{ \langle 0 | \phi | 0 \rangle = v }$</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-mass);">
+<h2 style="color:var(--accent-mass);">4. Emergence of Mass</h2>
+<p>Structural Resistance: $\boxed{ m = g \cdot v }$</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-structure);">
+<h2 style="color:var(--accent-structure);">5. Differentiation of Reality</h2>
+<p>Diverse Structure: $\boxed{ \text{SU(2)} \times \text{U(1)} \rightarrow \text{U(1)}_{em} }$</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-unified);">
+<h2 style="color:var(--accent-unified);">6. Stage 46 Summary</h2>
+<p>Mass is the Imprint of Selection.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, Gujarat - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color: var(--accent-blue); text-align: center; margin-bottom: 25px; border-bottom: 2px solid rgba(56, 189, 248, 0.2); padding-bottom: 10px;">STAGE 46 — MATHEMATICAL SUMMARY</h2>
+<p style="text-align: center; font-weight: bold; color: #38bdf8; margin-top: -10px;">Mass, Symmetry Breaking, and Differentiation</p>
+
+<div class="math-section" style="text-align: justify; line-height: 1.6;">
+<h3 style="color: #38bdf8; margin-top: 20px;">1. Symmetric Starting Point</h3>
+<p>Begin with a symmetry-invariant Lagrangian:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$\mathcal{L} = |D_\mu \phi|^2 - V(\phi) - \frac{1}{4}F_{\mu\nu}F^{\mu\nu}$
+</div>
+<p>Potential: $V(\phi) = \mu^2 |\phi|^2 + \lambda |\phi|^4, \quad \lambda > 0$</p>
+<p>Symmetry: $\phi \rightarrow e^{i\alpha(x)} \phi$</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px;">2. Degenerate Vacuum Structure</h3>
+<p>For $\mu^2 < 0$, minimization gives:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$|\phi| = v = \sqrt{-\frac{\mu^2}{2\lambda}}$
+</div>
+<p>Vacuum manifold: $\phi = v e^{i\theta}, \quad \theta \in [0,2\pi)$</p>
+<div style="text-align: center; border: 1px solid #f472b6; padding: 10px; margin: 10px 0;">
+<strong>Degenerate vacua: continuous symmetry preserved in potential</strong>
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px;">3. Instability of Symmetric State</h3>
+<p>At $\phi = 0$:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$\frac{d^2 V}{d\phi^2} = \mu^2 < 0$
+</div>
+<div style="text-align: center; border: 1px solid #f472b6; padding: 10px; margin: 10px 0;">
+<strong>Symmetric state is unstable (false vacuum)</strong>
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px;">4. Vacuum Selection (Spontaneous Breaking)</h3>
+<p>System settles at $|\phi| = v \neq 0$, resulting in $G \rightarrow H$.</p>
+<p>Symmetry is preserved in laws but broken in the vacuum state.</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px;">5. Field Decomposition</h3>
+<p>$\phi(x) = \frac{1}{\sqrt{2}}(v + h(x)) e^{i\theta(x)/v}$</p>
+<p>$h(x) \rightarrow$ radial mode (massive); $\theta(x) \rightarrow$ Goldstone mode (massless).</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px;">6. Gauge Interaction and Mass Generation</h3>
+<p>With $D_\mu = \partial_\mu - i g A_\mu$, the kinetic term yields:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$|D_\mu \phi|^2 \supset \frac{1}{2} g^2 v^2 A_\mu A^\mu \implies \boxed{ m_A = g v }$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px;">7. Scalar Mass</h3>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$m_h^2 = 2\lambda v^2$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px;">8. Sector Differentiation</h3>
+<p>Different fields $A_\mu^i$ with couplings $g_i$ yield:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$m_i = g_i v$
+</div>
+<div style="text-align: center; border: 1px solid #f472b6; padding: 10px; margin: 10px 0;">
+<strong>Different couplings $\Rightarrow$ Different masses</strong>
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px;">9. Emergence of Physical Diversity</h3>
+<p>$G \rightarrow H \Rightarrow \{\text{distinct field sectors}\}$</p>
+<div style="text-align: center; border: 1px solid #f472b6; padding: 10px; margin: 10px 0;">
+<strong>Reality = $\sum_i \text{Field}_i(m_i, g_i)$</strong>
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px;">10. Energy–Momentum Realization</h3>
+<p>Each sector carries its own energy-momentum tensor:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$T_{\mu\nu}^{(i)} = \frac{\partial \mathcal{L}}{\partial (\partial^\mu \phi_i)} \partial_\nu \phi_i - g_{\mu\nu} \mathcal{L}_i$
+</div>
+
+<div class="completion-theorem" style="margin-top: 30px; padding: 20px; background: rgba(244, 114, 182, 0.05); border: 2px solid #f472b6; border-radius: 8px;">
+<h3 style="color: #f472b6; text-align: center; margin-top: 0;">🔷 COMPLETION THEOREM — STAGE 46</h3>
+<div style="font-family: 'Times New Roman', serif; font-style: italic; color: #e2e8f0; text-align: center;">
+$\text{Given a symmetric field theory } \mathcal{L}[\phi] \text{ with } \mu^2 < 0,$<br>
+$\text{the vacuum becomes degenerate and the symmetric state unstable.}$<br>
+$\text{The system necessarily selects a vacuum } |\phi| = v \neq 0,$<br>
+$\text{thereby breaking } G \rightarrow H.$<br><br>
+$\text{Coupling of fields to the vacuum generates masses: } m_i = g_i v.$<br>
+$\text{Different couplings produce differentiated field sectors.}$
+</div>
+<p style="text-align: center; font-weight: bold; color: #f472b6; margin-top: 20px; font-size: 1.1rem;">
+$\therefore$
+</p>
+<div style="text-align: center; font-weight: bold; border: 1px solid #f472b6; padding: 10px; margin-top: 10px;">
+Mass and physical diversity arise as necessary consequences of<br>
+spontaneous symmetry breaking and field–vacuum interaction.
+</div>
+</div>
+
+<div style="text-align: center; margin-top: 25px;">
+<p style="font-weight: bold; color: #38bdf8;">FINAL STRUCTURAL STATEMENT</p>
+<div style="border: 1px solid #38bdf8; display: inline-block; padding: 10px; color: #f472b6;">
+Reality = Broken Symmetry $\Rightarrow$ Mass $\Rightarrow$ Differentiation
+</div>
+</div>
+
+<div style="margin-top: 25px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<p style="color: #38bdf8; font-weight: bold; margin-bottom: 5px;">FINAL INSIGHT</p>
+<ul style="list-style-type: none; padding: 0; color: #e2e8f0;">
+<li>&bull; Symmetry provides possibility</li>
+<li>&bull; Instability enforces transition</li>
+<li>&bull; Vacuum selection creates structure</li>
+<li>&bull; Interaction generates mass</li>
+<li>&bull; Differentiation produces reality</li>
+</ul>
+</div>
+
+<div style="text-align: center; margin-top: 25px; font-weight: bold; color: #f472b6;">
+<p>STAGE 46 — COMPLETE</p>
+<p>$\boxed{ \text{Mass = Imprint of Broken Symmetry} }$</p>
+<p>$\boxed{ \text{Diversity = Structured manifestation of that imprint} }$</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div class="primary-constant-box">
+<div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val">11.350</span></div>
+<div class="const-item"><span class="const-label">Synthesis P</span><span class="const-val">0.6900</span></div>
+</div>
+
+<div id="structure-box-area"></div>
+
+<div id="mapping-box-area"></div>
+
+<div class="diagnostic-panel">
+<span class="diag-title">Symmetry Telemetry</span>
+<div id="telemetry-area"></div>
+</div>
+
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-unified); font-size:0.75rem; cursor:pointer; padding:6px;">RESET SYMMETRY</button>
+<div id="panel-footer-text" style="font-size: 0.75rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.3; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:8px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Structural Selection Logic</span>
+<div id="metrics-content" style="font-size:0.65rem; font-family:monospace; line-height:1.3;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Realization Result</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.65rem; color: var(--text-dim); line-height: 1.4; background: #000; padding: 10px; border-radius: 0px; border: 1px solid #222; margin-top: auto;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "DEGENERACY OF STATES",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Degeneracy of States</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. CORE IDEA</h3>
+<p>This module establishes the starting condition of symmetry: a system governed by perfectly symmetric laws possesses multiple equally valid ground states. There is no preferred configuration. This leads to a fundamental conclusion: $\\text{Symmetry} \\Rightarrow \\text{Indeterminacy of Ground State}$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. STRUCTURAL LOGIC</h3>
+<p>The structure developed in this module is: <strong>Symmetric Laws &rarr; Degenerate Ground States &rarr; No Unique Physical Realization</strong>. This means the governing equations are fully symmetric, the potential admits multiple identical minima, and the system cannot select one state over another.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. PHYSICAL INTERPRETATION</h3>
+<p>The vacuum is defined as <strong>DEGENERATE (NON-UNIQUE MINIMUM)</strong>. This means there is not a single lowest-energy state; instead, there is a continuous set of minimum-energy states, all of which are physically equivalent. Because of this, mass generation has not yet occurred, as mass requires selection and resistance—neither of which exists yet.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. ROLE OF THE POTENTIAL</h3>
+<p>The potential is described as a <strong>Continuous Degenerate Minimum (Circular Valley)</strong>. This structure implies that energy is minimized along an entire ring, movement along the ring does not change energy, and there is no preferred direction in field space. Thus, the system is perfectly symmetric but physically unresolved.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. REALIZATION STATEMENT</h3>
+<p style="font-style: italic; color: #f472b6; text-align: center;">“In perfect symmetry, no unique physical reality can be selected.”</p>
+<p>This is the correct closure of Module 1.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. GRAPH INTERPRETATION</h3>
+<p>This graph represents a symmetric potential with a continuous set of minimum-energy states forming a circular valley. The vertical axis represents potential energy, while the horizontal axes represent components of the field. The lowest-energy region is not a single point but an entire ring, indicating that all configurations along this circle are equally stable. This demonstrates degeneracy: the system has infinitely many valid ground states but no mechanism to select one. As a result, the system remains indeterminate, and no definite physical structure or mass can emerge at this stage.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. WHY THIS MODULE IS CRITICAL</h3>
+<p>This module proves that perfect symmetry is physically incomplete because it does not produce uniqueness, structure, or mass.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. TRANSITION TO MODULE 2</h3>
+<p>The natural question now arises: If symmetry gives no unique state, how does reality choose one? This leads directly to Instability ($\\mu^2 < 0$), where symmetry cannot remain stable.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">FINAL INSIGHT</h3>
+<p style="margin-bottom: 0;">Symmetry is not structure—it is the condition before structure.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 1 Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Symmetry Condition:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\mathcal{L}(\\phi) = \\mathcal{L}(e^{i\\alpha}\\phi)$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The vacuum remains in a state of perfect, unresolved potential where all directions are equal and no distinct physical identity has been forged.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: Degeneracy of States</h2>
+
+<div class="math-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. FIELD AND SYMMETRY</h3>
+<p>Consider a complex scalar field $\\Psi(x) \\in \\mathbb{C}$. It can be written in terms of its real components:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\Psi(x) = \\phi_1(x) + i \\phi_2(x)$$
+</div>
+<p>This defines a 2D internal field space.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. GLOBAL SYMMETRY</h3>
+<p>The system is invariant under a global phase rotation:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\Psi(x) \\rightarrow e^{i\\theta} \\Psi(x)$$
+</div>
+<p>This corresponds to a rotation $(\\phi_1, \\phi_2)$ in the internal plane.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. SYMMETRIC POTENTIAL</h3>
+<p>The potential depends only on the magnitude of the field, $V(\\Psi) = V(|\\Psi|)$. Given $|\\Psi|^2 = \\phi_1^2 + \\phi_2^2$, we choose the general symmetric form:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$V(\\Psi) = \\mu^2 |\\Psi|^2 + \\lambda |\\Psi|^4$$
+</div>
+<p>where $\\lambda > 0$ to ensure the potential is bounded from below.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. DEGENERATE MINIMUM CONDITION</h3>
+<p>For degeneracy (the "Mexican Hat" potential), we require $\\mu^2 < 0$. To find the minimum, we take the derivative with respect to $|\\Psi|$:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\frac{dV}{d|\\Psi|} = 0 \\implies 2\\mu^2 |\\Psi| + 4\\lambda |\\Psi|^3 = 0$$
+</div>
+<p>Factoring out the field gives $|\\Psi|(\\mu^2 + 2\\lambda |\\Psi|^2) = 0$. The non-trivial solution for the vacuum is:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$|\\Psi|^2 = -\\frac{\\mu^2}{2\\lambda}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. VACUUM MANIFOLD</h3>
+<p>This defines the vacuum expectation value $v$:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$|\\Psi| = v = \\sqrt{-\\frac{\\mu^2}{2\\lambda}}$$
+</div>
+<p>In the $(\\phi_1, \\phi_2)$ plane, this corresponds to the circle $\\phi_1^2 + \\phi_2^2 = v^2$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. DEGENERACY</h3>
+<p>All points satisfying $\\Psi = v e^{i\\theta}$ have the exact same potential energy. Since $V(\\Psi) = \\text{constant}$ along this path, infinite ground states exist.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. NO UNIQUE MINIMUM</h3>
+<p>The vacuum is not a single point but a manifold $M = \\{ \\Psi : |\\Psi| = v \\}$. Because there is no preferred phase $\\theta$, there is no unique vacuum, and full symmetry remains preserved at this stage.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. MASS ABSENCE</h3>
+<p>Mass is determined by the curvature of the potential evaluated at the vacuum. Along the degenerate circular direction, the curvature vanishes:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\frac{d^2V}{d\\theta^2} = 0 \\implies m = 0$$
+</div>
+<p>There is no mass generation along the degenerate direction.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. STRUCTURAL RESULT</h3>
+<p>The chain of logic is established: <strong>Symmetry $\\rightarrow$ $V(|\\Psi|)$ $\\rightarrow$ Degenerate Minimum $\\rightarrow$ Continuous Vacuum Manifold $\\rightarrow$ No Unique State $\\rightarrow$ No Mass Generation.</strong></p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">FINAL MATHEMATICAL INSIGHT</h3>
+<p style="text-align: center; font-family: 'Courier New', monospace; color: #f472b6;">
+$V(\\Psi) = \\mu^2|\\Psi|^2 + \\lambda|\\Psi|^4 \\implies |\\Psi| = v \\implies \\Psi = v e^{i\\theta}$
+</p>
+<p style="margin-bottom: 0;">This results in a degenerate vacuum, which mathematically confirms: No unique ground state, no structure, and no mass.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 1: Mathematical Ground State</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Vacuum Condition:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\langle 0 | \\Psi | 0 \\rangle \\in \\{ v e^{i\\theta} \\}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The potential does not force a specific point of existence, leaving the system in a state of symmetric indeterminacy.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>DEGENERACY DEPTH</span><input type="number" id="d_in" class="digital-entry" value="1.0" oninput="syncVal(this.value, 'd_sl')"></div><input type="range" id="d_sl" min="0.1" max="2" step="0.1" value="1.0" oninput="syncVal(this.value, 'd_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">POTENTIAL WELL</span><div style="text-align:center; font-size: 0.9rem;">$\\mathcal{V}(\\phi)$ : Continuous Degenerate Minimum (Circular Valley)<br>No unique ground state exists.</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">CORE INSIGHT</span><div style="text-align:center; font-size: 0.8rem;">Symmetry ⇒ Indeterminacy of Ground State</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Vacuum State</span><span class="const-val">DEGENERATE<br>(NON-UNIQUE MINIMUM)</span></div><div class="const-item"><span class="const-label">Mass Gen</span><span class="const-val">NONE</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-degeneracy);">SYMMETRY REALIZED</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.95rem;">Symmetric Laws<br>↓<br>Degenerate Ground States<br>↓<br>No Unique Physical Realization`,
+hierarchy: `<div style="color: var(--accent-degeneracy); font-weight: bold; font-size: 0.95rem;">Laws Preserved: Symmetric</div>`,
+footer: "The potential exists as a perfect circle of possibilities. No structure can emerge yet.",
+rightNote: `<div style="color: #f472b6; line-height: 1.4; font-size: 0.95rem;">In perfect symmetry, no unique physical reality can be selected.`
+},
+
+2: {
+title: "DYNAMICAL INSTABILITY OF SYMMETRY",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Dynamical Instability</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. CORE IDEA</h3>
+<p>This module establishes the turning point of symmetry: even though symmetry exists, the symmetric state cannot remain stable. This is the first moment where Nature is forced to move.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. STRUCTURAL LOGIC</h3>
+<p>The structure developed here is: <strong>Degeneracy (Module 1) &rarr; Instability of symmetric state &rarr; System cannot stay at symmetric point &rarr; Transition becomes inevitable.</strong></p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. MATHEMATICAL CAUSE (CRITICAL)</h3>
+<p>The introduction of $\\mu^2 < 0$ is the key. It implies that the curvature at $\\Psi = 0$ is negative, meaning the symmetric point is not a minimum—it is a maximum (or unstable point). Thus: $\\mu^2 < 0 \\Rightarrow \\text{symmetric state unstable}$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. PHYSICAL INTERPRETATION</h3>
+<p>At the symmetric state where $\\Psi = 0$, any small fluctuation pushes the system away. The system cannot remain at the center; it is in an unstable equilibrium. This state is referred to as the <strong>False Vacuum</strong> (Unstable Symmetric State).</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. STRUCTURAL SELECTION LOGIC</h3>
+<p>The refined flow is as follows: <strong>Fluctuation Initiated &rarr; Symmetric Point Becomes Unstable &rarr; System Forced Toward Lower Energy.</strong> This means that instability creates direction, an energy gradient appears, and motion becomes necessary.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. GRAPH INTERPRETATION</h3>
+<p>This graph represents the instability of the symmetric state at the origin of the potential. The central point corresponds to $\\Psi = 0$, which is shown as an elevated position rather than a minimum. The surrounding surface slopes downward away from the center, indicating that any small perturbation will cause the system to move away from this point. The vertical axis represents potential energy, while the horizontal axes represent field components. The central peak illustrates that the symmetric state is an unstable equilibrium, not a stable vacuum. This demonstrates that perfect symmetry cannot persist, as the system is dynamically driven away toward lower-energy configurations.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. CRITICAL INSIGHT</h3>
+<p style="font-style: italic; color: #f472b6; text-align: center;">“Perfect symmetry cannot exist as a stable physical state.”</p>
+<p>This insight serves as the engine of symmetry breaking.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. WHAT THIS MODULE ACHIEVES</h3>
+<p>While Module 1 showed that there is no unique state, Module 2 shows that even the symmetric state is unstable. Together, they demonstrate that selection is not optional—it is forced.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. TRANSITION TO MODULE 3</h3>
+<p>Now the question becomes: If the system must move, where does it go? The answer is that it settles into one of the minima, which leads directly to <strong>Spontaneous Symmetry Breaking</strong>.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">FINAL STRUCTURAL FLOW</h3>
+<p style="text-align: center; font-family: 'Courier New', monospace; color: #f472b6;">
+Symmetry &rarr; Degeneracy &rarr; Instability &rarr; Forced Transition
+</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">FINAL INSIGHT</h3>
+<p style="margin-bottom: 0;">Symmetry is not broken by choice—it is broken by instability.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 2 Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Instability Trigger:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\mu^2 < 0 \\implies \\frac{d^2V}{d\\Psi^2}\\bigg|_{\\Psi=0} < 0$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The symmetric configuration loses its status as a physical equilibrium, mandating a transition toward a more stable, structured state.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: Dynamical Instability of Symmetric State</h2>
+
+<div class="math-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Scalar Field and Symmetric Potential</h3>
+<p>Consider a scalar field $\\phi$ with a symmetry-preserving potential defined as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$V(\\phi) = \\frac{1}{2}\\mu^2 \\phi^2 + \\frac{\\lambda}{4}\\phi^4$$
+</div>
+<p>where $\\lambda > 0$ ensures stability at large $|\\phi|$, and $\\mu^2 < 0$ is the crucial condition for instability.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Stationary Points (Vacuum Candidates)</h3>
+<p>To find the extrema of the potential, we evaluate the first derivative:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\frac{dV}{d\\phi} = \\mu^2 \\phi + \\lambda \\phi^3 = \\phi(\\mu^2 + \\lambda \\phi^2)$$
+</div>
+<p>This yields the stationary points: $\\phi = 0$ or $\\phi^2 = -\\frac{\\mu^2}{\\lambda}$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Nature of the Symmetric State</h3>
+<p>We evaluate the curvature (second derivative) at the symmetric point $\\phi = 0$:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\frac{d^2 V}{d\\phi^2}\\bigg|_{\\phi=0} = \\mu^2$$
+</div>
+<p>Since $\\mu^2 < 0$, it follows that $\\frac{d^2 V}{d\\phi^2}\\big|_{\\phi=0} < 0$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Interpretation</h3>
+<div style="text-align: center; margin: 10px 0; font-weight: bold; border: 1px solid #f472b6; padding: 10px; display: inline-block; width: 100%;">
+$\\phi = 0$ is a local maximum (unstable equilibrium)
+</div>
+<p>This confirms that while the symmetric state exists, it is dynamically unstable.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. True Vacuum (For Reference)</h3>
+<p>The stable minima (true vacuum) occur at the non-zero values:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\phi = \\pm v, \\quad v = \\sqrt{-\\frac{\\mu^2}{\\lambda}}$$
+</div>
+<p>These values establish the ground state utilized in Module 3.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Energy Difference (Driving Instability)</h3>
+<p>The potential energy at the symmetric point is $V(0) = 0$. At the minima, the energy is:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$V(\\pm v) = -\\frac{\\mu^4}{4\\lambda} < 0$$
+</div>
+<div style="text-align: center; margin: 10px 0; font-weight: bold; border: 1px solid #f472b6; padding: 10px; display: inline-block; width: 100%;">
+$V(\\pm v) < V(0)$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Dynamical Equation (Field Evolution)</h3>
+<p>From the Lagrangian $\\mathcal{L} = \\frac{1}{2}(\\partial_\\mu \\phi)^2 - V(\\phi)$, the equation of motion is:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\Box \\phi + \\mu^2 \\phi + \\lambda \\phi^3 = 0$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Linearized Instability Near Symmetry</h3>
+<p>Near the symmetric point ($\\phi \\approx 0$), the equation linearizes to:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\Box \\phi - |\\mu^2| \\phi = 0$$
+</div>
+<p>The solution contains growing modes $\\phi(t) \\sim e^{|\\mu| t}$, showing exponential departure from the symmetric state.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Final Mathematical Statement</h3>
+<div style="text-align: center; margin: 10px 0; font-weight: bold; border: 1px solid #f472b6; padding: 10px; display: inline-block; width: 100%;">
+$\\mu^2 < 0 \\implies \\text{Symmetric vacuum is unstable}$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Structural Meaning</h3>
+<div style="text-align: center; margin: 10px 0; font-weight: bold; border: 1px solid #f472b6; padding: 10px; display: inline-block; width: 100%;">
+$\\text{Symmetry} \\implies \\text{Instability} \\implies \\text{Forced Evolution}$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Final Insight</h3>
+<p style="margin-bottom: 0;">The mathematics clearly demonstrates that while symmetry is allowed by the laws of physics, stability forbids the system from remaining in that state.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 2: Instability Parameter</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Energy Gradient:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\nabla V(\\phi) \\neq 0$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The "False Vacuum" at the center of the potential creates an inevitable drive toward the lower energy configurations of the ground state ring.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>INSTABILITY FACTOR</span><input type="number" id="i_in" class="digital-entry" value="0.5" oninput="syncVal(this.value, 'i_sl')"></div><input type="range" id="i_sl" min="0" max="1" step="0.05" value="0.5" oninput="syncVal(this.value, 'i_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">TIPPING POINT</span><div style="text-align:center; font-size: 0.9rem;">μ² < 0 → symmetric state unstable.</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">CORE INSIGHT</span><div style="text-align:center; font-size: 0.8rem;">Perfect symmetry cannot exist as a stable physical state.</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Vacuum State</span><span class="const-val">DEGENERATE<br>(UNSTABLE AT ORIGIN)</span></div><div class="const-item"><span class="const-label">Mass Gen</span><span class="const-val">NONE</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-instability);">INSTABILITY DETECTED</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.95rem;">Fluctuation Initiated<br>↓<br>Symmetric Point Becomes Unstable<br>↓<br>System Forced Toward Lower Energy`,
+hierarchy: `<div style="color: var(--accent-instability); font-weight: bold; font-size: 0.95rem;">Symmetry State: Unstable</div>`,
+footer: "The center cannot hold. Dynamics demand a transition to a stable minimum.",
+rightNote: `<div style="color: #f472b6; line-height: 1.4; font-size: 0.95rem;">Stability requires departure from perfect symmetry.`
+},
+
+3: {
+title: "SPONTANEOUS BREAKING",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Spontaneous Symmetry Breaking</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. CORE IDEA</h3>
+<p>This module marks the actual realization of structure. After instability (Module 2), the system cannot remain at the symmetric point. It is therefore forced to settle into one of the available minima. This selection is not imposed externally—it arises naturally from the dynamics. Symmetry remains in the laws, but is broken in the realized state.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. STRUCTURAL LOGIC</h3>
+<p>The progression is now complete: <strong>Degeneracy (many equivalent states) &rarr; Instability (cannot remain symmetric) &rarr; Selection (system settles into one state).</strong> This gives a unique physical realization from symmetric possibility.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. VACUUM SELECTION</h3>
+<p>The field does not remain at zero; it acquires a non-zero vacuum expectation value (VEV):</p>
+<div style="text-align: center; margin: 10px 0; font-weight: bold; color: #f472b6;">
+$|\\phi| = v \\neq 0$
+</div>
+<p>One specific point on the circular minimum is selected.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. WHAT “SPONTANEOUS” MEANS</h3>
+<p>No external force breaks symmetry. Instead, the laws and the potential remain perfectly symmetric, but the solution (the vacuum) is not symmetric. This is the essence of spontaneous symmetry breaking.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. GRAPH INTERPRETATION</h3>
+<p>The graph represents the characteristic “Mexican hat” potential, where the central point corresponds to the unstable symmetric state and the circular valley represents a continuous set of degenerate minima. The circle shown at the bottom indicates the vacuum manifold defined by $|\\phi| = v$. Any point on this circle is equally valid energetically. The highlighted point represents the selected vacuum (VEV), indicating that the system has chosen a specific orientation in field space. The flat direction along the circle corresponds to massless excitations (Goldstone modes), while the radial direction represents changes in energy. This visualization clearly shows how symmetry exists in the structure of the potential, but the actual realized state breaks that symmetry.</p>
+
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. GOLDSTONE MODE</h3>
+<p>Because the minimum is not a single point but a continuous set, motion along the circle costs no energy. This gives rise to the <strong>Goldstone Mode (Massless along Vacuum Manifold)</strong>. This means there is no restoring force along the angular direction, resulting in a zero-mass excitation.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. PHYSICAL INTERPRETATION</h3>
+<p>After symmetry breaking, the system acquires a definite orientation. The background is no longer neutral, and physical properties become directional. Reality becomes structured.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. CRITICAL INSIGHT</h3>
+<p style="font-style: italic; color: #f472b6; text-align: center;">“Symmetry preserved in laws, broken in vacuum state.”</p>
+<p>This is one of the most fundamental principles in modern physics.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. WHAT THIS MODULE ACHIEVES</h3>
+<p>Before, there was no unique state. Now, one state is selected. This marks the birth of physical identity.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. TRANSITION TO MODULE 4</h3>
+<p>If symmetry is broken, how does mass emerge? While Goldstone modes are massless, real particles have mass. This leads directly to the <strong>Mass Generation Mechanism</strong>.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">FINAL STRUCTURAL FLOW</h3>
+<p style="text-align: center; font-family: 'Courier New', monospace; color: #f472b6;">
+Symmetry &rarr; Degeneracy &rarr; Instability &rarr; Selection &rarr; Broken Reality
+</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">FINAL INSIGHT</h3>
+<p style="margin-bottom: 0;">Symmetry gives possibilities, but reality emerges only after selection.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 3 Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Selection Event:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\phi(x) = v + \\sigma(x) + i\\eta(x)$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The system settles into a specific ground state, distinguishing the background and allowing for the emergence of distinct physical properties.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: Spontaneous Symmetry Breaking</h2>
+
+<div class="math-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Symmetric Lagrangian</h3>
+<p>Consider a complex scalar field $\\phi$ with global $U(1)$ symmetry defined by the Lagrangian:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\mathcal{L} = \\partial_\\mu \\phi^* \\partial^\\mu \\phi - V(\\phi)$$
+</div>
+<p>with the potential $V(\\phi) = \\mu^2 |\\phi|^2 + \\lambda |\\phi|^4$, where $\\lambda > 0$ and $\\mu^2 < 0$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Vacuum Condition (Minimization)</h3>
+<p>To find the ground state, we minimize the potential:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\frac{\\partial V}{\\partial \\phi} = 0 \\Rightarrow \\phi(\\mu^2 + 2\\lambda |\\phi|^2) = 0$$
+</div>
+<p>The non-trivial solution for the vacuum expectation value (VEV) is:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$|\\phi|^2 = -\\frac{\\mu^2}{2\\lambda} \\implies v = \\sqrt{-\\frac{\\mu^2}{2\\lambda}}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Vacuum Manifold</h3>
+<p>The condition $|\\phi| = v$ implies that the vacuum is a set of points in the complex plane:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\phi = v e^{i\\theta}, \\quad \\theta \\in [0, 2\\pi)$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Degenerate Vacua</h3>
+<div style="text-align: center; margin: 10px 0; font-weight: bold; border: 1px solid #f472b6; padding: 10px; display: inline-block; width: 100%;">
+Vacuum manifold: $S^1$ (a circle)
+</div>
+<p>All values of $\\theta$ are energetically equivalent: $V(\\phi) = \\text{constant}$ for all $|\\phi| = v$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Field Decomposition (Key Step)</h3>
+<p>We write the field in terms of fluctuations around a selected vacuum point:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\phi(x) = \\frac{1}{\\sqrt{2}} \\left( v + h(x) \\right) e^{i\\theta(x)/v}$$
+</div>
+<p>where $h(x)$ represents the radial (Higgs-like) mode and $\\theta(x)$ represents the angular (Goldstone) mode.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Substitute into Lagrangian</h3>
+<p>Expanding the kinetic term reveals the dynamics of these modes:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$|\\partial_\\mu \\phi|^2 = \\frac{1}{2}(\\partial_\\mu h)^2 + \\frac{1}{2}(v + h)^2 \\left(\\frac{\\partial_\\mu \\theta}{v}\\right)^2$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Mass Terms</h3>
+<p>Expanding the potential $V(\\phi) = \\lambda (|\\phi|^2 - v^2)^2$ around the vacuum $|\\phi|^2 = \\frac{(v + h)^2}{2}$ yields:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$V(h) = \\frac{1}{2}(2\\lambda v^2) h^2 + \\dots$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Mass Spectrum</h3>
+<p>The radial mode $h(x)$ acquires a mass $m_h^2 = 2\\lambda v^2$, while the angular mode $\\theta(x)$ remains massless: $m_\\theta = 0$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Goldstone Theorem (Realized)</h3>
+<div style="text-align: center; margin: 10px 0; font-weight: bold; border: 1px solid #f472b6; padding: 10px; display: inline-block; width: 100%;">
+Continuous symmetry breaking $\\Rightarrow$ Massless mode
+</div>
+<p>The massive $h(x)$ mode and massless Goldstone $\\theta(x)$ mode are now mathematically distinct.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Final Mathematical Structure</h3>
+<div style="text-align: center; margin: 10px 0; color: #f472b6; line-height: 1.8;">
+$\\phi = v e^{i\\theta} \\Rightarrow$ Symmetry broken in state<br>
+Vacuum: $|\\phi| = v \\neq 0$<br>
+Massless modes arise along vacuum manifold
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Final Insight</h3>
+<p style="margin-bottom: 0;">The mathematics demonstrates that a symmetric structure leads to a circular vacuum, where a single selection point turns abstract symmetry into physical fluctuations (particles).</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 3: Realized Ground State</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Mass Equation:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$m_h = v\\sqrt{2\\lambda}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The breaking of the circular symmetry fixes the vacuum, giving birth to massive radial excitations while leaving the angular "motion" massless.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>SELECTION ANGLE</span><input type="number" id="a_in" class="digital-entry" value="0" oninput="syncVal(this.value, 'a_sl')"></div><input type="range" id="a_sl" min="0" max="360" step="1" value="0" oninput="syncVal(this.value, 'a_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">THE SELECTION</span><div style="text-align:center; font-size: 0.9rem;">Vacuum selects: $|\\phi| = v \\neq 0$</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">CORE INSIGHT</span><div style="text-align:center; font-size: 0.8rem;">Symmetry preserved in laws, broken in vacuum state.</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Vacuum State</span><span class="const-val">DEGENERATE VACUA<br>(CONTINUOUS MINIMA)</span></div><div class="const-item"><span class="const-label">Mass Gen</span><span class="const-val">NONE</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-breaking);">SYMMETRY: BROKEN IN STATE</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Phase Selection<br>↓<br>Unique Ground State<br>↓<br>Background Orientation Established`,
+hierarchy: `<div style="color: var(--accent-breaking); font-weight: bold;">Symmetry Broken in State</div>`,
+footer: "The system has settled. A 'direction' in the vacuum now exists.",
+rightNote: `<div style="color: #f472b6; line-height: 1.4; font-size: 0.85rem;">Vacuum acquires a definite orientation in field space.`
+},
+
+4: {
+title: "EMERGENCE OF MASS",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Emergence of Mass</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. CORE IDEA</h3>
+<p>This module establishes the origin of mass as a dynamical consequence. Mass is not introduced as a fundamental input. Instead, it appears naturally when fields interact with the selected vacuum (VEV) created by symmetry breaking.</p>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">👉 Mass = response of a field moving through a structured vacuum</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. STRUCTURAL POSITION</h3>
+<p>The logical flow is now complete: <strong>Symmetry &rarr; Degeneracy &rarr; Instability &rarr; Vacuum Selection &rarr; Mass Emergence.</strong> This module converts structure into physical resistance.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. PHYSICAL MEANING OF MASS</h3>
+<p>The physical definition of mass is: <strong>Resistance to Field Variation</strong>. This means a field does not freely propagate; it experiences opposition due to vacuum structure, and this opposition manifests as inertia (mass).</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. ROLE OF VEV (VACUUM STRUCTURE)</h3>
+<p>After the transition in Module 3 where $|\\phi| = v \\neq 0$, the vacuum is no longer empty. It possesses a non-zero background value. Fields interacting with this background value acquire mass as a direct result of this coupling.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. STRUCTURAL LOGIC</h3>
+<p>The refined flow is as follows: <strong>Field interacting with VEV &rarr; Inertial response induced &rarr; Mass emerges dynamically.</strong> This proves that mass is not intrinsic but is entirely interaction-dependent.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. GRAPH INTERPRETATION</h3>
+<p>The graph represents a propagating field excitation moving through a structured vacuum. The oscillatory curve illustrates how the field no longer propagates freely but exhibits a modified trajectory due to interaction with the vacuum expectation value. The vertical axis represents field amplitude, while the horizontal direction represents propagation through space. The curvature and bounded oscillation indicate that energy is required to sustain motion, reflecting an inertial resistance. This visualizes the emergence of mass as a dynamical effect: the field experiences resistance from the vacuum structure, and this resistance manifests as mass.</p>
+
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. CRITICAL INSIGHT</h3>
+<p style="font-style: italic; color: #f472b6; text-align: center;">“Mass is the imprint of broken symmetry.”</p>
+<p>Without symmetry breaking, there is no mass; with vacuum structure, mass appears.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. WHAT THIS MODULE ACHIEVES</h3>
+<p>Before this stage, fields existed only as mathematical possibilities. Now, fields acquire physical weight. This is the transition from abstract field to material-like behavior.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. IMPORTANT CLARIFICATION</h3>
+<p>Mass is not created or added externally. It is uniquely <strong>induced by interaction with vacuum structure</strong>.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. TRANSITION TO MODULE 5</h3>
+<p>Now that mass exists, how are energy and momentum carried? This leads to <strong>Energy–Momentum Reality</strong>, providing the final confirmation of physicality.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">FINAL STRUCTURAL FLOW</h3>
+<p style="text-align: center; font-family: 'Courier New', monospace; color: #f472b6;">
+Vacuum Selection &rarr; Field–Vacuum Interaction &rarr; Resistance &rarr; Mass
+</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">FINAL INSIGHT</h3>
+<p style="margin-bottom: 0;">Mass is not a property of the field alone—it is a property of the field in a structured vacuum.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 4 Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Mass Coupling:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$M = g \\cdot v$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Physical weight arises from the coupling constant $g$ and the vacuum expectation value $v$, transforming field fluctuations into massive particles.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: Emergence of Mass (Gauge / Higgs Mechanism)</h2>
+
+<div class="math-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Start from Local Gauge Theory</h3>
+<p>Take a complex scalar field $\\phi$ with local $U(1)$ symmetry, where the transformation depends on position $x$:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\phi(x) \\rightarrow e^{i\\alpha(x)} \\phi(x)$$
+</div>
+<p>To maintain invariance, we introduce a gauge field $A_\\mu$ and the covariant derivative:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$D_\\mu = \\partial_\\mu - i g A_\\mu$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Gauge-Invariant Lagrangian</h3>
+<p>The full Lagrangian including the field strength tensor $F_{\\mu\\nu}$ is:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\mathcal{L} = |D_\\mu \\phi|^2 - V(\\phi) - \\frac{1}{4}F_{\\mu\\nu}F^{\\mu\\nu}$$
+</div>
+<p>with the potential $V(\\phi) = \\mu^2 |\\phi|^2 + \\lambda |\\phi|^4$ and the condition $\\mu^2 < 0$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Vacuum Expectation Value (VEV)</h3>
+<p>Minimization of the potential leads to the non-zero vacuum expectation value:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$|\\phi| = v = \\sqrt{-\\frac{\\mu^2}{2\\lambda}}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Field Expansion Around Vacuum</h3>
+<p>Choosing the <strong>unitary gauge</strong>, we represent the field purely in terms of its radial fluctuation $h(x)$ around the vacuum:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\phi(x) = \\frac{1}{\\sqrt{2}} (v + h(x))$$
+</div>
+<p>In this gauge, the Goldstone mode is "eaten" or absorbed into the longitudinal component of the gauge field.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Substitute into Kinetic Term</h3>
+<p>Substituting the expansion into the covariant kinetic term:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$|D_\\mu \\phi|^2 = \\left| \\partial_\\mu \\left(\\frac{v + h}{\\sqrt{2}}\\right) - i g A_\\mu \\frac{v + h}{\\sqrt{2}} \\right|^2$$
+</div>
+<p>Expanding this expression yields:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$= \\frac{1}{2}(\\partial_\\mu h)^2 + \\frac{1}{2} g^2 (v + h)^2 A_\\mu A^\\mu$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Mass Term for Gauge Field</h3>
+<p>The term quadratic in the gauge field $A_\\mu$ reveals its mass:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\frac{1}{2} g^2 v^2 A_\\mu A^\\mu \\implies \\boxed{ m_A = g v }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Mass of Scalar (Higgs-like Mode)</h3>
+<p>From the potential expansion $V(h) = \\frac{1}{2}(2\\lambda v^2) h^2 + \\dots$, the scalar mass is identified as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\boxed{ m_h^2 = 2\\lambda v^2 }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Key Structural Result</h3>
+<p>Before symmetry breaking, $A_\\mu$ was massless and a Goldstone mode was present. After symmetry breaking, the gauge field becomes massive and the Goldstone mode disappears (absorbed).</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Final Mathematical Statement</h3>
+<div style="text-align: center; margin: 10px 0; font-weight: bold; border: 1px solid #f472b6; padding: 10px; display: inline-block; width: 100%;">
+Mass $\\propto g \\cdot v$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Structural Interpretation</h3>
+<div style="text-align: center; margin: 10px 0; font-weight: bold; border: 1px solid #f472b6; padding: 10px; display: inline-block; width: 100%;">
+Field + Vacuum (VEV) $\\implies$ Mass
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">11. Connection to the Framework</h3>
+<p>This directly confirms that <strong>Mass = Resistance to Field Variation</strong>. The interaction term $g v$ introduces inertia, ensuring the field no longer propagates freely through the structured vacuum.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Final Insight</h3>
+<p style="margin-bottom: 0;">Symmetry breaking creates the VEV ($v$), and the coupling ($g$) connects the field to this vacuum. Their product generates mass, shifting the state from abstract symmetry to physical reality.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 4: Core Physical Result</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Fundamental Relation:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\boxed{ m = g v }$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Physical inertia is a derived property, emerging from the interaction between a gauge field and the underlying vacuum expectation value.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>COUPLING (g): FIELD–VACUUM INTERACTION</span><input type="number" id="m_in" class="digital-entry" value="1.0" oninput="syncVal(this.value, 'm_sl')"></div><input type="range" id="m_sl" min="0" max="2" step="0.1" value="1.0" oninput="syncVal(this.value, 'm_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MASSIVE RESPONSE</span><div style="text-align:center; font-size: 0.9rem;">Mass = Resistance to Field Variation</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">CORE INSIGHT</span><div style="text-align:center; font-size: 0.8rem;">Mass is the imprint of broken symmetry.</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Vacuum State</span><span class="const-val">SELECTED (|$\\phi$| = v)</span></div><div class="const-item"><span class="const-label">Mass Gen</span><span class="const-val">ACTIVE</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-mass);">INERTIA REALIZED</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Field interacting with VEV<br>↓<br>Inertial response induced<br>↓<br>Mass emerges dynamically`,
+hierarchy: `<div style="color: var(--accent-mass); font-weight: bold;">Mass: Emergent from Vacuum Interaction</div>`,
+footer: "Particles gain mass not by being created, but by being coupled to the broken vacuum.",
+rightNote: `<div style="color: #f472b6; line-height: 1.4; font-size: 0.85rem;">Mass is not fundamental; it is a consequence of selection.`
+},
+
+5: {
+title: "DIFFERENTIATION",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Differentiation of Reality</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. CORE IDEA</h3>
+<p>This module completes the transition from symmetry to structured diversity. After symmetry breaking and mass generation, the system no longer behaves uniformly. Instead, different fields exhibit distinct behaviors, leading to the emergence of a richly differentiated physical reality.</p>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">👉 Reality is not uniform—it is structured through differentiation.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. STRUCTURAL POSITION</h3>
+<p>The full progression now reaches its final stage: <strong>Symmetry &rarr; Degeneracy &rarr; Instability &rarr; Vacuum Selection &rarr; Mass Emergence &rarr; Field Differentiation.</strong> This is the point where physics becomes diverse and observable.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. MEANING OF DIFFERENTIATION</h3>
+<p>Once the vacuum is selected and mass is generated, the uniformity of the field space is lost. Some fields acquire mass while others remain massless; coupling constants differ, and interaction strengths vary. This creates multiple field sectors with distinct identities.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. MASSIVE VS MASSLESS SECTORS</h3>
+<p>The distinction between <strong>Massive vs Massless Field Sectors</strong> is fundamental to physical reality. Massive fields interact strongly with the vacuum, experiencing high resistance, whereas massless fields propagate freely without resistance.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. STRUCTURAL LOGIC</h3>
+<p>The logical flow is as follows: <strong>Distinct Field Behaviors &rarr; Functional Specialization &rarr; Emergent Physical Complexity.</strong> Fields are no longer equivalent; each acquires a specific role, and complexity emerges naturally from these differences.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. GRAPH INTERPRETATION</h3>
+<p>The graph represents the differentiation of field sectors after symmetry breaking. Each line corresponds to a distinct field sector, and the varying slopes indicate differences in mass and coupling strength. The axes represent field components and potential, while the divergence of lines illustrates how initially symmetric behavior splits into multiple distinct dynamical responses. As the slider increases, more field sectors appear, indicating increasing structural complexity. This visualization captures how a single underlying symmetry gives rise to a spectrum of physically distinct fields through symmetry breaking and vacuum interaction.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. ROLE OF THE SLIDER</h3>
+<p>The slider represents the <strong>Degree of symmetry breaking &rarr; degree of differentiation</strong>. A low value indicates minimal distinction with few sectors, while a high value results in a rich structure with many sectors, providing an intuitive grasp of how complexity emerges.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. CRITICAL INSIGHT</h3>
+<p style="font-style: italic; color: #f472b6; text-align: center;">“Breaking symmetry creates the diversity of physical reality.”</p>
+<p>This stands as one of the deepest conclusions of modern physics.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. WHAT THIS MODULE ACHIEVES</h3>
+<p>We move from a single symmetric framework to multiple distinct physical entities. This is the emergence of the observable universe's structure.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. FINAL INTERPRETATION</h3>
+<p>Reality is the result of symmetry choosing its manifestation. Laws provide possibilities, symmetry breaking selects outcomes, and differentiation produces reality.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">FINAL STRUCTURAL FLOW</h3>
+<p style="text-align: center; font-family: 'Courier New', monospace; color: #f472b6;">
+Symmetry &rarr; Breaking &rarr; Mass &rarr; Differentiation &rarr; Reality
+</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">FINAL INSIGHT</h3>
+<p style="margin-bottom: 0;">Uniform symmetry cannot produce a world—only broken symmetry can generate structure, diversity, and complexity.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 5 Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Reality Manifest:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\mathcal{L}_{eff} = \\sum_{i} \\mathcal{L}_i(m_i, g_i)$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The effective Lagrangian now describes a collection of distinct particles and forces, each with unique masses and couplings, giving rise to the complex universe we observe.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: Differentiation of Field Sectors</h2>
+
+<div class="math-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Starting Point: Broken Symmetry</h3>
+<p>After symmetry breaking, the field is expressed as an expansion around the non-zero vacuum expectation value $v$:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\phi = \\frac{1}{\\sqrt{2}}(v + h(x))$$
+</div>
+<p>where $v \\neq 0$. Consequently, the original high-energy symmetry group $G$ is reduced to a lower-energy subgroup $H$:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$G \\longrightarrow H$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Gauge Group Decomposition</h3>
+<p>Consider the original symmetry group of the Standard Model:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$G = SU(3) \\times SU(2) \\times U(1)$$
+</div>
+<p>After symmetry breaking, this decomposes into the observed symmetries of low-energy physics:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$G \\rightarrow H = SU(3) \\times U(1)_{\\text{em}}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Gauge Fields</h3>
+<p>Each symmetry corresponds to specific gauge bosons:</p>
+<ul style="list-style-type: none; padding-left: 20px; color: #e2e8f0;">
+<li>$U(1) \\rightarrow B_\\mu$ (Hypercharge)</li>
+<li>$SU(2) \\rightarrow W_\\mu^a$ (Weak Isospin)</li>
+<li>$SU(3) \\rightarrow G_\\mu^a$ (Gluons)</li>
+</ul>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Covariant Derivative</h3>
+<p>The interaction between fields is governed by the covariant derivative, incorporating all coupling constants:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$D_\\mu = \\partial_\\mu - i g_1 B_\\mu - i g_2 W_\\mu^a T^a - i g_3 G_\\mu^a \\lambda^a$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Mass Generation Pattern</h3>
+<p>The symmetry breaking pattern determines which fields acquire mass and which remain massless, following the general relation:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$m \\sim g \\cdot v$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Example: Electroweak Sector</h3>
+<p>The mixing of the $W_\\mu^3$ and $B_\\mu$ fields produces the observed physical bosons:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\begin{aligned} Z_\\mu &= \\cos\\theta_W\\, W_\\mu^3 - \\sin\\theta_W\\, B_\\mu \\\\ A_\\mu &= \\sin\\theta_W\\, W_\\mu^3 + \\cos\\theta_W\\, B_\\mu \\end{aligned}$$
+</div>
+<p>The resulting masses are:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$m_W = \\frac{1}{2} g_2 v, \\quad m_Z = \\frac{1}{2} \\sqrt{g_1^2 + g_2^2}\\, v, \\quad m_\\gamma = 0$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Sector Differentiation</h3>
+<div style="text-align: center; margin: 10px 0; font-weight: bold; border: 1px solid #f472b6; padding: 10px; display: inline-block; width: 100%;">
+Different fields $\\Rightarrow$ Different masses and couplings
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Coupling Hierarchy</h3>
+<p>The variation in coupling strengths ($g_3 \\gg g_2 > g_1$) establishes the fundamental hierarchy of forces:</p>
+<ul style="list-style-type: none; padding-left: 20px; color: #e2e8f0;">
+<li>Strong interaction ($SU(3)$) &rarr; strongest</li>
+<li>Weak interaction ($SU(2)$) &rarr; intermediate</li>
+<li>Electromagnetic ($U(1)$) &rarr; weakest</li>
+</ul>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Energy–Momentum Differentiation</h3>
+<p>Each differentiated field possesses its own energy-momentum tensor, characterizing its physical presence:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$T_{\\mu\\nu}^{(i)} = \\frac{\\partial \\mathcal{L}}{\\partial (\\partial^\\mu \\phi_i)} \\partial_\\nu \\phi_i - g_{\\mu\\nu} \\mathcal{L}_i$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Final Mathematical Structure</h3>
+<div style="text-align: center; margin: 10px 0; color: #f472b6; line-height: 1.8;">
+$G \\rightarrow H \\Rightarrow \\{\\text{distinct field sectors}\\}$<br>
+$m_i = g_i \\cdot v$<br>
+$\\text{Reality} = \\sum_i \\text{Field}_i(\\text{mass}_i, \\text{coupling}_i)$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Final Insight</h3>
+<p style="margin-bottom: 10px;">The mathematics demonstrates that symmetry breaking splits the unified system, forcing different generators to behave differently. This creates the distinct physical sectors that define our universe.</p>
+<div style="text-align: center; margin: 10px 0; font-weight: bold; border: 1px solid #f472b6; padding: 10px; display: inline-block; width: 100%;">
+Differentiation = Symmetry breaking + coupling structure
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">STAGE 46 &mdash; MATHEMATICAL COMPLETION</h3>
+<div style="text-align: center; margin: 10px 0; font-weight: bold; background: rgba(244, 114, 182, 0.1); border: 1px solid #f472b6; padding: 10px; display: inline-block; width: 100%;">
+Mass + Diversity = Broken Symmetry acting through structure
+</div>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 5: Final Result</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Structural Resolution:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\text{Diversity} \\propto \\text{VEV} \\times \\Delta g_i$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The interaction between the universal vacuum and specific coupling constants transforms unified potential into a manifold of distinct physical realities.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>STRUCTURAL COMPLEXITY</span><input type="number" id="s_in" class="digital-entry" value="1" oninput="syncVal(this.value, 's_sl')"></div><input type="range" id="s_sl" min="1" max="5" step="1" value="1" oninput="syncVal(this.value, 's_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">DIVERSE STRUCTURES</span><div style="text-align:center; font-size: 0.9rem;">Massive vs Massless Field Sectors</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">CORE INSIGHT</span><div style="text-align:center; font-size: 0.8rem;">Breaking symmetry creates the diversity of physical reality.</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Vacuum State</span><span class="const-val">SELECTED (|$\\phi$| = v)</span></div><div class="const-item"><span class="const-label">Mass Gen</span><span class="const-val">ESTABLISHED</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-structure);">SECTORIZATION: COMPLETE</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Distinct Field Behaviors<br>↓<br>Functional Specialization<br>↓<br>Emergent Physical Complexity`,
+hierarchy: `<div style="color: var(--accent-structure); font-weight: bold;">Reality: Structurally Differentiated</div>`,
+footer: "Increasing symmetry breaking → increasing field differentiation.<p>From a single symmetric law, a world of multiple distinct forces and masses is born.</p>",
+rightNote: `<div style="color: #f472b6; line-height: 1.4; font-size: 0.85rem;">Reality is the result of symmetry choosing its manifestation.`
+}
+};
+
+function syncVal(val, id) {
+const sliderId = id.includes('_in') ? id.replace('_in', '_sl') : id;
+const inputId = id.includes('_sl') ? id.replace('_sl', '_in') : id;
+if(document.getElementById(sliderId)) document.getElementById(sliderId).value = val;
+if(document.getElementById(inputId)) document.getElementById(inputId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+document.getElementById('brief-box-content').innerHTML = content.brief;
+document.getElementById('math-box-content').innerHTML = content.math;
+document.getElementById('control-sliders').innerHTML = content.sliders;
+document.getElementById('active-module-title').innerText = content.title;
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('metrics-content').innerHTML = content.metricsContent;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+
+// NEW DYNAMIC INJECTIONS
+document.getElementById('structure-box-area').innerHTML = content.structure;
+document.getElementById('telemetry-area').innerHTML = content.telemetry;
+
+showScreen('briefing');
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() {
+showScreen('lab');
+setTimeout(() => { runLab(); window.dispatchEvent(new Event('resize')); }, 100);
+}
+
+function runLab() {
+const target = document.getElementById('plot-area');
+if (!target) return;
+let data = [];
+let layout = {
+paper_bgcolor: 'black', plot_bgcolor: 'black', margin: {t:60,b:10,l:0,r:0},
+showlegend: true,
+font: { family: 'sans-serif', size: 10 },
+legend: { font: { color: '#94a3b8' }, x: 0.8, y: 0.9 },
+scene: {
+xaxis: { title: 'Field Re(φ)', visible: true, gridcolor: '#222', color: '#38bdf8' },
+yaxis: { title: 'Field Im(φ)', visible: true, gridcolor: '#222', color: '#38bdf8' },
+zaxis: { title: 'Potential V(φ)', visible: true, gridcolor: '#222', color: '#f472b6' },
+camera: { eye: { x: 1.5, y: 1.5, z: 1.2 } },
+aspectmode: 'cube'
+}
+};
+
+if (currentTool === 1) { // DEGENERACY
+let d = parseFloat(document.getElementById('d_sl')?.value || 1.0);
+let x_val=[], y_val=[], z_val=[];
+for(let i=-2; i<=2; i+=0.2){
+for(let j=-2; j<=2; j+=0.2){
+let r2 = i*i + j*j;
+x_val.push(i); y_val.push(j);
+z_val.push(-d*r2 + 0.5*r2*r2);
+}
+}
+data.push({
+type: 'mesh3d', x: x_val, y: y_val, z: z_val,
+intensity: z_val, colorscale: 'Portland', opacity: 0.8,
+name: 'Symmetric Potential Manifold'
+});
+layout.title = { text: "DEGENERATE VACUUM STATES", font: { color: '#38bdf8' } };
+
+} else if (currentTool === 2) { // INSTABILITY
+let i_f = parseFloat(document.getElementById('i_sl')?.value || 0.5);
+data.push({
+type: 'scatter3d', mode: 'markers+lines',
+x: [0, 0], y: [0, 0.1 * i_f], z: [1, 0.8],
+marker: { size: 10, color: '#fb7185' },
+line: { color: '#fb7185', width: 4 },
+name: 'Symmetric False Vacuum'
+});
+let x_v=[], y_v=[], z_v=[];
+for(let i=-1; i<=1; i+=0.1){
+for(let j=-1; j<=1; j+=0.1){
+let r2 = i*i + j*j;
+x_v.push(i); y_v.push(j); z_v.push(-1.0*r2 + 0.5*r2*r2 + 1);
+}
+}
+data.push({ type: 'mesh3d', x: x_v, y: y_v, z: z_v, opacity: 0.2, color: '#444', name: 'Potential Gradient' });
+layout.title = { text: "DYNAMICAL INSTABILITY", font: { color: '#fb7185' } };
+
+} else if (currentTool === 3) { // SPONTANEOUS BREAKING
+let angle = (parseFloat(document.getElementById('a_sl')?.value || 0)) * (Math.PI/180);
+let v = 1.2;
+data.push({
+type: 'scatter3d', mode: 'markers',
+x: [v * Math.cos(angle)], y: [v * Math.sin(angle)], z: [-0.5],
+marker: { size: 12, color: '#facc15', symbol: 'diamond' },
+name: 'Selected Vacuum State (VEV)'
+});
+let rx=[], ry=[], rz=[];
+for(let a=0; a<=Math.PI*2; a+=0.1){ rx.push(v*Math.cos(a)); ry.push(v*Math.sin(a)); rz.push(-0.5); }
+data.push({ type: 'scatter3d', mode: 'lines', x: rx, y: ry, z: rz, line: { color: '#38bdf8', width: 2, dash: 'dot' }, name: 'Goldstone Mode (Massless)' });
+layout.title = { text: "SPONTANEOUS SYMMETRY BREAKING<br>Circle → Vacuum Manifold (|φ| = v); Point → Selected Vacuum (VEV)", font: { color: '#facc15' } };
+
+} else if (currentTool === 4) { // EMERGENCE OF MASS
+let g = parseFloat(document.getElementById('m_sl')?.value || 1.0);
+let mx=[], my=[], mz=[];
+for(let t=0; t<10; t+=0.1){
+mx.push(t*0.5 - 2.5);
+my.push(Math.sin(t * (1 + g)) * 0.4);
+mz.push(Math.cos(t * (1 + g)) * 0.4);
+}
+data.push({ type: 'scatter3d', mode: 'lines', x: mx, y: my, z: mz, line: { color: '#4ade80', width: 6 }, name: 'Massive Field Excitation' });
+layout.scene.xaxis.title = "Propagation Axis";
+layout.scene.zaxis.title = "Field Amplitude";
+layout.title = { text: "MASS AS STRUCTURAL RESISTANCE", font: { color: '#4ade80' } };
+
+} else if (currentTool === 5) { // DIFFERENTIATION
+let complexity = parseInt(document.getElementById('s_sl')?.value || 1);
+let colors = ['#38bdf8', '#fb7185', '#facc15', '#4ade80', '#a78bfa'];
+let labels = ['U(1) Sector', 'SU(2) Sector', 'Weak Interaction', 'Strong Sector', 'Higgs Sector'];
+for(let n=0; n<complexity; n++){
+data.push({
+type: 'scatter3d', mode: 'lines',
+x: [0, Math.cos(n*1.2)*2], y: [0, Math.sin(n*1.2)*2], z: [0, n*0.6],
+line: { color: colors[n%5], width: 8 },
+name: labels[n%5]
+});
+}
+layout.title = { text: "FIELD DIFFERENTIATION", font: { color: '#a78bfa' } };
+}
+
+Plotly.react('plot-area', data, layout, {responsive: true, displayModeBar: false});
+}
+
+function resetLab() {
+if(currentTool===1) syncVal(1.0, 'd_sl');
+if(currentTool===2) syncVal(0.5, 'i_sl');
+if(currentTool===3) syncVal(0, 'a_sl');
+if(currentTool===4) syncVal(1.0, 'm_sl');
+if(currentTool===5) syncVal(1, 's_sl');
+}
+
+window.onload = () => { showScreen('portal'); };
+</script>
+</body>
+</html>

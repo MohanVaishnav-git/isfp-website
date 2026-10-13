@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 21 — Quantum Substrate Field Dynamics</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-purple: #a855f7;
+--accent-blue: #3b82f6; --accent-gold: #f59e0b; --accent-green: #10b981; --text-main: #e5e7eb;
+--text-dim: #94a3b8; --border: #262626;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; position: sticky; top: 0; z-index: 1000; height: 50px;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-purple); font-family: sans-serif; font-size: 0.85rem; min-width: 350px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; height: calc(100vh - 50px); box-sizing: border-box; }
+.screen.active { display: flex; }
+
+#screen-portal { justify-content: flex-start; padding-top: 15px; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; text-decoration: none; color: inherit; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-purple); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 40px 40px; margin: 0px 40px 40px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); height: 100%; overflow-y: auto;
+}
+
+#tool { display: none; width: 100%; max-width: 1350px; margin: 0px auto; grid-template-columns: 340px 1fr 300px; gap: 10px; height: 98%; padding-top: 0px; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 95%; box-sizing: border-box; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.constant-display-box {
+background: #111; border: 1px solid var(--accent-purple); padding: 6px; border-radius: 8px;
+display: flex; justify-content: space-around; margin-bottom: 10px;
+}
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-purple); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(168, 85, 247, 0.05); border: 1px solid #331a4d; padding: 8px; border-radius: 8px; margin-bottom: 8px; font-size: 0.6rem; }
+.def-title { color: var(--accent-purple); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid #331a4d; text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+input[type=range] { width: 100%; accent-color: var(--accent-purple); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#canvas-container { background: #000; border: 1px solid var(--border); border-radius: 12px; height: 95%; position: relative; overflow: hidden; }
+canvas { width: 100%; height: 100%; cursor: crosshair; }
+
+.grid-label-group { position: absolute; top: 15px; right: 25px; text-align: right; pointer-events: none; opacity: 0.8; }
+.grid-label-main { font-size: 0.55rem; color: var(--accent-purple); letter-spacing: 2px; font-family: sans-serif; font-weight: bold; display: block; }
+.grid-label-sub { font-size: 0.45rem; color: var(--text-dim); font-family: sans-serif; text-transform: uppercase; display: block; margin-top: 2px; }
+
+.btn-nav-brief { background: var(--accent-purple); color: #fff; border: none; padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.btn-action { width: 100%; margin-top: 8px; background: transparent; border: 1px solid #333; color: var(--text-dim); font-size: 0.62rem; text-transform: uppercase; cursor: pointer; padding: 6px; }
+.btn-exit-lab { width: 100%; margin-top: 8px; background: transparent; border: 1px solid #333; color: var(--accent-blue); font-size: 0.62rem; text-transform: uppercase; cursor: pointer; padding: 6px; }
+
+.causal-pulse { width: 10px; height: 10px; border-radius: 50%; background: var(--accent-purple); display: inline-block; margin-right: 8px; }
+.pulsing { animation: pulse-anim 0.5s infinite; }
+@keyframes pulse-anim { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(3); } }
+
+.isfp-footer {
+width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem;
+color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 21 — QUANTUM SUBSTRATE FIELD DYNAMICS</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-brief" id="launch-lab-btn" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<h1 style="font-size: 2.0rem; margin: 20px 0 5px 0;">Quantum Entrance</h1>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-purple);">
+<h2>1. Substrate Engine Room</h2>
+<p>Monitoring stochastic flux and structural convergence.</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-blue);">
+<h2 style="color:var(--accent-blue);">2. The Emergent Wavefield</h2>
+<p>Visualizing the transition to quantum probability amplitudes.</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-gold);">
+<h2 style="color:var(--accent-gold);">3. Localized Excitation Generator</h2>
+<p>Observing the emergence of stable particle-like structures.</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-green);">
+<h2 style="color:var(--accent-green);">4. Substrate Field Overview</h2>
+<p>Executive summary of dynamics, mission, and pillars.</p>
+</div>
+</div>
+
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box" id="brief-box-content"></div>
+</div>
+
+<footer class="isfp-footer" style="padding: 10px 0;">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool" style="display: grid;">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div id="constant-header-area">
+<div class="constant-display-box">
+<div class="const-item"><span class="const-label">Target K</span><span class="const-val">11.350</span></div>
+<div class="const-item"><span class="const-label">Target P</span><span class="const-val">0.6900</span></div>
+</div>
+</div>
+
+<div id="mapping-box-area">
+<div class="definition-box">
+<span class="def-title">Micro-to-Macro Mapping</span>
+<div style="text-align:center; padding: 4px 0;">
+$K = \langle |\nabla C| \rangle_{\text{Planck}}$<br>
+$P = \langle -V(N_0) \rangle_{\text{Planck}}$
+</div>
+</div>
+</div>
+
+<div class="diagnostic-panel">
+<span class="diag-title">State Regime</span>
+<span id="scale-label" style="font-family:monospace; font-size:0.85rem; color:var(--accent-purple);">PLANCK SCALE</span>
+</div>
+
+<div id="control-sliders"></div>
+
+<button onclick="resetSliders()" class="btn-action">RESET SUBSTRATE</button>
+
+<div id="panel-footer-text" style="font-size: 0.62rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.4; margin-top: auto;">
+<b>Stochastic Floor:</b> At this scale, $K$ and $P$ are statistical averages of field gradients. As resolution decreases, jitter stabilizes.
+</div>
+
+<button onclick="showScreen('briefing')" class="btn-exit-lab">BACK TO BRIEFING</button>
+</div>
+
+<div id="canvas-container">
+<div class="grid-label-group">
+<span id="canvas-main-label" class="grid-label-main">PLANCK-SCALE CAUSAL SUBSTRATE</span>
+<span id="canvas-sub-label" class="grid-label-sub">Discrete causal update network</span>
+</div>
+<canvas id="quantumCanvas"></canvas>
+<div style="position:absolute; bottom:20px; left:20px; background:rgba(0,0,0,0.7); padding:10px; border-radius:5px; font-size:0.6rem; border:1px solid #333;">
+<div id="pulse-indicator" class="causal-pulse"></div> <span id="pulse-text">CAUSAL UPDATE PULSE (FIELD C)</span>
+</div>
+</div>
+
+<div class="panel">
+<div id="law-box-area">
+<div class="definition-box" style="background: rgba(59, 130, 246, 0.05); border-color: #1e3a8a;">
+<span class="def-title" style="color: var(--accent-blue);">Causal Update Law</span>
+<div style="text-align:center; padding: 4px 0; font-size: 0.75rem;">
+$\phi_i(t+\Delta t) = \sum_j W_{ij}\phi_j(t)$
+</div>
+</div>
+</div>
+
+<div class="diagnostic-panel">
+<span class="diag-title">Instantaneous Metrics</span>
+<div id="metrics-content" style="font-size:0.75rem; font-family:monospace; line-height:1.8;">
+$K_{loc}$: <span id="k-inst" style="color:var(--accent-gold);">--</span><br>
+$\Phi_{noise}$: <span style="color:var(--accent-blue);">ACTIVE</span><br>
+Memory: <span style="color:var(--accent-purple);">STOCHASTIC</span>
+</div>
+</div>
+
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-gold);">
+<span class="diag-title">Coarse-Graining Hierarchy</span>
+<p style="margin: 0; font-family: monospace; font-size: 0.6rem; line-height: 1.5;">
+Planck Substrate<br>↓<br>$(K, P)$<br>↓<br>$(a_0, H)$<br>↓<br>Cosmic Phenomena
+</p>
+</div>
+
+<div id="panel-right-note" style="font-size: 0.65rem; color: var(--text-dim); line-height: 1.5; background: #000; padding: 10px; border-radius: 8px; border: 1px solid #222; margin-top: auto;">
+<b>Topological Note:</b> Click canvas to seed a structural defect. Observe local substrate stiffening (Mass formation).
+</div>
+</div>
+</div>
+</div>
+
+<script>
+let currentModule = 1;
+let frame = 0;
+let particles = [];
+let solitonX = 0;
+const canvas = document.getElementById('quantumCanvas');
+const ctx = canvas.getContext('2d');
+
+const toolContent = {
+1: {
+title: "The Quantum Substrate",
+brief: `
+<h2 style="text-align: center; color: var(--accent-purple); font-size: 1.2rem; margin-top: 30px;">Detailed Briefing: Quantum Substrate Foundation</h2>
+
+<section>
+<h4>Purpose of the Module</h4>
+<p>The Quantum Substrate Foundation module represents the deepest structural layer of the framework. Its purpose is to illustrate how the macroscopic gravitational parameters of the universe—vacuum stiffness $K$ and synthesis pressure $P$—can emerge from microscopic Planck-scale dynamics of a causal substrate.</p>
+<p>Earlier modules demonstrate how $K$ and $P$ explain phenomena such as galaxy rotation curves and cosmic expansion. This module explores the underlying possibility that these parameters themselves arise as statistical coarse-grained quantities of microscopic vacuum activity.</p>
+<p style="text-align:center; font-weight:bold;">$\\text{Planck-scale dynamics} \\rightarrow \\text{macroscopic gravitational parameters}$</p>
+</section>
+
+<section>
+<h4>1. The Planck-Scale Causal Substrate</h4>
+<p>The central visualization represents a discrete causal lattice at Planck resolution. Each node represents a local element of the vacuum substrate capable of storing and transmitting structural information.</p>
+<p>Unlike a continuous geometric manifold, this substrate is modeled as a network of interacting causal elements whose collective behavior generates the macroscopic properties of spacetime. The grid therefore represents not a literal spatial geometry but an abstract causal update network operating at the Planck scale.</p>
+</section>
+
+<section>
+<h4>2. Micro-to-Macro Parameter Mapping</h4>
+<p>The left panel introduces the fundamental principle of coarse-graining. Macroscopic gravitational parameters are defined as statistical averages over microscopic substrate fluctuations.</p>
+<p>The framework expresses this mapping as:</p>
+<p style="text-align:center;">$K = \\langle |\\nabla C| \\rangle_{\\text{Planck}}$<br>$P = \\langle -V(N) \\rangle_{\\text{Planck}}$</p>
+<ul style="font-size: 0.85rem;">
+<li><b>C</b> denotes the Conserving Field, representing structural memory of spacetime.</li>
+<li><b>N</b> denotes the Stabilizing Field, responsible for vacuum equilibrium.</li>
+</ul>
+</section>
+
+<section>
+<h4>3. Resolution Scale and Causal Flux Density</h4>
+<p><b>Resolution Scale:</b> Determines the effective observation scale. At Planck resolution, the lattice structure and stochastic fluctuations dominate. As scale increases, fluctuations average out into stable macroscopic constants.</p>
+<p><b>Causal Flux Density C:</b> Represents the intensity of causal update pulses. Higher densities correspond to stronger dynamical interaction among nodes, increasing microscopic fluctuations before stabilization.</p>
+</section>
+
+<section>
+<h4>4. Causal Update Law</h4>
+<p>The right panel introduces the simplified update rule for information propagation:</p>
+<p style="text-align:center;">$\\phi_i(t+\\Delta t) = \\sum_j W_{ij}\\phi_j(t)$</p>
+<ul style="font-size: 0.85rem;">
+<li><b>$\\phi_i$</b> represents the local state of node $i$.</li>
+<li><b>$W_{ij}$</b> represents the causal coupling between neighboring nodes.</li>
+</ul>
+</section>
+
+<section>
+<h4>5. Stochastic Ground State</h4>
+<p>The instantaneous metrics panel indicates the substrate operates in a stochastic regime. Individual node updates are not perfectly deterministic; instead, the substrate exhibits fluctuations whose average behavior stabilizes into the interpreted macroscopic parameters $K$ and $P$.</p>
+</section>
+
+<section>
+<h4>6. Coarse-Graining Hierarchy</h4>
+<p>The framework proposes the following structural sequence for the hierarchical emergence of cosmic structure:</p>
+<p style="text-align:center;">$\\text{Planck Substrate} \\rightarrow (K,P) \\rightarrow (a_0,H) \\rightarrow \\text{Cosmic Phenomena}$</p>
+</section>
+
+<section>
+<h4>7. Topological Defects and Local Structure</h4>
+<p>Clicking the lattice introduces local structural defects, representing variations in substrate stiffness. This illustrates how localized mass formation might arise as perturbations of the substrate network rather than external additions.</p>
+</section>
+
+<section>
+<h4>8. Role within the Framework</h4>
+<p>Stage-21 completes the conceptual architecture:</p>
+<p style="text-align:center;"><b>microscopic substrate dynamics $\\rightarrow$ emergent vacuum parameters $\\rightarrow$ gravitational and cosmological phenomena</b></p>
+<p>It provides the pathway linking quantum-scale activity with macroscopic cosmic structure.</p>
+</section>
+`,
+sliders: `
+<div class="control-item">
+<div class="label-group"><span>Resolution Scale</span></div>
+<input type="range" id="res_slider" min="1" max="100" value="5" oninput="update()">
+</div>
+<div class="control-item">
+<div class="label-group"><span>Causal Flux Density (C)</span></div>
+<input type="range" id="flux_slider" min="0.1" max="2.0" step="0.1" value="1.0" oninput="update()">
+</div>
+`
+},
+2: {
+title: "The Emergent Wavefield",
+brief: `
+<h2 style="text-align: center; color: var(--accent-blue); font-size: 1.2rem; margin-top: 30px;">Detailed Briefing: Emergent Wavefield</h2>
+<section>
+<h4>Purpose of the Module</h4>
+<p>The Emergent Wavefield module illustrates how coherent wave-like structures can arise from stochastic interactions within the Planck-scale causal substrate introduced in the first module of Stage-21.</p>
+<p>Where the first module visualizes the microscopic causal lattice, this module demonstrates how local causal updates within that substrate can synchronize to produce mesoscopic wave patterns. These wave structures represent the earliest stage at which collective dynamical behavior emerges from the microscopic substrate.</p>
+<p>Thus the module demonstrates the transition:</p>
+<p style="text-align:center; font-weight:bold;">$\\text{stochastic causal substrate} \\rightarrow \\text{emergent wavefield} \\rightarrow \\text{macroscopic physical parameters}$</p>
+</section>
+<section>
+<h4>1. The Emergent Wavefield</h4>
+<p>The central visualization represents a mesoscopic wavefield generated by collective dynamics of substrate nodes.</p>
+<p>Each point in the field represents a local excitation of the causal substrate. When nodes update independently, the field appears random. However, as interactions synchronize, coherent wave-like patterns emerge.</p>
+<p>These patterns illustrate how ordered physical behavior can arise from an initially stochastic microscopic system. The visualization therefore demonstrates the formation of collective modes within the substrate.</p>
+</section>
+<section>
+<h4>2. Micro-to-Macro Parameter Mapping</h4>
+<p>The left panel recalls the mapping between microscopic substrate dynamics and the macroscopic parameters used throughout the framework.</p>
+<p>The relations are expressed as:</p>
+<p style="text-align:center;">$K = \\langle |\\nabla C| \\rangle_{\\text{Planck}}$<br>$P = \\langle -V(N) \\rangle_{\\text{Planck}}$</p>
+<p>These expressions indicate that the vacuum stiffness $K$ and synthesis pressure $P$ arise as statistical averages of microscopic substrate fluctuations. The emergent wavefield represents an intermediate dynamical stage in this coarse-graining process.</p>
+</section>
+<section>
+<h4>3. State Regime: Planck Scale</h4>
+<p>The module operates in the Planck-scale regime, where substrate dynamics are dominated by stochastic fluctuations.</p>
+<p>At this level:</p>
+<ul>
+<li>local causal updates are discrete</li>
+<li>fluctuations dominate system behavior</li>
+<li>macroscopic constants have not yet stabilized</li>
+</ul>
+<p>As coherence increases, collective patterns begin to appear in the substrate dynamics.</p>
+</section>
+<section>
+<h4>4. Coherence Factor</h4>
+<p>The coherence factor controls the degree of synchronization among substrate nodes.</p>
+<p>Low coherence corresponds to random independent updates. High coherence allows interactions between nodes to align, producing wave-like patterns across the field. This parameter illustrates how macroscopic order can emerge gradually from microscopic stochasticity.</p>
+</section>
+<section>
+<h4>5. Update Frequency</h4>
+<p>The update frequency controls the rate at which causal interactions propagate through the substrate network.</p>
+<p>Higher update frequencies increase the speed of information transfer between nodes and allow coherent structures to form more rapidly. This parameter represents the dynamical activity of the substrate rather than a conventional oscillation frequency.</p>
+</section>
+<section>
+<h4>6. Causal Update Law</h4>
+<p>The right panel displays the simplified rule governing node evolution:</p>
+<p style="text-align:center;">$\\phi_i(t+\\Delta t) = \\sum_j W_{ij}\\phi_j(t)$</p>
+<p>Here $\phi_i$ represents the state of node $i$ and $W_{ij}$ represents causal coupling between neighboring nodes. This equation expresses the principle that each node evolves through local interactions with surrounding nodes, forming a dynamic causal network.</p>
+</section>
+<section>
+<h4>7. Probabilistic Microscopic Dynamics</h4>
+<p>The instantaneous metrics panel indicates that the substrate operates in a probabilistic regime.</p>
+<p>Microscopic updates contain stochastic fluctuations. These fluctuations generate the noisy patterns seen in the wavefield. However, when averaged over large regions and long timescales, these fluctuations stabilize into macroscopic structural parameters such as $K$ and $P$.</p>
+</section>
+<section>
+<h4>8. Coarse-Graining Hierarchy</h4>
+<p>The module highlights the hierarchical emergence of physical structure:</p>
+<p style="text-align:center;">$\\text{Planck Substrate} \\rightarrow (K,P) \\rightarrow (a_0,H) \\rightarrow \\text{Cosmic Phenomena}$</p>
+<p>The emergent wavefield represents the intermediate dynamical stage where microscopic substrate activity begins to organize into coherent patterns that eventually give rise to stable macroscopic parameters.</p>
+</section>
+<section>
+<h4>9. Phase Coherence Pulse</h4>
+<p>The phase coherence pulse visualized in the central field represents synchronized update events propagating through the substrate network. These pulses demonstrate how local interactions can produce large-scale phase correlations within the wavefield. Such correlations represent the first stage of collective organization within the substrate.</p>
+</section>
+<section>
+<h4>10. Role within Stage-21</h4>
+<p>Stage-21 therefore contains two complementary modules:</p>
+<ul>
+<li><b>Module 1 — Quantum Substrate:</b> Visualizes the microscopic causal lattice and stochastic substrate dynamics.</li>
+<li><b>Module 2 — Emergent Wavefield:</b> Shows how coherent wave patterns arise from those microscopic interactions.</li>
+</ul>
+<p>Together, the modules illustrate the conceptual pathway: <b>causal substrate $\rightarrow$ wavefield dynamics $\rightarrow$ emergent vacuum parameters</b>.</p>
+</section>
+<section>
+<h4>Conceptual Significance</h4>
+<p>The Emergent Wavefield module illustrates how ordered physical structures can arise naturally from stochastic microscopic dynamics. Within the framework, this process provides a mechanism through which the vacuum parameters $K$ and $P$ could emerge from deeper Planck-scale interactions. Thus the module forms an essential link between microscopic substrate behavior and the macroscopic gravitational phenomena explored in earlier stages.</p>
+</section>
+`,
+sliders: `
+<div class="control-item">
+<div class="label-group"><span>Coherence Factor</span></div>
+<input type="range" id="coherence_slider" min="1" max="50" value="10" oninput="update()">
+</div>
+<div class="control-item">
+<div class="label-group"><span>Update Frequency</span></div>
+<input type="range" id="freq_slider" min="0.1" max="5.0" step="0.2" value="1.0" oninput="update()">
+</div>
+`
+},
+3: {
+title: "Localized Excitation Generator",
+brief: `
+<h2 style="text-align: center; color: var(--accent-gold); font-size: 1.2rem; margin-top: 30px;">Detailed Briefing: Localized Excitation Generator</h2>
+<section>
+<h4>Purpose of the Module</h4>
+<p>The Localized Excitation Generator demonstrates how stable localized structures can emerge within the wavefield dynamics of the vacuum substrate. These structures represent persistent concentrations of substrate activity that propagate through the wavefield as coherent excitations.</p>
+<p>While the previous modules of Stage-21 illustrate the microscopic causal substrate and the emergent wavefield, this module shows how coherent wave patterns can stabilize into localized moving structures. These structures behave like particle-like excitations of the substrate.</p>
+<p>Thus the module illustrates the transition:</p>
+<p style="text-align:center; font-weight:bold;">$\\text{causal substrate} \\rightarrow \\text{wavefield dynamics} \\rightarrow \\text{localized excitations}$.</p>
+</section>
+<section>
+<h4>1. The Accelerated Excitation Field</h4>
+<p>The central visualization shows the propagation of a localized luminous excitation moving across the substrate field.</p>
+<p>The bright moving region represents a localized concentration of phase and amplitude within the emergent wavefield. Unlike the background fluctuations of the substrate, this excitation maintains a coherent structure while moving through the field.</p>
+<p>Such coherent localized disturbances illustrate how particle-like structures could arise as persistent modes of the substrate.</p>
+</section>
+<section>
+<h4>2. Micro-to-Macro Parameter Mapping</h4>
+<p>The left panel recalls the structural relations linking microscopic dynamics to macroscopic vacuum parameters:</p>
+<p style="text-align:center;">$K = \\langle |\\nabla C| \\rangle_{\\text{Planck}}$<br>$P = \\langle -V(N) \\rangle_{\\text{Planck}}$</p>
+<p>These expressions indicate that vacuum stiffness and synthesis pressure arise as statistical averages of microscopic substrate dynamics. Localized excitations therefore represent mesoscopic structures within the same substrate that ultimately gives rise to the macroscopic parameters $K$ and $P$.</p>
+</section>
+<section>
+<h4>3. State Regime: Planck Scale</h4>
+<p>The module operates in the Planck-scale regime, where the substrate exhibits stochastic microscopic dynamics.</p>
+<p>At this level:</p>
+<ul>
+<li>local causal updates occur discretely</li>
+<li>fluctuations dominate the microscopic behavior</li>
+<li>coherent structures appear only when local synchronization occurs.</li>
+</ul>
+<p>The formation of localized excitations therefore represents a transition from stochastic dynamics to coherent structure.</p>
+</section>
+<section>
+<h4>4. Coherence Threshold</h4>
+<p>The coherence threshold slider controls the degree of synchronization required for localized excitations to form.</p>
+<p>Low thresholds allow coherent structures to appear easily within the wavefield. Higher thresholds require stronger alignment among neighboring nodes before an excitation becomes stable.</p>
+<p>This parameter illustrates how coherence conditions influence the emergence of localized structures.</p>
+</section>
+<section>
+<h4>5. Nonlinear Coupling</h4>
+<p>The nonlinear coupling parameter controls the strength of self-interaction within the wavefield.</p>
+<p>When nonlinear coupling increases, local disturbances reinforce themselves instead of dispersing. This allows the formation of persistent localized structures that maintain their shape while propagating through the field.</p>
+<p>Such nonlinear stabilization is the mechanism by which wave packets become stable excitations.</p>
+</section>
+<section>
+<h4>6. Excitation Energy</h4>
+<p>The excitation energy slider determines the amplitude of the disturbance introduced into the wavefield.</p>
+<p>Small excitations dissipate quickly into the background fluctuations. Larger excitations produce coherent structures capable of propagating across the substrate field.</p>
+<p>This parameter illustrates how energy input influences the stability and propagation of localized excitations.</p>
+</section>
+<section>
+<h4>7. Causal Update Law</h4>
+<p>The evolution of the substrate field continues to follow the causal update rule introduced in earlier modules:</p>
+<p style="text-align:center;">$\\phi_i(t+\\Delta t) = \\sum_j W_{ij}\\phi_j(t)$</p>
+<p>Here $\\phi_i$ represents the state of node $i$ and $W_{ij}$ represents the causal coupling between neighboring nodes. Through repeated local updates governed by this rule, coherent wave patterns and localized excitations emerge within the substrate.</p>
+</section>
+<section>
+<h4>8. Instantaneous Metrics</h4>
+<p>The right-hand metrics panel reports the current dynamical state of the excitation field.</p>
+<p>Typical indicators include:</p>
+<ul>
+<li><b>State: stable</b> — indicating that the localized excitation persists while propagating.</li>
+<li><b>Topology: locked</b> — indicating that the excitation corresponds to a stable topological configuration of the wavefield.</li>
+<li><b>Memory: coherent</b> — indicating that the excitation maintains structural consistency as it moves through the substrate.</li>
+</ul>
+<p>These indicators illustrate the stability of localized excitations within the wavefield.</p>
+</section>
+<section>
+<h4>9. Phase-Learning Hierarchy</h4>
+<p>The module also highlights the hierarchical emergence of physical phenomena through coarse-graining:</p>
+<p style="text-align:center;">$\\text{Planck Substrate} \\rightarrow (K, P) \\rightarrow (a_0, H) \\rightarrow \\text{Cosmic Phenomena}$</p>
+<p>Localized excitations exist within the same substrate whose averaged behavior determines the macroscopic parameters governing galaxy dynamics and cosmic expansion.</p>
+</section>
+<section>
+<h4>10. Topological Defects and Mass Formation</h4>
+<p>Clicking the field introduces localized disturbances in the substrate. These disturbances illustrate topological defects, which correspond to regions where the wavefield configuration cannot smoothly relax into the surrounding state. Such defects provide an intuitive model for how localized concentrations of substrate structure could correspond to the formation of matter or gravitational mass.</p>
+</section>
+<section>
+<h4>Role within Stage-21</h4>
+<p>Stage-21 now consists of three complementary modules:</p>
+<ul>
+<li><b>Module-1 — Quantum Substrate:</b> Visualizes the microscopic causal lattice underlying spacetime.</li>
+<li><b>Module-2 — Emergent Wavefield:</b> Shows how coherent wave patterns arise from stochastic substrate dynamics.</li>
+<li><b>Module-3 — Localized Excitation Generator:</b> Demonstrates how stable localized excitations form within the wavefield.</li>
+</ul>
+<p>Together, the modules illustrate the conceptual chain: <b>causal substrate $\\rightarrow$ wavefield dynamics $\\rightarrow$ localized excitations $\\rightarrow$ emergent vacuum parameters</b>.</p>
+</section>
+<section>
+<h4>Conceptual Significance</h4>
+<p>The Localized Excitation Generator suggests that particle-like structures may arise as stable coherent excitations of the vacuum substrate. Within this interpretation, particles correspond to localized wavefield structures, gravitational behavior arises from vacuum stiffness, and cosmic expansion arises from synthesis pressure.</p>
+<p>Thus microscopic substrate dynamics, particle-like excitations, and cosmic-scale phenomena all emerge from the same underlying structural system.</p>
+</section>
+`,
+sliders: `
+<div class="control-item">
+<div class="label-group"><span>Coherence Threshold</span></div>
+<input type="range" id="threshold_slider" min="1" max="100" value="50" oninput="update()">
+</div>
+<div class="control-item">
+<div class="label-group"><span>Nonlinear Coupling</span></div>
+<input type="range" id="coupling_slider" min="0" max="10" step="0.5" value="5" oninput="update()">
+</div>
+<div class="control-item">
+<div class="label-group"><span>Excitation Energy</span></div>
+<input type="range" id="energy_slider" min="1" max="20" value="10" oninput="update()">
+</div>
+`
+},
+4: {
+title: "Quantum Substrate Field Overview",
+brief: `
+<h2 style="text-align: center; color: var(--accent-green); font-size: 1.2rem; margin-top: 30px;">Executive Summary: Quantum Substrate Field Overview</h2>
+<section>
+<p style="text-align: center; font-style: italic; color: var(--text-dim);">Understanding how microscopic substrate dynamics give rise to macroscopic physical reality.</p>
+<p>This overview introduces the <b>Quantum Substrate Field Dynamics</b> protocol, explaining how stochastic Planck-scale updates organize into coherent wavefields and stable localized excitations that ultimately govern cosmic structure.</p>
+</section>
+
+<section>
+<h4 style="color: var(--accent-green);">Section 1 — Concept</h4>
+<p>The Quantum Substrate Field Dynamics protocol (Stage 21) represents the transition from discrete causal updates to collective physical emergence. This field treats the vacuum not as an empty container, but as a high-density information substrate governed by stochastic flux and restorative stiffness.</p>
+<p>By monitoring the interaction between Vacuum Stiffness ($K$) and Synthesis Pressure ($P$), we observe the transition from Planck-scale "jitter" to the coherent wavefields that characterize our observable universe.</p>
+</section>
+
+<section>
+<h4 style="color: var(--accent-green);">Section 2 — Dynamics Mission</h4>
+<p style="text-align: center; font-size: 1.1rem; padding: 15px; background: rgba(16, 185, 129, 0.05); border-left: 4px solid var(--accent-green);">"To map the mathematical bridge between microscopic causal updates and macroscopic cosmic expansion. We do not merely observe the vacuum; we simulate the active mechanisms of its emergence."</p>
+</section>
+
+<section>
+<h4 style="color: var(--accent-green);">Section 3 — Key Research Pillars</h4>
+<ul style="line-height: 1.8;">
+<li><b>Stochastic Convergence:</b> How random Planck-scale updates stabilize into the universal constants $K$ and $P$.</li>
+<li><b>Phase Synchronization:</b> The process by which independent substrate nodes align to form the global Wavefield ($\Psi$).</li>
+<li><b>Soliton Localization:</b> The emergence of stable, self-reinforcing excitations (matter) from background field noise.</li>
+</ul>
+</section>
+`,
+sliders: `<p style="font-size: 0.7rem; color: var(--text-dim); text-align: center; padding-top: 20px;">This module is a conceptual anchor. No laboratory controls are active for the Overview.</p>`
+}
+};
+
+function openTool(id) {
+currentModule = id;
+const box = document.getElementById('brief-box-content');
+box.innerHTML = toolContent[id].brief;
+document.getElementById('control-sliders').innerHTML = toolContent[id].sliders;
+document.getElementById('active-module-title').innerText = toolContent[id].title;
+
+// Show/Hide Launch Lab button for the Overview card
+const launchBtn = document.getElementById('launch-lab-btn');
+launchBtn.style.display = (id === 4) ? 'none' : 'flex';
+
+const metrics = document.getElementById('metrics-content');
+if (id === 4) {
+// Set defaults for overview screen though lab won't launch
+metrics.innerHTML = `System: <span style="color:var(--accent-green);">UNIFIED</span><br>Briefing: <span style="color:var(--accent-blue);">ACTIVE</span><br>Context: <span style="color:var(--accent-purple);">EXECUTIVE</span>`;
+} else if (id === 3) {
+document.getElementById('canvas-main-label').innerText = "LOCALIZED EXCITATION FIELD";
+document.getElementById('canvas-sub-label').innerText = "Self-Sustaining Soliton Pattern";
+document.getElementById('pulse-text').innerText = "STABILITY HARMONIC";
+metrics.innerHTML = `State: <span id="particle-state" style="color:var(--accent-gold);">STABLE</span><br>Topological: <span style="color:var(--accent-blue);">LOCKED</span><br>Memory: <span style="color:var(--accent-purple);">COHERENT</span>`;
+} else if (id === 2) {
+document.getElementById('canvas-main-label').innerText = "MESOSCOPIC WAVEFIELD (Ψ)";
+document.getElementById('canvas-sub-label').innerText = "Emergent Probability Interference";
+document.getElementById('pulse-text').innerText = "PHASE COHERENCE PULSE";
+metrics.innerHTML = `$K_{loc}$: <span id="k-inst" style="color:var(--accent-gold);">--</span><br>$\Phi_{noise}$: <span style="color:var(--accent-blue);">ACTIVE</span><br>Memory: <span style="color:var(--accent-purple);">STOCHASTIC</span>`;
+} else {
+document.getElementById('canvas-main-label').innerText = "PLANCK-SCALE CAUSAL SUBSTRATE";
+document.getElementById('canvas-sub-label').innerText = "Discrete causal update network";
+document.getElementById('pulse-text').innerText = "CAUSAL UPDATE PULSE (FIELD C)";
+metrics.innerHTML = `$K_{loc}$: <span id="k-inst" style="color:var(--accent-gold);">--</span><br>$\Phi_{noise}$: <span style="color:var(--accent-blue);">ACTIVE</span><br>Memory: <span style="color:var(--accent-purple);">STOCHASTIC</span>`;
+}
+showScreen('briefing');
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+if (id === 'lab') { resize(); requestAnimationFrame(draw); }
+if (window.MathJax) MathJax.typesetPromise();
+}
+
+function launchLab() { showScreen('lab'); }
+
+function resetSliders() {
+if (currentModule === 1) {
+document.getElementById('res_slider').value = 5;
+document.getElementById('flux_slider').value = 1.0;
+} else if (currentModule === 2) {
+document.getElementById('coherence_slider').value = 10;
+document.getElementById('freq_slider').value = 1.0;
+} else if (currentModule === 3) {
+document.getElementById('threshold_slider').value = 50;
+document.getElementById('coupling_slider').value = 5;
+document.getElementById('energy_slider').value = 10;
+}
+update();
+}
+
+function update() {
+const label = document.getElementById('scale-label');
+if (currentModule === 1) {
+const res = parseInt(document.getElementById('res_slider').value);
+label.innerText = res > 80 ? "MACRO SCALE" : res > 30 ? "MESO SCALE" : "PLANCK SCALE";
+} else if (currentModule === 2) {
+label.innerText = "QUANTUM REGIME";
+} else if (currentModule === 3) {
+const energy = parseInt(document.getElementById('energy_slider').value);
+const state = document.getElementById('particle-state');
+if (energy > 15) { label.innerText = "EXCITED STATE"; state.innerText = "STABLE"; state.style.color = "var(--accent-gold)"; }
+else if (energy > 5) { label.innerText = "RESONANT STATE"; state.innerText = "METASTABLE"; state.style.color = "var(--accent-blue)"; }
+else { label.innerText = "DECAY STATE"; state.innerText = "DISSIPATING"; state.style.color = "var(--text-dim)"; }
+}
+}
+
+function resize() {
+canvas.width = canvas.parentElement.offsetWidth;
+canvas.height = canvas.parentElement.offsetHeight;
+}
+
+canvas.addEventListener('mousedown', (e) => {
+const rect = canvas.getBoundingClientRect();
+particles.push({ x: e.clientX - rect.left, y: e.clientY - rect.top, s: 25 });
+});
+
+function draw() {
+if (!document.getElementById('screen-lab').classList.contains('active')) return;
+ctx.fillStyle = '#000';
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+if (currentModule === 1) {
+const res = parseInt(document.getElementById('res_slider').value);
+const flux = parseFloat(document.getElementById('flux_slider').value);
+const step = Math.max(5, res / 2);
+for (let x = 0; x < canvas.width; x += step) {
+for (let y = 0; y < canvas.height; y += step) {
+const noise = Math.sin(x * 0.05 + frame * flux * 2) * Math.cos(y * 0.05 + frame * flux * 2);
+ctx.fillStyle = `rgba(168, 85, 247, ${Math.abs(noise) / (res/10) * 0.4})`;
+ctx.fillRect(x, y, step - 1, step - 1);
+}
+}
+} else if (currentModule === 2) {
+const coherence = parseInt(document.getElementById('coherence_slider').value);
+const freq = parseFloat(document.getElementById('freq_slider').value);
+for (let x = 0; x < canvas.width; x += 15) {
+for (let y = 0; y < canvas.height; y += 15) {
+const d1 = Math.sqrt((x-canvas.width/3)**2 + (y-canvas.height/2)**2);
+const d2 = Math.sqrt((x-2*canvas.width/3)**2 + (y-canvas.height/2)**2);
+const wave = Math.sin(d1/coherence - frame*freq) + Math.sin(d2/coherence - frame*freq);
+ctx.fillStyle = `rgba(59, 130, 246, ${Math.abs(wave) * 0.3})`;
+ctx.beginPath();
+ctx.arc(x, y, Math.abs(wave)*3, 0, Math.PI*2);
+ctx.fill();
+}
+}
+} else if (currentModule === 3) {
+const coupling = parseFloat(document.getElementById('coupling_slider').value);
+const energy = parseInt(document.getElementById('energy_slider').value);
+solitonX = (solitonX + 2) % (canvas.width + 100);
+
+for (let x = 0; x < canvas.width; x += 30) {
+for (let y = 0; y < canvas.height; y += 30) {
+const wave = Math.sin(x * 0.02 + frame) * 0.1;
+ctx.fillStyle = `rgba(50, 50, 50, ${Math.abs(wave)})`;
+ctx.fillRect(x, y, 2, 2);
+}
+}
+
+const px = solitonX - 50;
+const py = canvas.height/2;
+const grad = ctx.createRadialGradient(px, py, 0, px, py, energy * 8);
+grad.addColorStop(0, `rgba(245, 158, 11, ${coupling/10})`);
+grad.addColorStop(0.5, 'rgba(168, 85, 247, 0.2)');
+grad.addColorStop(1, 'rgba(0,0,0,0)');
+
+ctx.fillStyle = grad;
+ctx.beginPath();
+ctx.arc(px, py, energy * 8, 0, Math.PI*2);
+ctx.fill();
+
+ctx.fillStyle = "#fff";
+ctx.beginPath(); ctx.arc(px, py, 2, 0, Math.PI*2); ctx.fill();
+}
+
+particles.forEach((p, i) => {
+ctx.strokeStyle = `rgba(245, 158, 11, ${p.s/25})`;
+ctx.beginPath(); ctx.arc(p.x, p.y, 25 - p.s, 0, Math.PI*2); ctx.stroke();
+p.s *= 0.95; if (p.s < 1) particles.splice(i, 1);
+});
+
+if (currentModule === 1) document.getElementById('k-inst').innerText = (11.35 + (Math.random()-0.5)*0.5).toFixed(3);
+else if (currentModule === 2) document.getElementById('k-inst').innerText = "PROBABILISTIC";
+
+if (frame % 25 === 0) {
+const p = document.getElementById('pulse-indicator');
+p.classList.add('pulsing'); setTimeout(() => p.classList.remove('pulsing'), 400);
+}
+frame += 0.05;
+requestAnimationFrame(draw);
+}
+</script>
+</body>
+</html>

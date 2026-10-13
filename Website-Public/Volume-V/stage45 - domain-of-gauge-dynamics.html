@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 45 — Gauge Dynamics</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #00ffcc;
+--accent-evolve: #38bdf8; --accent-action: #f472b6; --accent-wave: #fbbf24; --accent-self: #fb7185; --accent-energy: #4ade80;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-unified); font-family: sans-serif; font-size: 0.85rem; min-width: 350px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls, #nav-summary-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+#screen-lab.active { display: flex; flex-direction: column; height: calc(100vh - 50px); }
+
+#screen-portal { justify-content: flex-start; padding-top: 4dvh; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 50px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.primary-constant-box { background: #000; border: 1px solid var(--accent-unified); padding: 6px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 8px; }
+.secondary-structure-box { background: rgba(0, 255, 204, 0.05); border: 1px dashed var(--accent-unified); padding: 6px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 12px; }
+
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(0, 255, 204, 0.05); border: 1px solid var(--accent-unified); padding: 5px; border-radius: 5px; margin-bottom: 8px; font-size: 0.7rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; }
+#plot-area { flex-grow: 1; width: 100%; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #000; border: 1px solid var(--accent-unified); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer { width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem; color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 45 — GAUGE DYNAMICS</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">Gauge Dynamics Portal</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">The inevitable transition from static structure to active physics.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-evolve);">
+<h2 style="color:var(--accent-evolve);">1. Dynamical Necessity</h2>
+<p>Concept: $\boxed{ \text{Static Field} \neq \text{Physical Field} }$</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-action);">
+<h2 style="color:var(--accent-action);">2. Action & Field Equations</h2>
+<p>Derivation: $\boxed{ D_\mu F^{\mu\nu} = 0 }$</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-wave);">
+<h2 style="color:var(--accent-wave);">3. Wave Propagation</h2>
+<p>Movement: $\boxed{ (\Box + \dots)A_\mu = 0 }$</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-self);">
+<h2 style="color:var(--accent-self);">4. Non-Abelian Self-Interaction</h2>
+<p>Coupling: $\boxed{ [A_\mu, A_\nu] \rightarrow \text{Self-Energy} }$</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-energy);">
+<h2 style="color:var(--accent-energy);">5. Energy-Momentum Reality</h2>
+<p>Physicality: $\boxed{ T^{\mu\nu} \propto F^2 }$</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-unified);">
+<h2 style="color:var(--accent-unified);">6. Stage 45 Summary</h2>
+<p>Dynamics: The Breath of Physics.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Summary: Mathematical Structure of Gauge Dynamics</h2>
+
+<div class="summary-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Structural Flow of Stage 45</h3>
+<p>Stage 45 completes the transition: <strong>Curvature &rarr; Dynamics &rarr; Propagation &rarr; Self-Interaction &rarr; Physical Reality</strong>. This establishes a fully dynamical gauge system.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Mathematical Chain</h3>
+<p>The complete mathematical structure developed in this stage is: Gauge curvature defined &rarr; Action constructed &rarr; Field equations derived &rarr; Wave solutions obtained &rarr; Nonlinear self-interaction included &rarr; Energy–momentum tensor established.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Step-by-Step Structure</h3>
+<ul style="list-style: none; padding-left: 0;">
+<li style="margin-bottom: 10px;"><strong style="color: #f472b6;">(A) Curvature:</strong><br>
+<div style="text-align: center; margin: 5px 0;">$F_{\mu\nu} = \partial_\mu A_{\nu} - \partial_\nu A_{\mu} + i g [A_\mu, A_\nu]$</div>
+Defines field structure.</li>
+<li style="margin-bottom: 10px;"><strong style="color: #f472b6;">(B) Action:</strong><br>
+<div style="text-align: center; margin: 5px 0;">$S = \int \left( -\frac{1}{4} \text{Tr}(F_{\mu\nu} F^{\mu\nu}) \right) d^4x$</div>
+Defines dynamics.</li>
+<li style="margin-bottom: 10px;"><strong style="color: #f472b6;">(C) Field Equations:</strong><br>
+<div style="text-align: center; margin: 5px 0;">$D_\mu F^{\mu\nu} = 0$</div>
+Defines evolution.</li>
+<li style="margin-bottom: 10px;"><strong style="color: #f472b6;">(D) Wave Behavior:</strong><br>
+<div style="text-align: center; margin: 5px 0;">$\Box A_\mu = 0$ (Abelian limit)</div>
+Defines propagation.</li>
+<li style="margin-bottom: 10px;"><strong style="color: #f472b6;">(E) Nonlinearity:</strong><br>
+$F_{\mu\nu}^a$ contains $A \cdot A$ terms. Defines self-interaction.</li>
+<li style="margin-bottom: 10px;"><strong style="color: #f472b6;">(F) Energy–Momentum:</strong><br>
+<div style="text-align: center; margin: 5px 0;">$T^{\mu\nu} = F^{\mu\lambda, a} F^{\nu}_{\phantom{\nu}\lambda}{}^{a} + \frac{1}{4} \eta^{\mu\nu} F^2$</div>
+Defines physical reality.</li>
+</ul>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Core Structural Insight</h3>
+<p>Gauge field is not static structure — it is a self-evolving dynamical system governed by curvature.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Completion (Closure) Theorem — Stage 45</h3>
+<div style="background: rgba(56, 189, 248, 0.1); border-left: 4px solid #38bdf8; padding: 15px; margin: 10px 0;">
+<p><strong>Theorem (Completion of Gauge Dynamics)</strong></p>
+<p>Let $A_\mu(x)$ be a gauge connection associated with a local symmetry group. If curvature is defined as $F_{\mu\nu} = \partial_\mu A_{\nu} - \partial_\nu A_{\mu} + i g [A_\mu, A_\nu]$, the action is constructed from curvature $S = \int \text{Tr}(F_{\mu\nu} F^{\mu\nu}) d^4x$, and field equations are obtained from stationary action $D_\mu F^{\mu\nu} = 0$; then:</p>
+<p><strong>(A) Dynamical Evolution:</strong> The gauge field necessarily satisfies differential equations governing its evolution.<br>
+<strong>(B) Propagation:</strong> The field admits wave-like solutions that propagate through spacetime with finite invariant speed.<br>
+<strong>(C) Self-Interaction:</strong> If the symmetry group is non-Abelian ($[A_\mu, A_\nu] \neq 0$), then the field exhibits intrinsic self-interaction, leading to nonlinear dynamics.<br>
+<strong>(D) Energy–Momentum Reality:</strong> A conserved tensor $T^{\mu\nu}$ exists such that $\partial_\mu T^{\mu\nu} = 0$, establishing the field as an energy–momentum carrying physical entity.</p>
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Conclusion</h3>
+<p>A gauge field defined by local symmetry necessarily becomes a fully dynamical, propagating, self-interacting, and energy–momentum carrying physical system.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Final Compact Form</h3>
+<p style="text-align: center; font-family: 'Courier New', monospace; color: #f472b6;">
+Gauge connection $A_\mu$ &rarr; Curvature $F_{\mu\nu}$ &rarr; Action $S$ &rarr; Field equations $D_\mu F^{\mu\nu} = 0$ &rarr; Propagation + Nonlinearity &rarr; Energy–momentum tensor $T^{\mu\nu}$ &rarr; Physical gauge dynamics
+</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Ultimate Insight of Stage 45</h3>
+<p style="margin-bottom: 0;">Dynamics is not added to interaction — it is the inevitable consequence of curvature governed by action.</p>
+</div>
+
+</section>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div class="primary-constant-box">
+<div class="const-item"><span class="const-label">Vacuum Stiffness K</span><span class="const-val">11.350</span></div>
+<div class="const-item"><span class="const-label">Synthesis Pressure P</span><span class="const-val">0.6900</span></div>
+</div>
+<div id="structure-box-area" class="secondary-structure-box"></div>
+
+<div id="mapping-box-area"></div>
+
+<div class="diagnostic-panel">
+<span class="diag-title">Dynamic Telemetry</span>
+<span id="epoch-label" style="font-family:monospace; font-size:0.85rem; color:var(--accent-unified);">SYSTEM PROPAGATING</span>
+</div>
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-unified); font-size:0.75rem; cursor:pointer; padding:6px;">RESET DYNAMICS</button>
+<div id="panel-footer-text" style="font-size: 0.75rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.3; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:10px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:6px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Field Evolution Logic</span>
+<div id="metrics-content" style="font-size:0.65rem; font-family:monospace; line-height:1.3;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Structural Phase</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.65rem; color: var(--text-dim); line-height: 1.4; background: #000; padding: 10px; border-radius: 0px; border: 1px solid #222; margin-top: auto;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "DYNAMICAL NECESSITY",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Dynamical Necessity — Emergence of Field Evolution</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Starting Point: Field Already Established</h3>
+<p>According to this framework, from Stage 44, the gauge field has been introduced and the interaction structure defined. The field exists as a real physical entity. However, the field has so far been treated structurally, not dynamically.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Central Question</h3>
+<p>According to this framework, once a field exists, the central question is: Can it remain static? This is the key question of this module.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Observation from Structure</h3>
+<p>According to this framework, a field is defined over spacetime, meaning it exists at every point and can vary from point to point. This immediately implies that variation is inherent to the existence of a field.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Necessity of Evolution</h3>
+<p>According to this framework, if a field varies across spacetime, it must change, evolve, and propagate. A completely static field would imply no change, no propagation, and no physical effect. Thus, a static field is physically indistinguishable from the absence of dynamics.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Core Insight</h3>
+<p>According to this framework, this leads to the fundamental statement: A real field must possess dynamics. This is not an assumption—it is a necessity.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Transition Established</h3>
+<p>According to this framework, the module establishes the transition: <strong>Static Structure $\\rightarrow$ Requires Evolution $\\rightarrow$ Active Physics</strong>. Structure alone is insufficient; evolution is what activates physical reality.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Emergence of Governing Need</h3>
+<p>According to this framework, once evolution is recognized, a new requirement arises: How does the field evolve? This cannot remain undefined. Thus, governing equations become necessary.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Structural Meaning</h3>
+<p>According to this framework, this module establishes the chain: <strong>Field $\\rightarrow$ Variation $\\rightarrow$ Evolution $\\rightarrow$ Need for Laws</strong>. This is the first true entry into dynamics.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Graph Interpretation (Very Important)</h3>
+<p>According to this framework, the 3D graph represents the field distribution over spacetime, where the horizontal axes correspond to spatial coordinates and the vertical axis represents field value or potential. The plotted points are not uniform; they form a structured variation across the domain. This non-uniformity directly demonstrates that the field is not static but varies across space and implicitly in time. The sloped and distributed pattern shows gradients in the field, indicating that different regions possess different values, which cannot remain fixed without evolution. This visual structure makes it clear that once a field exists over spacetime, variation is unavoidable, and therefore a rule governing how this variation evolves is required. The graph thus establishes, in a geometric manner, that dynamics is not optional but an inherent necessity of any real field.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. What This Module Achieves</h3>
+<p>According to this framework, this module does not yet introduce equations. It establishes the inevitability of dynamics, the impossibility of static physical fields, and the necessity for governing laws.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">11. Role in Stage 45</h3>
+<p>According to this framework, this is the entry point of Stage 45. It prepares the ground for field equations, propagation laws, and the action principle.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Final Statement</h3>
+<p style="margin-bottom: 0;">According to this framework, a field that exists must evolve. This evolution cannot be arbitrary, and therefore requires governing equations. Dynamics is not introduced; it is demanded by the existence of the field itself.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 1 Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Dynamical Requirement:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\text{Static Structure} \\rightarrow \\text{Active Physics}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The existence of the field across the substrate necessitates temporal variation and evolution, demanding the introduction of governing dynamical laws.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematical Formulation: Dynamical Necessity</h2>
+
+<div class="math-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Field Defined Over Spacetime</h3>
+<p>According to this framework, let a field be defined as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\Psi(x)$$
+</div>
+<p>where $x$ denotes spacetime coordinates. This means the field has a value at every point and can vary across spacetime.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Spatial Variation Implies Gradient</h3>
+<p>According to this framework, if the field is not constant:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\partial_\\mu \\Psi(x) \\neq 0$$
+</div>
+<p>This represents the change of the field across spacetime and the presence of variation.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Static Condition</h3>
+<p>According to this framework, a completely static field would satisfy:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\partial_\\mu \\Psi(x) = 0$$
+</div>
+<p>This implies no variation, no propagation, and no observable effect. Thus: $\\text{Static field} \\Rightarrow \\text{no physical dynamics}$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Necessity of Evolution</h3>
+<p>According to this framework, if $\\partial_\\mu \\Psi(x) \\neq 0$, then the field changes and evolves. This introduces field evolution as a necessary condition.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Temporal Evolution</h3>
+<p>According to this framework, separating the time component shows:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\frac{\\partial \\Psi}{\\partial t} \\neq 0$$
+</div>
+<p>This explicitly shows the field changes with time and that evolution is unavoidable.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Need for Governing Equation</h3>
+<p>According to this framework, once evolution exists, it cannot be arbitrary. Therefore, a rule must govern how $\\Psi(x)$ evolves. The general form dictates that the evolution of $\\Psi$ depends on its spacetime variation.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Emergence of Differential Equation Structure</h3>
+<p>According to this framework, the evolution must relate the field value and its derivatives. Thus, a general dynamical relation takes the form of a relation between $\\Psi$, $\\partial_\\mu \\Psi$, and $\\partial_\\mu \\partial_\\nu \\Psi$. This is the origin of field equations.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Extension to Gauge Field</h3>
+<p>According to this framework, for the gauge field $A_\\mu(x)$:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\partial_\\nu A_\\mu(x) \\neq 0$$
+</div>
+<p>This implies the gauge field varies and must therefore evolve.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Structural Conclusion</h3>
+<p>According to this framework, the presence of non-zero derivatives implies variation, evolution, and the necessity of governing dynamics.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Final Mathematical Statement</h3>
+<p style="margin-bottom: 0;">According to this framework, if a field $\\Psi(x)$ defined over spacetime exhibits non-zero variation $(\\partial_\\mu \\Psi \\neq 0)$, then temporal evolution is unavoidable, and a governing differential equation is required to describe its behavior. Dynamics therefore arises as a necessary consequence of field variation.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 1: Dynamical Condition</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Fundamental Relation:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\partial_\\mu \\Psi \\neq 0 \\implies \\text{Dynamics Required}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The gradient of the field across the substrate creates the mathematical pressure for evolution, necessitating the transition from static geometry to physical dynamics.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>EVOLUTION RATE</span><input type="number" id="e_in" class="digital-entry" value="1.0" oninput="syncVal(this.value, 'e_sl')"></div><input type="range" id="e_sl" min="0" max="2" step="0.1" value="1.0" oninput="syncVal(this.value, 'e_in')"></div>`,
+structureBox: `<div class="const-item"><span class="const-label">Status</span><span class="const-val">DYNAMICAL</span></div><div class="const-item"><span class="const-label">Mode</span><span class="const-val">FIELD EVOLUTION</span></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">TRANSITION LOGIC</span><div style="text-align:center; font-size: 0.9rem;">Static Structure $\\rightarrow$ Requires Evolution $\\rightarrow$ Becomes Active Physics</div></div>`,
+telemetry: "FIELD PROPAGATION ESTABLISHED",
+lawBox: `<div class="definition-box"><span class="def-title">CORE INSIGHT</span><div style="text-align:center; font-size: 0.8rem;">A real field must possess dynamics</div>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-size: 0.9rem;">Field Snapshot<br>↓<br>Temporal Variation Identified<br>↓<br>Governing Equations Required`,
+hierarchy: `<div style="color: var(--accent-evolve); font-weight: bold; font-size: 0.9rem;">Dynamics Required</div>`,
+footer: "The necessity of governing equations follows from the requirement of field evolution.",
+rightNote: `<div style="color: #00ffcc; font-size: 0.9rem;">Physicality requires the capacity for change.`
+},
+
+2: {
+title: "FIELD EQUATIONS FROM ACTION",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Field Equations from Action — Emergence of Governing Laws</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Starting Point: Dynamics Established</h3>
+<p>From Module 1, it has been established that the field must evolve, evolution is unavoidable, and variation exists across spacetime. This leads to a critical requirement: evolution cannot be arbitrary.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Central Question</h3>
+<p>If the field evolves, what determines how it evolves? This is the core question of this module.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Necessity of a Governing Principle</h3>
+<p>A physical field cannot change randomly or evolve without constraint. According to this framework, there must exist a governing principle that determines the evolution. This is where the action principle emerges.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Introduction of Action Principle</h3>
+<p>The field dynamics is governed by the variation of action equaling zero ($ \\delta S = 0 $). This means the field follows a specific path—not any arbitrary evolution, but an optimized evolution. This establishes that dynamics is constrained by a variational principle.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Role of the Lagrangian</h3>
+<p>The action is constructed from the Lagrangian density, which depends on the field structure. For gauge fields, the Lagrangian depends on curvature ($F$). Thus, curvature becomes the fundamental quantity driving dynamics.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Emergence of Field Equations</h3>
+<p>From the variation of action, governing equations arise. This leads to equations of motion for the field. These equations control evolution, define propagation, and encode interaction behavior.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Structural Meaning</h3>
+<p>This module establishes a logical chain: field variation exists, that variation must be governed, the governing principle is the action, and the action leads to field equations.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Core Insight</h3>
+<p>Evolution is curvature in motion. This means field curvature is not static; it evolves according to laws, and interaction is realized as dynamic curvature.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Graph Interpretation (Very Important)</h3>
+<p>The 3D graph shows a structured vector-like distribution representing the flow of curvature across the field domain. The arrows form a circulating pattern, indicating that the field is not only varying but exhibiting directional flux. This visually represents the divergence and flow of curvature, where each point contributes to an overall structured movement. The organized pattern of vectors shows that the field evolution is not random but follows a coherent rule. This directly corresponds to the emergence of field equations: the field evolves according to a law that governs how curvature flows and redistributes across spacetime. The graph therefore demonstrates that dynamics is governed by a structured flux of curvature, which is precisely what the field equations encode.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. What This Module Achieves</h3>
+<p>This module establishes the action principle, the necessity of governing laws, the emergence of field equations, and the fundamental connection between curvature and dynamics.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">11. Role in Stage 45</h3>
+<p>This module is the turning point: moving from the requirement that the field must evolve to the realization that field evolution is strictly governed.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Final Statement</h3>
+<p style="margin-bottom: 0;">Field evolution is not arbitrary. It is determined by a variational principle, where the action is extremized. This leads to field equations, which govern how curvature evolves across spacetime, establishing the foundation of gauge dynamics.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 2 Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Variational Principle:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\delta S = \\delta \\int \\mathcal{L} \\, d^4x = 0$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The field equations emerge from the requirement of stationary action, ensuring that the evolution of curvature across the substrate follows an optimized, governed path.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematical Formulation: Field Equations from Action</h2>
+
+<div class="math-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Starting Point: Gauge Field and Curvature</h3>
+<p>The gauge field is defined as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$A_\\mu(x) = A_\\mu^a(x) T^a$$
+</div>
+<p>The corresponding curvature (field strength) is:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$F_{\\mu\\nu} = \\partial_\\mu A_\\nu - \\partial_\\nu A_\\mu + i g [A_\\mu, A_\\nu]$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Lagrangian Density</h3>
+<p>The dynamics of the gauge field is constructed from curvature:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\mathcal{L} = -\\frac{1}{4} \\text{Tr}(F_{\\mu\\nu} F^{\\mu\\nu})$$
+</div>
+<p>This defines the energetic content of the field.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Action Definition</h3>
+<p>The action is defined as the integral of the Lagrangian density over spacetime:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$S = \\int \\mathcal{L} \\, d^4x = \\int \\left( -\\frac{1}{4} \\text{Tr}(F_{\\mu\\nu} F^{\\mu\\nu}) \\right) d^4x$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Principle of Stationary Action</h3>
+<p>The physical evolution satisfies the principle of stationary action:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\delta S = 0 \\implies \\delta \\int \\text{Tr}(F^2) \\, d^4x = 0$$
+</div>
+<p>This is the central governing condition for the field's dynamics.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Variation of the Gauge Field</h3>
+<p>We vary the gauge field $A_\\mu \\rightarrow A_\\mu + \\delta A_\\mu$. This induces a variation in the curvature:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\delta F_{\\mu\\nu} = D_\\mu(\\delta A_\\nu) - D_\\nu(\\delta A_\\mu)$$
+</div>
+<p>where the covariant derivative is $D_\\mu = \\partial_\\mu + i g A_\\mu$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Variation of Action</h3>
+<p>Substituting the field variation into the action variation gives:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\delta S = \\int \\text{Tr}(F^{\\mu\\nu} \\delta F_{\\mu\\nu}) \\, d^4x$$
+</div>
+<p>After simplification, this becomes:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\delta S = \\int \\text{Tr}(F^{\\mu\\nu} D_\\mu(\\delta A_\\nu)) \\, d^4x$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Integration by Parts</h3>
+<p>Using integration by parts and assuming boundary terms vanish at infinity:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\delta S = - \\int \\text{Tr}((D_\\mu F^{\\mu\\nu}) \\delta A_\\nu) \\, d^4x$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Field Equations</h3>
+<p>For an arbitrary variation $\\delta A_\\nu$, the stationary condition $\\delta S = 0$ requires:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.2rem;">
+$$D_\\mu F^{\\mu\\nu} = 0$$
+</div>
+<p>This is the fundamental gauge field equation.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Component Form</h3>
+<p>In terms of group components, the equation is $D_\\mu F^{\\mu\\nu, a} = 0$, which expands to:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\partial_\\mu F^{\\mu\\nu, a} + g f^{abc} A_\\mu^b F^{\\mu\\nu, c} = 0$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Abelian Limit</h3>
+<p>For a $U(1)$ symmetry, the commutator vanishes and the equation reduces to:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\partial_\\mu F^{\\mu\\nu} = 0$$
+</div>
+<p>This corresponds to the source-free Maxwell equations.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">11. Mathematical Meaning</h3>
+<p>In this framework, $F_{\\mu\\nu}$ represents curvature, while $D_\\mu F^{\\mu\\nu}$ represents the divergence of that curvature. The equation enforces a structured flow of curvature across spacetime.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Final Mathematical Statement</h3>
+<p style="margin-bottom: 0;">The dynamics of the gauge field is obtained by extremizing the action constructed from curvature, leading to the field equation $D_\\mu F^{\\mu\\nu} = 0$. This equation governs the propagation and evolution of gauge curvature, establishing the mathematical foundation of gauge field dynamics.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 2: Field Equation Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Yang-Mills Equation:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$D_\\mu F^{\\mu\\nu} = 0$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The divergence of the gauge curvature must vanish, defining the governed path of field evolution within the substrate.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>VARIATIONAL DEPTH</span><input type="number" id="v_in" class="digital-entry" value="0.5" oninput="syncVal(this.value, 'v_sl')"></div><input type="range" id="v_sl" min="0.1" max="1" step="0.05" value="0.5" oninput="syncVal(this.value, 'v_in')"></div>`,
+structureBox: `<div class="const-item"><span class="const-label">Status</span><span class="const-val">DYNAMICAL</span></div><div class="const-item"><span class="const-label">Mode</span><span class="const-val">FIELD EVOLUTION</span></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">ACTION PRINCIPLE</span><div style="text-align:center; font-size: 0.9rem;">$\\delta \\int \\mathrm{Tr}(F^2)\\, d^4x = 0$</div></div>`,
+telemetry: "SYSTEM PROPAGATING",
+lawBox: `<div class="definition-box"><span class="def-title">CORE INSIGHT</span><div style="text-align:center; font-size: 0.8rem;">Evolution is curvature in motion</div>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-size: 0.9rem;">Lagrangian density L<br>↓<br>Action S variation<br>↓<br>Stationary condition = Field Equation`,
+hierarchy: `<div style="color: var(--accent-action); font-weight: bold; font-size: 0.9rem;">Equations of Motion Derived</div>`,
+footer: "Field evolution is now governed by the divergence of curvature.",
+rightNote: `<div style="color: #00ffcc; font-size: 0.9rem;">The field follows the path of extremal curvature.`
+},
+
+3: {
+title: "WAVE PROPAGATION",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Wave Propagation — Dynamics of Gauge Interaction</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Starting Point: Field Equations Established</h3>
+<p>From Module 2, it is established that field evolution is governed by equations, dynamics is no longer arbitrary, and curvature evolves according to laws. This immediately leads to the next question: How does this evolution physically manifest?</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Central Insight</h3>
+<p>A governed field must not only exist and evolve, but propagate across spacetime. This introduces the wave-like behavior of the gauge field.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Emergence of Propagation</h3>
+<p>From the field equations, it is clear that solutions are not static; they naturally produce propagating modes. This means that interaction travels—not instantaneously, but with a finite speed through the substrate.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Physical Interpretation</h3>
+<p>Gauge interaction is now understood as a disturbance in the gauge field that moves through spacetime. This disturbance is a propagating curvature wave.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Role of Speed (c)</h3>
+<p>The propagation is constrained by an invariant speed ($c$). This implies that causality is preserved, there is no instantaneous interaction, and the structure respects spacetime limits.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Structural Meaning</h3>
+<p>This module establishes that curvature is not static; it evolves dynamically and propagates as a wave. Thus, interaction is realized as propagating curvature.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Core Insight</h3>
+<p>In this framework, gauge interaction propagates as a curvature wave in spacetime. This is a major conceptual shift from a static force to dynamic propagation.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Graph Interpretation (Very Important)</h3>
+<p>The graph shows a continuous oscillatory structure moving along a defined propagation axis. The looping waveform represents a repeating pattern, indicating periodic variation of the field. This visually captures the essence of wave propagation: a structured oscillation traveling through space. The smooth continuity of the curve shows that the field is evolving coherently, not randomly. The orientation along one direction highlights propagation, while the oscillation perpendicular to it represents field variation. This directly corresponds to solutions of the field equations, where curvature propagates as a wave. The graph therefore demonstrates that interaction is not localized but travels as a structured, continuous wave across the substrate.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. What This Module Achieves</h3>
+<p>This module establishes the propagation of gauge interaction, the wave nature of field dynamics, the finite speed constraint, and the physical realization of interaction.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Role in Stage 45</h3>
+<p>This module advances the chain from field equations to propagation, converting mathematical dynamics into physical behavior.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Final Statement</h3>
+<p style="margin-bottom: 0;">Gauge interaction is not a static entity but a propagating curvature wave. The field equations generate wave-like solutions that travel through spacetime at a finite invariant speed, establishing interaction as a dynamic and physically transmitted phenomenon.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 3 Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Wave Equation:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\Box A_\\mu - \\dots = 0$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Interaction is transmitted through the substrate as a propagating ripple in the gauge connection, limited by the invariant speed of the vacuum structure.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematical Formulation: Wave Propagation</h2>
+
+<div class="math-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Starting Point: Field Equation</h3>
+<p>From Module 2, the gauge field satisfies the fundamental dynamical equation:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$D_\\mu F^{\\mu\\nu} = 0$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Abelian Case (Simplest Propagation)</h3>
+<p>For a $U(1)$ symmetry, the covariant derivative simplifies to the partial derivative ($D_\\mu \\rightarrow \\partial_\\mu$), and the equation becomes:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\partial_\\mu F^{\\mu\\nu} = 0$$
+</div>
+<p>where the field strength is $F_{\\mu\\nu} = \\partial_\\mu A_\\nu - \\partial_\\nu A_\\mu$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Substitution into Field Equation</h3>
+<p>Substituting $F$ into the equation yields:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\partial_\\mu (\\partial^\\mu A^\\nu - \\partial^\\nu A^\\mu) = 0$$
+</div>
+<p>Expanding this gives:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\partial_\\mu \\partial^\\mu A^\\nu - \\partial^\\nu (\\partial_\\mu A^\\mu) = 0$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Gauge Choice (Lorenz Gauge)</h3>
+<p>To simplify, we impose the Lorenz gauge condition:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\partial_\\mu A^\\mu = 0$$
+</div>
+<p>Under this condition, the second term vanishes.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Wave Equation</h3>
+<p>Defining the d'Alembertian operator $\\Box = \\partial_\\mu \\partial^\\mu$, we obtain the wave equation:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.2rem;">
+$$\\Box A^\\nu = 0$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Explicit Form</h3>
+<p>In terms of spacetime coordinates, this is expressed as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\left( \\frac{\\partial^2}{\\partial t^2} - \\nabla^2 \\right) A^\\nu = 0$$
+</div>
+<p>This explicitly shows both temporal variation and spatial propagation.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Plane Wave Solution</h3>
+<p>A typical solution for the propagating field is:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$A^\\nu(x) = \\epsilon^\\nu e^{i(k \\cdot x)}$$
+</div>
+<p>where $\\epsilon^\\nu$ is the polarization vector and $k$ is the wave vector.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Dispersion Relation</h3>
+<p>Substituting the solution into the wave equation gives:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$k_\\mu k^\\mu = 0 \\implies \\omega^2 = |k|^2$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Propagation Speed</h3>
+<p>The velocity of the wave is given by $v = \\omega / |k| = 1$. Thus, propagation occurs at the invariant speed ($c$).</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Non-Abelian Case</h3>
+<p>For $SU(N)$, the full equation $D_\\mu F^{\\mu\\nu} = 0$ expands to:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\partial_\\mu F^{\\mu\\nu, a} + g f^{abc} A_\\mu^b F^{\\mu\\nu, c} = 0$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">11. Key Difference</h3>
+<p>In the Abelian case, we have a linear wave equation. In the non-Abelian case, the equation is nonlinear, leading to self-interacting wave propagation.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">12. Mathematical Meaning</h3>
+<p>In this framework, $A_\\mu$ is the propagating field, $\\Box A_\\mu = 0$ represents its wave behavior, and $k^2 = 0$ ensures light-like propagation through the substrate.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Final Mathematical Statement</h3>
+<p style="margin-bottom: 0;">The gauge field equations admit wave solutions, where the gauge field satisfies a relativistic wave equation. These solutions propagate at invariant speed and represent the physical transmission of interaction as a curvature wave through spacetime.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 3: Propagation Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Wave Constraint:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\Box A^\\nu = 0 \\quad \\text{ (Lorenz Gauge) }$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The field equations naturally resolve into propagating wave solutions, establishing interaction as a dynamic signal moving through the spacetime substrate at speed $c$.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>PROPAGATION SPEED (c)</span><input type="number" id="w_in" class="digital-entry" value="1.0" oninput="syncVal(this.value, 'w_sl')"></div><input type="range" id="w_sl" min="0.1" max="3" step="0.1" value="1.0" oninput="syncVal(this.value, 'w_in')"></div>`,
+structureBox: `<div class="const-item"><span class="const-label">Status</span><span class="const-val">DYNAMICAL</span></div><div class="const-item"><span class="const-label">Mode</span><span class="const-val">FIELD EVOLUTION</span></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">DYNAMICAL FLOW</span><div style="text-align:center; font-size: 0.9rem;">Gauge interaction propagates at invariant substrate speed (c)</div></div>`,
+telemetry: "GAUGE FIELD PROPAGATING",
+lawBox: `<div class="definition-box"><span class="def-title">CORE INSIGHT</span><div style="text-align:center; font-size: 0.8rem;">Gauge interaction propagates as a curvature wave in spacetime</div>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-size: 0.9rem;">Wavefront structure established<br>↓<br>Propagation through spacetime activated<br>↓<br>Finite invariant velocity governs interaction`,
+hierarchy: `<div style="color: var(--accent-wave); font-weight: bold; font-size: 0.9rem;">Gauge Wave Propagation Structurally Active</div>`,
+footer: "Gauge interaction is realized as a wave-like propagation of curvature through the substrate.",
+rightNote: `<div style="color: #00ffcc; font-size: 0.9rem;">Interaction is a propagating curvature ripple in the gauge connection field.`
+},
+
+4: {
+title: "NON-ABELIAN SELF-INTERACTION",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Non-Abelian Self-Interaction — Intrinsic Nonlinearity of Gauge Fields</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Starting Point: Wave Propagation Established</h3>
+<p>From Module 3, it has been established that the gauge field propagates as a wave, interaction travels through spacetime, and dynamics is governed and physical. Now the next question arises: Is propagation always simple and linear?</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Abelian vs Non-Abelian Distinction</h3>
+<p>In Abelian theory ($U(1)$), fields do not interact with themselves, propagation is linear, and the principle of superposition holds. But in Non-Abelian theory ($SU(N)$), fields carry internal structure, the commutator term is non-zero, and a new phenomenon emerges: self-interaction.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Origin of Self-Interaction</h3>
+<p>From the curvature definition, $F_{\\mu\\nu}$ includes the commutator term $[A_\\mu, A_\\nu]$. This term implies that the field contributes to its own curvature and influences its own evolution. Thus, the gauge field interacts with itself through its own structure.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Emergence of Nonlinearity</h3>
+<p>Because of self-interaction, field equations become nonlinear, and superposition no longer holds. Small changes can amplify or suppress behavior, establishing the intrinsic nonlinearity of gauge dynamics.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Physical Meaning</h3>
+<p>This leads to complex interaction behavior where energy density depends on the field configuration and dynamics become richer and more structured. In particular, the strong interaction arises from this self-coupling nature.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Structural Meaning</h3>
+<p>This module establishes that interaction is not just between fields; it can be internal to the field itself. The field carries its own interaction, and thus interaction becomes self-sustained.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Core Insight</h3>
+<p>Non-Abelian gauge fields are intrinsically self-coupled systems. This is a defining property that distinguishes the strong force from electromagnetism and explains nonlinear behavior.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Graph Interpretation (Very Important)</h3>
+<p>The graph shows a curved surface with peaks and gradients that vary across the domain, representing the nonlinear energy structure of the field. Unlike a simple wave, this surface does not exhibit uniform oscillation but instead displays regions of amplification and suppression. This indicates that the field is influencing itself, creating localized structures. The smooth yet non-uniform shape reflects how self-interaction generates complex dynamics, where the field modifies its own evolution. The elevation variations correspond to coupling strength, showing that energy density is not constant but depends on the field configuration itself. The graph therefore visually demonstrates that the field is self-coupled and evolves in a nonlinear manner.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. What This Module Achieves</h3>
+<p>This module establishes the self-interaction of gauge fields, the nonlinear nature of dynamics, the origin of complex interaction behavior, and the structural distinction between Abelian and Non-Abelian systems.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Role in Stage 45</h3>
+<p>This module completes the dynamical structure: Field equations $\\rightarrow$ Propagation $\\rightarrow$ Self-interaction. It introduces the full dynamical richness of gauge fields.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Final Statement</h3>
+<p style="margin-bottom: 0;">In Non-Abelian systems, the gauge field is not merely a mediator but an active participant in its own interaction. Through its curvature, it self-couples, generating intrinsically nonlinear dynamics that define the complexity of fundamental interactions.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 4 Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Nonlinear Coupling:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$F_{\\mu\\nu} \\sim \\partial A + [A, A]$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The field structure itself generates interaction, leading to self-coupling and the emergence of non-linear dynamics within the gauge substrate.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematical Formulation: Non-Abelian Self-Interaction</h2>
+
+<div class="math-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Starting Point: Gauge Field Structure</h3>
+<p>The gauge field is defined as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$A_\\mu(x) = A_\\mu^a(x) T^a$$
+</div>
+<p>where $T^a$ are generators of the group, and the index $a$ runs from $1$ to $N^2 - 1$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Curvature (Field Strength)</h3>
+<p>The key source of self-interaction appears in the definition of the field strength tensor:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$F_{\\mu\\nu} = \\partial_\\mu A_\\nu - \\partial_\\nu A_\\mu + i g [A_\\mu, A_\\nu]$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Commutator Expansion</h3>
+<p>Expanding the commutator term using the field components and the algebra of the generators $[T^a, T^b] = i f^{abc} T^c$:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$[A_\\mu, A_\\nu] = A_\\mu^a A_\\nu^b [T^a, T^b] = i f^{abc} A_\\mu^a A_\\nu^b T^c$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Component Form of Curvature</h3>
+<p>The curvature can be written in terms of its components $F_{\\mu\\nu} = F_{\\mu\\nu}^a T^a$, where:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$F_{\\mu\\nu}^a = \\partial_\\mu A_\\nu^a - \\partial_\\nu A_\\mu^a - g f^{abc} A_\\mu^b A_\\nu^c$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Source of Nonlinearity</h3>
+<p>Observe that the term $A_\\mu^b A_\\nu^c$ appears, meaning the field is multiplied by itself. This is the mathematical origin of the self-interaction term.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Gauge Field Lagrangian</h3>
+<p>The Lagrangian density is defined as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\mathcal{L} = -\\frac{1}{4} F_{\\mu\\nu}^a F^{\\mu\\nu, a}$$
+</div>
+<p>Substituting the expression for $F_{\\mu\\nu}^a$ produces terms of the following types:</p>
+<ul style="color: #e2e8f0; margin-left: 20px;">
+<li>$(\\partial A)(\\partial A) \\rightarrow$ Kinetic (linear)</li>
+<li>$g (\\partial A) A A \\rightarrow$ Cubic interaction</li>
+<li>$g^2 A A A A \\rightarrow$ Quartic interaction</li>
+</ul>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Explicit Structure</h3>
+<p>The Lagrangian expands into a kinetic term plus three-field and four-field interaction terms. Thus, the field interacts with itself directly through its own structure.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Field Equation</h3>
+<p>From the variation of the action, the field equation is derived as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$D_\\mu F^{\\mu\\nu} = 0$$
+</div>
+<p>Expanded into components, this yields:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\partial_\\mu F^{\\mu\\nu, a} + g f^{abc} A_\\mu^b F^{\\mu\\nu, c} = 0$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Nonlinear Structure</h3>
+<p>The equation contains $A_\\mu \\times F$ terms, and since $F$ already contains $A \\times A$ terms, the resulting dynamics include $A \\cdot \\partial A$ and $A \\cdot A \\cdot A$ interactions.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Abelian Comparison</h3>
+<p>For a $U(1)$ symmetry, the structure constants $f^{abc} = 0$. Consequently, the field strength $F_{\\mu\\nu} = \\partial_\\mu A_\\nu - \\partial_\\nu A_\\mu$ has no $A \\cdot A$ term, resulting in linear dynamics and no self-interaction.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">11. Mathematical Meaning</h3>
+<p>The non-vanishing commutator $[A, A] \\neq 0$ implies self-coupling, where the coupling constant $g$ controls the strength and higher-order terms lead to complex nonlinear behavior.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Final Mathematical Statement</h3>
+<p style="margin-bottom: 0;">The non-Abelian gauge field contains intrinsic self-interaction arising from the commutator term in curvature. This generates nonlinear terms in both the field strength and Lagrangian, leading to self-coupled dynamics governed by $D_\\mu F^{\\mu\\nu} = 0$, where the field interacts with itself through its own structure.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 4: Self-Interaction Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Interaction Terms:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\mathcal{L}_{int} \\sim g f^{abc} (\\partial A)AA + g^2 f^{abc} f^{ade} AAAA$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The presence of internal structure within the gauge group transforms the field from a passive carrier of force into an active, self-interacting medium.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>NONLINEAR SELF-COUPLING STRENGTH (g)</span><input type="number" id="s_in" class="digital-entry" value="1.0" oninput="syncVal(this.value, 's_sl')"></div><input type="range" id="s_sl" min="0" max="2" step="0.1" value="1.0" oninput="syncVal(this.value, 's_in')"></div>`,
+structureBox: `<div class="const-item"><span class="const-label">Status</span><span class="const-val">DYNAMICAL</span></div><div class="const-item"><span class="const-label">Mode</span><span class="const-val">FIELD EVOLUTION</span></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">NONLINEARITY</span><div style="text-align:center; font-size: 0.9rem;">Gauge field self-interacts via its own curvature</div></div>`,
+telemetry: "SELF-INTERACTING FIELD PROPAGATING",
+lawBox: `<div class="definition-box"><span class="def-title">CORE INSIGHT</span><div style="text-align:center; font-size: 0.8rem;">Non-Abelian gauge fields are intrinsically self-coupled systems</div>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-size: 0.9rem;">Commutator term [A, A] structurally active<br>↓<br>Nonlinear energy density generated<br>↓<br>Asymptotic behavior emerges from self-coupling`,
+hierarchy: `<div style="color: var(--accent-self); font-weight: bold; font-size: 0.9rem;">Non-Abelian Self-Interaction Structurally Established</div>`,
+footer: "Self-interaction generates intrinsically nonlinear dynamics, underlying the complex behavior of strong interactions.",
+rightNote: `<div style="color: #00ffcc; font-size: 0.9rem;">The gauge field carries its own interaction through self-coupling.`
+},
+
+5: {
+title: "ENERGY-MOMENTUM REALITY",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Energy–Momentum Reality — Physicalization of Gauge Fields</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Starting Point: Full Gauge Dynamics Established</h3>
+<p>From previous modules, it is established that field equations govern evolution, fields propagate as waves, and non-Abelian fields self-interact. At this point, a crucial question arises: Is the gauge field merely mathematical, or physically real?</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Necessity of Physical Reality</h3>
+<p>A true physical field must carry energy, transfer momentum, and influence physical systems. Otherwise, it remains only a formal construct.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Emergence of Energy–Momentum Structure</h3>
+<p>From the gauge Lagrangian, one can construct energy density and momentum flow. This leads to the energy–momentum tensor of the field.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Key Quantities</h3>
+<p>The energy density is represented by $T_{00}$, and momentum flux is represented by $T_{0i}$. These quantities establish that the field stores energy and transports momentum.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Physical Meaning</h3>
+<p>This implies that the gauge field is not abstract; it has measurable physical effects and participates in dynamics as a real entity. Thus, interaction carries physical content.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Structural Meaning</h3>
+<p>This module establishes the identity: Gauge field = energy–momentum carrier, Dynamics = energy flow, and Interaction = physical process. This completes the transition: <strong>Structure $\\rightarrow$ Dynamics $\\rightarrow$ Physical Reality</strong>.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Core Insight</h3>
+<p>The gauge field is physically real as an energy–momentum carrying entity. This is the decisive conclusion of Stage 45.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Graph Interpretation (Very Important)</h3>
+<p>The graph shows a smooth curved surface representing energy density distributed across space. The central region rises higher, indicating a concentration of energy, while the gradual decline outward shows how energy spreads continuously across the field. The symmetry of the surface reflects that energy density is structured and governed, not random. The continuous nature of the surface indicates that energy is distributed through the field itself, rather than localized at a point. This visually demonstrates that the gauge field carries energy intrinsically, and that this energy evolves and propagates across spacetime. The graph therefore confirms that the field is a real, energy-bearing entity with a well-defined distribution.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. What This Module Achieves</h3>
+<p>This module establishes the energy–momentum tensor of the gauge field, the physical reality of interaction, energy storage and transfer, and the completion of gauge dynamics.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Role in Stage 45</h3>
+<p>This module completes the entire stage: Field equations $\\rightarrow$ Propagation $\\rightarrow$ Self-interaction $\\rightarrow$ Physical reality. It converts mathematical structure into physical existence.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Final Statement</h3>
+<p style="margin-bottom: 0;">Gauge fields are not merely mathematical constructs but real physical entities that carry energy and momentum. Their dynamics represent the flow and redistribution of this energy across spacetime, establishing interaction as a physically realized process.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 5 Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Physical Reality:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$T^{\\mu\\nu}_{gauge} \\neq 0$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The interaction field possesses intrinsic energy-momentum density, transitioning from a geometric connection to a measurable physical substance within the substrate.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematical Formulation: Energy–Momentum Reality</h2>
+
+<div class="math-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Starting Point: Gauge Field Lagrangian</h3>
+<p>The gauge field dynamics is defined by the Lagrangian density:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\mathcal{L} = -\\frac{1}{4} F_{\\mu\\nu}^a F^{\\mu\\nu, a}$$
+</div>
+<p>This Lagrangian encodes the energetic content of the field structure.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Definition of Energy–Momentum Tensor</h3>
+<p>The energy–momentum tensor is obtained from the Lagrangian as follows:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$T^{\\mu\\nu} = F^{\\mu\\lambda, a} F^{\\nu}_{\\phantom{\\nu}\\lambda}{}^{a} + \\frac{1}{4} \\eta^{\\mu\\nu} F_{\\alpha\\beta}^a F^{\\alpha\\beta, a}$$
+</div>
+<p>where $\\eta^{\\mu\\nu}$ is the spacetime metric and $a$ is the gauge index.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Energy Density ($T^{00}$)</h3>
+<p>The energy density (the time-time component) is given by:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$T^{00} = \\frac{1}{2} (E^a \\cdot E^a + B^a \\cdot B^a)$$
+</div>
+<p>where $E^a$ represents the electric component and $B^a$ represents the magnetic component of the gauge field.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Field Components</h3>
+<p>We define these components in terms of the field strength tensor:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$E_i^a = F_{0i}^a \\quad , \\quad B_i^a = -\\frac{1}{2} \\epsilon_{ijk} F_{jk}^a$$
+</div>
+<p>Thus, the energy density depends directly on the field strength components across the substrate.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Momentum Density (Poynting-like Vector)</h3>
+<p>The momentum flow (the time-space component) is given by:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$T^{0i} = (E^a \\times B^a)^i$$
+</div>
+<p>This represents energy transport and the directional propagation of the field disturbance.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Conservation Law</h3>
+<p>The energy–momentum conservation is expressed as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\partial_\\mu T^{\\mu\\nu} = 0$$
+</div>
+<p>This ensures that both total energy and total momentum are conserved within the system.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Relation to Field Equations</h3>
+<p>Using the dynamical equations $D_\\mu F^{\\mu\\nu} = 0$, it can be shown that the energy–momentum tensor is naturally conserved as a consequence of the field's evolution laws.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Non-Abelian Contribution</h3>
+<p>Because $F_{\\mu\\nu}^a$ includes $A \\cdot A$ terms in non-Abelian theories, the energy density includes interaction energy and self-coupling contributions, reflecting the self-interacting nature of the field.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Integrated Quantities</h3>
+<p>The total energy $E$ and total momentum $P^i$ are obtained by integrating over the spatial volume:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$E = \\int T^{00} \\, d^3x \\quad , \\quad P^i = \\int T^{0i} \\, d^3x$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Mathematical Meaning</h3>
+<p>In this formulation, $F_{\\mu\\nu}$ defines the field strength, $T^{\\mu\\nu}$ defines the energy and momentum content, and $\\partial_\\mu T^{\\mu\\nu} = 0$ enforces the conservation of physical reality.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Final Mathematical Statement</h3>
+<p style="margin-bottom: 0;">The gauge field possesses a well-defined energy–momentum tensor derived from its Lagrangian. The components $T^{00}$ and $T^{0i}$ represent energy density and momentum flow, establishing the field as a physically real entity whose dynamics correspond to the propagation and redistribution of energy and momentum across spacetime.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 5: Conservation Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Continuity Equation:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\partial_\\mu T^{\\mu\\nu} = 0$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The field is not just a carrier of information but a vessel for energy and momentum, ensuring the physical continuity of interaction across the substrate.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>ENERGY DENSITY (T₀₀)</span><input type="number" id="en_in" class="digital-entry" value="1" oninput="syncVal(this.value, 'en_sl')"></div><input type="range" id="en_sl" min="0" max="2" step="0.1" value="1" oninput="syncVal(this.value, 'en_in')"></div>`,
+structureBox: `<div class="const-item"><span class="const-label">Status</span><span class="const-val">DYNAMICAL</span></div><div class="const-item"><span class="const-label">Mode</span><span class="const-val">FIELD EVOLUTION</span></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">PHYSICALITY</span><div style="text-align:center; font-size: 0.9rem;">Gauge field is an energy–momentum carrying physical entity</div></div>`,
+telemetry: "ENERGY-MOMENTUM PROPAGATING",
+lawBox: `<div class="definition-box"><span class="def-title">CORE INSIGHT</span><div style="text-align:center; font-size: 0.8rem;">Gauge field is physically real as an energy–momentum carrying entity</div>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-size: 0.9rem;">Energy density (T₀₀) defined<br>↓<br>Momentum flux (T₀ᵢ) identified<br>↓<br>Field realized as a physical energy–momentum carrier`,
+hierarchy: `<div style="color: var(--accent-energy); font-weight: bold; font-size: 0.9rem;">Energy–Momentum Structure of Gauge Field Confirmed</div>`,
+footer: "The transition is complete: gauge structure is now an active, energy–momentum carrying physical reality.",
+rightNote: `<div style="color: #00ffcc; font-size: 0.8rem;">Gauge interaction carries energy and momentum as a real physical entity.<P>Gauge fields are not merely mathematical constructs — they are real, energy–momentum carrying entities whose dynamics constitute physical interaction.</p>`
+}
+};
+
+function syncVal(val, id) {
+const sliderId = id.includes('_in') ? id.replace('_in', '_sl') : id;
+const inputId = id.includes('_sl') ? id.replace('_sl', '_in') : id;
+if(document.getElementById(sliderId)) document.getElementById(sliderId).value = val;
+if(document.getElementById(inputId)) document.getElementById(inputId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+document.getElementById('brief-box-content').innerHTML = content.brief;
+document.getElementById('math-box-content').innerHTML = content.math;
+document.getElementById('control-sliders').innerHTML = content.sliders;
+document.getElementById('active-module-title').innerText = content.title;
+
+// Filling modular sections
+document.getElementById('structure-box-area').innerHTML = content.structureBox;
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('epoch-label').innerHTML = content.telemetry;
+
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('metrics-content').innerHTML = content.metricsContent;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+showScreen('briefing');
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() {
+showScreen('lab');
+setTimeout(() => { runLab(); window.dispatchEvent(new Event('resize')); }, 100);
+}
+
+function runLab() {
+const target = document.getElementById('plot-area');
+if (!target) return;
+let data = [];
+let layout = {
+paper_bgcolor: 'black', plot_bgcolor: 'black', margin: {t:60,b:10,l:0,r:0},
+showlegend: false, font: { family: 'sans-serif', size: 10 },
+scene: {
+xaxis: { title: 'Spacetime x₁', standoff: 20, gridcolor: '#222', font: { color: '#94a3b8' } },
+yaxis: { title: 'Spacetime x₂', standoff: 20, gridcolor: '#222', font: { color: '#94a3b8' } },
+zaxis: { title: 'Field Value', standoff: 25, gridcolor: '#222', font: { color: '#94a3b8' } },
+aspectmode: 'manual', aspectratio: { x: 1, y: 1, z: 0.8 },
+camera: { eye: { x: 1.6, y: 1.6, z: 1.2 } }
+}
+};
+
+if (currentTool === 1) { // DYNAMICAL NECESSITY
+let e = parseFloat(document.getElementById('e_sl')?.value || 1.0);
+let gx=[], gy=[], gz=[];
+for(let i=-2; i<=2; i+=0.3){
+for(let j=-2; j<=2; j+=0.3){
+gx.push(i); gy.push(j);
+gz.push(Math.sin(i*e)*0.3);
+}
+}
+data.push({
+type: 'scatter3d',
+mode: 'markers',
+x: gx, y: gy, z: gz,
+marker: { size: 3, color: '#38bdf8', opacity: 0.8 },
+name: 'Dynamic Potential'
+});
+layout.title = { text: "FIELD EVOLUTION POTENTIAL", font: { color: '#38bdf8', size: 18 } };
+layout.scene = {
+xaxis: { title: 'Space (x)', color: '#38bdf8', gridcolor: 'rgba(56, 189, 248, 0.4)', zerolinecolor: '#38bdf8', showbackground: true, backgroundcolor: 'rgba(0, 0, 0, 0.2)' },
+yaxis: { title: 'Space (y)', color: '#38bdf8', gridcolor: 'rgba(56, 189, 248, 0.4)', zerolinecolor: '#38bdf8', showbackground: true, backgroundcolor: 'rgba(0, 0, 0, 0.2)' },
+zaxis: { title: 'Potential (Φ)', color: '#f472b6', gridcolor: 'rgba(244, 114, 182, 0.4)', zerolinecolor: '#f472b6', range: [-1, 1] },
+camera: { eye: { x: 1.5, y: 1.5, z: 1.2 } }
+};
+
+} else if (currentTool === 2) { // FIELD EQUATIONS
+let v_sl = parseFloat(document.getElementById('v_sl')?.value || 0.5);
+let x=[], y=[], z=[], u=[], v_vec=[], w=[];
+for(let i=-2; i<=2; i+=0.6){
+for(let j=-2; j<=2; j+=0.6){
+x.push(i); y.push(j); z.push(0);
+u.push(-j * v_sl * 1.5);
+v_vec.push(i * v_sl * 1.5);
+w.push(v_sl * 1.2);
+}
+}
+data.push({ type: 'cone', x: x, y: y, z: z, u: u, v: v_vec, w: w, colorscale: 'Portland', showscale: false, sizemode: 'scaled', sizeref: 2.0, anchor: 'cm' });
+layout.title = { text: "EQUATION FLUX (DIVERGENCE OF CURVATURE)", font: { color: '#f472b6', size: 18 } };
+layout.scene = {
+xaxis: { title: 'Field X', color: '#38bdf8', gridcolor: 'rgba(56, 189, 248, 0.4)', zerolinecolor: '#38bdf8', showbackground: true, backgroundcolor: 'rgba(0, 0, 0, 0.2)' },
+yaxis: { title: 'Field Y', color: '#38bdf8', gridcolor: 'rgba(56, 189, 248, 0.4)', zerolinecolor: '#38bdf8', showbackground: true, backgroundcolor: 'rgba(0, 0, 0, 0.2)' },
+zaxis: { title: 'Flux Density', color: '#f472b6', gridcolor: 'rgba(244, 114, 182, 0.4)', zerolinecolor: '#f472b6', range: [-2, 2] },
+camera: { eye: { x: 1.2, y: 1.2, z: 1.5 } }
+};
+
+} else if (currentTool === 3) { // WAVE PROPAGATION
+let w_val = parseFloat(document.getElementById('w_sl')?.value || 1.0);
+let wx=[], wy=[], wz=[];
+for(let t=0; t<15; t+=0.1){
+wx.push(t*0.2); wy.push(Math.sin(t*w_val)); wz.push(Math.cos(t*w_val));
+}
+data.push({ type: 'scatter3d', mode: 'lines', x: wx, y: wy, z: wz, line: { color: '#fbbf24', width: 8 } });
+layout.title = { text: "PROPAGATING GAUGE WAVE", font: { color: '#fbbf24', size: 18 } };
+layout.scene = {
+xaxis: { title: 'Propagation (z)', color: '#38bdf8', gridcolor: 'rgba(56, 189, 248, 0.4)', zerolinecolor: '#38bdf8', showbackground: true, backgroundcolor: 'rgba(0, 0, 0, 0.2)' },
+yaxis: { title: 'Field Y', color: '#38bdf8', gridcolor: 'rgba(56, 189, 248, 0.4)', zerolinecolor: '#38bdf8', showbackground: true, backgroundcolor: 'rgba(0, 0, 0, 0.2)' },
+zaxis: { title: 'Field X', color: '#f472b6', gridcolor: 'rgba(244, 114, 182, 0.4)', zerolinecolor: '#f472b6', range: [-1.5, 1.5] },
+camera: { eye: { x: 1.8, y: 1.2, z: 1.2 } }
+};
+
+} else if (currentTool === 4) { // SELF-INTERACTION
+let s = parseFloat(document.getElementById('s_sl')?.value || 1.0);
+let sx=[], sy=[], sz=[];
+for(let i=-2; i<=2; i+=0.2){
+for(let j=-2; j<=2; j+=0.2){
+let r = Math.sqrt(i*i + j*j);
+sx.push(i); sy.push(j);
+sz.push(Math.exp(-r*s) * Math.cos(r*5*s));
+}
+}
+data.push({
+type: 'mesh3d',
+x: sx, y: sy, z: sz,
+color: '#fb7185',
+opacity: 0.8,
+flatshading: true // Gives it a more "structured" geometric look
+});
+
+layout.title = { text: "NONLINEAR GAUGE SELF-COUPLING STRUCTURE", font: { color: '#fb7185', size: 18 } };
+
+// SURGICAL CORRECTION: Strengthening Axis and Grid Visibility
+layout.scene = {
+xaxis: {
+title: 'Field X',
+color: '#38bdf8',
+gridcolor: 'rgba(56, 189, 248, 0.4)', // Brightened grid
+zerolinecolor: '#38bdf8',
+showbackground: true,
+backgroundcolor: 'rgba(0, 0, 0, 0.2)'
+},
+yaxis: {
+title: 'Field Y',
+color: '#38bdf8',
+gridcolor: 'rgba(56, 189, 248, 0.4)',
+zerolinecolor: '#38bdf8',
+showbackground: true,
+backgroundcolor: 'rgba(0, 0, 0, 0.2)'
+},
+zaxis: {
+title: 'Coupling (G)',
+color: '#f472b6',
+gridcolor: 'rgba(244, 114, 182, 0.4)',
+zerolinecolor: '#f472b6',
+range: [-1, 1]
+},
+camera: { eye: { x: 1.5, y: 1.5, z: 1.0 } }
+};
+
+} else if (currentTool === 5) { // ENERGY-MOMENTUM
+let en = parseFloat(document.getElementById('en_sl')?.value || 1);
+let ex=[], ey=[], ez=[];
+for(let i=-2; i<=2; i+=0.25){
+for(let j=-2; j<=2; j+=0.25){
+ex.push(i); ey.push(j); ez.push((i*i + j*j)*en*0.2);
+}
+}
+data.push({ type: 'surface', x: Array.from(new Set(ex)), y: Array.from(new Set(ey)), z: Array.from({length: 17}, (_, i) => ez.slice(i*17, (i+1)*17)), colorscale: 'Viridis', showscale: false, opacity: 0.9 });
+layout.title = { text: "ENERGY–MOMENTUM DENSITY (T₀₀)", font: { color: '#4ade80', size: 18 } };
+layout.scene = {
+xaxis: { title: 'Coordinate X', color: '#38bdf8', gridcolor: 'rgba(56, 189, 248, 0.4)', zerolinecolor: '#38bdf8', showbackground: true, backgroundcolor: 'rgba(0, 0, 0, 0.2)' },
+yaxis: { title: 'Coordinate Y', color: '#38bdf8', gridcolor: 'rgba(56, 189, 248, 0.4)', zerolinecolor: '#38bdf8', showbackground: true, backgroundcolor: 'rgba(0, 0, 0, 0.2)' },
+zaxis: { title: 'Energy Density', color: '#f472b6', gridcolor: 'rgba(244, 114, 182, 0.4)', zerolinecolor: '#f472b6', range: [0, 2] },
+camera: { eye: { x: 1.6, y: 1.6, z: 1.2 } }
+};
+}
+
+Plotly.react('plot-area', data, layout, {responsive: true, displayModeBar: false});
+}
+
+function resetLab() {
+if(currentTool===1) syncVal(1.0, 'e_sl');
+if(currentTool===2) syncVal(0.5, 'v_sl');
+if(currentTool===3) syncVal(1.0, 'w_sl');
+if(currentTool===4) syncVal(1.0, 's_sl');
+if(currentTool===5) syncVal(1, 'en_sl');
+}
+
+window.onload = () => { showScreen('portal'); };
+</script>
+</body>
+</html>

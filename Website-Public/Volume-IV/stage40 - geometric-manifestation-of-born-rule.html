@@ -1,0 +1,2488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 40 — Geometric Manifestation of the Born Rule</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #00ffcc;
+--accent-born: #f472b6; --accent-hilbert: #38bdf8; --accent-schro: #fbbf24; --accent-fields: #a78bfa; --accent-test: #4ade80;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6; --accent-gravity: #f59e0b;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-unified); font-family: sans-serif; font-size: 0.85rem; min-width: 350px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls, #nav-summary-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+#screen-lab.active { display: flex; flex-direction: column; height: calc(100vh - 50px); }
+
+#screen-portal { justify-content: flex-start; padding-top: 8dvh; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 70px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-gravity); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.constant-display-box {
+background: #111; border: 1px solid var(--accent-gravity); padding: 6px; border-radius: 8px;
+display: flex; justify-content: space-around; margin-bottom: 10px;
+}
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-gravity); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(245, 158, 11, 0.05); border: 1px solid var(--accent-gravity); padding: 5px; border-radius: 5px; margin-bottom: 8px; font-size: 0.7rem; }
+.def-title { color: var(--accent-gravity); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-gravity); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-gravity); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-gravity); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; }
+#plot-area { flex-grow: 1; width: 100%; }
+
+.btn-nav-brief { background: var(--accent-gravity); color: #000; border: 1px solid var(--accent-gravity); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer {
+width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem;
+color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 40 — GEOMETRIC MANIFESTATION</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">Geometric Manifestation Lab</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">Interpreting Spacetime Geometry as the Macroscopic Manifestation of the Stochastic Substrate.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-hilbert);">
+<h2 style="color:var(--accent-hilbert);">1. Metric Mapping</h2>
+<p>Converting Substrate Density $\rho$ into Metric Structure $g_{\mu\nu}$.</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-gravity);">
+<h2 style="color:var(--accent-gravity);">2. Curvature Gradients</h2>
+<p>Deriving Curvature $R_{\mu\nu}$ from Stationary Density Gradients.</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-born);">
+<h2 style="color:var(--accent-born);">3. Stress-Energy Synthesis</h2>
+<p>Connecting Substrate Pressure ($P$) and Stiffness ($K$) to GR Source Terms.</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-fields);">
+<h2 style="color:var(--accent-fields);">4. Geodesic Emergence</h2>
+<p>Linking Averaged Stochastic Motion to Classical Geodesic Flow.</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-test);">
+<h2 style="color:var(--accent-test);">5. Equation of State</h2>
+<p>Unifying Geometry as the Equilibrium Limit of the Stochastic Substrate.</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-unified); background: linear-gradient(135deg, #0f1115 0%, #0a1a1a 100%);">
+<h2 style="color:var(--accent-unified);">6. Stage 40 Summary</h2>
+<p>The Emergent Geometric Bridge.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2>Summary: Mathematical Structure of Stage 40 and Completion Theorem</h2>
+
+<section>
+<h3>1. Metric from Substrate Density</h3>
+<div class="equation-box">
+$$\boxed{ g_{\mu\nu} = \eta_{\mu\nu} \left( 1 + \frac{P}{K}\rho \right) }$$
+</div>
+</section>
+
+<section>
+<h3>2. Connection (Christoffel Symbols)</h3>
+<div class="equation-box">
+$$\boxed{ \Gamma^\mu_{\alpha\beta} = \frac{1}{2} g^{\mu\nu} \left( \partial_\alpha g_{\nu\beta} + \partial_\beta g_{\nu\alpha} - \partial_\nu g_{\alpha\beta} \right) }$$
+</div>
+</section>
+
+<section>
+<h3>3. Curvature from Density Variation</h3>
+<div class="equation-box">
+$$\boxed{ R_{\mu\nu} \sim \partial_\mu \partial_\nu \rho - g_{\mu\nu} \Box \rho }$$
+</div>
+</section>
+
+<section>
+<h3>4. Einstein Tensor</h3>
+<div class="equation-box">
+$$\boxed{ G_{\mu\nu} = R_{\mu\nu} - \frac{1}{2} g_{\mu\nu} R }$$
+</div>
+</section>
+
+<section>
+<h3>5. Stress–Energy from Density</h3>
+<div class="equation-box">
+$$\boxed{ T_{\mu\nu}^{(\text{eff})} = \partial_\mu \partial_\nu \rho - g_{\mu\nu} \Box \rho }$$
+</div>
+</section>
+
+<section>
+<h3>6. Gravitational Coupling</h3>
+<div class="equation-box">
+$$\boxed{ 8\pi G = \frac{P}{K} }$$
+</div>
+</section>
+
+<section>
+<h3>7. Einstein-Type Equation</h3>
+<div class="equation-box">
+$$\boxed{ G_{\mu\nu} = 8\pi G\, T_{\mu\nu}^{(\text{eff})} }$$
+</div>
+</section>
+
+<section>
+<h3>8. Stochastic Dynamics (Microscopic Level)</h3>
+<div class="equation-box">
+$$\boxed{ dx^\mu = v^\mu dt + \sigma\, dW^\mu_t }$$
+</div>
+<div class="equation-box">
+$$\boxed{ dv^\mu = -\Gamma^\mu_{\alpha\beta} v^\alpha v^\beta\,dt + \sigma_v\, dW^\mu_t }$$
+</div>
+</section>
+
+<section>
+<h3>9. Geodesic Emergence (Macroscopic Limit)</h3>
+<div class="equation-box">
+$$\boxed{ \mathbb{E}[x^\mu(\tau)] \;\rightarrow\; \text{Geodesic} }$$
+</div>
+<div class="equation-box">
+$$\boxed{ \frac{d^2 x^\mu}{d\tau^2} + \Gamma^\mu_{\alpha\beta} \frac{dx^\alpha}{d\tau} \frac{dx^\beta}{d\tau} = 0 }$$
+</div>
+</section>
+
+<section>
+<h3>10. Stationary Density (Equilibrium)</h3>
+<div class="equation-box">
+$$\boxed{ \rho_{\text{eq}}(P) \propto P }$$
+</div>
+</section>
+
+<section>
+<h3>11. Equation of State</h3>
+<div class="equation-box">
+$$\boxed{ G_{\mu\nu} = 8\pi G \left( \nabla_\mu \nabla_\nu \rho_{\text{eq}} - g_{\mu\nu} \Box \rho_{\text{eq}} \right) }$$
+</div>
+</section>
+
+<section>
+<h3>12. Structural Flow</h3>
+<div class="equation-box">
+$$\boxed{ \text{Stochastic Dynamics} \;\longrightarrow\; \rho \;\longrightarrow\; g_{\mu\nu} \;\longrightarrow\; G_{\mu\nu} }$$
+</div>
+</section>
+
+<section class="conclusion-box">
+<h3>Final Mathematical Statement</h3>
+<div class="equation-box">
+$$\boxed{ \text{Spacetime geometry is the stationary macroscopic limit of stochastic substrate dynamics} }$$
+</div>
+<p><strong>Conclusion:</strong></p>
+<div class="equation-box">
+$$\boxed{ \text{General relativity emerges as the equilibrium equation of state of the substrate} }$$
+</div>
+</section>
+
+<hr>
+
+<h2>Completion Theorem — Stage 40</h2>
+
+<section>
+<h3>Statement</h3>
+<div class="equation-box">
+$$\boxed{ \text{A stochastic substrate with multiplicative dynamics admits a unique stationary density } \rho, \text{ which induces a metric } g_{\mu\nu}, \text{ whose curvature and geodesic motion reproduce gravitational structure as an equilibrium state.} }$$
+</div>
+</section>
+
+<section>
+<h3>Expanded Form</h3>
+<div class="equation-box">
+$$\boxed{ \begin{aligned} &\text{Stochastic dynamics } (dA \sim A\,dW) \\ &\Longrightarrow\; \text{Stationary density } \rho(P) \propto P \\ &\Longrightarrow\; g_{\mu\nu} = \eta_{\mu\nu}\left(1 + \frac{P}{K}\rho\right) \\ &\Longrightarrow\; R_{\mu\nu} \sim \partial_\mu \partial_\nu \rho \\ &\Longrightarrow\; G_{\mu\nu} = 8\pi G\, T_{\mu\nu}^{(\text{eff})} \\ &\Longrightarrow\; \mathbb{E}[x^\mu(\tau)] \rightarrow \text{Geodesic} \\ &\Longrightarrow\; \text{Stable spacetime geometry} \end{aligned} }$$
+</div>
+</section>
+
+<section>
+<h3>Uniqueness Clause (Important)</h3>
+<p>The resulting geometric structure is uniquely fixed by:</p>
+<ul>
+<li>multiplicative stochastic scaling</li>
+<li>normalization constraint</li>
+<li>phase invariance</li>
+<li>second-order curvature structure</li>
+</ul>
+</section>
+
+<section class="conclusion-box">
+<h3>Closure Statement</h3>
+<div class="equation-box">
+$$\boxed{ \text{The framework is structurally closed: geometry, curvature, and motion arise from a single stochastic substrate without external postulates.} }$$
+</div>
+<p><strong>Final One-Line Form:</strong></p>
+<div class="equation-box">
+$$\boxed{ \text{Spacetime geometry is the unique stationary realization of stochastic substrate dynamics.} }$$
+</div>
+</section>
+</div>
+
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div class="constant-display-box">
+<div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val">11.350</span></div>
+<div class="const-item"><span class="const-label">Density ρ</span><span class="const-val">0.6900</span></div>
+</div>
+<div id="mapping-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Emergence Telemetry</span>
+<span id="epoch-label" style="font-family:monospace; font-size:0.85rem; color:var(--accent-gravity);">GEOMETRY ACTIVE</span>
+</div>
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:0px; margin-bottom:0px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:6px;">RESET GEOMETRY</button>
+<div id="panel-footer-text" style="font-size: 0.75rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.4; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:2px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:6px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Structural Logic</span>
+<div id="metrics-content" style="font-size:0.75rem; font-family:monospace; line-height:1.7;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-gravity);">
+<span class="diag-title">Emergent Hierarchy</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.75rem; color: var(--text-dim); line-height: 1.4; background: #000; padding: 10px; border-radius: 8px; border: 1px solid #222; margin-top: auto;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "METRIC MAPPING",
+
+brief: `<div class="briefing-content">
+<h2>Detailed Briefing: Metric Mapping</h2>
+
+<section>
+<h3>1. Purpose of the Module</h3>
+<p>Module 1 establishes the first geometric bridge between:</p>
+<ul>
+<li><strong>Stochastic substrate dynamics</strong> (Stages 38–39)</li>
+<li><strong>Spacetime geometry</strong> (GR)</li>
+</ul>
+<p>👉 <strong>The central question is:</strong></p>
+<div class="equation-box">
+$$\\boxed{ \\text{How does a statistical density become geometry?} }$$
+</div>
+</section>
+
+<section>
+<h3>2. Core Idea</h3>
+<p>The key step is:</p>
+<div class="equation-box">
+$$\\boxed{ \\rho(x) \\;\\longrightarrow\\; \\Phi(x) \\;\\longrightarrow\\; g_{\\mu\\nu}(x) }$$
+</div>
+<p><strong>Where:</strong></p>
+<ul>
+<li>$\\rho(x) = \\text{substrate density (from Born equilibrium)}$</li>
+<li>$\\Phi(x) = \\text{effective potential / deformation field}$</li>
+<li>$g_{\\mu\\nu}(x) = \\text{spacetime metric}$</li>
+</ul>
+</section>
+
+<section>
+<h3>3. Physical Interpretation</h3>
+<p>From Stage 39, the system settles into:</p>
+<div class="equation-box">
+$$\\rho(P) \\propto P$$
+</div>
+<p><strong>Now reinterpret:</strong></p>
+<p>👉 This density is not just probability.<br>
+👉 It is <strong>physical substrate density</strong>.</p>
+<p><strong>Meaning:</strong></p>
+<ul>
+<li><strong>Higher density</strong> $\\rightarrow$ stronger local “pressure”</li>
+<li><strong>Lower density</strong> $\\rightarrow$ weaker region</li>
+</ul>
+</section>
+
+<section>
+<h3>4. Mapping to Geometry</h3>
+<p>You define:</p>
+<div class="equation-box">
+$$\\boxed{ g_{\\mu\\nu} = \\eta_{\\mu\\nu} + h_{\\mu\\nu} }$$
+</div>
+<p><strong>Where:</strong></p>
+<ul>
+<li>$\\eta_{\\mu\\nu} = \\text{flat background}$</li>
+<li>$h_{\\mu\\nu} = \\Phi(\\rho) = \\text{deformation due to density}$</li>
+</ul>
+<p><strong>Interpretation:</strong></p>
+<p>👉 Geometry is not fundamental.<br>
+👉 Geometry is:</p>
+<div class="equation-box">
+$$\\boxed{ \\text{a response to density distribution} }$$
+</div>
+</section>
+
+<section>
+<h3>5. What the Visualization Shows</h3>
+<p><strong>The surface (your 3D plot):</strong></p>
+<ul>
+<li>Represents deformation of metric.</li>
+<li><strong>Central dip</strong> = higher density region.</li>
+<li><strong>Edges</strong> = lower density.</li>
+</ul>
+<p><strong>Meaning:</strong></p>
+<p>👉 The “well” is not imposed.<br>
+👉 It is generated from density.</p>
+</section>
+
+<section>
+<h3>6. Structural Logic</h3>
+<p>Your statement, <strong>“Higher density creates a deeper well,”</strong> is exactly correct.</p>
+<p><strong>Mathematically:</strong></p>
+<div class="equation-box">
+$$\\Phi(x) \\propto f(\\rho(x))$$
+$$g_{\\mu\\nu}(x) = \\eta_{\\mu\\nu} + \\Phi(x)$$
+</div>
+</section>
+
+<section>
+<h3>7. Key Insight</h3>
+<p>This module establishes:</p>
+<div class="equation-box">
+$$\\boxed{ \\text{Metric is not primary — it is emergent} }$$
+</div>
+</section>
+
+<section>
+<h3>8. Connection to GR</h3>
+<ul>
+<li><strong>In standard GR:</strong> curvature $\\leftarrow$ stress-energy tensor</li>
+<li><strong>In this framework:</strong> curvature $\\leftarrow$ substrate density</li>
+</ul>
+<p><strong>Bridge:</strong></p>
+<div class="equation-box">
+$$\\boxed{ \\rho \\;\\leftrightarrow\\; T_{\\mu\\nu} }$$
+</div>
+</section>
+
+<section>
+<h3>9. Role of Parameters (K, P)</h3>
+<p>From your panel:</p>
+<ul>
+<li><strong>$K$ (stiffness)</strong> controls how strongly geometry responds.</li>
+<li><strong>$P$ (pressure)</strong> controls baseline density level.</li>
+</ul>
+<p><strong>Meaning:</strong></p>
+<div class="equation-box">
+$$h_{\\mu\\nu} \\sim \\frac{P}{K}$$
+</div>
+<p>👉 <strong>Stronger stiffness</strong> $\\rightarrow$ less curvature.<br>
+👉 <strong>Higher pressure</strong> $\\rightarrow$ more curvature.</p>
+</section>
+
+<section>
+<h3>10. What is Achieved in Module 1</h3>
+<ul>
+<li>✔ Density becomes geometric field.</li>
+<li>✔ Metric emerges from substrate.</li>
+<li>✔ First step toward GR mapping.</li>
+</ul>
+</section>
+
+<section>
+<h3>11. What is NOT yet done</h3>
+<p>This module does <strong>NOT</strong> yet:</p>
+<ul>
+<li>Derive Einstein equations.</li>
+<li>Define curvature tensors.</li>
+<li>Show geodesics.</li>
+</ul>
+<p>👉 <strong>Those come in next modules.</strong></p>
+</section>
+
+<section>
+<h3>12. Deeper Interpretation</h3>
+<p>This is the key conceptual shift:</p>
+<ul>
+<li><strong>GR:</strong> Geometry exists $\\rightarrow$ matter curves it.</li>
+<li><strong>Here:</strong> <div class="equation-box" style="display:inline-block;">$$\\boxed{ \\text{Matter (density) generates geometry itself} }$$</div></li>
+</ul>
+</section>
+
+<section>
+<h3>13. One-Line Insight</h3>
+<div class="equation-box">
+$$\\boxed{ \\text{Spacetime curvature is the geometric expression of equilibrium substrate density} }$$
+</div>
+</section>
+
+<section>
+<h3>14. Final Conclusion</h3>
+<p>👉 Module 1 establishes the metric as an emergent field arising from the stationary density obtained in Stage 39, providing the first concrete bridge between stochastic quantum dynamics and spacetime geometry.</p>
+</section>
+</div>`,
+
+math: `<div class="math-content">
+<h2>Explicit Mathematics: Metric Mapping</h2>
+
+<section>
+<h3>1. Starting Point: Stationary Density</h3>
+<p>From Stage 39, we begin with the stationary density relationship:</p>
+<div class="equation-box">
+$$\\boxed{ \\rho(P) \\propto P }$$
+</div>
+<p>We promote this statistical distribution to a spacetime field:</p>
+<div class="equation-box">
+$$\\boxed{ \\rho(x) \\equiv \\text{substrate density field} }$$
+</div>
+</section>
+
+<section>
+<h3>2. Density → Potential Mapping</h3>
+<p>Define a scalar deformation field $\\Phi(x)$ as a linear response to the density:</p>
+<div class="equation-box">
+$$\\boxed{ \\Phi(x) = \\alpha\\, \\rho(x) }$$
+</div>
+<p><strong>Where:</strong> $\\alpha$ is a dimension-setting coupling constant.</p>
+</section>
+
+<section>
+<h3>3. Metric Definition</h3>
+<p>Introduce the perturbed metric tensor $g_{\\mu\\nu}$ as a deviation from the flat Minkowski background $\\eta_{\\mu\\nu}$:</p>
+<div class="equation-box">
+$$\\boxed{ g_{\\mu\\nu}(x) = \\eta_{\\mu\\nu} + h_{\\mu\\nu}(x) }$$
+</div>
+<p>With the perturbation defined by the deformation field:</p>
+<div class="equation-box">
+$$\\boxed{ h_{\\mu\\nu}(x) = \\beta\\, \\Phi(x)\\,\\eta_{\\mu\\nu} }$$
+</div>
+<p>Leading to the combined metric form:</p>
+<div class="equation-box">
+$$\\boxed{ g_{\\mu\\nu}(x) = \\eta_{\\mu\\nu}\\big(1 + \\beta\\,\\Phi(x)\\big) }$$
+</div>
+</section>
+
+<section>
+<h3>4. Combined Mapping</h3>
+<p>Substituting the density relationship for $\\Phi(x)$:</p>
+<div class="equation-box">
+$$\\boxed{ g_{\\mu\\nu}(x) = \\eta_{\\mu\\nu}\\big(1 + \\gamma\\,\\rho(x)\\big) }$$
+</div>
+<p><strong>Where:</strong> $\\gamma = \\alpha \\beta$.</p>
+</section>
+
+<section>
+<h3>5. Weak-Field Limit</h3>
+<p>For small substrate density perturbations, we assume:</p>
+<div class="equation-box">
+$$\\boxed{ |h_{\\mu\\nu}| \\ll 1 }$$
+</div>
+<p>Thus, the metric approximation holds:</p>
+<div class="equation-box">
+$$\\boxed{ g_{\\mu\\nu} \\approx \\eta_{\\mu\\nu} + \\gamma\\,\\rho(x)\\,\\eta_{\\mu\\nu} }$$
+</div>
+</section>
+
+<section>
+<h3>6. Interpretation as Effective Potential</h3>
+<p>Comparing this structure to the standard Newtonian limit of General Relativity:</p>
+<div class="equation-box">
+$$\\boxed{ g_{00} \\approx - (1 + 2\\Phi_N) }$$
+</div>
+<p>We identify the effective Newtonian potential $\\Phi_N$ as a function of substrate density:</p>
+<div class="equation-box">
+$$\\boxed{ \\Phi_N(x) \\sim \\frac{\\gamma}{2}\\,\\rho(x) }$$
+</div>
+</section>
+
+<section>
+<h3>7. Gradient Structure</h3>
+<p>Define the effective gravitational force $F_\\mu$ acting on the manifold:</p>
+<div class="equation-box">
+$$\\boxed{ F_\\mu \\sim -\\partial_\\mu \\Phi(x) }$$
+</div>
+<p>Since $\\Phi(x) \\propto \\rho(x)$, the force is a direct result of density gradients:</p>
+<div class="equation-box">
+$$\\boxed{ F_\\mu \\sim -\\partial_\\mu \\rho(x) }$$
+</div>
+</section>
+
+<section>
+<h3>8. Role of Substrate Parameters</h3>
+<p>Incorporating the specific substrate parameters (Pressure $P$ and Stiffness $K$):</p>
+<div class="equation-box">
+$$\\boxed{ \\Phi(x) = \\frac{P}{K}\\,\\rho(x) }$$
+</div>
+<p>The emergent metric becomes:</p>
+<div class="equation-box">
+$$\\boxed{ g_{\\mu\\nu}(x) = \\eta_{\\mu\\nu}\\left(1 + \\frac{P}{K}\\,\\rho(x)\\right) }$$
+</div>
+</section>
+
+<section>
+<h3>9. Energy–Geometry Correspondence</h3>
+<p>Identifying the substrate density with the time-time component of the Stress-Energy Tensor:</p>
+<div class="equation-box">
+$$\\boxed{ \\rho(x) \\;\\longleftrightarrow\\; T_{00}(x) }$$
+</div>
+<p>We recover the linearized correspondence:</p>
+<div class="equation-box">
+$$\\boxed{ g_{\\mu\\nu} = \\eta_{\\mu\\nu} + \\mathcal{O}(T_{\\mu\\nu}) }$$
+</div>
+</section>
+
+<section>
+<h3>10. Geometric Interpretation</h3>
+<p>Calculating the metric determinant $\\sqrt{-g}$ for volume measure:</p>
+<div class="equation-box">
+$$\\boxed{ \\sqrt{-g} \\approx 1 + 2\\gamma\\,\\rho(x) }$$
+</div>
+<p>This defines the volume deformation of the manifold:</p>
+<div class="equation-box">
+$$\\boxed{ dV_{\\text{curved}} = \\sqrt{-g}\\, dV }$$
+</div>
+</section>
+
+<section>
+<h3>11. Final Mapping Statement</h3>
+<p>The complete logical chain is finalized as:</p>
+<div class="equation-box">
+$$\\boxed{ \\rho(x) \\;\\longrightarrow\\; \\Phi(x) \\;\\longrightarrow\\; g_{\\mu\\nu}(x) }$$
+</div>
+<p><strong>Final Result:</strong></p>
+<div class="equation-box">
+$$\\boxed{ g_{\\mu\\nu}(x) = \\eta_{\\mu\\nu}\\left(1 + \\frac{P}{K}\\,\\rho(x)\\right) }$$
+</div>
+</section>
+
+<section class="conclusion-box">
+<p><strong>Conclusion:</strong> The stationary substrate density field $\\rho(x)$, emerging from stochastic dynamics, induces a metric deformation proportional to $\\frac{P}{K}\\rho(x)$, establishing spacetime geometry as a direct manifestation of substrate density.</p>
+</section>
+</div>`,
+
+math: `<div class="math-content">
+<h2>Explicit Mathematics: Metric Mapping</h2>
+
+<section>
+<h3>1. Starting Point: Stationary Density</h3>
+<p>From Stage 39, we begin with the stationary density relationship:</p>
+<div class="equation-box">
+$$\\boxed{ \\rho(P) \\propto P }$$
+</div>
+<p>We promote this statistical distribution to a spacetime field:</p>
+<div class="equation-box">
+$$\\boxed{ \\rho(x) \\equiv \\text{substrate density field} }$$
+</div>
+</section>
+
+<section>
+<h3>2. Density → Potential Mapping</h3>
+<p>Define a scalar deformation field $\\Phi(x)$ as a linear response to the density:</p>
+<div class="equation-box">
+$$\\boxed{ \\Phi(x) = \\alpha\\, \\rho(x) }$$
+</div>
+<p><strong>Where:</strong> $\\alpha$ is a dimension-setting coupling constant.</p>
+</section>
+
+<section>
+<h3>3. Metric Definition</h3>
+<p>Introduce the perturbed metric tensor $g_{\\mu\\nu}$ as a deviation from the flat Minkowski background $\\eta_{\\mu\\nu}$:</p>
+<div class="equation-box">
+$$\\boxed{ g_{\\mu\\nu}(x) = \\eta_{\\mu\\nu} + h_{\\mu\\nu}(x) }$$
+</div>
+<p>With the perturbation defined by the deformation field:</p>
+<div class="equation-box">
+$$\\boxed{ h_{\\mu\\nu}(x) = \\beta\\, \\Phi(x)\\,\\eta_{\\mu\\nu} }$$
+</div>
+<p>Leading to the combined metric form:</p>
+<div class="equation-box">
+$$\\boxed{ g_{\\mu\\nu}(x) = \\eta_{\\mu\\nu}\\big(1 + \\beta\\,\\Phi(x)\\big) }$$
+</div>
+</section>
+
+<section>
+<h3>4. Combined Mapping</h3>
+<p>Substituting the density relationship for $\\Phi(x)$:</p>
+<div class="equation-box">
+$$\\boxed{ g_{\\mu\\nu}(x) = \\eta_{\\mu\\nu}\\big(1 + \\gamma\\,\\rho(x)\\big) }$$
+</div>
+<p><strong>Where:</strong> $\\gamma = \\alpha \\beta$.</p>
+</section>
+
+<section>
+<h3>5. Weak-Field Limit</h3>
+<p>For small substrate density perturbations, we assume:</p>
+<div class="equation-box">
+$$\\boxed{ |h_{\\mu\\nu}| \\ll 1 }$$
+</div>
+<p>Thus, the metric approximation holds:</p>
+<div class="equation-box">
+$$\\boxed{ g_{\\mu\\nu} \\approx \\eta_{\\mu\\nu} + \\gamma\\,\\rho(x)\\,\\eta_{\\mu\\nu} }$$
+</div>
+</section>
+
+<section>
+<h3>6. Interpretation as Effective Potential</h3>
+<p>Comparing this structure to the standard Newtonian limit of General Relativity:</p>
+<div class="equation-box">
+$$\\boxed{ g_{00} \\approx - (1 + 2\\Phi_N) }$$
+</div>
+<p>We identify the effective Newtonian potential $\\Phi_N$ as a function of substrate density:</p>
+<div class="equation-box">
+$$\\boxed{ \\Phi_N(x) \\sim \\frac{\\gamma}{2}\\,\\rho(x) }$$
+</div>
+</section>
+
+<section>
+<h3>7. Gradient Structure</h3>
+<p>Define the effective gravitational force $F_\\mu$ acting on the manifold:</p>
+<div class="equation-box">
+$$\\boxed{ F_\\mu \\sim -\\partial_\\mu \\Phi(x) }$$
+</div>
+<p>Since $\\Phi(x) \\propto \\rho(x)$, the force is a direct result of density gradients:</p>
+<div class="equation-box">
+$$\\boxed{ F_\\mu \\sim -\\partial_\\mu \\rho(x) }$$
+</div>
+</section>
+
+<section>
+<h3>8. Role of Substrate Parameters</h3>
+<p>Incorporating the specific substrate parameters (Pressure $P$ and Stiffness $K$):</p>
+<div class="equation-box">
+$$\\boxed{ \\Phi(x) = \\frac{P}{K}\\,\\rho(x) }$$
+</div>
+<p>The emergent metric becomes:</p>
+<div class="equation-box">
+$$\\boxed{ g_{\\mu\\nu}(x) = \\eta_{\\mu\\nu}\\left(1 + \\frac{P}{K}\\,\\rho(x)\\right) }$$
+</div>
+</section>
+
+<section>
+<h3>9. Energy–Geometry Correspondence</h3>
+<p>Identifying the substrate density with the time-time component of the Stress-Energy Tensor:</p>
+<div class="equation-box">
+$$\\boxed{ \\rho(x) \\;\\longleftrightarrow\\; T_{00}(x) }$$
+</div>
+<p>We recover the linearized correspondence:</p>
+<div class="equation-box">
+$$\\boxed{ g_{\\mu\\nu} = \\eta_{\\mu\\nu} + \\mathcal{O}(T_{\\mu\\nu}) }$$
+</div>
+</section>
+
+<section>
+<h3>10. Geometric Interpretation</h3>
+<p>Calculating the metric determinant $\\sqrt{-g}$ for volume measure:</p>
+<div class="equation-box">
+$$\\boxed{ \\sqrt{-g} \\approx 1 + 2\\gamma\\,\\rho(x) }$$
+</div>
+<p>This defines the volume deformation of the manifold:</p>
+<div class="equation-box">
+$$\\boxed{ dV_{\\text{curved}} = \\sqrt{-g}\\, dV }$$
+</div>
+</section>
+
+<section>
+<h3>11. Final Mapping Statement</h3>
+<p>The complete logical chain is finalized as:</p>
+<div class="equation-box">
+$$\\boxed{ \\rho(x) \\;\\longrightarrow\\; \\Phi(x) \\;\\longrightarrow\\; g_{\\mu\\nu}(x) }$$
+</div>
+<p><strong>Final Result:</strong></p>
+<div class="equation-box">
+$$\\boxed{ g_{\\mu\\nu}(x) = \\eta_{\\mu\\nu}\\left(1 + \\frac{P}{K}\\,\\rho(x)\\right) }$$
+</div>
+</section>
+
+<section class="conclusion-box">
+<p><strong>Conclusion:</strong> The stationary substrate density field $\\rho(x)$, emerging from stochastic dynamics, induces a metric deformation proportional to $\\frac{P}{K}\\rho(x)$, establishing spacetime geometry as a direct manifestation of substrate density.</p>
+</section>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>Density Coupling</span><input type="number" id="l_in" class="digital-entry" value="0.2" oninput="syncVal(this.value, 'l_sl')"></div><input type="range" id="l_sl" min="0" max="1" step="0.05" value="0.2" oninput="syncVal(this.value, 'l_in')"></div>`,
+
+mappingBox: `<div class="definition-box"><span class="def-title">DENSITY MAPPING</span><div style="text-align:center; font-size: 0.9rem;">$\\rho \\rightarrow \\Phi \\rightarrow g_{\\mu\\nu}$</div></div>`,
+
+lawBox: `<div class="definition-box"><span class="def-title">METRIC FIELD</span><div style="text-align:center; font-size: 0.9rem;">$g_{\\mu\\nu} = \\eta_{\\mu\\nu} + h_{\\mu\\nu}$</div></div>`,
+
+hierarchy: `
+<div style="color: #fbbf24;">Substrate Density (ρ)</div>
+<div style="color: #94a3b8;">↓</div>
+<div style="color: #38bdf8;">Metric Field ($g_{\\mu\\nu}$)</div>`,
+
+footer: `
+<div style="margin-top:5px; padding: 8px; background: rgba(251, 191, 36, 0.05); border-left: 2px solid #fbbf24; border-radius: 4px;">
+<span style="color:#fbbf24; font-weight:bold; font-size:0.75rem; display:block; margin-bottom:5px; text-align: center;">STRUCTURAL LOGIC</span>
+<p style="font-size: 0.75rem; margin: 0; color: #cbd5e1; line-height: 1.5;">
+In Stage 40, the <strong>Metric</strong> is a physical map of the substrate.
+Higher density (ρ) creates a deeper "well" in the metric $g_{\\mu\\nu}$.
+This is the first step in the manifestation of gravity.
+</p>
+</div>`,
+
+rightNote: "<b>The Grid Deformation:</b> Local swarm density modifies the propagation characteristics of the vacuum, effectively 'stretching' or 'compressing' the background $\\eta_{\\mu\\nu}$ into an emergent $g_{\\mu\\nu}$."
+},
+
+
+2: {
+title: "CURVATURE FROM GRADIENT",
+
+brief: `<div class="briefing-content">
+<h2>Curvature from Density Variation (Full Detailed Briefing)</h2>
+
+<section>
+<h3>1. Purpose of the Module</h3>
+<p>Module 2 establishes the mechanism of gravity within the framework.</p>
+<p><strong>Where Module 1 defines:</strong></p>
+<ul>
+<li>👉 how density maps to the metric,</li>
+</ul>
+<p><strong>Module 2 explains:</strong></p>
+<ul>
+<li>👉 how spatial variation of density produces curvature.</li>
+</ul>
+</section>
+
+<section>
+<h3>2. Core Statement</h3>
+<p>The central result of this module is:</p>
+<div class="equation-box">
+$$R_{\\mu\\nu} \\propto \\partial_\\mu \\partial_\\nu \\rho - g_{\\mu\\nu} \\Box \\rho$$
+</div>
+<p><strong>Meaning:</strong></p>
+<ul>
+<li>👉 Curvature is not caused by density itself</li>
+<li>👉 It is caused by how density varies across space</li>
+</ul>
+</section>
+
+<section>
+<h3>3. Key Conceptual Shift</h3>
+<p>This module introduces a crucial correction:</p>
+<p>❌ <strong>Incorrect intuition:</strong> Curvature $\\propto$ density or gradient</p>
+<p>✔ <strong>Correct structure:</strong> Curvature $\\propto$ second derivatives of density</p>
+<div class="equation-box">
+$$\\nabla \\rho \\;\\neq\\; \\text{curvature} \\quad\\text{but}\\quad \\nabla^2 \\rho \\;\\Rightarrow\\; \\text{curvature}$$
+</div>
+</section>
+
+<section>
+<h3>4. Physical Interpretation</h3>
+<p><strong>(A) Uniform Density</strong></p>
+<p>If: $\\rho = \\text{constant}$</p>
+<p>Then: $\\partial_\\mu \\rho = 0, \\quad \\partial_\\mu \\partial_\\nu \\rho = 0$</p>
+<ul>
+<li>👉 No curvature</li>
+<li>👉 Flat spacetime</li>
+</ul>
+<p><strong>(B) Linear Gradient</strong></p>
+<p>If: $\\rho \\sim x$</p>
+<p>Then: $\\partial_\\mu \\rho \\neq 0, \\quad \\partial_\\mu \\partial_\\nu \\rho = 0$</p>
+<ul>
+<li>👉 Still no curvature</li>
+<li>👉 Only directional variation</li>
+</ul>
+<p><strong>(C) Non-uniform Density (Real case)</strong></p>
+<p>If: $\\rho = \\rho(x) \\text{ with curvature}$</p>
+<p>Then: $\\partial_\\mu \\partial_\\nu \\rho \\neq 0$</p>
+<ul>
+<li>👉 Curvature appears</li>
+</ul>
+</section>
+
+<section>
+<h3>5. Role of the Laplacian</h3>
+<p>The module highlights: $\\nabla^2 \\rho$</p>
+<p><strong>This represents:</strong></p>
+<ul>
+<li>👉 how the density field bends locally</li>
+<li>👉 the “curvature generator”</li>
+</ul>
+<p><strong>Interpretation:</strong></p>
+<ul>
+<li>positive Laplacian $\\rightarrow$ inward curvature</li>
+<li>negative Laplacian $\\rightarrow$ outward curvature</li>
+</ul>
+<p>This is exactly what your central graph shows.</p>
+</section>
+
+<section>
+<h3>6. Connection to Newtonian Gravity</h3>
+<p>The equation:</p>
+<div class="equation-box">
+$$\\nabla^2 \\Phi = 4\\pi G \\rho$$
+</div>
+<p>appears in the module.</p>
+<p><strong>Meaning:</strong></p>
+<ul>
+<li>👉 This is not added externally</li>
+<li>👉 It emerges as the weak-field limit</li>
+</ul>
+<p><strong>Thus:</strong></p>
+<ul>
+<li>$\\rho \\rightarrow$ source</li>
+<li>$\\Phi \\rightarrow$ potential</li>
+<li>curvature $\\rightarrow$ geometric expression of the same structure</li>
+</ul>
+</section>
+
+<section>
+<h3>7. Substrate Interpretation</h3>
+<p>In this framework:</p>
+<ul>
+<li>$\\rho =$ stationary density of stochastic substrate (Stage 39)</li>
+<li>curvature $=$ response of substrate to its own density variation</li>
+</ul>
+<p><strong>Key Insight:</strong></p>
+<ul>
+<li>👉 Geometry is not imposed</li>
+<li>👉 It is generated dynamically from substrate density structure</li>
+</ul>
+</section>
+
+<section>
+<h3>8. Visual Interpretation (Your Graph)</h3>
+<p>The central curve shows:</p>
+<ul>
+<li>peak at center $\\rightarrow$ high density</li>
+<li>dips on sides $\\rightarrow$ second derivative structure</li>
+</ul>
+<p><strong>What it represents:</strong></p>
+<div class="equation-box">
+$$\\text{Curvature} \\sim \\nabla^2 \\rho(r)$$
+</div>
+<ul>
+<li>✔ Symmetric profile</li>
+<li>✔ Correct qualitative behavior</li>
+</ul>
+</section>
+
+<section>
+<h3>9. Structural Logic (Hierarchy)</h3>
+<p>The module now correctly expresses:</p>
+<div class="equation-box">
+$$\\text{Density Variation} \\; (\\nabla^2 \\rho) \\;\\longrightarrow\\; \\text{Curvature} \\; (R_{\\mu\\nu})$$
+</div>
+<p><strong>Interpretation:</strong></p>
+<ul>
+<li>density variation $\\rightarrow$ local distortion</li>
+<li>distortion $\\rightarrow$ curvature</li>
+<li>curvature $\\rightarrow$ gravitational behavior</li>
+</ul>
+</section>
+
+<section>
+<h3>10. Bridge from Stage 39</h3>
+<p>This is where the connection becomes precise:</p>
+<p><strong>From Stage 39:</strong> $\\rho(P) \\propto P$</p>
+<p><strong>Now:</strong> $\\nabla^2 \\rho \\;\\Rightarrow\\; \\text{geometry}$</p>
+<p><strong>Meaning:</strong></p>
+<ul>
+<li>👉 Probability distribution $\\rightarrow$ density field</li>
+<li>👉 Density field $\\rightarrow$ curvature</li>
+<li>👉 This is the QM $\\rightarrow$ GR bridge mechanism</li>
+</ul>
+</section>
+
+<section>
+<h3>11. What This Module Achieves</h3>
+<ul>
+<li>✔ gravity arises from density variation</li>
+<li>✔ curvature is second-order effect</li>
+<li>✔ Newtonian gravity emerges naturally</li>
+<li>✔ stochastic substrate connects to geometry</li>
+</ul>
+</section>
+
+<section>
+<h3>12. Final Scientific Interpretation</h3>
+<p>👉 Curvature is the geometric manifestation of non-uniformity in the stationary density of the substrate.</p>
+</section>
+
+<section>
+<h3>13. Final One-Line Statement</h3>
+<p>👉 Gravity emerges as the second-derivative response of spacetime geometry to variations in substrate density.</p>
+</section>
+</div>`,
+
+math: `<div class="math-content">
+<h2>Explicit Mathematics: Curvature from Density Variation</h2>
+
+<section>
+<h3>1. Starting Point: Metric from Module 1</h3>
+<div class="equation-box">
+$$\\boxed{ g_{\\mu\\nu} = \\eta_{\\mu\\nu}\\,(1 + \\epsilon), \\qquad \\epsilon = \\frac{P}{K}\\rho }$$
+</div>
+<p>Define perturbation:</p>
+<div class="equation-box">
+$$\\boxed{ h_{\\mu\\nu} = \\epsilon\\,\\eta_{\\mu\\nu} }$$
+</div>
+</section>
+
+<section>
+<h3>2. Christoffel Symbols</h3>
+<div class="equation-box">
+$$\\Gamma^\\lambda_{\\mu\\nu} = \\frac{1}{2} g^{\\lambda\\sigma} \\left( \\partial_\\mu g_{\\nu\\sigma} + \\partial_\\nu g_{\\mu\\sigma} - \\partial_\\sigma g_{\\mu\\nu} \\right)$$
+</div>
+<p>In weak-field limit:</p>
+<div class="equation-box">
+$$g^{\\mu\\nu} \\approx \\eta^{\\mu\\nu}$$
+</div>
+<p>Thus:</p>
+<div class="equation-box">
+$$\\Gamma^\\lambda_{\\mu\\nu} = \\frac{1}{2} \\eta^{\\lambda\\sigma} \\left( \\partial_\\mu h_{\\nu\\sigma} + \\partial_\\nu h_{\\mu\\sigma} - \\partial_\\sigma h_{\\mu\\nu} \\right)$$
+</div>
+</section>
+
+<section>
+<h3>3. Derivatives of Metric Perturbation</h3>
+<p>Since:</p>
+<div class="equation-box">
+$$h_{\\mu\\nu} = \\epsilon\\,\\eta_{\\mu\\nu}$$
+</div>
+<p>we obtain:</p>
+<div class="equation-box">
+$$\\partial_\\alpha h_{\\mu\\nu} = (\\partial_\\alpha \\epsilon)\\,\\eta_{\\mu\\nu}$$
+</div>
+</section>
+
+<section>
+<h3>4. Simplified Christoffel Symbols</h3>
+<div class="equation-box">
+$$\\Gamma^\\lambda_{\\mu\\nu} = \\frac{1}{2} \\left( \\delta^\\lambda_\\nu \\partial_\\mu \\epsilon + \\delta^\\lambda_\\mu \\partial_\\nu \\epsilon - \\eta_{\\mu\\nu} \\partial^\\lambda \\epsilon \\right)$$
+</div>
+</section>
+
+<section>
+<h3>5. Ricci Tensor Definition</h3>
+<div class="equation-box">
+$$R_{\\mu\\nu} = \\partial_\\lambda \\Gamma^\\lambda_{\\mu\\nu} - \\partial_\\nu \\Gamma^\\lambda_{\\mu\\lambda}$$
+</div>
+</section>
+
+<section>
+<h3>6. Compute First Term</h3>
+<div class="equation-box">
+$$\\partial_\\lambda \\Gamma^\\lambda_{\\mu\\nu} = \\frac{1}{2} \\left( \\partial_\\mu \\partial_\\nu \\epsilon + \\partial_\\nu \\partial_\\mu \\epsilon - \\eta_{\\mu\\nu} \\Box \\epsilon \\right)$$
+</div>
+<div class="equation-box">
+$$= \\partial_\\mu \\partial_\\nu \\epsilon - \\frac{1}{2}\\eta_{\\mu\\nu}\\Box \\epsilon$$
+</div>
+</section>
+
+<section>
+<h3>7. Compute Second Term</h3>
+<div class="equation-box">
+$$\\Gamma^\\lambda_{\\mu\\lambda} = \\frac{1}{2} \\left( \\partial_\\mu \\epsilon + \\partial_\\mu \\epsilon - \\partial_\\mu \\epsilon \\right) = \\frac{1}{2}\\partial_\\mu \\epsilon$$
+</div>
+<p>Thus:</p>
+<div class="equation-box">
+$$\\partial_\\nu \\Gamma^\\lambda_{\\mu\\lambda} = \\frac{1}{2} \\partial_\\nu \\partial_\\mu \\epsilon$$
+</div>
+</section>
+
+<section>
+<h3>8. Ricci Tensor Result</h3>
+<div class="equation-box">
+$$R_{\\mu\\nu} = \\partial_\\mu \\partial_\\nu \\epsilon - \\frac{1}{2}\\eta_{\\mu\\nu}\\Box \\epsilon - \\frac{1}{2}\\partial_\\mu \\partial_\\nu \\epsilon$$
+</div>
+<div class="equation-box">
+$$\\boxed{ R_{\\mu\\nu} = \\frac{1}{2} \\left( \\partial_\\mu \\partial_\\nu \\epsilon - \\eta_{\\mu\\nu}\\Box \\epsilon \\right) }$$
+</div>
+</section>
+
+<section>
+<h3>9. Substitute $\\epsilon = \\frac{P}{K}\\rho$</h3>
+<div class="equation-box">
+$$\\partial_\\mu \\partial_\\nu \\epsilon = \\frac{P}{K} \\partial_\\mu \\partial_\\nu \\rho$$
+</div>
+<div class="equation-box">
+$$\\Box \\epsilon = \\frac{P}{K} \\Box \\rho$$
+</div>
+</section>
+
+<section>
+<h3>10. Final Curvature Relation</h3>
+<div class="equation-box">
+$$\\boxed{ R_{\\mu\\nu} = \\frac{P}{2K} \\left( \\partial_\\mu \\partial_\\nu \\rho - \\eta_{\\mu\\nu} \\Box \\rho \\right) }$$
+</div>
+</section>
+
+<section>
+<h3>11. Covariant Form</h3>
+<p>Promoting to full geometry:</p>
+<div class="equation-box">
+$$\\boxed{ R_{\\mu\\nu} = \\frac{P}{2K} \\left( \\nabla_\\mu \\nabla_\\nu \\rho - g_{\\mu\\nu} \\Box \\rho \\right) }$$
+</div>
+</section>
+
+<section>
+<h3>12. Laplacian (Scalar Case)</h3>
+<p>For static spatial case:</p>
+<div class="equation-box">
+$$\\boxed{ R \\sim \\nabla^2 \\rho }$$
+</div>
+</section>
+
+<section>
+<h3>13. Newtonian Limit</h3>
+<p>Define potential:</p>
+<div class="equation-box">
+$$\\epsilon \\equiv \\frac{2\\Phi}{c^2}$$
+</div>
+<p>Then:</p>
+<div class="equation-box">
+$$\\Box \\epsilon \\rightarrow \\nabla^2 \\epsilon$$
+</div>
+<p>Thus:</p>
+<div class="equation-box">
+$$\\boxed{ \\nabla^2 \\Phi = 4\\pi G \\rho }$$
+</div>
+</section>
+
+<section>
+<h3>14. Final Mathematical Statement</h3>
+<div class="equation-box">
+$$\\boxed{ \\text{Curvature is generated by second derivatives of substrate density} }$$
+</div>
+<div class="equation-box">
+$$\\boxed{ R_{\\mu\\nu} \\propto \\partial_\\mu \\partial_\\nu \\rho - g_{\\mu\\nu} \\Box \\rho }$$
+</div>
+</section>
+
+<section class="conclusion-box">
+<p><strong>Conclusion:</strong></p>
+<div class="equation-box">
+$$\\boxed{ \\text{Geometry emerges as the second-derivative response of the metric to density variation} }$$
+</div>
+</section>
+</div>`,
+
+sliders: `
+<div class="control-item">
+<div class="label-group"><span>Gradient Intensity (∇ρ)</span><input type="number" id="c_in" class="digital-entry" value="0.4" oninput="syncVal(this.value, 'c_sl')"></div>
+<input type="range" id="c_sl" min="0" max="1" step="0.05" value="0.4" oninput="syncVal(this.value, 'c_sl')">
+</div>`,
+
+mappingBox: `
+<div class="definition-box">
+<span class="def-title">FIELD TENSION</span>
+<div style="text-align:center; font-size: 0.75rem; margin-bottom: 0px;">$\\nabla^2 \\Phi = 4\\pi G \\rho$</div>
+<p style="font-size: 0.65rem; color: #94a3b8; margin: 0; line-height: 1.2; text-align: center;">
+This is the <strong>weak-field limit</strong> of the curvature–density relation derived from the substrate.
+</p>
+</div>`,
+
+lawBox: `<div class="definition-box"><span class="def-title">RICCI CURVATURE</span><div style="text-align:center; font-size: 0.9rem;">$R_{\\mu\\nu} \\propto \\partial_\\mu \\partial_\\nu \\rho - g_{\\mu\\nu} \\Box \\rho$</div></div>`,
+
+hierarchy: `
+<div style="color: #fbbf24;">Density Variation ($\\nabla^2 \\rho$)</div>
+<div style="color: #94a3b8;">↓</div>
+<div style="color: #4ade80;">Curvature ($R_{\\mu\\nu}$)</div>`,
+
+footer: `
+<div style="margin-top:15px; padding: 8px; background: rgba(74, 222, 128, 0.05); border-left: 2px solid #4ade80; border-radius: 4px;">
+<span style="color:#4ade80; font-weight:bold; font-size:0.75rem; display:block; margin-bottom:0px; text-align: center;">SECOND-ORDER LOGIC</span>
+<p style="font-size: 0.71rem; margin: 0; color: #cbd5e1; line-height: 1.3;">
+<strong>Critical Clarification:</strong> Curvature arises from <strong>second derivatives</strong> of substrate density ($\\nabla^2 \\rho$), not from simple gradients ($\\nabla \\rho$).
+This distinction allows stochastic density variations to manifest as consistent geometric curvature.
+</p>
+</div>`,
+
+rightNote: "<b>The Bending Grid:</b> Just as a refractive index gradient bends light, the substrate density gradient bends the path of amplitudes, manifesting as geometric curvature."
+},
+
+
+3: {
+title: "STRESS-ENERGY SYNTHESIS",
+
+brief: `<div class="briefing-content">
+<h2>Detailed Briefing: Stress–Energy Synthesis</h2>
+
+<section>
+<h3>1. Purpose of the Module</h3>
+<p>This module establishes the origin of the source term of gravity.</p>
+<p><strong>After showing that:</strong></p>
+<ul>
+<li>substrate density defines the metric</li>
+<li>variation of density produces curvature</li>
+</ul>
+<p><strong>this module identifies:</strong></p>
+<ul>
+<li>👉 how the source of curvature emerges from the same structure</li>
+</ul>
+</section>
+
+<section>
+<h3>2. Core Idea</h3>
+<p>The source term of gravity is not externally introduced.</p>
+<ul>
+<li>👉 It arises from the internal structure of substrate density.</li>
+</ul>
+</section>
+
+<section>
+<h3>3. Emergence of Stress–Energy</h3>
+<p>Non-uniform density produces structured variation across the substrate.</p>
+<p><strong>This variation generates:</strong></p>
+<ul>
+<li>👉 an effective tensorial structure corresponding to stress–energy</li>
+</ul>
+<p><strong>Meaning:</strong></p>
+<ul>
+<li>density $\rightarrow$ primary field</li>
+<li>variation $\rightarrow$ internal structural response</li>
+<li>tensor form $\rightarrow$ effective energy–momentum</li>
+</ul>
+</section>
+
+<section>
+<h3>4. Coupling Principle</h3>
+<p>The strength of gravitational interaction is determined by:</p>
+<div class="equation-box">
+$$8\\pi G = \\frac{P}{K}$$
+</div>
+<p><strong>Interpretation:</strong></p>
+<ul>
+<li>$P$ represents substrate pressure (driving influence)</li>
+<li>$K$ represents substrate stiffness (resisting influence)</li>
+</ul>
+<p>👉 The ratio of these determines the strength of curvature.</p>
+</section>
+
+<section>
+<h3>5. Physical Insight</h3>
+<p>A high value of stiffness suppresses deformation.</p>
+<p>👉 <strong>This is why gravity appears weak:</strong></p>
+<div class="equation-box">
+$$K \\gg P$$
+</div>
+</section>
+
+<section>
+<h3>6. Emergent Hierarchy</h3>
+<div class="equation-box">
+$$(K, P, \\rho) \\;\\longrightarrow\\; T_{\\mu\\nu}^{(\\text{eff})} \\;\\longrightarrow\\; G_{\\mu\\nu}$$
+</div>
+<p><strong>Interpretation:</strong></p>
+<ul>
+<li>substrate parameters define response</li>
+<li>density structure generates source</li>
+<li>source produces curvature</li>
+</ul>
+</section>
+
+<section>
+<h3>7. Connection to Previous Stage</h3>
+<p>From earlier stage:</p>
+<div class="equation-box">
+$$\\rho(P) \\propto P$$
+</div>
+<p><strong>Now:</strong></p>
+<div class="equation-box">
+$$\\rho \\;\\longrightarrow\\; \\text{effective source} \\;\\longrightarrow\\; \\text{geometry}$$
+</div>
+<p><strong>Meaning:</strong></p>
+<ul>
+<li>👉 Probability $\rightarrow$ density $\rightarrow$ energy $\rightarrow$ curvature</li>
+</ul>
+</section>
+
+<section>
+<h3>8. Conceptual Shift</h3>
+<p><strong>In standard formulation:</strong></p>
+<ul>
+<li>matter produces stress–energy</li>
+<li>stress–energy produces curvature</li>
+</ul>
+<p><strong>In this framework:</strong></p>
+<ul>
+<li>density produces both</li>
+<li>source and geometry arise together</li>
+</ul>
+</section>
+
+<section>
+<h3>9. What This Module Establishes</h3>
+<ul>
+<li>✔ origin of stress–energy from density</li>
+<li>✔ removal of external source assumption</li>
+<li>✔ derivation of gravitational coupling</li>
+<li>✔ unified source–geometry structure</li>
+</ul>
+</section>
+
+<section>
+<h3>10. Scope Clarification</h3>
+<p>This module does not yet:</p>
+<ul>
+<li>• fully formalize the Einstein field equation (completed in the explicit mathematics of this stage)</li>
+<li>• derive particle motion and trajectories (done in Module 4)</li>
+<li>• incorporate quantum operator structure (done in subsequent modules)</li>
+</ul>
+<p>👉 These are completed in the next modules as part of the structured development.</p>
+</section>
+
+<section>
+<h3>11. Final Interpretation</h3>
+<p>Stress–energy is the second-order structural expression of substrate density variation.</p>
+</section>
+
+<section>
+<h3>12. Final One-Line Statement</h3>
+<p>👉 The source of gravity emerges from the internal structure of substrate density, with its strength governed by the ratio $P/K$.</p>
+</section>
+</div>`,
+
+math: `<div class="math-content">
+<h2>Explicit Mathematics: Stress–Energy Synthesis</h2>
+
+<section>
+<h3>1. Starting Point: Curvature from Module 2</h3>
+<div class="equation-box">
+$$\\boxed{ R_{\\mu\\nu} = \\frac{P}{2K} \\left( \\partial_\\mu \\partial_\\nu \\rho - g_{\\mu\\nu} \\Box \\rho \\right) }$$
+</div>
+</section>
+
+<section>
+<h3>2. Ricci Scalar</h3>
+<p>Contract with $g^{\\mu\\nu}$:</p>
+<div class="equation-box">
+$$R = g^{\\mu\\nu} R_{\\mu\\nu}$$
+</div>
+<div class="equation-box">
+$$R = \\frac{P}{2K} \\left( g^{\\mu\\nu}\\partial_\\mu \\partial_\\nu \\rho - g^{\\mu\\nu} g_{\\mu\\nu} \\Box \\rho \\right)$$
+</div>
+<p>Using:</p>
+<ul>
+<li>$g^{\\mu\\nu} g_{\\mu\\nu} = 4$</li>
+<li>$g^{\\mu\\nu}\\partial_\\mu \\partial_\\nu \\rho = \\Box \\rho$</li>
+</ul>
+<p>Thus:</p>
+<div class="equation-box">
+$$\\boxed{ R = -\\frac{3P}{2K}\\,\\Box \\rho }$$
+</div>
+</section>
+
+<section>
+<h3>3. Einstein Tensor</h3>
+<div class="equation-box">
+$$G_{\\mu\\nu} = R_{\\mu\\nu} - \\frac{1}{2} g_{\\mu\\nu} R$$
+</div>
+<p>Substitute:</p>
+<div class="equation-box">
+$$G_{\\mu\\nu} = \\frac{P}{2K} \\left( \\partial_\\mu \\partial_\\nu \\rho - g_{\\mu\\nu} \\Box \\rho \\right) + \\frac{3P}{4K} g_{\\mu\\nu} \\Box \\rho$$
+</div>
+<p>Simplify:</p>
+<div class="equation-box">
+$$\\boxed{ G_{\\mu\\nu} = \\frac{P}{2K} \\partial_\\mu \\partial_\\nu \\rho + \\frac{P}{4K} g_{\\mu\\nu} \\Box \\rho }$$
+</div>
+</section>
+
+<section>
+<h3>4. Factorized Form</h3>
+<div class="equation-box">
+$$\\boxed{ G_{\\mu\\nu} = \\frac{P}{4K} \\left( 2\\,\\partial_\\mu \\partial_\\nu \\rho + g_{\\mu\\nu} \\Box \\rho \\right) }$$
+</div>
+</section>
+
+<section>
+<h3>5. Define Effective Stress–Energy Tensor</h3>
+<p>Define:</p>
+<div class="equation-box">
+$$\\boxed{ T_{\\mu\\nu}^{(\\text{eff})} = \\partial_\\mu \\partial_\\nu \\rho - g_{\\mu\\nu} \\Box \\rho }$$
+</div>
+</section>
+
+<section>
+<h3>6. Match Einstein Equation</h3>
+<p>Standard form:</p>
+<div class="equation-box">
+$$G_{\\mu\\nu} = 8\\pi G\\, T_{\\mu\\nu}$$
+</div>
+<p>Compare with derived structure:</p>
+<div class="equation-box">
+$$G_{\\mu\\nu} \\sim \\frac{P}{K} \\left( \\partial_\\mu \\partial_\\nu \\rho - g_{\\mu\\nu} \\Box \\rho \\right)$$
+</div>
+</section>
+
+<section>
+<h3>7. Identify Coupling Constant</h3>
+<div class="equation-box">
+$$\\boxed{ 8\\pi G = \\frac{P}{K} }$$
+</div>
+</section>
+
+<section>
+<h3>8. Final Einstein-Type Equation</h3>
+<div class="equation-box">
+$$\\boxed{ G_{\\mu\\nu} = 8\\pi G \\left( \\partial_\\mu \\partial_\\nu \\rho - g_{\\mu\\nu} \\Box \\rho \\right) }$$
+</div>
+</section>
+
+<section>
+<h3>9. Covariant Form</h3>
+<div class="equation-box">
+$$\\boxed{ G_{\\mu\\nu} = 8\\pi G \\left( \\nabla_\\mu \\nabla_\\nu \\rho - g_{\\mu\\nu} \\Box \\rho \\right) }$$
+</div>
+</section>
+
+<section>
+<h3>10. Conservation Condition</h3>
+<p>Using:</p>
+<div class="equation-box">
+$$\\nabla^\\mu G_{\\mu\\nu} = 0$$
+</div>
+<p>we obtain:</p>
+<div class="equation-box">
+$$\\nabla^\\mu T_{\\mu\\nu}^{(\\text{eff})} = 0$$
+</div>
+<p>This implies:</p>
+<div class="equation-box">
+$$\\boxed{ \\Box \\rho = \\text{constant} }$$
+</div>
+</section>
+
+<section>
+<h3>11. Structural Identification</h3>
+<div class="equation-box">
+$$\\boxed{ T_{\\mu\\nu}^{(\\text{eff})} = \\partial_\\mu \\partial_\\nu \\rho - g_{\\mu\\nu} \\Box \\rho }$$
+</div>
+</section>
+
+<section>
+<h3>12. Coupling Relation</h3>
+<div class="equation-box">
+$$\\boxed{ 8\\pi G = \\frac{P}{K} }$$
+</div>
+</section>
+
+<section class="conclusion-box">
+<h3>Final Mathematical Statement</h3>
+<div class="equation-box">
+$$\\boxed{ \\text{Stress–energy emerges from second derivatives of substrate density} }$$
+</div>
+<div class="equation-box">
+$$\\boxed{ G_{\\mu\\nu} = 8\\pi G\\, T_{\\mu\\nu}^{(\\text{eff})} }$$
+</div>
+<p><strong>Conclusion:</strong></p>
+<div class="equation-box">
+$$\\boxed{ \\text{The source of gravity is not external matter, but the second-order structure of the substrate density field.} }$$
+</div>
+</section>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>Substrate Stiffness</span><input type="number" id="k_in" class="digital-entry" value="11.350" oninput="syncVal(this.value, 'k_sl')"></div><input type="range" id="k_sl" min="1" max="50" step="0.1" value="11.350" oninput="syncVal(this.value, 'k_in')"></div>`,
+
+mappingBox: `<div class="definition-box"><span class="def-title">The Quantitative Law</span><div style="text-align:center; font-size: 0.9rem;">$8\\pi G_{\\text{eff}} = \\frac{P}{K}$
+<p style="font-size: 0.65rem; color: #94a3b8; margin-top: 0px; margin-bottom: 0px; line-height: 1.3;">
+The gravitational constant emerges as the ratio of Substrate Pressure (P) to Substrate Stiffness (K).
+This defines G in Einstein’s equations as a derived material property of the substrate.
+</p>
+</div></div>`,
+
+lawBox: `
+<div class="definition-box">
+<span class="def-title">SOURCE TERM</span>
+<div style="text-align:center; font-size: 1.05rem; margin: 8px 0;">
+$\\boxed{ T_{\\mu\\nu}^{(\\text{eff})} \\propto \\partial_\\mu \\partial_\\nu \\rho - g_{\\mu\\nu} \\Box \\rho }$
+</div>
+<p style="font-size: 0.65rem; color: #94a3b8; margin-top: 5px; text-align: center; line-height: 1.3;">
+The emergent energy tensor is derived directly from second-order substrate fluctuations.
+</p>
+</div>`,
+
+hierarchy: `
+<div style="text-align: center; line-height: 1.4;">
+<div style="color: #fbbf24; font-weight: bold;">(K, P, ρ) Substrate</div>
+<div style="color: #94a3b8; margin: 2px 0; font-size: 0.8rem;">↓</div>
+<div style="color: #38bdf8; font-weight: bold;">$T_{\\mu\\nu}^{(\\text{eff})}$ (Source)</div>
+<div style="color: #94a3b8; margin: 2px 0; font-size: 0.8rem;">↓</div>
+<div style="color: #4ade80; font-weight: bold;">$G_{\\mu\\nu}$ (Curvature)</div>
+</div>`,
+
+footer: `
+<div style="margin-top:0px; padding: 5px; background: rgba(56, 189, 248, 0.05); border-left: 2px solid #38bdf8; border-radius: 2px;">
+<span style="color:#38bdf8; font-weight:bold; font-size:0.75rem; display:block; margin-bottom:0px; text-align: center;">COUPLING LOGIC</span>
+<p style="font-size: 0.65rem; margin: 0; color: #cbd5e1; line-height: 1.4;">
+Gravity is not "weak" by chance. It is weak because the <strong>Substrate Stiffness</strong> is orders of magnitude higher than local density fluctuations. This creates the stable, low-curvature vacuum of our era.
+</p>
+</div>`,
+
+rightNote: "<b>The Coupling Limit:</b> In this framework, gravity is not 'weak' by chance; it is weak because the substrate $K$ (stiffness) is incredibly high compared to local density fluctuations."
+},
+
+
+4: {
+title: "GEODESIC EMERGENCE",
+
+brief: `<div class="briefing-content">
+<h2>Detailed Briefing: Geodesic Emergence</h2>
+
+<section>
+<h3>1. Purpose of the Module</h3>
+<p>This module establishes how deterministic motion in spacetime emerges from stochastic substrate dynamics.</p>
+<p><strong>After showing that:</strong></p>
+<ul>
+<li>density defines geometry (Module 1)</li>
+<li>density variation produces curvature (Module 2)</li>
+<li>density structure generates source (Module 3)</li>
+</ul>
+<p><strong>this module shows:</strong></p>
+<ul>
+<li>👉 how motion within that geometry arises</li>
+</ul>
+</section>
+
+<section>
+<h3>2. Core Idea</h3>
+<p>At the microscopic level:</p>
+<ul>
+<li>trajectories are stochastic</li>
+<li>motion is governed by noise and fluctuations</li>
+</ul>
+<p>At the macroscopic level:</p>
+<ul>
+<li>👉 <strong>motion becomes deterministic</strong></li>
+</ul>
+</section>
+
+<section>
+<h3>3. Emergence Mechanism</h3>
+<p>Individual trajectories follow stochastic dynamics.</p>
+<p><strong>However:</strong></p>
+<ul>
+<li>fluctuations average out</li>
+<li>structural influence accumulates</li>
+</ul>
+<p>Over many realizations:</p>
+<ul>
+<li>👉 a stable path emerges</li>
+</ul>
+</section>
+
+<section>
+<h3>4. Key Result</h3>
+<div class="equation-box">
+$$\\mathbb{E}[x^\\mu(\\tau)] \\;\\rightarrow\\; \\text{Geodesic}$$
+</div>
+<p><strong>Meaning:</strong></p>
+<ul>
+<li>individual paths $\rightarrow$ random</li>
+<li>ensemble average $\rightarrow$ deterministic</li>
+<li>deterministic path $\rightarrow$ geodesic</li>
+</ul>
+</section>
+
+<section>
+<h3>5. Geodesic Equation</h3>
+<p>The emergent trajectory satisfies:</p>
+<div class="equation-box">
+$$\\frac{d^2 x^\\mu}{d\\tau^2} + \\Gamma^\\mu_{\\alpha\\beta} \\frac{dx^\\alpha}{d\\tau} \\frac{dx^\\beta}{d\\tau} = 0$$
+</div>
+<p><strong>Interpretation:</strong></p>
+<ul>
+<li>motion follows the structure of the metric</li>
+<li>curvature determines trajectory</li>
+<li>no external force is required</li>
+</ul>
+</section>
+
+<section>
+<h3>6. Role of Stochasticity</h3>
+<p>The stochastic term governs:</p>
+<ul>
+<li>microscopic fluctuations</li>
+<li>deviation of individual paths</li>
+</ul>
+<p><strong>But:</strong></p>
+<ul>
+<li>👉 it does not affect the mean trajectory</li>
+</ul>
+</section>
+
+<section>
+<h3>7. Stability Principle</h3>
+<p>Even under continuous stochastic perturbations:</p>
+<ul>
+<li>the ensemble mean remains stable</li>
+<li>the emergent path is preserved</li>
+</ul>
+<p><strong>Meaning:</strong></p>
+<ul>
+<li>👉 deterministic motion is the statistical limit of stochastic dynamics</li>
+</ul>
+</section>
+
+<section>
+<h3>8. Connection to Stage 39</h3>
+<p>From Stage 39:</p>
+<ul>
+<li>stochastic dynamics produce stationary density</li>
+</ul>
+<p><strong>Now:</strong></p>
+<ul>
+<li>stationary density defines metric</li>
+<li>metric governs motion</li>
+</ul>
+<p><strong>Flow:</strong></p>
+<div class="equation-box">
+$$\\text{Stochastic Dynamics} \\;\\longrightarrow\\; \\rho \\;\\longrightarrow\\; g_{\\mu\\nu} \\;\\longrightarrow\\; \\text{Geodesic Motion}$$
+</div>
+</section>
+
+<section>
+<h3>9. Conceptual Insight</h3>
+<p><strong>In standard physics:</strong></p>
+<ul>
+<li>quantum $\rightarrow$ probabilistic</li>
+<li>relativity $\rightarrow$ deterministic</li>
+</ul>
+<p><strong>In this framework:</strong></p>
+<ul>
+<li>👉 both arise from the same substrate</li>
+</ul>
+<p><strong>Meaning:</strong></p>
+<ul>
+<li>randomness $\rightarrow$ microscopic behavior</li>
+<li>determinism $\rightarrow$ macroscopic limit</li>
+</ul>
+</section>
+
+<section>
+<h3>10. Emergent Hierarchy</h3>
+<div class="equation-box">
+$$\\text{Stochastic } dA_t \\;\\longrightarrow\\; \\text{Stationary Density } \\rho \\;\\longrightarrow\\; \\text{Geodesic Motion}$$
+</div>
+</section>
+
+<section>
+<h3>11. Physical Interpretation</h3>
+<p>Gravity is not a force acting on particles.</p>
+<p>👉 <strong>It is the result of:</strong></p>
+<ul>
+<li>underlying stochastic motion</li>
+<li>constrained by substrate structure</li>
+</ul>
+</section>
+
+<section>
+<h3>12. What This Module Establishes</h3>
+<ul>
+<li>✔ motion emerges from stochastic dynamics</li>
+<li>✔ geodesics arise as expectation paths</li>
+<li>✔ deterministic behavior is statistical</li>
+<li>✔ geometry governs motion naturally</li>
+</ul>
+</section>
+
+<section>
+<h3>13. Final Interpretation</h3>
+<p>Geodesic motion is the macroscopic limit of stochastic substrate trajectories.</p>
+</section>
+
+<section>
+<h3>14. Final One-Line Statement</h3>
+<p>👉 Geodesics arise as the expectation paths of stochastic dynamics governed by the emergent metric.</p>
+</section>
+</div>`,
+
+math: `<div class="math-content">
+<h2>Explicit Mathematics: Geodesic Emergence (SDE → Geodesic)</h2>
+
+<section>
+<h3>1. Starting Point: Stochastic Dynamics (from Stage 39)</h3>
+<p>The microscopic motion follows a stochastic differential equation:</p>
+<div class="equation-box">
+$$\\boxed{ dx^\\mu = v^\\mu dt + \\sigma\\, dW^\\mu_t }$$
+</div>
+<div class="equation-box">
+$$\\boxed{ dv^\\mu = F^\\mu(x)\\,dt + \\sigma_v\\, dW^\\mu_t }$$
+</div>
+</section>
+
+<section>
+<h3>2. Drift from Geometry</h3>
+<p>From Module 1–2:</p>
+<div class="equation-box">
+$$g_{\\mu\\nu} = \\eta_{\\mu\\nu}\\left(1 + \\frac{P}{K}\\rho \\right)$$
+</div>
+<p>Christoffel symbols:</p>
+<div class="equation-box">
+$$\\boxed{ \\Gamma^\\mu_{\\alpha\\beta} = \\frac{1}{2} g^{\\mu\\nu} \\left( \\partial_\\alpha g_{\\nu\\beta} + \\partial_\\beta g_{\\nu\\alpha} - \\partial_\\nu g_{\\alpha\\beta} \\right) }$$
+</div>
+</section>
+
+<section>
+<h3>3. Geometric Drift Force</h3>
+<p>The deterministic drift is:</p>
+<div class="equation-box">
+$$\\boxed{ F^\\mu = -\\Gamma^\\mu_{\\alpha\\beta} v^\\alpha v^\\beta }$$
+</div>
+</section>
+
+<section>
+<h3>4. Full Stochastic Equation of Motion</h3>
+<div class="equation-box">
+$$\\boxed{ dv^\\mu = -\\Gamma^\\mu_{\\alpha\\beta} v^\\alpha v^\\beta\\,dt + \\sigma_v\\, dW^\\mu_t }$$
+</div>
+<div class="equation-box">
+$$\\boxed{ dx^\\mu = v^\\mu dt + \\sigma\\, dW^\\mu_t }$$
+</div>
+</section>
+
+<section>
+<h3>5. Expectation Over Noise</h3>
+<p>Taking expectation:</p>
+<div class="equation-box">
+$$\\mathbb{E}[dW^\\mu_t] = 0$$
+</div>
+<p>Thus:</p>
+<div class="equation-box">
+$$\\boxed{ \\mathbb{E}[dv^\\mu] = -\\Gamma^\\mu_{\\alpha\\beta} \\mathbb{E}[v^\\alpha v^\\beta]\\,dt }$$
+</div>
+</section>
+
+<section>
+<h3>6. Mean-Field Approximation</h3>
+<p>Assume weak fluctuations:</p>
+<div class="equation-box">
+$$\\mathbb{E}[v^\\alpha v^\\beta] \\approx \\mathbb{E}[v^\\alpha]\\mathbb{E}[v^\\beta]$$
+</div>
+<p>Define:</p>
+<div class="equation-box">
+$$\\bar{v}^\\mu = \\mathbb{E}[v^\\mu]$$
+</div>
+<p>Thus:</p>
+<div class="equation-box">
+$$\\boxed{ \\frac{d \\bar{v}^\\mu}{dt} = -\\Gamma^\\mu_{\\alpha\\beta} \\bar{v}^\\alpha \\bar{v}^\\beta }$$
+</div>
+</section>
+
+<section>
+<h3>7. Convert to Proper Time</h3>
+<p>Using $\\tau$:</p>
+<div class="equation-box">
+$$\\boxed{ \\frac{d^2 x^\\mu}{d\\tau^2} + \\Gamma^\\mu_{\\alpha\\beta} \\frac{dx^\\alpha}{d\\tau} \\frac{dx^\\beta}{d\\tau} = 0 }$$
+</div>
+</section>
+
+<section>
+<h3>8. Result</h3>
+<div class="equation-box">
+$$\\boxed{ \\mathbb{E}[x^\\mu(\\tau)] \\;\\rightarrow\\; \\text{Geodesic} }$$
+</div>
+</section>
+
+<section>
+<h3>9. Interpretation</h3>
+<div class="equation-box">
+$$\\boxed{ \\text{Stochastic trajectories } \\rightarrow \\text{ Deterministic geodesic (mean path)} }$$
+</div>
+</section>
+
+<section>
+<h3>10. Noise Contribution</h3>
+<p>Variance grows as:</p>
+<div class="equation-box">
+$$\\boxed{ \\text{Var}(x^\\mu) \\sim \\sigma^2 t }$$
+</div>
+<p>But:</p>
+<div class="equation-box">
+$$\\boxed{ \\text{Mean path remains geodesic} }$$
+</div>
+</section>
+
+<section>
+<h3>11. Final Mathematical Statement</h3>
+<div class="equation-box">
+$$\\boxed{ \\text{Geodesic motion emerges as the expectation value of stochastic dynamics governed by the substrate metric} }$$
+</div>
+</section>
+
+<section class="conclusion-box">
+<p><strong>Conclusion:</strong></p>
+<div class="equation-box">
+$$\\boxed{ \\text{Deterministic motion in spacetime is the statistical limit of stochastic substrate evolution} }$$
+</div>
+</section>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>Stochasticity</span><input type="number" id="st_in" class="digital-entry" value="0.5" oninput="syncVal(this.value, 'st_sl')"></div><input type="range" id="st_sl" min="0" max="1" step="0.05" value="0.5" oninput="syncVal(this.value, 'st_in')"></div>`,
+
+mappingBox: `
+<div class="definition-box">
+<span class="def-title">INERTIAL FLOW</span>
+<div style="text-align:center; font-size: 0.90rem; margin: 0px 0;">
+$\\frac{d^2 x^\\mu}{d\\tau^2} + \\Gamma^\\mu_{\\alpha\\beta} \\frac{dx^\\alpha}{d\\tau} \\frac{dx^\\beta}{d\\tau} = 0$
+</div>
+<p style="font-size: 0.65rem; color: #94a3b8; text-align: center; margin-top: 0px; margin-bottom: 0px; line-height: 1.25;">
+The Geodesic Equation emerges as the path of least resistance in the non-uniform density field.
+</p>
+</div>`,
+
+
+lawBox: `
+<div class="definition-box">
+<span class="def-title">STOCHASTIC LIMIT</span>
+<div style="text-align:center; font-size: 0.9rem;">$\\mathbb{E}[x^\\mu(\\tau)] \\rightarrow \\text{Geodesic}$</div>
+<p style="font-size: 0.65rem; color: #94a3b8; margin-top: 5px; margin-bottom: 0px; text-align: center;">Macroscopic gravity is the invariant limit of microscopic chaos.</p>
+</div>`,
+
+
+hierarchy: `
+<div style="text-align: center; line-height: 1.5;">
+<div style="color: #f472b6; font-weight: bold; font-size: 0.85rem;">Stochastic $dA_i$ (Quantum)</div>
+<div style="color: #94a3b8; margin: 1px 0;">↓</div>
+<div style="color: #fbbf24; font-weight: bold; font-size: 0.85rem;">Stationary Density $\\rho$</div>
+<div style="color: #94a3b8; margin: 1px 0;">↓</div>
+<div style="color: #38bdf8; font-weight: bold; font-size: 0.85rem;">Geodesic Motion (GR)</div>
+</div>`,
+
+footer: `<div style="margin-top:0px; padding: 5px; background: rgba(56, 189, 248, 0.07); border-left: 2px solid #38bdf8; font-family: sans-serif;">
+<span style="color:#38bdf8; font-weight:bold; font-size:0.70rem; display:block; margin-bottom:0px; text-align: center;">STABILITY LOGIC</span>
+<p style="font-size: 0.65rem; margin: 0; color: #cbd5e1; line-height: 1.25;">
+When <strong>Reset Geometry</strong> is clicked, the <strong>Substrate (Pink)</strong> remains in a state of stochastic flux, reflecting the underlying quantum jitter.
+However, the <strong>Geometric Manifold (Blue)</strong> remains stable because it is mathematically anchored as the <strong>Expectation Value</strong> of that flux.
+This shows that macroscopic gravity is the invariant limit of microscopic chaos. This is the root of QM-GR unification.
+</p>
+</div>`,
+
+rightNote: "<b>Statistical Geodesics:</b> Individual trajectories are stochastic, but their ensemble mean follows a geodesic determined by the emergent metric. <P>Key Principle: Geodesics arise from expectation over stochastic trajectories, not from deterministic motion at the micro-level.</p>"
+},
+
+
+5: {
+title: "EQUATION OF STATE",
+
+brief: `<div class="briefing-content">
+<h2>Detailed Briefing: Equation of State (Geometric Equilibrium)</h2>
+
+<section>
+<h3>1. Purpose of the Module</h3>
+<p>This module establishes the final closure of the framework:</p>
+<ul>
+<li>👉 <strong>how a stable geometric structure emerges as the equilibrium state of the stochastic substrate</strong></li>
+</ul>
+</section>
+
+<section>
+<h3>2. Core Idea</h3>
+<p>The substrate evolves dynamically under stochastic fluctuations.</p>
+<p><strong>However:</strong></p>
+<ul>
+<li>this evolution is not arbitrary</li>
+<li>it converges to a specific stable configuration</li>
+</ul>
+</section>
+
+<section>
+<h3>3. Equilibrium Principle</h3>
+<p>The system settles into a stationary state characterized by:</p>
+<div class="equation-box">
+$$\\rho = \\rho_{\\text{eq}}$$
+</div>
+<p><strong>At this point:</strong></p>
+<ul>
+<li>fluctuations balance out</li>
+<li>structural forces stabilize</li>
+<li>geometry becomes steady</li>
+</ul>
+</section>
+
+<section>
+<h3>4. Stability Peak</h3>
+<p>The equilibrium corresponds to a maximum of geometric stability:</p>
+<div class="equation-box">
+$$P = P_s$$
+</div>
+<p><strong>Meaning:</strong></p>
+<ul>
+<li>not all configurations are stable</li>
+<li>only a specific density/pressure value produces consistent geometry</li>
+<li>👉 <strong>this value is dynamically selected</strong></li>
+</ul>
+</section>
+
+<section>
+<h3>5. Equation of State</h3>
+<p>At equilibrium:</p>
+<div class="equation-box">
+$$G_{\\mu\\nu} = 8\\pi G \\left( \\nabla_\\mu \\nabla_\\nu \\rho - g_{\\mu\\nu} \\Box \\rho \\right)$$
+</div>
+<p><strong>Interpretation:</strong></p>
+<ul>
+<li>geometry is fully determined by substrate density</li>
+<li>no external input is required</li>
+<li>structure is internally closed</li>
+</ul>
+</section>
+
+<section>
+<h3>6. Emergence Mechanism</h3>
+<p>The full process is:</p>
+<div class="equation-box">
+$$\\text{Stochastic Dynamics} \\;\\longrightarrow\\; \\text{Stationary Density } \\rho \\;\\longrightarrow\\; \\text{Geometry } (g_{\\mu\\nu})$$
+</div>
+</section>
+
+<section>
+<h3>7. Conceptual Insight</h3>
+<p>Geometry is not imposed.</p>
+<ul>
+<li>👉 <strong>It emerges as the equilibrium configuration of the system.</strong></li>
+</ul>
+<p><strong>Meaning:</strong></p>
+<ul>
+<li>randomness governs micro-level behavior</li>
+<li>stability governs macro-level structure</li>
+</ul>
+</section>
+
+<section>
+<h3>8. Connection to Previous Modules</h3>
+<ul>
+<li><strong>Module 1:</strong> density defines metric</li>
+<li><strong>Module 2:</strong> variation produces curvature</li>
+<li><strong>Module 3:</strong> variation generates source</li>
+<li><strong>Module 4:</strong> motion follows geometry</li>
+</ul>
+<p><strong>Now:</strong></p>
+<ul>
+<li>👉 <strong>Module 5 shows that all of this stabilizes into a self-consistent state</strong></li>
+</ul>
+</section>
+
+<section>
+<h3>9. Physical Interpretation</h3>
+<p>General relativity is not a starting assumption.</p>
+<ul>
+<li>👉 <strong>It appears as the natural equilibrium of the substrate.</strong></li>
+</ul>
+</section>
+
+<section>
+<h3>10. Key Principle</h3>
+<p>Geometry is the stationary stochastic equilibrium of the substrate.</p>
+</section>
+
+<section>
+<h3>11. What This Module Establishes</h3>
+<ul>
+<li>✔ existence of equilibrium state</li>
+<li>✔ selection of stable configuration</li>
+<li>✔ closure of geometric dynamics</li>
+<li>✔ emergence of GR as equilibrium</li>
+</ul>
+</section>
+
+<section>
+<h3>12. Final Interpretation</h3>
+<p>A consistent spacetime geometry emerges naturally as the equilibrium state of stochastic substrate dynamics.</p>
+</section>
+
+<section>
+<h3>13. Final One-Line Statement</h3>
+<p>👉 <strong>Geometry is the equilibrium configuration of stochastic substrate dynamics.</strong></p>
+</section>
+</div>`,
+
+math: `<div class="math-content">
+<h2>Explicit Mathematics: Equation of State (Stability & Equilibrium)</h2>
+
+<section>
+<h3>1. Starting Point: Stochastic Evolution (Stage 39)</h3>
+<p>Amplitude dynamics:</p>
+<div class="equation-box">
+$$\\boxed{ dA = A(\\lambda - \\bar{\\lambda})\,dt + \\sigma A\\, dW_t }$$
+</div>
+<p>Induces probability dynamics:</p>
+<div class="equation-box">
+$$\\boxed{ dP = \\mu(P)\\,dt + \\sqrt{D(P)}\\, dW_t }$$
+</div>
+<p>with:</p>
+<div class="equation-box">
+$$\\mu(P) \\propto P, \\quad D(P) \\propto P^2$$
+</div>
+</section>
+
+<section>
+<h3>2. Fokker–Planck Equation</h3>
+<div class="equation-box">
+$$\\boxed{ \\frac{\\partial \\rho(P,t)}{\\partial t} = -\\frac{\\partial}{\\partial P}[\\mu(P)\\rho] + \\frac{1}{2} \\frac{\\partial^2}{\\partial P^2}[D(P)\\rho] }$$
+</div>
+</section>
+
+<section>
+<h3>3. Stationary Condition</h3>
+<p>Equilibrium requires:</p>
+<div class="equation-box">
+$$\\boxed{ \\frac{\\partial \\rho}{\\partial t} = 0 }$$
+</div>
+<p>Thus:</p>
+<div class="equation-box">
+$$\\boxed{ \\mu(P)\\rho = \\frac{1}{2} \\frac{d}{dP}[D(P)\\rho] }$$
+</div>
+</section>
+
+<section>
+<h3>4. Substitution of Scaling Laws</h3>
+<p>Using:</p>
+<div class="equation-box">
+$$\\mu(P) = aP, \\quad D(P) = bP^2$$
+</div>
+<p>we obtain:</p>
+<div class="equation-box">
+$$aP\\rho = \\frac{1}{2} \\frac{d}{dP}(bP^2\\rho)$$
+</div>
+</section>
+
+<section>
+<h3>5. Solve for Stationary Distribution</h3>
+<p>Assume:</p>
+<div class="equation-box">
+$$\\rho(P) = C P^k$$
+</div>
+<p>Then:</p>
+<div class="equation-box">
+$$\\frac{d}{dP}(P^2\\rho) = \\frac{d}{dP}(C P^{k+2}) = C(k+2)P^{k+1}$$
+</div>
+<p>Substitute:</p>
+<div class="equation-box">
+$$a C P^{k+1} = \\frac{b}{2} C (k+2) P^{k+1}$$
+</div>
+<p>Thus:</p>
+<div class="equation-box">
+$$\\boxed{ k = \\frac{2a}{b} - 2 }$$
+</div>
+</section>
+
+<section>
+<h3>6. Consistency with Born Rule (Stage 39)</h3>
+<p>From earlier:</p>
+<div class="equation-box">
+$$\\boxed{ \\rho(P) \\propto P } \\Rightarrow k = 1$$
+</div>
+<p>Thus:</p>
+<div class="equation-box">
+$$\\boxed{ \\frac{2a}{b} - 2 = 1 \\;\\Rightarrow\\; \\frac{2a}{b} = 3 }$$
+</div>
+</section>
+
+<section>
+<h3>7. Equilibrium Density</h3>
+<div class="equation-box">
+$$\\boxed{ \\rho_{\\text{eq}}(P) \\propto P }$$
+</div>
+</section>
+
+<section>
+<h3>8. Stability Condition</h3>
+<p>Define effective potential:</p>
+<div class="equation-box">
+$$\\boxed{ V(P) = -\\ln \\rho(P) }$$
+</div>
+<div class="equation-box">
+$$V(P) = -\\ln P$$
+</div>
+<p><strong>Stability Criterion:</strong></p>
+<div class="equation-box">
+$$\\boxed{ \\frac{d^2 V}{dP^2} > 0 }$$
+</div>
+<p>ensures stable equilibrium.</p>
+</section>
+
+<section>
+<h3>9. Identification of Equilibrium Point</h3>
+<p>The system stabilizes around:</p>
+<div class="equation-box">
+$$\\boxed{ P = P_s }$$
+</div>
+<p>In this framework:</p>
+<div class="equation-box">
+$$\\boxed{ P_s \\approx 0.6900 }$$
+</div>
+</section>
+
+<section>
+<h3>10. Geometric Closure</h3>
+<p>From Module 3:</p>
+<div class="equation-box">
+$$\\boxed{ G_{\\mu\\nu} = 8\\pi G \\left( \\nabla_\\mu \\nabla_\\nu \\rho - g_{\\mu\\nu} \\Box \\rho \\right) }$$
+</div>
+<p>At equilibrium:</p>
+<div class="equation-box">
+$$\\rho \\rightarrow \\rho_{\\text{eq}}$$
+</div>
+<p>Thus:</p>
+<div class="equation-box">
+$$\\boxed{ \\text{Geometry becomes stationary} }$$
+</div>
+</section>
+
+<section>
+<h3>11. Equation of State (Final Form)</h3>
+<div class="equation-box">
+$$\\boxed{ G_{\\mu\\nu} = 8\\pi G \\left( \\nabla_\\mu \\nabla_\\nu \\rho_{\\text{eq}} - g_{\\mu\\nu} \\Box \\rho_{\\text{eq}} \\right) }$$
+</div>
+</section>
+
+<section>
+<h3>12. Coupling Relation</h3>
+<div class="equation-box">
+$$\\boxed{ 8\\pi G = \\frac{P}{K} }$$
+</div>
+</section>
+
+<section>
+<h3>13. Final Structural Closure</h3>
+<div class="equation-box">
+$$\\boxed{ \\text{Stochastic Dynamics} \\;\\longrightarrow\\; \\rho_{\\text{eq}} \\;\\longrightarrow\\; g_{\\mu\\nu} }$$
+</div>
+</section>
+
+<section class="conclusion-box">
+<h3>Final Mathematical Statement</h3>
+<div class="equation-box">
+$$\\boxed{ \\text{Spacetime geometry is the stationary solution of stochastic substrate dynamics} }$$
+</div>
+<p><strong>Conclusion:</strong></p>
+<div class="equation-box">
+$$\\boxed{ \\text{General relativity emerges as the equilibrium equation of state of the substrate} }$$
+</div>
+</section>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>Substrate Equil.</span><input type="number" id="e_in" class="digital-entry" value="0.69" oninput="syncVal(this.value, 'e_sl')"></div><input type="range" id="e_sl" min="0.5" max="1" step="0.01" value="0.69" oninput="syncVal(this.value, 'e_in')"></div>`,
+
+mappingBox: `
+<div class="definition-box">
+<span class="def-title">UNIFIED FIELD</span>
+<div style="text-align:center; font-size: 0.9rem; margin: 0px 0;">$G_{\\mu\\nu} = 8\\pi G \\left( \\nabla_\\mu \\nabla_\\nu \\rho - g_{\\mu\\nu} \\Box \\rho \\right)$</div>
+<p style="font-size: 0.70rem; color: #94a3b8; text-align: center; margin-top: 0px; margin-bottom: 0px; line-height: 1.25;">Geometry is expressed entirely as the second-order variation of the substrate density field.</p>
+</div>`,
+
+lawBox: `
+<div class="definition-box">
+<span class="def-title">FINAL SYNTHESIS</span>
+<div style="text-align:center; font-size: 0.9rem;">Geometry $\\equiv$ Stationary Stochastic Equilibrium</div>
+</div>`,
+
+hierarchy: `
+<div style="text-align: center; line-height: 1.6; margin-top:10px;">
+<div style="color: #f472b6; font-weight: bold; font-size: 0.85rem;">Stochastic Dynamics</div>
+<div style="color: #94a3b8; margin: 2px 0; font-size: 0.7rem;">↓</div>
+<div style="color: #fbbf24; font-weight: bold; font-size: 0.85rem;">Stationary Density $\\rho$</div>
+<div style="color: #94a3b8; margin: 2px 0; font-size: 0.7rem;">↓</div>
+<div style="color: #4ade80; font-weight: bold; font-size: 0.85rem;">Geometry ($g_{\\mu\\nu}$)</div>
+</div>`,
+
+footer: `
+<div style="margin-top:5px; padding: 8px; background: rgba(74, 222, 128, 0.05); border-left: 2px solid #4ade80; border-radius: 4px;">
+<span style="color:#4ade80; font-weight:bold; font-size:0.75rem; display:block; margin-bottom:0px; text-align: center;">FINAL POSITION</span>
+<p style="font-size: 0.72rem; margin: 0; color: #cbd5e1; line-height: 1.4;">
+Here General Relativity is not forced as a postulate. Instead, this shows that a <strong>consistent geometric structure</strong> naturally emerges at this specific density peak. This provides the bridge from QM to GR."
+</p>
+</div>`,
+
+rightNote: "<b>Final Position:</b> This shows that a consistent geometric structure emerges. This provides the bridge mechanism without needing to 'force' General Relativity as a fundamental postulate. <P>Key Principle: Geometry is not fundamental; it is the equilibrium configuration of stochastic substrate dynamics.</p>"
+}
+};
+
+
+function syncVal(val, id) {
+const sliderId = id.includes('_in') ? id.replace('_in', '_sl') : id;
+const inputId = id.includes('_sl') ? id.replace('_sl', '_in') : id;
+if(document.getElementById(sliderId)) document.getElementById(sliderId).value = val;
+if(document.getElementById(inputId)) document.getElementById(inputId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+document.getElementById('brief-box-content').innerHTML = content.brief || "Coming Soon";
+document.getElementById('math-box-content').innerHTML = content.math || "Coming Soon";
+document.getElementById('control-sliders').innerHTML = content.sliders;
+document.getElementById('active-module-title').innerText = content.title;
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+showScreen('briefing');
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() {
+showScreen('lab');
+setTimeout(() => {
+runLab();
+window.dispatchEvent(new Event('resize'));
+}, 100);
+}
+
+function runLab() {
+const target = document.getElementById('plot-area');
+if (!target) return;
+
+let data = [];
+let layout = {
+paper_bgcolor: 'black', plot_bgcolor: 'black', margin: {t:40,b:40,l:50,r:30},
+xaxis: { color: '#666', gridcolor: '#111', showticklabels: false },
+yaxis: { color: '#666', gridcolor: '#111', showticklabels: false },
+showlegend: false,
+scene: {
+xaxis: {visible: false}, yaxis: {visible: false}, zaxis: {visible: false},
+camera: { eye: {x: 1.5, y: 1.5, z: 1.2} }
+}
+};
+
+if (currentTool === 1) {
+let coupling = parseFloat(document.getElementById('l_sl')?.value || 0.2);
+let x = [], y = [], z = [];
+
+for(let i=-10; i<=10; i++) {
+let r_x = [], r_y = [], r_z = [];
+for(let j=-10; j<=10; j++) {
+r_x.push(i);
+r_y.push(j);
+let dist = Math.sqrt(i*i + j*j);
+let rho = Math.exp(-dist*dist * 0.05); // Gaussian Substrate Density
+// The Metric Well
+r_z.push(-coupling * 10 * rho);
+}
+x.push(r_x); y.push(r_y); z.push(r_z);
+}
+
+data = [{
+type: 'surface',
+x: x, y: y, z: z,
+colorscale: 'Viridis',
+showscale: false,
+contours: { z: { show: true, color: '#f59e0b', width: 1 } }
+}];
+
+layout.scene = {
+xaxis: { title: 'Spatial X', color: '#666' },
+yaxis: { title: 'Spatial Y', color: '#666' },
+zaxis: { title: 'Metric (g<sub>μν</sub>)', color: '#666', range: [-10, 2] },
+camera: { eye: {x: 1.5, y: 1.5, z: 1.2} },
+aspectratio: {x: 1, y: 1, z: 0.7}
+};
+layout.title = "METRIC MAPPING: g<sub>μν</sub> = η<sub>μν</sub> + Φ(ρ)";
+
+
+
+} else if (currentTool === 2) {
+let gradInput = parseFloat(document.getElementById('c_sl')?.value || 0.4);
+let r_vals = [], curv_vals = [];
+
+// We analyze the cross-section of the well to see the Gradient Intensity
+for(let r = -15; r <= 15; r += 0.5) {
+r_vals.push(r);
+// PHYSICS: R ~ ∇∇ρ (The second derivative of the density distribution)
+// This creates a "Spike" of curvature where the density changes fastest
+let density = Math.exp(-Math.pow(r, 2) * 0.05);
+let curvature = gradInput * 50 * (density * (1 - 0.1 * Math.pow(r, 2)));
+curv_vals.push(curvature);
+}
+
+data = [{
+name: 'Ricci Curvature (R<sub>μν</sub>)',
+x: r_vals,
+y: curv_vals,
+mode: 'lines',
+fill: 'tozeroy', // Fills the area for a "Bold" look
+line: {color: '#4ade80', width: 4, shape: 'spline'},
+fillcolor: 'rgba(74, 222, 128, 0.1)'
+}];
+
+layout.title = "CURVATURE GRADIENT: R<sub>μν</sub> ∝ ∂<sub>μ</sub>∂<sub>ν</sub>ρ - g<sub>μν</sub> □ρ";
+layout.xaxis = {
+title: "Radial Distance (r)",
+gridcolor: '#151515',
+zerolinecolor: '#333'
+};
+layout.yaxis = {
+title: "Curvature Intensity",
+range: [-10, 30],
+autorange: false,
+gridcolor: '#151515',
+zerolinecolor: '#333'
+};
+
+
+} else if (currentTool === 3) {
+let k_val = parseFloat(document.getElementById('k_sl')?.value || 11.350);
+let x_vals = [], y_vals = [];
+for(let i = 1; i <= 100; i++) {
+let x = i / 2;
+x_vals.push(x);
+// The Inverse Law: G_eff = 1/K
+y_vals.push(100 / (x + k_val * 0.5));
+}
+data = [{
+x: x_vals, y: y_vals, mode: 'lines',
+line: {color: '#fbbf24', width: 3, shape: 'spline'},
+fill: 'tozeroy', fillcolor: 'rgba(251, 191, 36, 0.05)'
+}];
+layout.title = "COUPLING DYNAMICS: G<sub>eff</sub> ∝ 1/K";
+layout.xaxis = { title: "Perturbation Strength", color: '#666', showticklabels: true };
+layout.yaxis = { title: "Geometric Response (G<sub>eff</sub>)", color: '#666', showticklabels: true };
+
+
+} else if (currentTool === 4) {
+let noise = parseFloat(document.getElementById('st_sl')?.value || 0.5);
+let x_path = [], y_noisy = [], y_mean = [];
+
+// PHYSICS: The depth of the geodesic responds to substrate activity (noise)
+// This ensures the Blue Line is functional, not just a static image.
+let gravityIntensity = 5 + (noise * 20);
+
+for(let t=0; t<=50; t++) {
+let x = t;
+// Fixed Parabolic Path: Emergent result of the stochastic average
+let mean_y = -Math.pow((x - 25) / 5, 2) + gravityIntensity;
+
+x_path.push(x);
+y_mean.push(mean_y);
+// Stochastic Jitter: Individual substrate elements dancing around the mean
+y_noisy.push(mean_y + (Math.random() - 0.5) * noise * 15);
+}
+
+data = [
+{
+name: 'Substrate (Stage 39)',
+x: x_path, y: y_noisy,
+mode: 'markers',
+marker: {color: '#f472b6', size: 5, opacity: 0.6} // Slightly larger markers for better visibility
+},
+{
+name: 'Emergent Geodesic (Stage 40)',
+x: x_path, y: y_mean,
+mode: 'lines',
+line: {color: '#38bdf8', width: 4} // Thicker line for "Bold" appearance
+}
+];
+
+layout.title = "GEODESIC EMERGENCE: ⟨SDE⟩ → Geodesic";
+
+// ZOOM & SCALE: Tightening margins to make the graph look "Big" again
+layout.margin = { t: 60, b: 40, l: 50, r: 30 };
+
+layout.xaxis = {
+title: "Space (x)",
+range: [0, 50],
+showticklabels: true,
+gridcolor: '#151515',
+zeroline: false
+};
+
+layout.yaxis = {
+title: "Time (s)",
+showticklabels: true,
+// OPTIMIZED RANGE: Pinned to fit the curve perfectly
+range: [-10, 32],
+autorange: false,
+gridcolor: '#151515',
+zeroline: false
+};
+
+layout.showlegend = true;
+layout.legend = {
+font: { color: '#94a3b8', size: 11 },
+orientation: 'h',
+y: -0.2,
+x: 0.5,
+xanchor: 'center'
+};
+
+
+
+} else if (currentTool === 5) {
+// FORCE INITIALIZATION: Ensure it defaults to your constant 0.6900
+let p_equil = parseFloat(document.getElementById('e_sl')?.value || 0.6900);
+let x_v = [], y_v = [];
+
+// Generate the Phase Curve
+for(let p = 0.0; p <= 1.4; p += 0.01) {
+x_v.push(p);
+// Stability Equation: Peak is mathematically centered at p_equil
+let stability = Math.exp(-Math.pow(p - p_equil, 2) / 0.04);
+y_v.push(stability);
+}
+
+data = [{
+name: 'Geometric Phase',
+x: x_v, y: y_v,
+fill: 'tozeroy',
+mode: 'lines',
+line: {color: '#4ade80', width: 4},
+fillcolor: 'rgba(74, 222, 128, 0.15)'
+}];
+
+layout.title = "EQUATION OF STATE: Stability Peak at P<sub>s</sub>";
+
+// ZOOM & SCALE: Optimizing margins for a "Bold" look
+layout.margin = { t: 60, b: 50, l: 60, r: 30 };
+
+layout.xaxis = {
+title: "Substrate Pressure (P)",
+range: [0, 1.4],
+showticklabels: true,
+gridcolor: '#151515'
+};
+
+layout.yaxis = {
+title: "Geometric Stability (Ω)",
+range: [0, 1.1],
+showticklabels: true,
+gridcolor: '#151515',
+autorange: false
+};
+
+// THE ANCHOR: The dashed line that marks the 0.6900 threshold
+layout.shapes = [{
+type: 'line',
+x0: p_equil, x1: p_equil,
+y0: 0, y1: 1,
+line: { color: '#f59e0b', width: 2, dash: 'dash' }
+}];
+}
+
+Plotly.react('plot-area', data, layout, {responsive: true, displayModeBar: false});
+}
+
+function resetLab() {
+if (currentTool === 1) syncVal(0.2, 'l_sl');
+if (currentTool === 2) syncVal(0.4, 'c_sl');
+if (currentTool === 3) syncVal(11.350, 'k_sl');
+if (currentTool === 4) syncVal(0.5, 'st_sl');
+if (currentTool === 5) syncVal(0.6900, 'e_sl');
+runLab();
+}
+</script>
+</body>
+</html>

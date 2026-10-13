@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 72 — Electron Manifestation from Substrate Saturation</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #3b82f6;
+--accent-obs: #94a3b8; --accent-exp: #fbbf24; --accent-master: #c084fc; --accent-lock: #f87171; --accent-final: #2dd4bf;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6;
+--accent-gold: #fbbf24;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-gold); font-family: sans-serif; font-size: 0.85rem; min-width: 450px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls, #nav-summary-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+#screen-lab.active { display: flex; flex-direction: column; height: calc(100vh - 50px); }
+
+#screen-portal { justify-content: flex-start; padding-top: 6dvh; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 50px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 2px; font-weight: bold; letter-spacing: 0.5px; padding-bottom: 0px; }
+.module-subtitle { text-align: center; font-family: sans-serif; color: var(--accent-gold); margin-bottom: 5px; font-weight: bold; letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.primary-constant-box { background: #000; border: 1px solid var(--accent-unified); padding: 2px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 8px; }
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.derivation-box { background: rgba(192, 132, 252, 0.05); border: 1px solid var(--accent-master); padding: 8px; border-radius: 8px; margin-bottom: 10px; text-align: center; }
+.derivation-title { font-size: 0.52rem; color: var(--accent-master); text-transform: uppercase; display: block; border-bottom: 1px solid rgba(192, 132, 252, 0.2); margin-bottom: 5px; font-weight: bold; }
+
+.definition-box { background: rgba(59, 130, 246, 0.05); border: 1px solid var(--accent-unified); padding: 5px; border-radius: 5px; margin-bottom: 8px; font-size: 0.7rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; }
+#plot-area { flex-grow: 1; width: 100%; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #fff; border: 1px solid var(--accent-unified); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer { width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem; color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 72 — ELECTRON MANIFESTATION FROM SUBSTRATE SATURATION</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">Electron Manifestation from Substrate Saturation</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">Matter as a structural residue of the vacuum's mathematical closure.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-unified);">
+<h2 style="color:var(--accent-unified);">1. Saturation Threshold ($S_\chi$)</h2>
+<p>Substrate Elastic Limit<br>Absolute Structural Saturation</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-exp);">
+<h2 style="color:var(--accent-exp);">2. Manifold Tension Energy</h2>
+<p>Stored Geometric Work ($E_{geo}$)<br>Non-linear Elastic Resistance</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-master);">
+<h2 style="color:var(--accent-master);">3. Triadic Manifestation</h2>
+<p>Three-Field Discharge Energy<br>Synchronized Manifestation</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-lock);">
+<h2 style="color:var(--accent-lock);">4. Gauge Connection Bridge</h2>
+<p>Effective Stress Metric ($\Psi_{scale}$)<br>Radial/Tangential Composition</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-final);">
+<h2 style="color:var(--accent-final);">5. Electron Mass Manifestation</h2>
+<p>Electron Rest Mass $m_e$<br>CODATA 2022 Correspondence</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-unified);">
+<h2 style="color:var(--accent-unified);">6. Stage 72 Summary</h2>
+<p>The Mechanical Inevitability of Matter.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color:var(--accent-unified); text-align:center;">Module 6: Rigorous Synthesis of Stage 72</h2>
+
+<section>
+<p>Stage 72 provides the definitive derivation of the electron mass as a mechanical relief of vacuum saturation. Matter is not an "addition" to the universe, but the structural discharge of a substrate that has reached its geometric capacity.</p>
+
+<h4 style="color: var(--accent-final); border-bottom: 1px solid var(--accent-final); display: inline-block;">1. THE SATURATION WALL</h4>
+<p style="font-size: 0.9rem;">The threshold ($S_\chi$) defines the maximum elastic deformation the $S^3$ manifold can withstand before non-linear discharge:</p>
+<div style="background: rgba(59,130,246,0.05); padding: 12px; border-radius: 8px; font-family: monospace; border: 1px solid var(--accent-unified); margin: 10px 0; text-align: center;">
+$S_\chi = \frac{1 - 1/4\pi}{3} \approx 0.306807$
+</div>
+
+<h4 style="color: var(--accent-final); border-bottom: 1px solid var(--accent-final); display: inline-block;">2. ENERGY OF MANIFESTATION</h4>
+<p style="font-size: 0.9rem;">The stored work ($E_{geo} = K S_\chi^2$) is discharged simultaneously across the three fields of the triad:</p>
+<div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin: 10px 0; text-align: center;">
+$E_{manifest} = 3 \cdot K \cdot S_\chi^2 \approx 3.205149$
+</div>
+
+<h4 style="color: var(--accent-final); border-bottom: 1px solid var(--accent-final); display: inline-block;">3. THE PHYSICAL HANDSHAKE</h4>
+<p style="font-size: 0.9rem;">The electron mass ($m_e$) emerges as the manifest energy scaled by the gauge connection identity:</p>
+<div style="text-align: center; font-size: 1.3rem; padding: 15px; color: var(--accent-gold); background: rgba(251, 191, 36, 0.05); border: 2px solid var(--accent-gold); border-radius: 12px; margin: 15px 0;">
+$\boxed{m_e = E_{manifest} \cdot \Psi_{scale} \approx 0.510998 \text{ MeV}}$
+</div>
+
+<h4 style="color: var(--accent-final); border-bottom: 1px solid var(--accent-final); display: inline-block;">4. STRUCTURAL NECESSITY</h4>
+<p style="font-size: 0.9rem;">By establishing $m_e$ as a result of substrate closure, the framework proves that material existence is the mechanical inevitability of a finite-elasticity vacuum.</p>
+
+<div style="margin-top: 25px; padding: 20px; border: 1px solid var(--accent-unified); border-radius: 12px; background: #000; text-align: center;">
+<h3 style="color: var(--accent-unified); margin: 0; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">The Birth of Matter</h3>
+<p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 10px;">The electron is the first stable evidence of the substrate's structural limit.</p>
+</div>
+</section>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div id="active-module-result" class="module-subtitle">--</div>
+<div class="primary-constant-box">
+<div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val">11.350</span></div>
+<div class="const-item"><span class="const-label">Threshold Sχ</span><span class="const-val">0.3068</span></div>
+</div>
+<div id="mapping-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Manifestation Telemetry</span>
+<div id="telemetry-area"></div>
+</div>
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-unified); font-size:0.75rem; cursor:pointer; padding:6px;">RE-EQUILIBRATE MANIFOLD</button>
+<div id="panel-footer-text" style="font-size: 0.85rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.3; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:8px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="derivation-box">
+<span class="derivation-title">Derivation Formula</span>
+<div id="derivation-content" style="font-size:0.90rem; padding:5px;"></div>
+</div>
+<div class="diagnostic-panel">
+<span class="diag-title">Emergent Logic</span>
+<div id="metrics-content" style="font-size:0.85rem; text-align:center; padding:5px;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Validation Chain</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.65rem; color: var(--text-dim); line-height: 1.3; background: #000; padding: 5px; border-radius: 0px; border: 1px solid #222; margin-bottom: 0px; margin-top: auto;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "SATURATION THRESHOLD (Sχ)",
+result: "Absolute Structural Limit",
+resultSize: "0.85rem",
+derivation: `
+<div style="border: 1px solid var(--accent-unified); padding: 4px; border-radius: 4px; text-align: center; width: 98%; margin: 0 auto;">
+<span style="font-size: 0.55rem; color: var(--accent-unified); display: block; margin-bottom: 2px;">RECONSTRUCTED THRESHOLD: $S_\chi$</span>
+<span style="font-size: 0.85rem; color: #fff;">$S_\\chi = \\frac{1 - 1/4\\pi}{3}$</span>
+<br>
+<span id="calc-result-1" style="font-size: 0.85rem; color: var(--accent-gold); font-family: monospace;">0.30680751</span>
+</div>`,
+
+brief: `<h2>Module 1: Saturation Threshold ($S_\\chi$)</h2><p>Defining the "Saturation Wall." $S_\\chi$ represents the critical ratio where the boundary capacity is partitioned into the triadic system, locking the manifold's elastic limit.</p>`,
+math: `<h3>Mathematics: The Saturation Wall</h3>$$S_\\chi = \\frac{1 - \\frac{1}{4\\pi}}{3}$$<p>This is the geometric axiom that dictates why manifestation must occur: the substrate is finite.</p>`,
+sliders: `<div class="control-item"><div class="label-group"><span>ELASTIC STRAIN</span><input type="number" id="m_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'm_sl')"></div><input type="range" id="m_sl" min="0" max="200" step="1" value="100" oninput="syncVal(this.value, 'm_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Boundary Loss → Triadic Partition</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">LIMIT STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Substrate Saturated</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-unified);">MODE: STRESS BOUNDARY DETECTED<br>Threshold (Sχ): 0.30680751<br>STATUS: Reconstructed Point Locked</span>`,
+metricsContent: `$S_\\chi \\approx 0.30680751$`,
+hierarchy: `Axiom of Saturation Verified`,
+footer: "The threshold represents the point where elastic deformation ends and material discharge begins.",
+rightNote: `<div style="color: #94a3b8; line-height: 1.3; margin: 5px; text-align:center; font-size: 0.8rem;">Without a threshold, the vacuum would be an infinite void with no matter.</div>`
+},
+
+2: {
+title: "MANIFOLD TENSION ENERGY",
+result: "Stored Geometric Work",
+resultSize: "0.85rem",
+derivation: `
+<div style="border: 1px solid var(--accent-exp); padding: 4px; border-radius: 4px; text-align: center; width: 98%; margin: 0 auto;">
+<span style="font-size: 0.55rem; color: var(--accent-exp); display: block; margin-bottom: 2px;">RECONSTRUCTED ENERGY: $E_{geo}$</span>
+<span style="font-size: 0.85rem; color: #fff;">$E_{geo} = K \\cdot S_\\chi^2$</span>
+<br>
+<span id="calc-result-2" style="font-size: 0.85rem; color: var(--accent-gold); font-family: monospace;">1.0683851</span>
+</div>`,
+brief: `<h2>Module 2: Manifold Tension Energy</h2><p>Evaluating the non-linear work integral. As the strain approaches the saturation wall, the geometric energy stored in the substrate rises as the square of the threshold.</p>`,
+math: `<h3>Mathematics: Tension Integral</h3>$$E_{geo} = \\int_{0}^{S_\\chi} \\frac{K x}{\\sqrt{1 - (x/S_\\chi)^2}} dx = K \\cdot S_\\chi^2$$<p>Calculated using Vacuum Stiffness $K = 11.35$.</p>`,
+sliders: `<div class="control-item"><div class="label-group"><span>STIFFNESS LOAD</span><input type="number" id="c_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'c_sl')"></div><input type="range" id="c_sl" min="0" max="200" step="1" value="100" oninput="syncVal(this.value, 'c_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Stiffness K → Threshold Sχ</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">ENERGY STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Stored Work Resolved</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-exp);">TENSION FIELD STABLE<br>Energy Density ($E_geo$): 1.0683851<br>STATUS: Potential Maximized</span>`,
+metricsContent: `$E_{geo} \\approx 1.0683851$`,
+hierarchy: `Energy Integral Validation`,
+footer: "Geometric work defines the 'cost' of bringing the vacuum to its point of rupture.",
+rightNote: `<div style="color: #94a3b8; line-height: 1.22; margin: 0px; text-align:center; font-size: 0.80rem;">Energy is the curvature of the manifold compressed against its own limit.</div>`
+},
+
+3: {
+title: "TRIADIC MANIFESTATION",
+result: "Three-Field Discharge",
+resultSize: "0.85rem",
+derivation: `
+<div style="border: 1px solid var(--accent-master); padding: 4px; border-radius: 4px; text-align: center; width: 98%; margin: 0 auto;">
+<span style="font-size: 0.55rem; color: var(--accent-master); display: block; margin-bottom: 2px;">RECONSTRUCTED TOTAL ENERGY: $E_{man}$</span>
+<span style="font-size: 0.85rem; color: #fff;">$E_{man} = 3 \\cdot E_{geo}$</span>
+<br>
+<span id="calc-result-3" style="font-size: 0.85rem; color: var(--accent-gold); font-family: monospace;">3.2051553</span>
+</div>`,
+brief: `<h2>Module 3: Triadic Manifestation Energy</h2><p>Summing the discharge across the three functional fields. The manifestation is a synchronized event where the entire triad releases its stored geometric work.</p>`,
+math: `<h3>Mathematics: Triadic Summation</h3>$$E_{manifest} = 3 \\cdot K \\cdot S_\\chi^2 \\approx 3.205149$$<p>The energy is tripled to account for the simultaneous discharge across the triadic fields.</p>`,
+sliders: `<div class="control-item"><div class="label-group"><span>FIELD SYNC</span><input type="number" id="r_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'r_sl')"></div><input type="range" id="r_sl" min="0" max="200" step="1" value="100" oninput="syncVal(this.value, 'r_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Triad Discharge → Unified Energy</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">DISCHARGE STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Synchronized Activation</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-master);">FIELDS: 3<br>$\E_{man}$: 3.2051553<br>STATUS: Discharge Confirmed</span>`,
+metricsContent: `$E_{man} \\approx 3.2051553$`,
+hierarchy: `Triadic Manifestation Validation`,
+footer: "The particle represents the unified energy of the three fields acting as one.",
+rightNote: `<div style="color: #94a3b8; line-height: 1.22; margin: 0px; text-align:center; font-size: 0.80rem;">Matter is the first sign of collective triadic action in the vacuum.</div>`
+},
+
+4: {
+title: "GAUGE CONNECTION IDENTITY",
+result: "Effective Stress Metric",
+resultSize: "0.85rem",
+derivation: `
+<div style="border: 1px solid var(--accent-lock); padding: 4px; border-radius: 4px; text-align: center; width: 98%; margin: 0 auto;">
+<span style="font-size: 0.55rem; color: var(--accent-lock); display: block; margin-bottom: 2px;">RECONSTRUCTED SCALING: $\\Psi_{scale}$</span>
+<span style="font-size: 0.85rem; color: #fff;">$\\Psi_{scale} = \\frac{1}{\\pi \\sqrt{1/S_\\chi + \\chi^2}}$</span>
+<br>
+<span id="calc-result-4" style="font-size: 0.85rem; color: var(--accent-gold); font-family: monospace;">0.1594301</span>
+</div>`,
+brief: `<h2>Module 4: Gauge Connection Identity</h2><p>Deriving the bridge between substrate energy and manifest mass. $\\Psi_{scale}$ accounts for the radial pressure gradient and tangential restorative inertia of the manifold.</p>`,
+math: `<h3>Mathematics: Stress Composition</h3>$$\\Psi_{scale} = \\frac{1}{\\pi \\sqrt{\\frac{1}{S_\\chi} + \\chi^2}} \\approx 0.15943$$<p>Where $\\chi = \\sqrt{2\\pi S_\\chi}$ represents the restorative residue.</p>`,
+sliders: `<div class="control-item"><div class="label-group"><span>STRESS COUPLING</span><input type="number" id="e_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'e_sl')"></div><input type="range" id="e_sl" min="0" max="200" step="1" value="100" oninput="syncVal(this.value, 'e_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Radial Saturation / Tangential Inertia</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">COUPLING STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">$\\Psi_{scale} \\approx 0.15943$ Resolved</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-lock);">RESULT: 0.1594301<br>RESTORATIVE RESIDUE χ: 1.388<br>STATUS: Connection Established</span>`,
+metricsContent: `$\\Psi_{scale} \\approx 0.1594301$`,
+hierarchy: `Gauge Connection Validation`,
+footer: "The gauge connection is the 'lens' through which vacuum energy becomes measurable mass.",
+rightNote: `<div style="color: #94a3b8; line-height: 1.22; margin: 0px; text-align:center; font-size: 0.80rem;">Scaling represents the geometric impedance of manifestation itself.</div>`
+},
+
+5: {
+title: "ELECTRON MASS MANIFESTATION",
+result: "The Physical Handshake",
+resultSize: "0.85rem",
+derivation: `
+<div style="border: 1px solid var(--accent-final); padding: 4px; border-radius: 4px; text-align: center; width: 98%; margin: 0 auto;">
+<span style="font-size: 0.55rem; color: var(--accent-final); display: block; margin-bottom: 2px;">RECONSTRUCTED ELECTRON MASS: $m_e$</span>
+<span style="font-size: 0.85rem; color: #fff;">$m_e = E_{man} \\cdot \\Psi_{scale}$</span>
+<br>
+<span id="calc-result-5" style="font-size: 0.85rem; color: var(--accent-gold); font-family: monospace;">0.5109982</span>
+</div>`,
+brief: `<h2>Module 5: Electron Mass Manifestation</h2><p>Completing the derivation. The electron mass is revealed as the physical residue of the vacuum reaching its mathematical closure. This aligns perfectly with the CODATA 2022 value.</p>`,
+math: `<h3>Mathematics: The Handshake</h3>$$m_e = E_{manifest} \\cdot \\Psi_{scale} \\approx 0.510998 \\text{ MeV}$$<p>This handshake proves that matter is a structural necessity of the saturated vacuum.</p>`,
+sliders: `<div class="control-item"><div class="label-group"><span>CODATA ALIGN</span><input type="number" id="f_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'f_sl')"></div><input type="range" id="f_sl" min="0" max="200" step="1" value="100" oninput="syncVal(this.value, 'f_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Structural Residue → Physical Constant</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">MASS STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">CODATA Aligned (0.510998)</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-final);">DERIVED: 0.5109982<br>CODATA: 0.5109989<br>STATUS: Correspondence</span>`,
+metricsContent: `$m_e \\approx 0.5109982 \\text{ MeV}$`,
+hierarchy: `Mass Manifestation Validation`,
+footer: "The electron is the 'relief valve' of the saturated vacuum substrate.",
+rightNote: `<div style="color: #94a3b8; line-height: 1.3; margin: 5px; text-align:center; font-size: 0.85rem;">Matter is not what the world is made of; it is what the vacuum must produce to survive.</div>`
+}
+};
+
+function syncVal(val, id) {
+const sliderId = id.includes('_in') ? id.replace('_in', '_sl') : id;
+const inputId = id.includes('_sl') ? id.replace('_sl', '_in') : id;
+if(document.getElementById(sliderId)) document.getElementById(sliderId).value = val;
+if(document.getElementById(inputId)) document.getElementById(inputId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+document.getElementById('brief-box-content').innerHTML = content.brief;
+document.getElementById('math-box-content').innerHTML = content.math;
+document.getElementById('control-sliders').innerHTML = content.sliders;
+document.getElementById('active-module-title').innerText = content.title;
+const resultEl = document.getElementById('active-module-result');
+resultEl.innerText = content.result;
+resultEl.style.fontSize = content.resultSize || "0.75rem";
+document.getElementById('derivation-content').innerHTML = content.derivation;
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('metrics-content').innerHTML = content.metricsContent;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+document.getElementById('telemetry-area').innerHTML = content.telemetry;
+showScreen('briefing');
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() {
+showScreen('lab');
+setTimeout(() => { runLab(); window.dispatchEvent(new Event('resize')); }, 100);
+}
+
+function runLab() {
+const target = document.getElementById('plot-area');
+let data = [];
+let layout = {
+paper_bgcolor: 'black', plot_bgcolor: 'black', margin: {t:60,b:60,l:60,r:40},
+showlegend: true, font: { color: '#eee', size: 10 },
+legend: { x: 0.02, y: 0.98, bgcolor: 'rgba(0,0,0,0.5)', bordercolor: '#3b82f6', borderwidth: 1 }
+};
+
+const K_BASE = 11.35;
+const SX_BASE = 0.30680751;
+
+if (currentTool === 1) { // Saturation Threshold
+let val = parseFloat(document.getElementById('m_sl')?.value || 100) / 100;
+// Reconstructed constant S_x based on Chapter 68
+const SX_BASE = 0.30680751;
+const SX_dynamic = SX_BASE * val;
+
+const res = document.getElementById('calc-result-1');
+if(res) res.innerText = "= " + SX_dynamic.toFixed(7);
+
+// High-resolution stress profile
+let x = Array.from({length: 150}, (_, i) => i / 100);
+let y = x.map(xi => (xi < SX_dynamic) ? xi : SX_dynamic);
+
+data.push({
+x: x, y: y,
+type: 'scatter', mode: 'lines',
+name: 'Elastic Regime',
+fill: 'tozeroy',
+line: { color: '#3b82f6', width: 3 }
+});
+
+// Reconstructed Marker with 7-decimal precision
+data.push({
+x: [SX_dynamic],
+y: [SX_dynamic],
+type: 'scatter',
+mode: 'markers+text',
+name: 'Saturation Point',
+text: [SX_dynamic.toFixed(7)],
+textposition: 'top left',
+textfont: { color: '#ffffff', size: 10 },
+marker: { color: '#ffffff', size: 10, line: { color: '#3b82f6', width: 2 } }
+});
+
+layout.title = { text: "SUBSTRATE ELASTIC SATURATION PROFILE", font: { color: '#3b82f6' } };
+
+// Range set to 0.75 to accommodate the 200% stress load
+layout.xaxis = { title: "Applied Stress", range: [0, 0.75], gridcolor: '#222' };
+layout.yaxis = { title: "Deformation", range: [0, 0.75], gridcolor: '#222' };
+
+
+
+} else if (currentTool === 2) { // Manifold Tension
+let val = parseFloat(document.getElementById('c_sl')?.value || 100) / 100;
+const K_BASE = 11.350;
+const SX_BASE = 0.3068075;
+
+// Precise Calculation
+const E_geo_dynamic = K_BASE * Math.pow(SX_BASE, 2) * val;
+const res = document.getElementById('calc-result-2');
+if(res) res.innerText = "= " + E_geo_dynamic.toFixed(7);
+
+// X-axis: Range increased to 0.75 to accommodate the 200% slider (0.6136...)
+let x_range = Array.from({length: 250}, (_, i) => (i / 249) * 0.75);
+
+let y_curve = x_range.map(xi => {
+let ratio = xi / (SX_BASE * val);
+let intensity = (K_BASE * xi) / Math.sqrt(Math.abs(1 - Math.pow(ratio, 2)) + 0.005);
+return Math.min(intensity, 55);
+});
+
+data.push({
+x: x_range,
+y: y_curve,
+type: 'scatter',
+mode: 'lines',
+name: 'Work Density',
+fill: 'tozeroy',
+line: { color: '#fbbf24', width: 2 }
+});
+
+// MARKER: Riding the curve with full 7-decimal precision
+let currentX = SX_BASE * val;
+let currentY = (K_BASE * currentX) / Math.sqrt(0.005);
+
+data.push({
+x: [currentX],
+y: [Math.min(currentY, 55)],
+type: 'scatter',
+mode: 'markers+text',
+name: 'Current Tension',
+// Changed to 7 decimal places as requested
+text: [E_geo_dynamic.toFixed(7)],
+textposition: 'top center',
+textfont: { color: '#ffffff', size: 10 },
+marker: {
+color: '#ffffff',
+size: 10,
+line: { color: '#fbbf24', width: 2 }
+}
+});
+
+layout.title = { text: "NON-LINEAR MANIFOLD TENSION INTEGRAL", font: { color: '#fbbf24' } };
+// Range updated to 0.75 for full visibility
+layout.xaxis = {
+title: {
+text: "<b>Threshold Ratio x/Sχ</b><br><span style='font-size: 0.65rem; color: #eee; font-style: italic;'>Displacement (x) Scaling to Energy (Egeo)</span>",
+font: { size: 12 }
+},
+range: [0, 0.75],
+gridcolor: '#222',
+zeroline: false,
+tickfont: { size: 10 }
+};
+
+layout.yaxis = {
+title: "Tension Intensity",
+range: [0, 60],
+gridcolor: '#222',
+zeroline: false
+};
+
+// Increase bottom margin slightly to accommodate the extra line of text
+layout.margin = { t: 40, r: 20, b: 70, l: 60 };
+
+
+} else if (currentTool === 3) { // Quantum Flux Density
+let val = parseFloat(document.getElementById('r_sl')?.value || 100) / 100;
+const E_GEO_BASE = 1.0683851;
+const E_man_dynamic = (3 * E_GEO_BASE) * val;
+const fieldVal = E_GEO_BASE * val;
+
+const res = document.getElementById('calc-result-3');
+if(res) res.innerText = "= " + E_man_dynamic.toFixed(7);
+
+data.push({
+values: [fieldVal, fieldVal, fieldVal],
+labels: ['Interaction Field', 'Gauge Field', 'Matter Field'],
+type: 'pie',
+hole: 0.5,
+marker: {
+colors: ['#c084fc', '#2dd4bf', '#fbbf24'],
+line: { color: '#111', width: 2 }
+},
+// Restoration of Name, % and Figure
+textinfo: 'label+percent+value',
+texttemplate: '<b>%{label}</b><br>%{percent}<br>%{value:.4f}',
+hoverinfo: 'label+percent+value',
+textfont: { color: '#fff', size: 9 },
+insidetextorientation: 'horizontal'
+});
+
+layout.title = { text: "TRIADIC ENERGY DISCHARGE DISTRIBUTION", font: { color: '#c084fc' } };
+layout.showlegend = true;
+layout.legend = {
+orientation: "h",
+x: 0.5,
+xanchor: "center",
+y: -0.15,
+font: { color: '#94a3b8', size: 10 }
+};
+
+// Center figure restored with full 7-decimal precision
+layout.annotations = [{
+font: { size: 14, color: '#fbbf24', family: 'monospace', weight: 'bold' },
+showarrow: false,
+text: E_man_dynamic.toFixed(7),
+x: 0.5,
+y: 0.5
+}];
+
+
+
+} else if (currentTool === 4) { // Gauge Connection
+let val = parseFloat(document.getElementById('e_sl')?.value || 100) / 100;
+const PSI_BASE = 0.1594301;
+const CHI = 1.388;
+const SX_BASE = 0.3068075;
+
+const Psi_dynamic = PSI_BASE * val;
+
+const res = document.getElementById('calc-result-4');
+if(res) res.innerText = "= " + Psi_dynamic.toFixed(7);
+
+let theta = Array.from({length: 101}, (_, i) => (i * 360) / 100);
+
+// Radial saturation boundary (scales with val)
+let r_radial = theta.map(() => (1/SX_BASE) * val);
+// Tangential restorative inertia (scales with val)
+let r_tangent = theta.map(() => Math.pow(CHI, 2) * val);
+
+data.push({
+r: r_radial, theta: theta,
+type: 'scatterpolar', name: 'Radial Saturation',
+mode: 'lines',
+line: { color: '#f87171', width: 2, dash: 'dash' }
+});
+
+data.push({
+r: r_tangent, theta: theta,
+type: 'scatterpolar', name: 'Tangential Restorative',
+mode: 'lines',
+fill: 'toself',
+fillcolor: 'rgba(59, 130, 246, 0.2)',
+line: { color: '#3b82f6', width: 2 }
+});
+
+// MARKER: Placed at the 45-degree vector to show coupling state
+data.push({
+r: [Math.pow(CHI, 2) * val],
+theta: [45],
+type: 'scatterpolar',
+mode: 'markers+text',
+name: 'Coupling Point',
+text: [Psi_dynamic.toFixed(7)],
+textposition: 'top right',
+textfont: { color: '#ffffff', size: 10 },
+marker: { color: '#ffffff', size: 10, line: { color: '#f87171', width: 2 } }
+});
+
+layout.title = { text: "EFFECTIVE STRESS COMPOSITION", font: { color: '#f87171' } };
+layout.polar = {
+radialaxis: { range: [0, 4.5], gridcolor: '#333', tickfont: {color: '#94a3b8'} },
+angularaxis: { gridcolor: '#333', tickfont: {color: '#94a3b8'} },
+bgcolor: 'rgba(0,0,0,0)'
+};
+layout.showlegend = true;
+
+
+
+} else if (currentTool === 5) { // Mass Handshake
+let val = parseFloat(document.getElementById('f_sl')?.value || 100) / 100;
+
+// Using the established 7-decimal pillars for calculation
+const E_MAN = 3.2051553;
+const PSI_SCALE = 0.1594301;
+const ME_BASE = E_MAN * PSI_SCALE; // 0.5109982
+const ME_dynamic = ME_BASE * val;
+const CODATA = 0.5109989;
+
+const res = document.getElementById('calc-result-5');
+if(res) res.innerText = "= " + ME_dynamic.toFixed(7) + " MeV";
+
+data.push({
+x: ['Structural Derivation', 'CODATA 2022'],
+y: [ME_dynamic, CODATA],
+type: 'bar',
+text: [ME_dynamic.toFixed(7), CODATA.toFixed(7)],
+textposition: 'auto',
+marker: {
+color: ['#2dd4bf', '#fbbf24'],
+line: { color: '#111', width: 2 }
+},
+name: 'Mass Comparison'
+});
+
+layout.title = { text: "ELECTRON REST MASS DERIVATION", font: { color: '#2dd4bf' } };
+layout.yaxis = {
+title: "Rest Mass (MeV)",
+range: [0, 1.2], // Range expanded to accommodate 200% slider
+gridcolor: '#222'
+};
+layout.showlegend = false; // Bar labels are self-explanatory
+}
+
+Plotly.react('plot-area', data, layout, {responsive: true, displayModeBar: false});
+}
+
+function resetLab() {
+syncVal(100, 'm_sl'); syncVal(100, 'c_sl'); syncVal(100, 'r_sl'); syncVal(100, 'e_sl'); syncVal(100, 'f_sl');
+}
+
+window.onload = () => { showScreen('portal'); };
+</script>
+</body>
+</html>

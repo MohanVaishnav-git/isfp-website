@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 42 — Operator-Level Substrate Completion</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #00ffcc;
+--accent-born: #f472b6; --accent-hilbert: #38bdf8; --accent-schro: #fbbf24; --accent-fields: #a78bfa; --accent-test: #4ade80;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6; --accent-gravity: #f59e0b;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-unified); font-family: sans-serif; font-size: 0.85rem; min-width: 350px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls, #nav-summary-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+#screen-lab.active { display: flex; flex-direction: column; height: calc(100vh - 50px); }
+
+#screen-portal { justify-content: flex-start; padding-top: 4dvh; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 50px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.constant-display-box {
+background: #111; border: 1px solid var(--accent-unified); padding: 6px; border-radius: 8px;
+display: flex; justify-content: space-around; margin-bottom: 10px;
+}
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(0, 255, 204, 0.05); border: 1px solid var(--accent-unified); padding: 5px; border-radius: 5px; margin-bottom: 8px; font-size: 0.7rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; }
+#plot-area { flex-grow: 1; width: 100%; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #000; border: 1px solid var(--accent-unified); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer {
+width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem;
+color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 42 — OPERATOR-LEVEL COMPLETION</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">Operator-Level Substrate Portal</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">Transforming Structural Unification into a full Quantum–Geometric Operator Theory.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-unified);">
+<h2 style="color:var(--accent-unified);">1. Operator Field Lift</h2>
+<p>Upgrading the field: $\boxed{ \Psi(x,t) \rightarrow \hat{\Psi}(x,t) }$</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-schro);">
+<h2 style="color:var(--accent-schro);">2. Hilbert Space Emergence</h2>
+<p>Derived measurement structure: $\boxed{ \langle \Psi | \hat{O} | \Psi \rangle }$</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-gravity);">
+<h2 style="color:var(--accent-gravity);">3. Commutation Algebra</h2>
+<p>The Origin of Jitter: $\boxed{ [\hat{x}, \hat{p}] = i\hbar }$</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-fields);">
+<h2 style="color:var(--accent-fields);">4. Geometry Coupling</h2>
+<p>Quantum Field on Emergent Geometry: $\boxed{ \Box_g \hat{\Psi} = 0 }$</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-test);">
+<h2 style="color:var(--accent-test);">5. Backreaction Closure</h2>
+<p>Self-Consistent Loop: $\boxed{ g_{\mu\nu} = g_{\mu\nu}(\langle \hat{\Psi}^\dagger \hat{\Psi} \rangle) }$</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-unified); background: linear-gradient(135deg, #0f1115 0%, #1a1a2e 100%);">
+<h2 style="color:var(--accent-unified);">6. Stage 42 Summary</h2>
+<p>The Self-Consistent Operator-Level Theory.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 42 — Mathematical Structure (Summary)</h2>
+
+<div class="summary-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify;">
+
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Fundamental Entity</h3>
+<p>The theory is defined by a single operator-valued substrate field $\hat{\Psi}(x,t)$ acting on a Hilbert space:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$\hat{\Psi}(x,t) \in \mathrm{End}(\mathcal{H})$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Density (Observable Foundation)</h3>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$\rho(x) = \langle \hat{\Psi}^\dagger(x)\hat{\Psi}(x) \rangle$
+</div>
+<p>In the classical limit, this reduces to: $\rho(x) = |\Psi(x)|^2$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Emergent Geometry</h3>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$g_{\mu\nu}(x) = \eta_{\mu\nu}\left(1 + \frac{P}{K}\rho(x)\right)$
+</div>
+<p>Thus, the metric is a functional of the field: $g_{\mu\nu} = g_{\mu\nu}(\Psi)$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Curvature Relation</h3>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$R_{\mu\nu} \sim \partial_\mu \partial_\nu \rho$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Operator Dynamics on Emergent Geometry</h3>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$\mathcal{L}_{\text{sub}}(g_{\mu\nu}) \Psi = 0$
+</div>
+<p>where the operator itself is coupled to the emergent geometry: $\mathcal{L}_{\text{sub}} = \mathcal{L}_{\text{sub}}(g_{\mu\nu}(\Psi))$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Commutation Structure</h3>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$[\hat{x}, \hat{p}] = i\hbar$
+</div>
+<p>This structure emerges from intrinsic substrate stochasticity.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Hilbert Space Emergence</h3>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$\mathcal{H} = \text{span}\{\Psi_i\}, \quad \langle \Psi_i, \Psi_j \rangle = \delta_{ij}$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Full Coupled System</h3>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$\begin{cases} \rho = \langle \hat{\Psi}^\dagger \hat{\Psi} \rangle \\ g_{\mu\nu} = \eta_{\mu\nu}\left(1 + \dfrac{P}{K}\rho\right) \\ \mathcal{L}_{\text{sub}}(g_{\mu\nu}) \Psi = 0 \end{cases}$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Closure Loop</h3>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$\Psi \;\rightarrow\; \rho \;\rightarrow\; g_{\mu\nu} \;\rightarrow\; \Psi$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Structural Identity</h3>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$g_{\mu\nu} = g_{\mu\nu}(\Psi), \quad \Psi = \Psi(g_{\mu\nu})$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">11. Final Governing Equation</h3>
+<div style="text-align: center; margin: 20px 0; padding: 15px; border: 1px solid var(--accent-unified); background: rgba(0,255,204,0.05);">
+$\boxed{ \mathcal{L}_{\text{sub}}\big(g_{\mu\nu}(|\Psi|^2)\big)\Psi = 0 }$
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 30px 0;">
+
+<h2 style="color:var(--accent-blue); text-align: center;">Stage 42 — Closure Theorem</h2>
+<div style="text-align: center; margin: 20px 0; font-style: italic; color: #38bdf8;">
+Theorem (Operator-Level Closure of Quantum–Geometric Dynamics)
+</div>
+<div style="text-align: center; margin: 15px 0; padding: 15px; background: rgba(56, 189, 248, 0.1); border-radius: 8px;">
+A single operator-valued substrate field provides a complete, self-consistent, and closed description of both quantum dynamics and spacetime geometry.
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px;">Formal Statement</h3>
+<p>Let the fundamental dynamics be governed by $\mathcal{L}_{\text{sub}} \Psi = 0$ with structural parameters $(K,\; P,\; \sigma)$ and operator lift $\Psi \rightarrow \hat{\Psi}$.</p>
+
+<p><b>1. Emergence of Observables:</b> $\rho = \langle \hat{\Psi}^\dagger \hat{\Psi} \rangle$. All measurable quantities arise from the operator field.</p>
+<p><b>2. Emergence of Geometry:</b> $g_{\mu\nu} = \eta_{\mu\nu}\left(1 + \frac{P}{K}\rho\right)$. Thus, geometry is fully derived: $g_{\mu\nu} = g_{\mu\nu}(\hat{\Psi})$.</p>
+<p><b>3. Coupled Dynamics:</b> $\mathcal{L}_{\text{sub}}(g_{\mu\nu}) \Psi = 0$ with $g_{\mu\nu} = g_{\mu\nu}(|\Psi|^2)$.</p>
+<p><b>4. Closure Property:</b> $\Psi \;\rightarrow\; \rho \;\rightarrow\; g_{\mu\nu} \;\rightarrow\; \Psi$ defines a closed dynamical system.</p>
+<p><b>5. Self-Consistency Condition:</b> $\Psi^* = \mathcal{F}(\mathcal{G}(\Psi^*))$. No external inputs are required.</p>
+<p><b>6. Absence of Independent Geometry:</b> $g_{\mu\nu} \notin \text{fundamental variables}$.</p>
+<p><b>7. Absence of Gravitational Quanta:</b> $h_{\mu\nu} \notin \text{fundamental variables}$. No independent gravitational field exists.</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px;">Corollary (End of Quantum Gravity Problem)</h3>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$\boxed{ \text{Gravity is not an independent interaction but an emergent manifestation of substrate dynamics.} }$<br><br>
+$\boxed{ \text{Therefore, no separate quantization of gravity is required.} }$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px;">Identity of Reality</h3>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$\boxed{ S \equiv \Psi }$<br><br>
+$\boxed{ \text{Reality = solution space of } \mathcal{L}_{\text{sub}}\Psi = 0 }$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px;">Final Closure Statement</h3>
+<div style="text-align: center; margin: 15px 0; padding: 10px; border: 1px solid var(--accent-blue);">
+Unification is complete when quantum structure and geometry arise from a single self-consistent operator dynamics.
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px;">Ultimate Form</h3>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$\boxed{ \mathcal{L}_{\text{sub}}\big(g_{\mu\nu}(|\Psi|^2)\big)\Psi = 0 \;\Longrightarrow\; \text{All Physics} }$
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div class="constant-display-box">
+<div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val">11.350</span></div>
+<div class="const-item"><span class="const-label">Synthesis P</span><span class="const-val">0.6900</span></div>
+</div>
+<div id="mapping-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Operator Telemetry</span>
+<span id="epoch-label" style="font-family:monospace; font-size:0.85rem; color:var(--accent-unified);">OPERATOR FIELD ACTIVE</span>
+</div>
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:0px; margin-bottom:0px; background:transparent; border:1px solid #333; color:var(--accent-unified); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:6px;">RESET OPERATOR</button>
+<div id="panel-footer-text" style="font-size: 0.75rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.3; margin-top: auto; margin-bottom: 0;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:2px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:6px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Quantum–Geometric Logic</span>
+<div id="metrics-content" style="font-size:0.65rem; font-family:monospace; line-height:1.3;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Convergence Result</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.65rem; color: var(--text-dim); line-height: 1.4; background: #000; padding: 10px; border-radius: 0px; border: 1px solid #222; margin-top: auto; margin-bottom: 0;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "OPERATOR FIELD LIFT",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: OPERATOR FIELD LIFT</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Introduction</h3>
+<p>According to this framework, the first step in Stage 42 is the transition from a classical or stochastic description of the substrate to an operator-level formulation. In earlier stages, the substrate field $\\Psi(x,t)$ described both stochastic fluctuations and the emergence of geometry through its density. However, this description does not yet provide a complete quantum structure, because it lacks an intrinsic framework for observables and measurement.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. The Structural Necessity</h3>
+<p>According to this framework, to resolve this, the substrate field is lifted to an operator-valued field:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\Psi(x,t) \\rightarrow \\hat{\\Psi}(x,t)$$
+</div>
+<p>This transition is not an external quantization applied to a classical system. Instead, it is a structural necessity: the substrate must internally generate its own observable and measurement framework.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Operator Identity</h3>
+<p>According to this framework, the lifted field $\\hat{\\Psi}(x,t)$ acts on a Hilbert space. It is an operator that maps states to states. This establishes a fundamental shift: the substrate is no longer a function defined over spacetime, but an operator-valued entity whose action defines the structure of physical states. It can be represented in terms of modes, where operator coefficients act on underlying substrate modes, encoding the excitation structure of the system.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Emergence of Hilbert Space</h3>
+<p>According to this framework, in this framework, Hilbert space is not assumed at the outset. Instead, it emerges as the natural domain required for the action of the operator field. The set of all states is generated by the action of $\\hat{\\Psi}$ on an initial state, and the completion of this set forms the Hilbert space. This reverses the standard formulation of quantum theory: standard quantum mechanics begins with a Hilbert space and introduces operators; here, the operator field comes first, and the Hilbert space emerges from it.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Observable Structure</h3>
+<p>According to this framework, once the operator field is introduced, observables arise naturally. Any measurable quantity is defined through expectation values of operators acting on states. These operators are constructed from the substrate operator field and its adjoint. In particular, the density is obtained from the expectation value of $\\hat{\\Psi}^\\dagger \\hat{\\Psi}$. This shows that probability is not postulated, but derived from the operator structure of the substrate.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Origin of Non-Commutativity</h3>
+<p>According to this framework, at the operator level, non-commutativity emerges naturally. The intrinsic stochastic character of the substrate manifests as non-commuting operators. This is not imposed as an axiom, but arises from the internal structure of the operator field. As a result, canonical commutation relations are understood as emergent features of the substrate dynamics, rather than fundamental postulates.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Physical Interpretation</h3>
+<p>According to this framework, the operator field lift represents a fundamental shift in the description of reality. The substrate is no longer a passive field defined over spacetime. Instead, it becomes an active operator structure that generates states, observables, and dynamics. Reality is thus described not by field configurations alone, but by the action of operators on a space of states that the system itself generates.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Role in Stage 42</h3>
+<p>According to this framework, this module establishes the foundation for the entire operator-level framework. From this point, Hilbert space emerges from the operator field, commutation relations arise from substrate dynamics, geometry will later emerge from operator-generated density, and closure will be achieved through backreaction. Without this operator lift, none of these structures can arise internally.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Summary Insight</h3>
+<p style="margin-bottom: 0;">According to this framework, the substrate, when lifted to an operator-valued field, becomes the generator of quantum structure. Quantization is not imposed from outside, but emerges as an intrinsic property of the substrate itself.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Operator Lift Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Fundamental Transition:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\Psi(x,t) \\rightarrow \\hat{\\Psi}(x,t)$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Quantum structure is not imposed but emerges from the substrate as it generates its own Hilbert space and observable framework.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: OPERATOR FIELD LIFT</h2>
+
+<div class="math-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify;">
+
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Operator Lift</h3>
+<p>The substrate field is promoted to an operator-valued field:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\Psi(x,t) \\;\\longrightarrow\\; \\hat{\\Psi}(x,t)$$
+</div>
+<p>where $\\hat{\\Psi}(x,t) \\in \\mathrm{End}(\\mathcal{H})$ and acts as: $\\hat{\\Psi}(x,t): \\mathcal{H} \\rightarrow \\mathcal{H}$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Mode Expansion</h3>
+<p>The operator field admits a decomposition in substrate modes:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\hat{\\Psi}(x,t) = \\sum_k \\hat{a}_k \\,\\phi_k(x,t)$$
+</div>
+<p>where $\\phi_k(x,t)$ represent substrate mode functions and $\\hat{a}_k$ are the operator coefficients.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Adjoint Field</h3>
+<p>The adjoint operator is defined as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\hat{\\Psi}^\\dagger(x,t) = \\sum_k \\hat{a}_k^\\dagger \\,\\phi_k^*(x,t)$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. State Generation</h3>
+<p>States are generated by operator action:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$|\\psi\\rangle = \\hat{\\Psi}(x,t)\\,|0\\rangle$$
+</div>
+<p>and more generally: $|\\psi\\rangle \\in \\mathcal{H}$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Hilbert Space Construction</h3>
+<p>The Hilbert space is defined as the closure of all states generated by the operator field:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\mathcal{H} = \\overline{\\{ \\hat{\\Psi}(x,t)\\,|0\\rangle \\}}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Density Definition</h3>
+<p>The physical density is defined through expectation value:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\rho(x,t) = \\langle \\psi | \\hat{\\Psi}^\\dagger(x,t)\\hat{\\Psi}(x,t) | \\psi \\rangle$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Observable Operators</h3>
+<p>Any observable is constructed as an operator functional:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\hat{O} = F\\big(\\hat{\\Psi}, \\hat{\\Psi}^\\dagger\\big)$$
+</div>
+<p>with the expectation value: $\\langle O \\rangle = \\langle \\psi | \\hat{O} | \\psi \\rangle$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Emergence of Non-Commutativity</h3>
+<p>Operator algebra satisfies $[\\hat{A}, \\hat{B}] \\neq 0$. In particular, the canonical structure arises:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$[\\hat{x}, \\hat{p}] = i\\hbar$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Structural Identity</h3>
+<div style="text-align: center; margin: 20px 0; padding: 15px; border: 1px solid var(--accent-unified); background: rgba(0,255,204,0.05);">
+$$\\boxed{ \\text{Quantum structure arises from operator-valued substrate field } \\hat{\\Psi}(x,t) }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Minimal Closure (Module 1 Level)</h3>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\hat{\\Psi}(x,t) \\;\\Rightarrow\\; \\mathcal{H}, \\; \\rho(x,t), \\; \\hat{O}$$
+</div>
+</div>`,
+
+
+sliders: `<div class="control-item"><div class="label-group"><span>OPERATOR INTENSITY</span><input type="number" id="l_in" class="digital-entry" value="1.0" oninput="syncVal(this.value, 'l_sl')"></div><input type="range" id="l_sl" min="0" max="2" step="0.1" value="1.0" oninput="syncVal(this.value, 'l_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">OPERATOR IDENTITY</span><div style="text-align:center; font-size: 0.9rem;">$\\hat{\\Psi}(x,t) \\in \\mathrm{End}(\\mathcal{H})$<br>$\\hat{\\Psi}(x,t) = \\sum_k \\hat{a}_k \\, \\phi_k(x,t)$</div></div>`,
+lawBox: `<div class="definition-box"><span class="def-title">LIFT LAW</span><div style="text-align:center; font-size: 0.9rem;">$\\Psi(x,t) \\;\\longrightarrow\\; \\hat{\\Psi}(x,t)$</div></div>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; line-height: 1.3; font-size: 0.75rem;">Substrate Field Ψ<br>↓<br>Quantization Lift<br>↓<br>Operator Field $\\hat{\\Psi}$<br>↓<br>Observable Foundation</div>`,
+hierarchy: `<div style="color: #00ffcc; font-weight: bold;">Quantum Operator Field</div><div style="color: #94a3b8; font-size: 0.75rem;">The substrate is no longer a classical field, but an operator acting on Hilbert space, forming the basis of quantum observables.</div>`,
+footer: "The substrate field is lifted into an operator-valued field, enabling representation in Hilbert space and observable dynamics.<p>Non-commutative structure emerges at the operator level.</p>",
+rightNote: `<div style="color: #00ffcc; line-height: 1.4; font-size: 0.80rem;"<b>The Lift:</b> Reality is no longer just a field; it is an operator field. This is the first step in building a full operator theory.`
+},
+
+2: {
+title: "HILBERT SPACE EMERGENCE",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: HILBERT SPACE EMERGENCE</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Introduction</h3>
+<p>According to this framework, the second module establishes how Hilbert space arises naturally from the operator structure introduced in Module 1. Once the substrate field is lifted to an operator-valued entity, it necessarily acts on a space of states. This requirement is not imposed externally; it follows from the internal consistency of operator action. The collection of all such states forms the Hilbert space.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. The Derived Framework</h3>
+<p>According to this framework, in standard quantum mechanics, Hilbert space is assumed at the outset, and operators are defined upon it. In contrast, within this framework, Hilbert space is derived. It emerges as the minimal structure required to support the action of the operator field.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Generation of States</h3>
+<p>According to this framework, states arise from the repeated action of the operator field on a reference state. Starting from an initial state, successive applications of the operator generate a set of states. This generated set, when completed under linear combinations and limits, forms the Hilbert space. Thus, the space of states is not predefined but constructed dynamically.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Inner Product Structure</h3>
+<p>According to this framework, for the operator field to act consistently and for observables to be well-defined, the space of states must admit an inner product. This inner product is not an independent assumption but arises from the requirement of measurable quantities. It allows the definition of norms, orthogonality, and projection, which are essential for interpreting physical states. As a result, the structure of Hilbert space emerges with linearity, completeness, and an inner product.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Orthogonality and Mode Structure</h3>
+<p>According to this framework, the substrate modes naturally organize into orthogonal components. This orthogonality reflects the independence of different excitation patterns of the substrate. As the operator field acts on these modes, it generates states that inherit this orthogonality. This leads to a structured decomposition of the Hilbert space into independent directions corresponding to different modes. Thus, orthogonality is not imposed but follows from the structure of the substrate modes.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Eigenvalue Structure and Measurement</h3>
+<p>According to this framework, once Hilbert space is established, operators acting on it admit eigenvalue decompositions. The equation:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\hat{O} \\Psi = \\lambda \\Psi$$
+</div>
+<p>expresses that measurable quantities correspond to eigenvalues of operators. This is not an added postulate but a consequence of the existence of an inner product and the linear operator structure. Measurement therefore emerges as the extraction of eigenvalues from operator action on states.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Emergence of Measurement Framework</h3>
+<p>According to this framework, the full measurement structure of quantum mechanics arises naturally at this stage. Observables correspond to operators, states correspond to vectors in Hilbert space, and measurement outcomes correspond to eigenvalues. All of these follow from the operator field and the Hilbert space it generates. Thus, the measurement problem is not introduced separately but is embedded in the structure of the theory.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Physical Interpretation</h3>
+<p>According to this framework, Hilbert space is not a mathematical abstraction imposed on reality. It is the natural arena required for the consistent action of the substrate at the operator level. The substrate generates both the states and the structure in which those states exist. This unifies the notions of state, measurement, and dynamics within a single framework.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Role in Stage 42</h3>
+<p>According to this framework, this module establishes the complete quantum state space. From this point: operators act on well-defined states, observables acquire meaning through eigenvalues, and the algebra of operators becomes physically interpretable. This prepares the ground for Module 3 (emergence of commutation algebra), Module 4 (coupling to geometry), and Module 5 (closure through backreaction).</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Summary Insight</h3>
+<p style="margin-bottom: 0;">According to this framework, Hilbert space is not assumed but emerges as the natural consequence of the operator field. The full structure of quantum measurement arises from this emergent space, making the theory internally complete at the level of states and observables.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Hilbert Space Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Structural Result:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\mathcal{H} = \\text{Closure}(\\{ \\hat{\\Psi} |0\\rangle \\})$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The arena for quantum states is dynamically generated by the operator field itself, rather than being an external assumption.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: HILBERT SPACE EMERGENCE</h2>
+
+<div class="math-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify;">
+
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. State Space Generation</h3>
+<p>States are generated by the action of the operator field:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$|\\psi\\rangle = \\hat{\\Psi}(x,t)\\,|0\\rangle$$
+</div>
+<p>More generally, repeated action gives:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$|\\psi_n\\rangle = \\hat{\\Psi}^n\\,|0\\rangle$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Hilbert Space Definition</h3>
+<p>The Hilbert space is defined as the closure of all generated states:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\mathcal{H} = \\overline{\\text{span}\\{ |\\psi\\rangle \\}}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Inner Product Structure</h3>
+<p>The Hilbert space admits an inner product $\\langle \\psi_i | \\psi_j \\rangle$ with an orthonormal basis:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\langle \\psi_i | \\psi_j \\rangle = \\delta_{ij}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Completeness Relation</h3>
+<p>A complete set of states satisfies the identity operator condition:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\sum_i |\\psi_i\\rangle \\langle \\psi_i| = \\mathbb{I}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Operator Action</h3>
+<p>Operators act linearly on the Hilbert space:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\hat{O} : \\mathcal{H} \\rightarrow \\mathcal{H}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Eigenvalue Equation</h3>
+<p>Measurement structure arises from the fundamental relation:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\hat{O}|\\psi\\rangle = \\lambda |\\psi\\rangle$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Expectation Value</h3>
+<p>Observable values are determined by the expectation value:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\langle O \\rangle = \\langle \\psi | \\hat{O} | \\psi \\rangle$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Norm and Probability</h3>
+<p>State normalization is defined as: $\\langle \\psi | \\psi \\rangle = 1$. The probability amplitude interpretation follows directly from the inner product structure.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Spectral Decomposition</h3>
+<p>Operators admit a spectral decomposition in terms of eigenvalues and projection operators:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\hat{O} = \\sum_\\lambda \\lambda |\\psi_\\lambda\\rangle \\langle \\psi_\\lambda|$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Structural Identity</h3>
+<div style="text-align: center; margin: 20px 0; padding: 15px; border: 1px solid var(--accent-unified); background: rgba(0,255,204,0.05);">
+$$\\boxed{ \\mathcal{H} = \\text{closure of states generated by } \\hat{\\Psi} }$$
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>HILBERT SCALE</span><input type="number" id="c_in" class="digital-entry" value="0.5" oninput="syncVal(this.value, 'c_sl')"></div><input type="range" id="c_sl" min="0" max="1" step="0.05" value="0.5" oninput="syncVal(this.value, 'c_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">HILBERT SPACE</span><div style="text-align:center; font-size: 0.9rem;">$\\mathcal{H} = \\overline{\\mathrm{span}\\{\\Psi\\}}$ $$\\langle \\Psi_i , \\Psi_j \\rangle = \\delta_{ij}$$</div></div>`,
+lawBox: `<div class="definition-box"><span class="def-title">MEASUREMENT</span><div style="text-align:center; font-size: 0.9rem;">$\\hat{O}\\Psi = \\lambda \\Psi$</div></div>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; line-height: 1.3; font-size: 0.85rem;">Inner Product<br>↓<br>Hilbert Space $\\mathcal{H}$<br>↓<br>Operator Spectrum<br>↓<br>Measurement Output</div>`,
+hierarchy: `<div style="color: #00ffcc; font-weight: bold;">Hilbert Emergence</div><div style="color: #94a3b8; font-size: 0.85rem;">The Hilbert space structure is derived from substrate modes, ensuring a complete framework for quantum measurement.</div>`,
+footer: "Hilbert space is not postulated, but emerges from the completeness and orthogonality of substrate oscillatory modes.",
+rightNote: `<div style="color: #00ffcc; line-height: 1.4; font-size: 0.85rem;"<b>The Measurement:</b> All observables arise from the interaction between the operator field and its state vector.`
+},
+
+3: {
+title: "COMMUTATION ALGEBRA",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: COMMUTATION ALGEBRA</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Introduction</h3>
+<p>According to this framework, the third module establishes the algebraic structure governing the interaction of operators. Following the operator field lift and the emergence of Hilbert space, the framework must now determine how operators relate to one another. This relation is not arbitrary; it arises from the intrinsic dynamics of the substrate.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Origin of Non-Commutativity</h3>
+<p>According to this framework, non-commutativity is not introduced as an axiom. It emerges from the intrinsic stochastic character of the substrate. At the microscopic level, the substrate exhibits persistent fluctuations. Because of this, the action of operators depends on order. Two operator actions performed in different sequences do not produce identical results. This leads to the fundamental structure: operators do not commute.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Canonical Structure</h3>
+<p>According to this framework, from this intrinsic non-commutativity, canonical commutation relations arise. In particular, position and momentum operators exhibit a non-zero commutator proportional to a fundamental scale:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$[\\hat{x}, \\hat{p}] = i\\hbar$$
+</div>
+<p>This relation is not imposed but derived as a structural consequence of substrate dynamics.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Algebraic Formation</h3>
+<p>According to this framework, the set of commutation relations defines a consistent operator algebra. This algebra governs the evolution of states, constrains observable quantities, and determines uncertainty relations. Quantum mechanics thus emerges as an algebraic structure rooted in substrate behavior.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Physical Interpretation</h3>
+<p>According to this framework, non-commutativity reflects a fundamental property of reality. It is not merely a limitation of measurement, but a structural feature of the substrate. The inability to simultaneously define certain quantities with arbitrary precision arises from the intrinsic dynamics of the system.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Visual Interpretation</h3>
+<p>According to this framework, the visual representation shows a scatter distribution of position and momentum values under substrate dynamics. Each point represents a simultaneous sampling within the fluctuating substrate. The key features are: a finite spread in the distribution, the absence of a single sharply defined joint value, and persistent dispersion even under repeated sampling. This spread is not measurement error; it is the direct manifestation of intrinsic substrate fluctuations. The non-zero dispersion corresponds to non-commutativity, providing a visual representation of the underlying algebraic structure.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Emergence of Quantum Algebra</h3>
+<p>According to this framework, from the non-commutative structure: canonical commutation relations are established, operator ordering becomes physically meaningful, and quantum evolution equations become well-defined. Thus, the full algebraic framework of quantum mechanics is recovered from the substrate.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Role in Stage 42</h3>
+<p>According to this framework, this module provides the algebraic foundation necessary for the completion of the operator-level theory. It prepares the structure required for coupling with geometry and for achieving closure through backreaction.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Summary Insight</h3>
+<p style="margin-bottom: 0;">According to this framework, non-commutativity is an emergent property of the substrate. The non-zero commutator is the mathematical expression of intrinsic fluctuations, giving rise to the algebraic structure of quantum mechanics.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Commutation Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Algebraic Foundation:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$[\\hat{A}, \\hat{B}] = i\\hat{C}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The interaction of operators is governed by an emergent non-commutative algebra, rooted in the stochastic nature of the substrate.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: COMMUTATION ALGEBRA</h2>
+
+<div class="math-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify;">
+
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Operator Commutator Definition</h3>
+<p>For any two operators, the commutator is defined as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$[\\hat{A}, \\hat{B}] = \\hat{A}\\hat{B} - \\hat{B}\\hat{A}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Non-Commutativity Condition</h3>
+<p>Intrinsic substrate dynamics imply that operators generally do not commute:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$[\\hat{A}, \\hat{B}] \\neq 0$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Canonical Commutation Relation</h3>
+<p>Position and momentum operators satisfy the fundamental relation:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$[\\hat{x}, \\hat{p}] = i\\hbar$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Generalized Commutation Structure</h3>
+<p>For operator-valued fields, the commutation structure is given by:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$[\\hat{\\Psi}(x), \\hat{\\Psi}^\\dagger(y)] = \\delta(x - y)$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Algebra Closure</h3>
+<p>The operator algebra satisfies the Jacobi identity, ensuring structural consistency:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$[\\hat{A},[\\hat{B},\\hat{C}]] + [\\hat{B},[\\hat{C},\\hat{A}]] + [\\hat{C},[\\hat{A},\\hat{B}]] = 0$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Expectation Value of Commutator</h3>
+<p>The measurable consequence of the commutator is its expectation value:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\langle [\\hat{A}, \\hat{B}] \\rangle = \\langle \\psi | [\\hat{A}, \\hat{B}] | \\psi \\rangle$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Uncertainty Relation</h3>
+<p>The uncertainty principle is derived directly from the non-zero commutator:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\Delta A \\, \\Delta B \\geq \\frac{1}{2} \\left| \\langle [\\hat{A}, \\hat{B}] \\rangle \\right|$+$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Time Evolution (Algebraic Form)</h3>
+<p>The dynamics of any operator are governed by its commutation with the Hamiltonian:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\frac{d\\hat{O}}{dt} = \\frac{i}{\\hbar} [\\hat{H}, \\hat{O}]$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Structural Identity</h3>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$[\\hat{A}, \\hat{B}] \\neq 0 \\;\\Rightarrow\\; \\text{quantum algebra}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Substrate Interpretation</h3>
+<div style="text-align: center; margin: 20px 0; padding: 15px; border: 1px solid var(--accent-unified); background: rgba(0,255,204,0.05);">
+$$\\boxed{ [\\hat{x}, \\hat{p}] = i\\hbar \\;\\;\\Longleftrightarrow\\;\\; \\text{intrinsic substrate fluctuations} }$$
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>JITTER RATE</span><input type="number" id="k_in" class="digital-entry" value="0.5" oninput="syncVal(this.value, 'k_sl')"></div><input type="range" id="k_sl" min="0.1" max="2" step="0.1" value="0.5" oninput="syncVal(this.value, 'k_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">COMMUTATOR</span><div style="text-align:center; font-size: 0.9rem;">$[\\hat{x}, \\hat{p}] = i\\hbar$</div></div>`,
+lawBox: `<div class="definition-box"><span class="def-title">ALGEBRA</span><div style="text-align:center; font-size: 0.9rem;">$[\\hat{x}, \\hat{p}] = i\\hbar$</div></div>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; line-height: 1.3; font-size: 0.85rem;">Stochastic Jitter<br>↓<br>Non-Commutativity<br>↓<br>Heisenberg Algebra<br>↓<br>Canonical Commutation</div>`,
+hierarchy: `<div style="color: #00ffcc; font-weight: bold;">Commutation Origin</div><div style="color: #94a3b8; font-size: 0.85rem;">Quantum algebra recovered from the substrate's stochastic dynamics.</div>`,
+footer: "Commutation emerges from the substrate’s intrinsic jitter, recovering full QM algebra.",
+rightNote: `<div style="color: #00ffcc; line-height: 1.4; font-size: 0.85rem;"<b>The Jitter:</b> The non-zero commutator is the mathematical signature of the substrate's micro-fluctuations.`
+},
+
+4: {
+title: "GEOMETRY COUPLING",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: GEOMETRY COUPLING</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Conceptual Foundation</h3>
+<p>According to this framework, this module establishes the coupling between quantum structure and geometry. With the operator field and its algebra already defined, the framework must now explain how spacetime geometry arises from the same underlying substrate. The key transition is that geometry is not introduced as an independent entity. Instead, it emerges directly from the operator field through its density.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. From Operator Field to Geometry</h3>
+<p>According to this framework, the operator field generates a density through its expectation value. This density encodes the distribution of substrate activity and serves as the source of geometric structure. Thus, geometry is derived from quantum structure, rather than existing independently of it. This establishes a direct functional relationship: the operator field determines density, and density determines geometry.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Emergence of Metric Structure</h3>
+<p>According to this framework, the spacetime metric is no longer fundamental; it is constructed from the substrate density. Variations in density produce variations in the metric, which are perceived as curvature. Thus, geometry is not primary; it is an emergent response to substrate distribution. This unifies quantum and geometric descriptions within a single framework.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Coupled Dynamics</h3>
+<p>According to this framework, once geometry emerges from the substrate, the dynamics of the operator field are no longer independent of geometry. The operator field evolves on a geometry that it itself generates. This creates a coupled system: the field determines geometry, and geometry influences the evolution of the field. This mutual dependence is the basis of quantum–geometric coupling.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Physical Interpretation</h3>
+<p>According to this framework, this module eliminates the separation between "field" and "spacetime". There is no external geometric background. Instead, the operator field represents microscopic dynamics, and geometry represents the macroscopic manifestation of those dynamics. Both are expressions of the same underlying substrate.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Visual Interpretation</h3>
+<p>According to this framework, the central visual shows a wave evolving over a curved surface. The surface represents the emergent geometry, while the wave represents the quantum field. Key observations: the curvature of the surface is not fixed—it reflects variations in the underlying density; the wave propagates along this curved structure; and the geometry and the wave are not independent—they are coupled. The visual demonstrates that the field evolves on geometry that arises from the field itself. This is not propagation on a background, but evolution within a self-generated structure.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Unified Picture</h3>
+<p>According to this framework, at this stage, the framework establishes: Quantum field $\\rightarrow$ generates density; Density $\\rightarrow$ generates geometry; Geometry $\\rightarrow$ influences field evolution. Thus, quantum mechanics and geometry are no longer separate theories, but two aspects of a single dynamical system.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Role in Stage 42</h3>
+<p>According to this framework, this module provides the essential bridge between operator theory and geometry. It prepares the framework for closure by establishing: geometry as emergent, dynamics as coupled, and spacetime as non-fundamental. This directly leads to the final module, where the system becomes self-consistent.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Summary Insight</h3>
+<p style="margin-bottom: 0;">According to this framework, geometry is not an independent structure but emerges from the density of the operator field. The field and geometry form a coupled system, where each determines the other, revealing spacetime as a macroscopic manifestation of underlying substrate dynamics.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Coupling Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Fundamental Relation:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\hat{\\Psi} \\rightarrow \\rho(x) \\rightarrow g_{\\mu\\nu}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Spacetime geometry is the macroscopic response of the substrate to the underlying operator field distribution.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: GEOMETRY COUPLING</h2>
+
+<div class="math-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify;">
+
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Density from Operator Field</h3>
+<p>The density is defined as the expectation value of the operator field and its adjoint:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\rho(x,t) = \\langle \\hat{\\Psi}^\\dagger(x,t)\\,\\hat{\\Psi}(x,t) \\rangle$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Emergent Metric Definition</h3>
+<p>The spacetime metric is constructed from the underlying substrate density:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$g_{\\mu\\nu}(x,t) = \\eta_{\\mu\\nu}\\left(1 + \\frac{P}{K}\\,\\rho(x,t)\\right)$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Metric Functional Dependence</h3>
+<p>Equivalently, the metric is expressed as a functional of the density generated by the operator field:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$g_{\\mu\\nu} = g_{\\mu\\nu}(\\rho[\\hat{\\Psi}])$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Curvature from Density Variation</h3>
+<p>Geometric curvature arises directly from the spatial variation of the substrate density:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$R_{\\mu\\nu} \\sim \\partial_\\mu \\partial_\\nu \\rho$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Effective Field Equation</h3>
+<p>The emergent geometry satisfies an effective field equation based on the $P/K$ coupling:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$G_{\\mu\\nu} = \\frac{P}{K}\\,T_{\\mu\\nu}^{(\\text{eff})}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Effective Stress-Energy</h3>
+<p>The effective source term is derived from the gradients of the substrate density:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$T_{\\mu\\nu}^{(\\text{eff})} \\sim \\partial_\\mu \\rho \\,\\partial_\\nu \\rho$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Field Evolution on Geometry</h3>
+<p>The operator field evolves on the emergent metric it has generated:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\hat{D}_{g}\\,\\hat{\\Psi} = 0$$
+</div>
+<p>where $\\hat{D}_{g}$ is a geometric differential operator defined by the metric $g_{\\mu\\nu}$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Coupled Dependence</h3>
+<p>The framework establishes a circular, self-consistent chain of dependence:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\hat{\\Psi} \\;\\Rightarrow\\; \\rho \\;\\Rightarrow\\; g_{\\mu\\nu} \\;\\Rightarrow\\; \\hat{\\Psi}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. No Background Structure</h3>
+<p>In this formulation, the metric is not an independent variable but a result of density:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$g_{\\mu\\nu} \\neq \\text{independent variable} \\;\\;\\; \\Rightarrow \\;\\;\\; g_{\\mu\\nu} = g_{\\mu\\nu}(\\rho)$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Structural Identity</h3>
+<div style="text-align: center; margin: 20px 0; padding: 15px; border: 1px solid var(--accent-unified); background: rgba(0,255,204,0.05);">
+$$\\boxed{ \\text{Geometry} = \\text{macroscopic manifestation of } \\rho(\\hat{\\Psi}) }$$
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>COUPLING STRENGTH</span><input type="number" id="st_in" class="digital-entry" value="0.5" oninput="syncVal(this.value, 'st_sl')"></div><input type="range" id="st_sl" min="0" max="1" step="0.05" value="0.5" oninput="syncVal(this.value, 'st_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">EMERGENT METRIC</span><div style="text-align:center; font-size: 1.0rem;">$g_{\\mu\\nu} = \\eta_{\\mu\\nu}\\!\\left(1 + \\frac{P}{K}\\rho\\right)$</div></div>`,
+lawBox: `<div class="definition-box"><span class="def-title">FIELD ON CURVE</span><div style="text-align:center; font-size: 1.0rem;">Quantum Field + Geometry</div></div>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; line-height: 1.3; font-size: 0.85rem;">Operator Field $\\hat{\\Psi}$<br>↓<br>Density ρ = |$\\Psi|^2$<br>↓<br>Emergent Metric $g_{\\mu\\nu}$<br>↓<br>Curved Wave Dynamics</div>`,
+hierarchy: `<div style="color: #00ffcc; font-weight: bold;">Geometric Coupling</div><div style="color: #94a3b8; font-size: 0.85rem;">Quantum fields evolve on geometry generated from their own density.</div>`,
+footer: "Quantum fields evolve on their own emergent geometry, unifying the systems.",
+rightNote: `<div style="color: #00ffcc; line-height: 1.4; font-size: 0.85rem;"<b>The Coexistence:</b> There is no 'external' space. The operator field and geometry are two manifestations of the same substrate.`
+},
+
+5: {
+title: "BACKREACTION CLOSURE",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: BACKREACTION CLOSURE</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Conceptual Completion</h3>
+<p>According to this framework, this module establishes the final closure of the system. All previously introduced structures—operator field, Hilbert space, algebra, and geometry—are now shown to form a single self-consistent system. There are no external inputs remaining.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Closure Principle</h3>
+<p>According to this framework, the central statement of this module is that the field and geometry do not merely interact—they form a closed dynamical loop. The operator field generates density; density generates geometry; and geometry governs the evolution of the operator field. This loop is complete and self-sustaining.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Elimination of External Structures</h3>
+<p>According to this framework, at this stage: no external spacetime is required, no independent gravitational postulate is needed, and no separate quantization procedure exists. All structures arise internally from the substrate dynamics.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Self-Consistent System</h3>
+<p>According to this framework, the system satisfies internal generation of structure, internal evolution laws, and internal feedback. Nothing lies outside the theory. This defines a self-consistent physical system.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Physical Interpretation</h3>
+<p>According to this framework, reality is no longer described as "fields in spacetime." Instead, it is a single substrate whose internal dynamics appear as both field and geometry. Thus: quantum mechanics describes operator behavior, geometry describes collective structure, and both are manifestations of the same underlying entity.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Visual Interpretation</h3>
+<p>According to this framework, the central visual shows a damped oscillatory loop. The curve represents iterative feedback between field and geometry. Initial oscillations represent adjustment between the two, while the damping indicates convergence toward a stable configuration. This visually encodes the self-consistent closure of the dynamical system.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. End of Quantum–Gravity Problem</h3>
+<p>According to this framework, because geometry is generated from the same field that defines quantum structure, there is no need to quantize gravity separately. Gravity is not an independent interaction—it is a manifestation of substrate structure.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Closure Insight (Final Integration)</h3>
+<p>According to this framework, the dynamical loop $\\Psi \\leftrightarrow g_{\\mu\\nu}$ closes self-consistently. The field generates geometry, and geometry governs the evolution of the field. No external spacetime is required, and no additional quantization of gravity is needed. The system forms a complete, self-contained description of physical reality.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Final Structural Meaning</h3>
+<p>According to this framework, at completion, there is one field, one equation, and one dynamical system. All physical phenomena arise as expressions of this unified structure.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Role in Stage 42</h3>
+<p>According to this framework, this module completes operator-level unification. It establishes closure, self-consistency, and total unification. This prepares directly for Stage 43, where phenomenology and observable consequences are developed.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">11. Final Statement</h3>
+<p>According to this framework, unification is achieved not by combining separate theories, but by revealing that all structures arise from a single self-consistent dynamical substrate.</p>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 25px 0;">
+
+<h2 style="color:var(--accent-blue); text-align: center;">Why Stage 42 Eliminates the Need for Gravitons</h2>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">1. The Standard Assumption</h3>
+<p>In conventional approaches, spacetime is assumed to be fundamental and decomposed as $g_{\\mu\\nu} = \\eta_{\\mu\\nu} + h_{\\mu\\nu}$. The perturbation $h_{\\mu\\nu}$ is treated as a field and quantized as $\\hat{h}_{\\mu\\nu}$, leading to the graviton. This assumes spacetime exists independently and gravity propagates on it.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Structural Shift</h3>
+<p>The framework replaces this with: $g_{\\mu\\nu} = \\eta_{\\mu\\nu}\\left(1 + \\frac{P}{K}\\rho\\right)$, where $\\rho = |\\Psi|^2$. Geometry is not fundamental, but emerges from substrate density.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Operator-Level Advancement</h3>
+<p>With the operator lift $\\Psi \\rightarrow \\hat{\\Psi}$, the density becomes $\\rho = \\langle \\hat{\\Psi}^\\dagger \\hat{\\Psi} \\rangle$, and the metric $g_{\\mu\\nu} = g_{\\mu\\nu}\\big(\\langle \\hat{\\Psi}^\\dagger \\hat{\\Psi} \\rangle\\big)$. Geometry is a functional of quantum operators, not an independent entity.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Closed Quantum–Geometric Loop</h3>
+<p>The identity $\\Psi \\rightarrow \\rho \\rightarrow g_{\\mu\\nu} \\rightarrow \\Psi$ expresses a closed system where quantum structure generates geometry, which feeds back into quantum evolution. No external structure is required.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Why the Graviton is Not Required</h3>
+<p>Gravity is not an independent field; it is an emergent manifestation of substrate density. Therefore, no independent $h_{\\mu\\nu}$ exists, no separate quantization of geometry is required, and no particle associated with gravity is needed.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Replacement of the Graviton Concept</h3>
+<p>Geometry is the macroscopic expression of quantum substrate dynamics: $R_{\\mu\\nu} \\sim \\partial_\\mu \\partial_\\nu \\rho$. Curvature arises from density variations, not from particle exchange.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Conceptual Unification</h3>
+<p>The correspondence "Forces $\\leftrightarrow$ particles" is replaced by: all interactions and geometry arise from a single substrate dynamics. No separate carrier of gravity exists; no force-exchange picture is required.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Final Structural Statement</h3>
+<p>Quantizing gravity is unnecessary because gravity is already a manifestation of quantum substrate dynamics.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Ultimate Conclusion</h3>
+<p style="margin-bottom: 0;">The graviton arises only when geometry is treated as a fundamental field. In a substrate-based framework, geometry is emergent. Therefore, no graviton is required.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Closure Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Unified Identity:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\hat{\\Psi} \\leftrightarrow g_{\\mu\\nu}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Self-consistency is achieved as the field defines the geometry that governs its own evolution, removing the need for external quantization.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: BACKREACTION CLOSURE</h2>
+
+<div class="math-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify;">
+
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Fundamental Closure Chain</h3>
+<p>According to this framework, the field and geometry form a self-consistent dynamical loop:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\Psi \\;\\longrightarrow\\; \\rho \\;\\longrightarrow\\; g_{\\mu\\nu} \\;\\longrightarrow\\; \\Psi$$
+</div>
+<p>where the density and emergent metric are defined as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\rho(x) = |\\Psi(x)|^2$$
+$$g_{\\mu\\nu}(x) = \\eta_{\\mu\\nu}\\left(1 + \\frac{P}{K}\\rho(x)\\right)$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Operator-Level Density</h3>
+<p>At the operator level, the density is the expectation value of the substrate field:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\rho(x) = \\langle \\Psi | \\hat{\\Psi}^\\dagger(x)\\hat{\\Psi}(x) | \\Psi \\rangle$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Geometry as Functional of the Field</h3>
+<p>The spacetime metric is not an independent variable but a functional of the substrate field intensity:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$g_{\\mu\\nu} = g_{\\mu\\nu}(\\rho) = g_{\\mu\\nu}(|\\Psi|^2)$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Substrate Evolution with Backreaction</h3>
+<p>The evolution operator depends on the geometry it generates. Substituting the metric functional back into the master equation yields:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\mathcal{L}_{\\text{sub}}(g_{\\mu\\nu}) \\Psi = 0$$
+$$\\mathcal{L}_{\\text{sub}}\\big(g_{\\mu\\nu}(|\\Psi|^2)\\big)\\Psi = 0$$
+</div>
+<p>This represents a non-linear, self-coupled equation where the field acts as its own background.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Functional Closure Form</h3>
+<p>The relationship between field evolution ($\\mathcal{F}$) and geometric generation ($\\mathcal{G}$) is expressed as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\Psi = \\mathcal{F}\\big(g_{\\mu\\nu}(\\Psi)\\big) \\quad \\text{and} \\quad g_{\\mu\\nu} = \\mathcal{G}(\\Psi)$$
+$$\\Psi = \\mathcal{F}(\\mathcal{G}(\\Psi))$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Fixed-Point (Self-Consistent) Condition</h3>
+<p>The physical reality corresponds to the fixed-point solution of the self-coupled system:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\Psi^* = \\mathcal{F}(\\mathcal{G}(\\Psi^*))$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Equivalent Loop Representation</h3>
+<p>The complete logical cycle of the substrate is represented as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\Psi \\;\\longrightarrow\\; |\\Psi|^2 \\;\\longrightarrow\\; g_{\\mu\\nu} \\;\\longrightarrow\\; \\mathcal{L}_{\\text{sub}} \\;\\longrightarrow\\; \\Psi$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Closure Identity</h3>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$g_{\\mu\\nu} = g_{\\mu\\nu}(\\Psi), \\quad \\Psi = \\Psi(g_{\\mu\\nu})$$
+$$\\boxed{ \\Psi \\;\\leftrightarrow\\; g_{\\mu\\nu} }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Coupled System (Final Form)</h3>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\begin{cases} \\rho = |\\Psi|^2 \\\\ g_{\\mu\\nu} = \\eta_{\\mu\\nu}\\left(1 + \\dfrac{P}{K}\\rho\\right) \\\\ \\mathcal{L}_{\\text{sub}}(g_{\\mu\\nu}) \\Psi = 0 \\end{cases}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Curvature–Density Relation</h3>
+<p>Curvature is mathematically equivalent to the second-order variation of density:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$R_{\\mu\\nu} \\sim \\partial_\\mu \\partial_\\nu \\rho$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">11. No Independent Gravitational Field</h3>
+<p>Because geometry is a consequence of the field, there are no fundamental perturbation variables ($h_{\\mu\\nu}$):</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$h_{\\mu\\nu} \\notin \\text{Fundamental Variables} \\;\\; \\Rightarrow \\;\\; g_{\\mu\\nu} = g_{\\mu\\nu}(\\Psi)$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">12. Final Mathematical Closure Statement</h3>
+<div style="text-align: center; margin: 20px 0; padding: 15px; border: 1px solid var(--accent-unified); background: rgba(0,255,204,0.05);">
+$$\\boxed{ \\mathcal{L}_{\\text{sub}}\\big(g_{\\mu\\nu}(|\\Psi|^2)\\big)\\Psi = 0 }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">13. Ultimate Compact Form</h3>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\boxed{ \\Psi \\;\\Rightarrow\\; \\text{All Geometry and Dynamics} }$$
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>CLOSURE INDEX</span><input type="number" id="e_in" class="digital-entry" value="1.0" oninput="syncVal(this.value, 'e_sl')"></div><input type="range" id="e_sl" min="0.5" max="1.5" step="0.01" value="1.0" oninput="syncVal(this.value, 'e_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">DYNAMIC LOOP</span><div style="text-align:center; font-size: 1.0rem;">$\\Psi \\;\\Longleftrightarrow\\; g_{\\mu\\nu}(\\rho[\\Psi])$<br>$g_{\\mu\\nu} = g_{\\mu\\nu}\\big(\\langle \\hat{\\Psi}^\\dagger \\hat{\\Psi} \\rangle\\big)$</div></div>`,
+lawBox: `<div class="definition-box"><span class="def-title">CLOSURE</span><div style="text-align:center; font-size: 1.0rem;">Self-Consistent Theory</div></div>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; line-height: 1.3;font-size: 0.85rem;">$\\Psi \\rightarrow \\rho \\rightarrow g_{\\mu\\nu} \\rightarrow \\Psi$<br>↓<br>No External Spacetime<br>↓<br>Total Substrate Identity<br>↓<br>Complete Unification</div>`,
+hierarchy: `<div style="color: #00ffcc; font-weight: bold;">Self-Consistent Closure</div><div style="color: #94a3b8; font-size: 0.85rem;">The substrate forms a closed, self-consistent system,  removing the need for an external quantization of gravity.</div>`,
+footer: "The field and geometry form a closed system, removing the need for 'Quantum Gravity'.",
+rightNote: `<div style="color: #00ffcc; line-height: 1.4; font-size: 0.85rem;"<b>The Closure:</b> Stage 42 shows that once the operator lift is complete, the dynamical loop $\\Psi \\leftrightarrow g_{\\mu\\nu}$ closes self-consistently.`
+}
+};
+
+function syncVal(val, id) {
+const sliderId = id.includes('_in') ? id.replace('_in', '_sl') : id;
+const inputId = id.includes('_sl') ? id.replace('_sl', '_in') : id;
+if(document.getElementById(sliderId)) document.getElementById(sliderId).value = val;
+if(document.getElementById(inputId)) document.getElementById(inputId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+document.getElementById('brief-box-content').innerHTML = content.brief || "Coming Soon";
+document.getElementById('math-box-content').innerHTML = content.math || "Coming Soon";
+document.getElementById('control-sliders').innerHTML = content.sliders;
+document.getElementById('active-module-title').innerText = content.title;
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('metrics-content').innerHTML = content.metricsContent;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+showScreen('briefing');
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() {
+showScreen('lab');
+setTimeout(() => {
+runLab();
+window.dispatchEvent(new Event('resize'));
+}, 100);
+}
+
+function runLab() {
+const target = document.getElementById('plot-area');
+if (!target) return;
+
+let data = [];
+let layout = {
+paper_bgcolor: 'black', plot_bgcolor: 'black', margin: {t:40,b:40,l:50,r:30},
+xaxis: { color: '#666', gridcolor: '#111', showticklabels: false },
+yaxis: { color: '#666', gridcolor: '#111', showticklabels: false },
+showlegend: false
+};
+
+
+if (currentTool === 1) { // MODULE 1: OPERATOR FIELD LIFT (FINAL VISUAL LOCK)
+let intensity = parseFloat(document.getElementById('l_sl')?.value || 1.0);
+let x = [], y = [], z = [];
+let size = 25;
+
+for (let i = 0; i < size; i++) {
+let r_x = [], r_y = [], r_z = [];
+for (let j = 0; j < size; j++) {
+let u = (i / (size - 1)) * 20 - 10;
+let v = (j / (size - 1)) * 20 - 10;
+let base = Math.sin(u * 0.5) * Math.cos(v * 0.5);
+let jitter = (Math.random() - 0.5) * 0.4 * intensity;
+
+r_x.push(u);
+r_y.push(v);
+r_z.push(intensity * (base + jitter));
+}
+x.push(r_x); y.push(r_y); z.push(r_z);
+}
+
+data = [{
+type: 'surface',
+x: x, y: y, z: z,
+name: 'Operator Field Ψ-hat', // THE LEGEND ENTRY
+colorscale: 'Viridis',
+showscale: false,
+lighting: { ambient: 0.6, diffuse: 0.8, specular: 0.5 },
+contours: {
+z: { show: true, color: '#00ffcc', width: 1 }
+}
+}];
+
+layout.showlegend = true; // FORCE LEGEND VISIBILITY
+layout.legend = { font: { color: '#94a3b8', size: 10 }, x: 0, y: 1 };
+
+layout.scene = {
+xaxis: {
+title: { text: 'Spatial X', font: { size: 10, color: '#94a3b8' } },
+showgrid: true, gridcolor: '#222'
+},
+yaxis: {
+title: { text: 'Spatial Y', font: { size: 10, color: '#94a3b8' } },
+showgrid: true, gridcolor: '#222'
+},
+zaxis: {
+title: { text: 'Operator Ψ-hat', font: { size: 10, color: '#00ffcc' } },
+range: [-12, 12],
+gridcolor: '#222',
+zerolinecolor: '#444'
+},
+camera: { eye: { x: 1.5, y: 1.5, z: 1.2 } }
+};
+layout.title = "MODULE 1: OPERATOR FIELD LIFT (Ψ → Ĥ)";
+
+
+} else if (currentTool === 2) { // MODULE 2: HILBERT SPACE EMERGENCE (UPGRADED)
+let scale = parseFloat(document.getElementById('c_sl')?.value || 0.5);
+let x_vals = [], y_vals = [];
+
+// Generate the Eigenvalue Spectral Distribution
+for(let i = 0; i < 50; i++) {
+x_vals.push(i);
+// Damped oscillation representing the convergence of the inner product
+y_vals.push(Math.exp(-i * scale * 0.2) * Math.sin(i * 0.8));
+}
+
+data = [{
+x: x_vals,
+y: y_vals,
+mode: 'lines+markers',
+name: 'Eigenvalue Spectrum λ', // THE LEGEND
+line: { color: '#38bdf8', width: 2 },
+marker: { color: '#00ffcc', size: 4 }
+}];
+
+layout.showlegend = true;
+layout.legend = { font: { color: '#94a3b8', size: 10 }, x: 0.7, y: 1 };
+
+layout.xaxis = {
+title: { text: 'Eigenstate Index (n)', font: { size: 10, color: '#94a3b8' } },
+showgrid: true, gridcolor: '#111', zeroline: false
+};
+layout.yaxis = {
+title: { text: 'Measurement Amplitude', font: { size: 10, color: '#38bdf8' } },
+showgrid: true, gridcolor: '#111', zerolinecolor: '#222'
+};
+
+layout.title = "HILBERT SPACE: EIGENVALUE DISTRIBUTION";
+
+
+} else if (currentTool === 3) { // MODULE 3: COMMUTATION ALGEBRA (PHASE SPACE)
+let jitter = parseFloat(document.getElementById('k_sl')?.value || 0.5);
+let x_vals = [], y_vals = [];
+
+// Generate 120 points to represent the Phase-Space Cloud
+for(let i = 0; i < 120; i++) {
+// Random distribution centered around zero
+x_vals.push((Math.random() - 0.5) * jitter * 1.5);
+y_vals.push((Math.random() - 0.5) * jitter * 1.5);
+}
+
+data = [{
+x: x_vals,
+y: y_vals,
+mode: 'markers',
+name: 'Commutator Jitter [x,p]', // THE LEGEND
+marker: {
+color: '#fbbf24',
+size: 5,
+opacity: 0.7,
+line: { color: '#fff', width: 0.5 }
+}
+}];
+
+layout.showlegend = true;
+layout.legend = { font: { color: '#94a3b8', size: 10 }, x: 0, y: 1 };
+
+// FIXING THE AXES: We lock the range so the horizontal line stays stable
+layout.xaxis = {
+title: { text: 'Position Operator (x-hat)', font: { size: 10, color: '#94a3b8' } },
+range: [-1, 1], // FIXED RANGE
+showgrid: true,
+gridcolor: '#111',
+zeroline: true,
+zerolinecolor: '#444'
+};
+layout.yaxis = {
+title: { text: 'Momentum Operator (p-hat)', font: { size: 10, color: '#fbbf24' } },
+range: [-1, 1], // FIXED RANGE
+showgrid: true,
+gridcolor: '#111',
+zeroline: true,
+zerolinecolor: '#444'
+};
+
+layout.title = "COMMUTATION ALGEBRA: STOCHASTIC JITTER";
+
+
+} else if (currentTool === 4) { // MODULE 4: GEOMETRY COUPLING (RESTORED FILL)
+let coupling = parseFloat(document.getElementById('st_sl')?.value || 0.5);
+let x_vals = [], y_vals = [];
+
+for(let r = -10; r <= 10; r += 0.1) {
+x_vals.push(r);
+// Coupling Logic: Metric Well + Quantum Wave
+let metric_well = -coupling * 5 * Math.exp(-r * r * 0.2);
+let quantum_wave = Math.sin(r * 2.5) * 0.3;
+y_vals.push(metric_well + quantum_wave);
+}
+
+data = [{
+x: x_vals,
+y: y_vals,
+fill: 'tozeroy', // RESTORED: This fills the area under the curve
+name: 'Coupled Field/Metric',
+line: { color: '#a78bfa', width: 2.5 },
+fillcolor: 'rgba(167, 139, 250, 0.2)' // Optimized glow opacity
+}];
+
+layout.showlegend = true;
+layout.legend = { font: { color: '#94a3b8', size: 10 }, x: 0.7, y: 1 };
+
+layout.xaxis = {
+title: { text: 'Manifold Coordinate (ρ)', font: { size: 10, color: '#94a3b8' } },
+showgrid: true, gridcolor: '#111', zeroline: true, zerolinecolor: '#333'
+};
+layout.yaxis = {
+title: { text: 'Curvature Potential (g_μν)', font: { size: 10, color: '#a78bfa' } },
+showgrid: true, gridcolor: '#111', zeroline: false
+};
+
+layout.title = "GEOMETRIC COUPLING: FIELD ON CURVATURE";
+
+
+
+} else if (currentTool === 5) { // MODULE 5: BACKREACTION CLOSURE (FULLY RESPONSIVE)
+let closure = parseFloat(document.getElementById('e_sl')?.value || 1.0);
+let x_vals = [], y_vals = [];
+
+// The Backreaction Loop Logic
+for(let t = 0; t < 20; t += 0.1) {
+x_vals.push(t);
+// Closure slider affects the 'tightness' of the resonance loop
+let amplitude = Math.sin(t * (0.5 + closure * 0.5));
+let stabilization = Math.exp(-t * (0.2 / closure));
+y_vals.push(amplitude * stabilization);
+}
+
+data = [{
+x: x_vals,
+y: y_vals,
+mode: 'lines',
+name: 'Backreaction Loop (F⇌G)', // THE LEGEND
+line: { color: '#4ade80', width: 3, shape: 'spline' }
+}];
+
+layout.showlegend = true;
+layout.legend = { font: { color: '#94a3b8', size: 10 }, x: 0.7, y: 1 };
+
+layout.xaxis = {
+title: { text: 'Iteration Time (τ)', font: { size: 10, color: '#94a3b8' } },
+showgrid: true, gridcolor: '#111'
+};
+layout.yaxis = {
+title: { text: 'Closure Resonance', font: { size: 10, color: '#4ade80' } },
+showgrid: true, gridcolor: '#111', zeroline: true, zerolinecolor: '#333'
+};
+
+layout.title = "BACKREACTION LOOP: SELF-CONSISTENT CLOSURE";
+}
+
+Plotly.react('plot-area', data, layout, {responsive: true, displayModeBar: false});
+}
+
+function resetLab() {
+if (currentTool === 1) syncVal(1.0, 'l_sl');
+if (currentTool === 2) syncVal(0.5, 'c_sl');
+if (currentTool === 3) syncVal(0.5, 'k_sl');
+if (currentTool === 4) syncVal(0.5, 'st_sl');
+if (currentTool === 5) syncVal(1.0, 'e_sl');
+runLab();
+}
+</script>
+</body>
+</html>

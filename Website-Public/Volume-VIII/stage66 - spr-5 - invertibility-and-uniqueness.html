@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 66 — Invertibility & Uniqueness (Final Structural Necessity Layer)</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #3b82f6;
+--accent-obs: #94a3b8; --accent-exp: #fbbf24; --accent-master: #c084fc; --accent-lock: #f87171; --accent-final: #2dd4bf;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6;
+--accent-gold: #fbbf24;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-gold); font-family: sans-serif; font-size: 0.85rem; min-width: 450px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls, #nav-summary-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+#screen-lab.active { display: flex; flex-direction: column; height: calc(100vh - 50px); }
+
+#screen-portal { justify-content: flex-start; padding-top: 8dvh; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 70px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 2px; font-weight: bold; letter-spacing: 0.5px; padding-bottom: 0px; }
+.module-subtitle { text-align: center; font-family: sans-serif; color: var(--accent-gold); margin-bottom: 5px; font-weight: bold; letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.primary-constant-box { background: #000; border: 1px solid var(--accent-unified); padding: 2px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 8px; }
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(59, 130, 246, 0.05); border: 1px solid var(--accent-unified); padding: 5px; border-radius: 5px; margin-bottom: 8px; font-size: 0.7rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; }
+#plot-area { flex-grow: 1; width: 100%; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #fff; border: 1px solid var(--accent-unified); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer { width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem; color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 66 — INVERTIBILITY & UNIQUENESS (Structural Necessity Layer)</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">Structural Necessity Closure</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">The Universe as a Logical Implication of Substrate Equilibrium.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-unified);">
+<h2 style="color:var(--accent-unified);">1. Uniqueness Proof</h2>
+<p>GR ≡ QM Identity via Contradiction.</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-exp);">
+<h2 style="color:var(--accent-exp);">2. Inverse Reconstruction</h2>
+<p>Observed Physics $\Rightarrow$ (K, P).</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-master);">
+<h2 style="color:var(--accent-master);">3. Stability Proof</h2>
+<p>Equilibrium Functional Minima.</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-lock);">
+<h2 style="color:var(--accent-lock);">4. Constraint Collapse</h2>
+<p>Zero Dimensional Freedom.</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-final);">
+<h2 style="color:var(--accent-final);">5. Non-Arbitrariness</h2>
+<p>Eliminating Tuning and Chance.</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-unified);">
+<h2 style="color:var(--accent-unified);">6. Stage 66 Summary</h2>
+<p>Final Closure Statement.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color:var(--accent-unified); text-align:center;">Stage 66: Structural Necessity Closure</h2>
+<section>
+<p>Stage 66 establishes the ultimate formal proof of the Synthesis Framework. It demonstrates that the universe is not a collection of arbitrary laws, but a unique and stable equilibrium state of the vacuum substrate.</p>
+<div style="background: rgba(59,130,246,0.03); padding: 15px; border-radius: 8px; font-family: monospace; font-size: 0.85rem; border: 1px solid var(--accent-unified); line-height: 1.6;">
+<strong>NECESSITY IDENTITY:</strong><br>
+$(K, P) \Longleftrightarrow \{ \text{GR, QM, SM, Constants} \}$<br>
+$\text{Geometry (GR)} \equiv \text{Quantum Modes (QM)}$
+</div>
+<h4 style="color: var(--accent-gold); margin-bottom: 5px;">STRUCTURAL CLOSURE</h4>
+<ul style="font-size: 0.85rem; line-height: 1.4;">
+<li><strong>Uniqueness:</strong> No alternative parameter sets can produce the observed physics.</li>
+<li><strong>Non-Duality:</strong> GR and QM are shown to be forced identities of the same substrate variation.</li>
+<li><strong>Invertibility:</strong> Every physical observable maps back uniquely to a single $(K, P)$ state.</li>
+<li><strong>Stability:</strong> Deviations from equilibrium result in unphysical/inconsistent couplings.</li>
+</ul>
+<p style="text-align:center; font-weight:bold; margin-top:20px; color: var(--accent-gold);">FINAL STAGE STATEMENT</p>
+<p style="text-align:center; border: 1px solid var(--accent-gold); padding: 10px; background: rgba(251, 191, 36, 0.05);">Physical reality is uniquely and necessarily determined by (K, P). The universe could not have been otherwise.</p>
+</section>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div id="active-module-result" class="module-subtitle">--</div>
+<div class="primary-constant-box">
+<div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val">11.350</span></div>
+<div class="const-item"><span class="const-label">Synthesis P</span><span class="const-val">0.6900</span></div>
+</div>
+
+<div id="mapping-box-area"></div>
+
+<div class="diagnostic-panel">
+<span class="diag-title">Necessity Telemetry</span>
+<div id="telemetry-area"></div>
+</div>
+
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-unified); font-size:0.75rem; cursor:pointer; padding:6px;">RE-SYNC SUBSTRATE</button>
+<div id="panel-footer-text" style="font-size: 0.85rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.3; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:8px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Structural Veracity</span>
+<div id="metrics-content" style="font-size:0.85rem; text-align:center; padding:5px;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Consistency Chain</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.65rem; color: var(--text-dim); line-height: 1.3; background: #000; padding: 5px; border-radius: 0px; border: 1px solid #222; margin-bottom: 0px; margin-top: auto;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "UNIQUENESS CLOSURE",
+result: "GR ≡ QM",
+resultSize: "0.85rem",
+brief: `<h2>Module 1: Uniqueness Proof</h2><p>Proving that Geometry and Quantum Modes cannot be independent sectors of reality.</p><ul><li>Step 1: Map $(K, P) \\rightarrow \\{g_{\\mu\\nu}, \\psi\\}$.</li><li>Step 2: Assume independence ($g \\neq \\mathcal{G}(\\psi)$).</li><li>Step 3: Derive contradiction (Conservation Violation).</li><li>Result: $g_{\\mu\\nu} = \\mathcal{G}(\\psi)$ is logically forced.</li></ul>`,
+math: `<h3>Mathematics: Reductio ad Absurdum</h3><p>If GR and QM were independent:</p>$$\\nabla^\\mu G_{\\mu\\nu} = 0 \\;\\not\\leftrightarrow\\; \\nabla^\\mu T_{\\mu\\nu} = 0$$<p>This leads to degeneracy where multiple realities exist for one substrate. Total contradiction. Therefore:</p>$$\\boxed{g_{\\mu\\nu} = \\mathcal{G}(\\psi)}$$`,
+sliders: `<div class="control-item"><div class="label-group"><span>DEGENERACY Parameter</span><input type="number" id="m_in" class="digital-entry" value="1" oninput="syncVal(this.value, 'm_sl')"></div><input type="range" id="m_sl" min="0" max="100" step="1" value="1" oninput="syncVal(this.value, 'm_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">FORCED MAPPING</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Geometry ≡ Quantum Modes</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">UNIQUENESS STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Unique Mapping Verified<br>Sector Duality Eliminated</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-final);">Sector Separation → Inconsistency<br>GR ≡ QM → Conserved Structure<br>Injective Mapping → Verified<br>Degeneracy → Eliminated</span>`,
+metricsContent: `$F(K,P)\\Rightarrow (\\psi \\equiv g_{\\mu\\nu})$`,
+hierarchy: `GR ≡ QM Closure`,
+footer: "Geometry and quantum modes are identical substrate representations.",
+rightNote: `<div style="text-align:center; font-size: 0.80rem; color: var(--accent-gold);">👉 This Module Establishes:<p>That GR and QM are non-independent manifestations of a single substrate structure.</p><p>That GR ≡ QM at substrate level.</p></div>`
+},
+
+
+2: {
+title: "INVERSE RECONSTRUCTION $\\text{(Exact Invertibility)}$",
+result: "Unique Substrate Recovery",
+resultSize: "0.85rem",
+brief: `<h2>Module 2: Inverse Reconstruction</h2><p>Demonstrating that any observable path leads back to the exact same $(K, P)$ state.</p><ul><li>GR Path: $g_{\\mu\\nu} \\rightarrow R \\rightarrow (K, P)$.</li><li>QM Path: $\\psi \\rightarrow \\hat{H} \\rightarrow (K, P)$.</li><li>Consistency: Both paths intersect at a single point.</li></ul>`,
+math: `<h3>Mathematics: Path Intersection</h3>$$\\mathcal{F}^{-1}_{GR}(\\text{Obs}) = (K, P) = \\mathcal{F}^{-1}_{QM}(\\text{Obs})$$<p>The uniqueness of the inverse mapping guarantees that the substrate is the only valid foundation.</p>`,
+sliders: `<div class="control-item"><div class="label-group"><span>Inversion Resolution</span><input type="number" id="c_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'c_sl')"></div><input type="range" id="c_sl" min="0" max="200" step="1" value="100" oninput="syncVal(this.value, 'c_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">RECOVERY RULE</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">$\\boxed{ \\mathcal{O}\\Rightarrow (K,P) }$</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">ALGORITHM STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Invertibility Closure Achieved</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-final);">GR Sector: Recovered<br>QM Sector: Recovered<br>Path Variance: Eliminated<br>Substrate Recovery: Unique</span>`,
+metricsContent: `$\\boxed{ \\mathcal{O}\\Longleftrightarrow (K,P) }$</p>`,
+hierarchy: `Inversion Closure`,
+footer: "All physical observables reconstruct the equilibrium substrate structure (K,P).",
+rightNote: `<div style="color: #94a3b8; line-height: 1.3; margin: 5px; text-align:center; font-size: 0.85rem;">Observables uniquely reconstruct substrate parameters.<p><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">👉 This Module Establishes:</p><p>That physical observables uniquely determine equilibrium substrate structure (K,P).</p></div>`
+},
+
+3: {
+title: "ENERGETIC NECESSITY",
+result: "Minimum Energy State",
+resultSize: "0.85rem",
+brief: `<h2>Module 3: Stability Proof</h2><p>Proving that the current (K, P) state is a stable minimum of the substrate energy functional.</p><ul><li>Define $\\mathcal{E}(K, P)$.</li><li>Evaluate derivatives: $\\partial \\mathcal{E} = 0$.</li><li>Confirm stability: $\\partial^2 \\mathcal{E} > 0$.</li><li>Result: The universe is in a stable geometric equilibrium.</li></ul>`,
+math: `<h3>Mathematics: Functional Minima</h3>$$\\frac{\\partial^2 \\mathcal{E}}{\\partial K^2} > 0, \\quad \\frac{\\partial^2 \\mathcal{E}}{\\partial P^2} > 0$$<p>Any perturbation $(\\delta K, \\delta P)$ leads to unphysical/unstable couplings, preserving the physical realization of the current state.</p>`,
+sliders: `<div class="control-item"><div class="label-group"><span>Equilibrium Perturbation</span><input type="number" id="r_in" class="digital-entry" value="0" oninput="syncVal(this.value, 'r_sl')"></div><input type="range" id="r_sl" min="-50" max="50" step="1" value="0" oninput="syncVal(this.value, 'r_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">EQUILIBRIUM RULE</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Unique Energy Minimum</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">STABILITY STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Energetic Necessity Achieved</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-final);">State: Minimum Energy<br>Restoring Dynamics: Active<br>Entropy Gradient: Zero<br>Stability: Locked</span>`,
+metricsContent: `<span style="font-family:monospace; font-size:1.0rem; color: #eee;">$\\boxed{ \\nabla_{K,P}\\mathcal{E} = 0 }$</span>`,
+hierarchy: `Energetic Closure`,
+footer: "Physical reality corresponds to the unique stable substrate equilibrium.",
+rightNote: `<div style="color: #94a3b8; line-height: 1.3; margin: 0px; text-align:center; font-size: 0.80rem;">Energetic stability uniquely fixes the realized physical state.<P>$\\text{Physical Reality}=\\text{Minimum Energy State}$</P><p><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">👉 This Module Establishes:</p><p>That physical reality is the unique minimum-energy configuration of the substrate.</p></div>`
+},
+
+4: {
+title: "CONSTRAINT COLLAPSE",
+result: "Zero-Degree Freedom",
+resultSize: "0.85rem",
+brief: `<h2>Module 4: Constraint Collapse</h2><p>Showing that the intersection of GR and QM constraints collapses the parameter space to a single point.</p><ul><li>GR Constraints: $\\Phi_{GR}(K, P) = 0$.</li><li>QM Constraints: $\\Phi_{QM}(K, P) = 0$.</li><li>Intersection: $\\bigcap \\Phi_i = (K, P)_{fixed}$.</li></ul>`,
+math: `<h3>Mathematics: Set Intersection</h3>$$\\dim(\\mathcal{M}_{\\text{allowed}}) = 0$$<p>Jointly, the laws of geometry and quantum modes allow only one possible substrate configuration. All continuous freedom is eliminated.</p>`,
+sliders: `<div class="control-item"><div class="label-group"><span>CONSTRAINT Density</span><input type="number" id="e_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'e_sl')"></div><input type="range" id="e_sl" min="0" max="200" step="1" value="100" oninput="syncVal(this.value, 'e_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">COLLAPSE RULE</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Independent Constraints ⇒ Unique State</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">FREEDOM STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Zero Free Parameters</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-final);">Degrees of Freedom: Eliminated<br>Constraint Solution: Unique<br>Solution Space: Collapsed<br>Parameter Tuning: Eliminated</span>`,
+metricsContent: `$\\boxed{ \\bigcap_i \\mathcal{C}_i = (K,P) }$`,
+hierarchy: `Constraint Closure`,
+footer: "Joint GR–QM constraints uniquely fix the substrate equilibrium state.",
+rightNote: `<div style="color: #94a3b8; line-height: 1.3; margin: 5px; text-align:center; font-size: 0.85rem;">Independent constraints uniquely fix the substrate state.<p><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">👉 This Module Establishes:</p><p>That independent GR and QM constraints uniquely determine equilibrium substrate structure.</p></div>`
+},
+
+5: {
+title: "NECESSITY CLOSURE",
+result: "Zero Arbitrary Parameters",
+resultSize: "0.85rem",
+brief: `<h2>Module 5: Non-Arbitrariness</h2><p>Final proof that no parameter in physics is arbitrary or independently tunable.</p><ul><li>$C_i$ are fixed functions of $K, P$.</li><li>Substrate $K, P$ is fixed by stability.</li><li>Result: $\\forall C_i, \\frac{\\partial C_i}{\\partial x} = 0$.</li></ul>`,
+math: `<h3>Mathematics: Chain of Necessity</h3>$$C_i = f_i(K, P) \\implies \\delta C_i \\equiv 0$$<p>Every "constant" is a derived geometric necessity. There are no "free knobs" in the ISFP Synthesis Framework.</p>`,
+sliders: `<div class="control-item"><div class="label-group"><span>Arbitrary Variation</span><input type="number" id="f_in" class="digital-entry" value="0" oninput="syncVal(this.value, 'f_sl')"></div><input type="range" id="f_sl" min="0" max="100" step="1" value="0" oninput="syncVal(this.value, 'f_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">CLOSURE RULE</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">$\\boxed{ \\text{Derived} \\equiv \\text{Necessary} }$</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">THEOREM STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">$\\boxed{ \\text{Arbitrariness Eliminated} }$</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-final);">Free Parameters: Zero<br>Arbitrary Tuning: Eliminated<br>Necessity: Enforced<br>Closure: Achieved</span>`,
+metricsContent: `Physical structure is uniquely fixed by constraint closure.`,
+hierarchy: `Necessity Closure`,
+footer: "Physical parameters are uniquely fixed by structural constraint closure.",
+rightNote: `<div style="color: #94a3b8; line-height: 1.3; margin: 10px; text-align:center; font-size: 0.8rem;">Structural necessity eliminates arbitrary parameter tuning.<P>$\\boxed{ \\text{Physical Reality}=\\text{Constraint Necessity} }$</P><p><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">👉 This Module Establishes:</p><p>That physical constants are uniquely fixed consequences of substrate structure.</p></div>`
+}
+};
+
+function syncVal(val, id) {
+const sliderId = id.includes('_in') ? id.replace('_in', '_sl') : id;
+const inputId = id.includes('_sl') ? id.replace('_sl', '_in') : id;
+if(document.getElementById(sliderId)) document.getElementById(sliderId).value = val;
+if(document.getElementById(inputId)) document.getElementById(inputId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+document.getElementById('brief-box-content').innerHTML = content.brief;
+document.getElementById('math-box-content').innerHTML = content.math;
+document.getElementById('control-sliders').innerHTML = content.sliders;
+
+document.getElementById('active-module-title').innerText = content.title;
+const resultEl = document.getElementById('active-module-result');
+resultEl.innerText = content.result;
+resultEl.style.fontSize = content.resultSize || "0.75rem";
+
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('metrics-content').innerHTML = content.metricsContent;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+document.getElementById('telemetry-area').innerHTML = content.telemetry;
+showScreen('briefing');
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() {
+showScreen('lab');
+setTimeout(() => { runLab(); window.dispatchEvent(new Event('resize')); }, 100);
+}
+
+function runLab() {
+const target = document.getElementById('plot-area');
+let data = [];
+let layout = {
+paper_bgcolor: 'black', plot_bgcolor: 'black', margin: {t:60,b:60,l:60,r:40},
+showlegend: false, font: { color: '#eee', size: 10 }
+};
+
+if (currentTool === 1) { // Uniqueness Proof
+let degeneracy = parseFloat(document.getElementById('m_sl')?.value || 1);
+let x = Array.from({length: 50}, (_, i) => i);
+data.push({
+x: x,
+y: x.map(v => 1 / (degeneracy * v + 1)),
+mode: 'lines',
+line: { color: '#3b82f6', width: 4 },
+name: 'Degeneracy Drop'
+});
+layout.title = { text: "DEGENERACY COLLAPSE: GR ≡ QM", font: { color: '#3b82f6', size: 16 } };
+layout.xaxis = { title: "Constraint Closure", gridcolor: '#222' };
+layout.yaxis = { title: "Degenerate Solution Space", gridcolor: '#222' };
+
+// Legend adjustments for top-left placement
+layout.showlegend = true;
+layout.legend = {
+x: 0,
+y: 1,
+xanchor: 'left',
+yanchor: 'top',
+font: { color: '#eee', size: 10 },
+bgcolor: 'rgba(0,0,0,0)' // Transparent background
+};
+
+
+} else if (currentTool === 2) { // Inverse Reconstruction
+let val = parseFloat(document.getElementById('c_sl')?.value || 100);
+
+data.push({
+type: 'scatterpolar',
+r: [val, val, val, val, val],
+theta: [0, 90, 180, 270, 0],
+fill: 'toself',
+fillcolor: 'rgba(251, 191, 36, 0.2)',
+line: { color: '#fbbf24', width: 2 },
+name: 'Unique Equilibrium'
+});
+
+layout.showlegend = true;
+layout.legend = {
+x: 0,
+y: 1.15,
+font: { color: '#eee', size: 10 },
+bgcolor: 'rgba(0,0,0,0)'
+};
+
+// Adding margins to prevent text clipping at the edges
+layout.margin = { l: 100, r: 150, t: 120, b: 60 };
+
+layout.polar = {
+bgcolor: 'black',
+radialaxis: { visible: false },
+angularaxis: {
+tickvals: [0, 90, 180, 270],
+ticktext: [
+'0°: Geometric Sector (g<sub>μν</sub>)',
+'90°: Quantum Sector (ψ)',
+'180°: Constants Sector (c, G, h)',
+'270°: T-Balance (P)'
+],
+color: '#94a3b8',
+font: { size: 11 },
+direction: "clockwise",
+rotation: 90, // Sets 0° at the top
+ticklen: 10 // Pulls text away from the center circle
+}
+};
+layout.title = {
+text: "OBSERVABLE CONVERGENCE ⇒ (K, P)",
+font: { color: '#fbbf24', size: 16 }
+};
+
+
+} else if (currentTool === 3) { // Stability Proof
+let perturb = parseFloat(document.getElementById('r_sl')?.value || 0);
+let x = Array.from({length: 41}, (_, i) => i - 20);
+
+data.push({
+x: x,
+y: x.map(v => Math.pow(v - perturb/5, 2)),
+mode: 'lines',
+fill: 'tozeroy',
+line: { color: '#c084fc' },
+name: 'Energy Minimum'
+});
+
+// Adding legend on the top left
+layout.showlegend = true;
+layout.legend = {
+x: 0.05,
+y: 1,
+font: { color: '#eee', size: 10 },
+bgcolor: 'rgba(0,0,0,0)'
+};
+
+layout.title = { text: "SUBSTRATE ENERGY MINIMUM", font: { color: '#c084fc', size: 16 } };
+layout.xaxis = { title: "Equilibrium Deviation", gridcolor: '#222' };
+layout.yaxis = { title: "𝓔{K,P}", gridcolor: '#222' };
+layout.margin = { l: 60, r: 40, t: 80, b: 60 };
+
+
+
+} else if (currentTool === 4) { // Constraint Collapse
+let tension = parseFloat(document.getElementById('e_sl')?.value || 100) / 100;
+
+// GR Constraint Line
+data.push({
+x: [-1, 1], y: [0, 0],
+mode: 'lines',
+line: { color: '#f87171', width: 2 },
+name: 'GR Sector Constraint'
+});
+
+// QM Constraint Line
+data.push({
+x: [0, 0], y: [-1, 1],
+mode: 'lines',
+line: { color: '#3b82f6', width: 2 },
+name: 'QM Sector Constraint'
+});
+
+// The Substrate Fixed Point
+data.push({
+x: [0], y: [0],
+mode: 'markers',
+marker: { size: 20 * tension, color: '#fbbf24' },
+name: 'Unique State (K,P)'
+});
+
+// Legend adjustments for top-left placement
+layout.showlegend = true;
+layout.legend = {
+x: 0.02,
+y: 1,
+xanchor: 'left',
+yanchor: 'top',
+font: { color: '#eee', size: 10 },
+bgcolor: 'rgba(0,0,0,0)'
+};
+
+layout.title = { text: "UNIQUE CONSTRAINT FIXED POINT", font: { color: '#f87171', size: 16 } };
+layout.xaxis = { title: "GR Constraint Space", gridcolor: '#222', range:[-1.5, 1.5] };
+layout.yaxis = { title: "QM Constraint Space", gridcolor: '#222', range:[-1.5, 1.5] };
+
+
+} else if (currentTool === 5) { // Non-Arbitrariness
+data.push({
+// Updated m_e to use HTML subscript for proper rendering
+x: ['c', 'G', 'h', 'α', 'm<sub>e</sub>'],
+y: [100, 100, 100, 100, 100],
+type: 'bar',
+marker: { color: '#2dd4bf' },
+name: 'Constraint-Locked Value'
+});
+
+layout.showlegend = true;
+layout.legend = { x: 0, y: 1.1, font: { color: '#eee', size: 10 }, bgcolor: 'rgba(0,0,0,0)' };
+
+layout.title = {
+text: "PARAMETER NECESSITY: Constraint-Enforced",
+font: { color: '#2dd4bf', size: 16 }
+};
+
+layout.xaxis = {
+title: "Fundamental Constants", // Added requested X-axis name
+gridcolor: '#222',
+color: '#eee'
+};
+
+layout.yaxis = {
+title: "Structural Necessity",
+range: [0, 110],
+gridcolor: '#222',
+color: '#eee'
+};
+layout.margin = { l: 60, r: 40, t: 90, b: 60 };
+}
+
+Plotly.react('plot-area', data, layout, {responsive: true, displayModeBar: false});
+}
+
+function resetLab() {
+syncVal(1, 'm_sl'); syncVal(100, 'c_sl'); syncVal(0, 'r_sl'); syncVal(100, 'e_sl'); syncVal(0, 'f_sl');
+}
+
+window.onload = () => { showScreen('portal'); };
+</script>
+</body>
+</html>

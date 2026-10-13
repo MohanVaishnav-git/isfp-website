@@ -1,0 +1,1677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 52 — Gauge Bosons (Interaction Carriers)</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #3b82f6;
+--accent-field: #60a5fa; --accent-quant: #c084fc; --accent-boson: #fbbf24; --accent-mech: #f87171; --accent-total: #2dd4bf;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6;
+--accent-gold: #fbbf24;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-boson); font-family: sans-serif; font-size: 0.85rem; min-width: 450px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls, #nav-summary-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+#screen-lab.active { display: flex; flex-direction: column; height: calc(100vh - 50px); }
+
+#screen-portal { justify-content: flex-start; padding-top: 5dvh; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 50px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 2px; font-weight: bold; letter-spacing: 0.5px; padding-bottom: 0px; }
+.module-subtitle { text-align: center; font-family: sans-serif; color: var(--accent-gold); margin-bottom: 12px; font-weight: bold; letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.primary-constant-box { background: #000; border: 1px solid var(--accent-unified); padding: 2px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 8px; }
+.secondary-structure-box { background: rgba(59, 130, 246, 0.05); border: 1px dashed var(--accent-unified); padding: 3px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 12px; }
+
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(59, 130, 246, 0.05); border: 1px solid var(--accent-unified); padding: 5px; border-radius: 5px; margin-bottom: 8px; font-size: 0.7rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; }
+#plot-area { flex-grow: 1; width: 100%; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #fff; border: 1px solid var(--accent-unified); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer { width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem; color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 52 — GAUGE BOSONS (INTERACTION CARRIERS)</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">Gauge Bosons</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">The quantization of symmetry-preserving interactions.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-field);">
+<h2 style="color:var(--accent-field);">1. Field as Physical Entity</h2>
+<p>Infrastructure of Interaction.<br>$A_\mu$ as a required field.</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-quant);">
+<h2 style="color:var(--accent-quant);">2. Quantization</h2>
+<p>Fields to Particles.<br>Creation of Gauge Quanta.</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-boson);">
+<h2 style="color:var(--accent-boson);">3. Identification</h2>
+<p>The Particle Spectrum.<br>Photons, Gluons, and Weak Bosons.</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-mech);">
+<h2 style="color:var(--accent-mech);">4. Interaction Mechanism</h2>
+<p>The Exchange Principle.<br>Forces as Quantum Trading.</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-total);">
+<h2 style="color:var(--accent-total);">5. Complete Structure</h2>
+<p>Standard Model Interactions.<br>Closing the Gauge Circuit.</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-unified);">
+<h2 style="color:var(--accent-unified);">6. Stage 52 Summary</h2>
+<p>Interactions as Structural Necessity.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">STAGE 52 — MATHEMATICAL STRUCTURE SUMMARY</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.6; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">Gauge Bosons (Interaction Carriers)</h3>
+<p style="text-align:center;"><b>(Symmetry → Connection → Quantization → Interaction → Closure)</b></p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">1. FOUNDATIONAL STRUCTURE</h3>
+<p>Gauge symmetry:</p>
+<p>$$G = U(1)\times SU(2)\times SU(3)$$</p>
+<p>$$\dim(G) = 1 + 3 + 8 = 12$$</p>
+<p>Generators:</p>
+<p>$$[T^a, T^b] = i f^{abc} T^c$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">2. GAUGE CONNECTION (INFRASTRUCTURE)</h3>
+<p>$$A_\mu = A_\mu^a T^a$$</p>
+<p>Covariant derivative:</p>
+<p>$$D_\mu = \partial_\mu + i g A_\mu^a T^a$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">3. FIELD DYNAMICS (CURVATURE)</h3>
+<p>$$F_{\mu\nu}^a = \partial_\mu A_\nu^a - \partial_\nu A_\mu^a + g f^{abc} A_\mu^b A_\nu^c$$</p>
+<p>Gauge field Lagrangian:</p>
+<p>$$\mathcal{L}_{gauge} = -\frac{1}{4} F_{\mu\nu}^a F^{\mu\nu a}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">4. QUANTIZATION OF GAUGE FIELD</h3>
+<p>$$A_\mu^a(x) \rightarrow \hat{A}_\mu^a(x)$$</p>
+<p>Mode expansion:</p>
+<p>$$\hat{A}_\mu^a = \sum_{\mathbf{k},\lambda} \left( a^a_{\mathbf{k},\lambda} \epsilon_\mu e^{-ikx} + a^{a\dagger}_{\mathbf{k},\lambda} \epsilon_\mu^* e^{ikx} \right)$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">5. BOSON EMERGENCE</h3>
+<p>$$a^{a\dagger}|0\rangle = |1^a\rangle$$</p>
+<p>$$\text{Gauge boson} = \text{quantized excitation of } A_\mu^a$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">6. GENERATOR → BOSON MAPPING</h3>
+<p>$$T^a \;\Rightarrow\; A_\mu^a \;\Rightarrow\; \text{Gauge Boson}_a$$</p>
+<p>$$\dim(G) = N \Rightarrow N \text{ gauge bosons}$$</p>
+<p>$$1 + 3 + 8 = 12$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">7. INTERACTION STRUCTURE</h3>
+<p>From covariant derivative:</p>
+<p>$$\mathcal{L}_{int} = g \bar{\psi}\gamma^\mu T^a \psi A_\mu^a$$</p>
+<p>Define current:</p>
+<p>$$J^\mu_a = \bar{\psi}\gamma^\mu T^a \psi$$</p>
+<p>Thus:</p>
+<p>$$\mathcal{L}_{int} = g J^\mu_a A_\mu^a$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">8. EXCHANGE MECHANISM</h3>
+<p>Scattering amplitude:</p>
+<p>$$\mathcal{M} = J^\mu_a \; D_{\mu\nu}^{ab}(k) \; J^\nu_b$$</p>
+<p>Propagator:</p>
+<p>$$D_{\mu\nu}^{ab}(k) = \frac{-i \delta^{ab} g_{\mu\nu}}{k^2 + i\epsilon}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">9. COMPLETE INTERACTION LAGRANGIAN</h3>
+<p>$$\boxed{ \mathcal{L} = \bar{\psi}(i\gamma^\mu D_\mu - m)\psi -\frac{1}{4}F_{\mu\nu}^a F^{\mu\nu a} }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">10. FIELD EQUATIONS</h3>
+<p>Dirac equation:</p>
+<p>$$(i\gamma^\mu D_\mu - m)\psi = 0$$</p>
+<p>Yang–Mills equation:</p>
+<p>$$D^\mu F_{\mu\nu}^a = g J_\nu^a$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">11. CONSERVATION LAW</h3>
+<p>$$D_\mu J^\mu_a = 0$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">12. STRUCTURAL CHAIN</h3>
+<p>$$G \;\Rightarrow\; T^a \;\Rightarrow\; A_\mu^a \;\Rightarrow\; \hat{A}_\mu^a \;\Rightarrow\; a^\dagger \;\Rightarrow\; \text{Bosons} \;\Rightarrow\; J^\mu A_\mu \;\Rightarrow\; \mathcal{L}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">13. NECESSITY STATEMENT</h3>
+<p>$$\text{Local symmetry} \;\Rightarrow\; \text{Gauge connection} \;\Rightarrow\; \text{Quantization} \;\Rightarrow\; \text{Bosons} \;\Rightarrow\; \text{Interaction}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">14. FINAL STRUCTURAL RESULT</h3>
+<p>$$\boxed{ \text{Gauge symmetry fully determines interaction carriers and interaction structure} }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">15. CONCEPTUAL COMPRESSION</h3>
+<p>$$\boxed{ \text{Symmetry} \;\rightarrow\; \text{Connection} \;\rightarrow\; \text{Quanta} \;\rightarrow\; \text{Interaction} \;\rightarrow\; \text{Closure} }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">16. CLOSURE STATEMENT (STAGE 52)</h3>
+<p>$$\boxed{ \text{Interactions are not introduced; they are inevitable consequences of symmetry quantization} }$$</p>
+
+</div>
+</section>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div id="active-module-result" class="module-subtitle">--</div>
+<div class="primary-constant-box">
+<div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val">11.350</span></div>
+<div class="const-item"><span class="const-label">Synthesis P</span><span class="const-val">0.6900</span></div>
+</div>
+
+<div id="structure-box-area"></div>
+<div id="mapping-box-area"></div>
+
+<div class="diagnostic-panel">
+<span class="diag-title">Mediator Telemetry</span>
+<div id="telemetry-area"></div>
+</div>
+
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-unified); font-size:0.75rem; cursor:pointer; padding:6px;">RESET FIELD</button>
+<div id="panel-footer-text" style="font-size: 0.85rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.3; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:8px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Gauge Logic</span>
+<div id="metrics-content" style="font-size:0.65rem; font-family:monospace; line-height:1.3;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Structural Outcome</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.65rem; color: var(--text-dim); line-height: 1.3; background: #000; padding: 5px; border-radius: 0px; border: 1px solid #222; margin-bottom: 0px; margin-top: auto;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "GAUGE FIELD AS PHYSICAL CONNECTION",
+result: "Infrastructure of Interaction",
+resultSize: "0.80rem",
+
+brief: `<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing : GAUGE FIELD AS PHYSICAL CONNECTION</h3>
+<p><strong>Infrastructure of Interaction</strong></p>
+
+<h4 style="color:var(--accent-blue); margin-top: 20px;">1. CORE IDEA</h4>
+<p>This module establishes that interaction is not an external addition to matter, but arises necessarily from the requirement of local symmetry consistency. When symmetry transformations vary across spacetime, a compensating structure must emerge. This structure is the gauge connection field.</p>
+<p>Thus, interaction is not introduced — it is required.</p>
+
+<h4 style="color:var(--accent-blue); margin-top: 20px;">2. CONCEPTUAL FOUNDATION</h4>
+<p>Global symmetry implies uniform transformation across spacetime and does not require additional structure. However, when symmetry is promoted to local symmetry, transformations differ from point to point.</p>
+<p>This creates a structural inconsistency:</p>
+<p>$$\\partial_\\mu \\psi \\;\\not\\rightarrow\\; \\text{covariant under local symmetry}$$</p>
+<p>To restore consistency, a new object must be introduced:</p>
+<p>$$D_\\mu = \\partial_\\mu + i g A_\\mu$$</p>
+<p>Here:</p>
+<ul>
+<li>$A_\\mu$ is not optional</li>
+<li>It is required to maintain symmetry</li>
+<li>It acts as a connection across spacetime</li>
+</ul>
+
+<h4 style="color:var(--accent-blue); margin-top: 20px;">3. EMERGENCE OF GAUGE FIELD</h4>
+<p>The gauge field arises as a connection on the symmetry manifold.</p>
+<p>$$A_\\mu = A_\\mu^a T^a$$</p>
+<p>Where:</p>
+<ul>
+<li>$T^a$ = generators of symmetry group</li>
+<li>$A_\\mu^a$ = connection components</li>
+<li>$\\mu$ = spacetime direction</li>
+</ul>
+<p><strong>This establishes:</strong></p>
+<blockquote>👉 Gauge field is a vector field in spacetime and algebra-valued in symmetry space</blockquote>
+
+<h4 style="color:var(--accent-blue); margin-top: 20px;">4. NECESSITY (WHY IT MUST EXIST)</h4>
+<p>Local symmetry imposes:</p>
+<p>$$\\psi(x) \\rightarrow U(x)\\psi(x)$$</p>
+<p>Then:</p>
+<p>$$\\partial_\\mu \\psi(x) \\rightarrow U(x)\\partial_\\mu \\psi(x) + (\\partial_\\mu U)\\psi(x)$$</p>
+<p>The second term breaks covariance.</p>
+<p>To cancel it:</p>
+<p>$$D_\\mu \\psi = (\\partial_\\mu + i g A_\\mu)\\psi$$</p>
+<p><strong>Thus:</strong></p>
+<blockquote>👉 Gauge field is structurally necessary, not phenomenological.</blockquote>
+
+<h4 style="color:var(--accent-blue); margin-top: 20px;">5. STRUCTURAL INTERPRETATION</h4>
+<p>Gauge field represents:</p>
+<ul>
+<li>A connection between neighboring symmetry states</li>
+<li>A rule of parallel transport in internal space</li>
+<li>The infrastructure enabling consistent transformation</li>
+</ul>
+<p><strong>Thus:</strong></p>
+<blockquote>👉 Interaction = manifestation of connection structure</blockquote>
+
+<h4 style="color:var(--accent-blue); margin-top: 20px;">6. GRAPH INTERPRETATION PARAGRAPH</h4>
+<p>The visualization shows a smooth surface representing the gauge connection field $A_\\mu$ across spacetime and internal symmetry dimensions.</p>
+<ul>
+<li><strong>X-axis:</strong> spacetime coordinate</li>
+<li><strong>Y-axis:</strong> internal symmetry phase</li>
+<li><strong>Z-axis:</strong> gauge potential $A_\\mu$</li>
+</ul>
+<p>The smooth curvature of the surface indicates that the gauge field varies continuously across spacetime. This variation encodes how symmetry transformations are connected locally.</p>
+<blockquote>👉 The graph represents connection geometry, not particle behavior.</blockquote>
+
+<h4 style="color:var(--accent-blue); margin-top: 20px;">7. MATHEMATICAL STRUCTURE</h4>
+<p>Gauge transformation:</p>
+<p>$$A_\\mu \\rightarrow U A_\\mu U^{-1} - \\frac{i}{g}(\\partial_\\mu U)U^{-1}$$</p>
+<p>Field strength (introduced implicitly):</p>
+<p>$$F_{\\mu\\nu} = \\partial_\\mu A_\\nu - \\partial_\\nu A_\\mu + i g [A_\\mu, A_\\nu]$$</p>
+<p>This shows:</p>
+<ul>
+<li>Abelian case → linear</li>
+<li>Non-Abelian case → self-interacting</li>
+</ul>
+
+<h4 style="color:var(--accent-blue); margin-top: 20px;">8. CONSISTENCY WITH STANDARD MODEL</h4>
+<p>This module corresponds to:</p>
+<p>$$SU(3) \\times SU(2) \\times U(1)$$</p>
+<p>Each symmetry requires its own connection:</p>
+<ul>
+<li>$A_\\mu^a$ for $SU(3)$</li>
+<li>$W_\\mu^i$ for $SU(2)$</li>
+<li>$B_\\mu$ for $U(1)$</li>
+</ul>
+<p><strong>Thus:</strong></p>
+<blockquote>👉 Interaction infrastructure is fully determined by symmetry structure.</blockquote>
+
+<h4 style="color:var(--accent-blue); margin-top: 20px;">9. NECESSITY / INEVITABILITY STATEMENT</h4>
+<p>Given local symmetry, the existence of a connection field is unavoidable. There is no consistent formulation of matter dynamics under local symmetry without introducing $A_\\mu$.</p>
+<p><strong>Thus:</strong></p>
+<blockquote>👉 Gauge field is not an assumption — it is a logical necessity.</blockquote>
+
+<h4 style="color:var(--accent-blue); margin-top: 20px;">10. CONCEPTUAL COMPRESSION</h4>
+<p>Local symmetry → connection requirement → gauge field → interaction infrastructure</p>
+
+<h4 style="color:var(--accent-blue); margin-top: 20px;">11. LOGICAL CLOSURE</h4>
+<p>This module completes the transition from symmetry to interaction infrastructure. It establishes that interaction is encoded in the geometry of connection, not added externally.</p>
+
+<h4 style="color:var(--accent-blue); margin-top: 20px;">12. WHAT THIS MODULE ESTABLISHES</h4>
+<blockquote>👉 Local symmetry → required gauge connection → interaction infrastructure</blockquote>
+
+<h4 style="color:var(--accent-blue); margin-top: 20px;">13. FINAL BOXED STATEMENT</h4>
+<div style="border: 1px solid #ffffff; padding: 10px; text-align: center; margin-top: 20px;">
+$$\\text{Interaction arises from the necessity of maintaining local symmetry via gauge connection fields}$$
+</div>
+</div>`,
+
+math: `<h3 style="color:var(--accent-blue); margin-top: 20px;">EXPLICIT MATHEMATICS</h3>
+<p><strong>Gauge Field as Physical Connection</strong></p>
+
+<h4 style="color:var(--accent-blue); margin-top: 20px;">1. GLOBAL SYMMETRY</h4>
+<p>Start with matter field:</p>
+<p>$$\\psi(x)$$</p>
+<p>Global transformation:</p>
+<p>$$\\psi(x) \\rightarrow U \\psi(x), \\quad U = e^{i\\alpha^a T^a}$$</p>
+<p>Derivative transforms as:</p>
+<p>$$\\partial_\\mu \\psi \\rightarrow U \\partial_\\mu \\psi$$</p>
+<p><strong>✔ Covariance preserved under global symmetry</strong></p>
+
+<h4 style="color:var(--accent-blue); margin-top: 20px;">2. LOCAL SYMMETRY</h4>
+<p>Promote transformation to spacetime-dependent:</p>
+<p>$$\\psi(x) \\rightarrow U(x)\\psi(x), \\quad U(x) = e^{i\\alpha^a(x) T^a}$$</p>
+<p>Now derivative transforms as:</p>
+<p>$$\\partial_\\mu \\psi \\rightarrow (\\partial_\\mu U)\\psi + U \\partial_\\mu \\psi$$</p>
+<p><strong>❌ Extra term breaks covariance:</strong></p>
+<p>$$(\\partial_\\mu U)\\psi \\neq 0$$</p>
+
+<h4 style="color:var(--accent-blue); margin-top: 20px;">3. INTRODUCTION OF GAUGE CONNECTION</h4>
+<p>Define covariant derivative:</p>
+<p>$$D_\\mu = \\partial_\\mu + i g A_\\mu$$</p>
+<p>Where:</p>
+<p>$$A_\\mu = A_\\mu^a T^a$$</p>
+<p>Thus:</p>
+<p>$$D_\\mu \\psi = (\\partial_\\mu + i g A_\\mu^a T^a)\\psi$$</p>
+
+<h4 style="color:var(--accent-blue); margin-top: 20px;">4. REQUIRED TRANSFORMATION LAW</h4>
+<p>To restore covariance:</p>
+<p>$$D_\\mu \\psi \\rightarrow U(x) D_\\mu \\psi$$</p>
+<p>This requires:</p>
+<p>$$A_\\mu \\rightarrow U A_\\mu U^{-1} - \\frac{i}{g}(\\partial_\\mu U)U^{-1}$$</p>
+<p><strong>✔ Gauge field transformation ensures consistency</strong></p>
+
+<h4 style="color:var(--accent-blue); margin-top: 20px;">5. GEOMETRIC INTERPRETATION</h4>
+<p>Gauge field acts as connection:</p>
+<p>$$A_\\mu \\sim \\text{connection on principal bundle}$$</p>
+<p>Parallel transport:</p>
+<p>$$\\psi(x + dx) = \\left(1 + i g A_\\mu dx^\\mu\\right)\\psi(x)$$</p>
+<p><strong>✔ Defines how internal state changes across spacetime</strong></p>
+
+<h4 style="color:var(--accent-blue); margin-top: 20px;">6. FIELD STRENGTH (CURVATURE)</h4>
+<p>Define:</p>
+<p>$$F_{\\mu\\nu} = \\frac{i}{g}[D_\\mu, D_\\nu]$$</p>
+<p>Explicit form:</p>
+<p>$$F_{\\mu\\nu} = \\partial_\\mu A_\\nu - \\partial_\\nu A_\\mu + i g [A_\\mu, A_\\nu]$$</p>
+<p><strong>Cases:</strong></p>
+<ul>
+<li><strong>Abelian (U(1)):</strong></li>
+<p>$$[A_\\mu, A_\\nu] = 0$$</p>
+<p>$$F_{\\mu\\nu} = \\partial_\\mu A_\\nu - \\partial_\\nu A_\\mu$$</p>
+<li><strong>Non-Abelian (SU(2), SU(3)):</strong></li>
+<p>$$[A_\\mu, A_\\nu] \\neq 0$$</p>
+<p>$$F_{\\mu\\nu}^a = \\partial_\\mu A_\\nu^a - \\partial_\\nu A_\\mu^a + g f^{abc} A_\\mu^b A_\\nu^c$$</p>
+</ul>
+
+<h4 style="color:var(--accent-blue); margin-top: 20px;">7. GAUGE-INVARIANT LAGRANGIAN (INFRASTRUCTURE)</h4>
+<p>Matter kinetic term:</p>
+<p>$$\\mathcal{L}_{matter} = \\bar{\\psi}(i\\gamma^\\mu D_\\mu - m)\\psi$$</p>
+<p>Gauge field term:</p>
+<p>$$\\mathcal{L}_{gauge} = -\\frac{1}{4}F_{\\mu\\nu}^a F^{\\mu\\nu a}$$</p>
+
+<h4 style="color:var(--accent-blue); margin-top: 20px;">8. FULL STRUCTURE AT THIS STAGE</h4>
+<p>$$\\mathcal{L} = \\bar{\\psi}(i\\gamma^\\mu D_\\mu - m)\\psi - \\frac{1}{4}F_{\\mu\\nu}^a F^{\\mu\\nu a}$$</p>
+<p>This already contains:</p>
+<ul>
+<li>Matter dynamics</li>
+<li>Gauge connection</li>
+<li>Interaction structure (implicit via $D_\\mu$)</li>
+</ul>
+
+<h4 style="color:var(--accent-blue); margin-top: 20px;">9. NECESSITY CONDITION</h4>
+<p>Without $A_\\mu$:</p>
+<p>$$D_\\mu \\rightarrow \\partial_\\mu$$</p>
+<p>Then:</p>
+<p>$$\\partial_\\mu \\psi \\not\\rightarrow U(x)\\partial_\\mu \\psi$$</p>
+<p><strong>❌ Local symmetry violated</strong></p>
+
+<h4 style="color:var(--accent-blue); margin-top: 20px;">10. STRUCTURAL RESULT</h4>
+<p>$$\\text{Local symmetry} \\;\\Rightarrow\\; \\text{existence of } A_\\mu$$</p>
+<p>$$\\text{Connection} \\;\\Rightarrow\\; \\text{interaction infrastructure}$$</p>
+
+<h4 style="color:var(--accent-blue); margin-top: 20px;">11. CONCEPTUAL COMPRESSION</h4>
+<p>$$\\partial_\\mu \\rightarrow D_\\mu \\Rightarrow A_\\mu \\Rightarrow F_{\\mu\\nu}$$</p>
+
+<h4 style="color:var(--accent-blue); margin-top: 20px;">12. FINAL STATEMENT</h4>
+<div style="border: 1px solid #ffffff; padding: 10px; text-align: center; margin-top: 20px;">
+$$D_\\mu = \\partial_\\mu + i g A_\\mu \\;\\;\\Rightarrow\\;\\; \\text{Gauge field is the necessary connection enforcing local symmetry}$$
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>FIELD COUPLING</span><input type="number" id="c_in" class="digital-entry" value="0" oninput="syncVal(this.value, 'c_sl')"></div><input type="range" id="c_sl" min="0" max="100" step="1" value="0" oninput="syncVal(this.value, 'c_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.8rem;">Local Symmetry &rarr; Required Gauge Connection Field $A_\\mu$</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Connection equals Interaction</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Object</span><span class="const-val">A_&mu;</span></div><div class="const-item"><span class="const-label">Type</span><span class="const-val">VECTOR</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-field);">FIELD: CONTINUOUS GAUGE CONNECTION</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Symmetry Manifold<br>↓<br>Gauge Connection Field<br>↓<br>Interaction Infrastructure`,
+hierarchy: `<div style="color: var(--accent-field); font-weight: bold; font-size: 0.95rem;">Infrastructure: Gauge Connection field</div>`,
+footer: "The field is the stage upon which forces perform.",
+rightNote: `<div style="color: #60a5fa; line-height: 1.3; margin-top: 5px; margin-bottom: 5px; padding: 5px; font-size: 0.77rem;">Interactions arise through the structure of the gauge connection field.<p>Gauge field is not introduced to create interaction; it is required to maintain local symmetry consistency.</p><p>👉 This Module Establishes:<br>Local symmetry → required gauge connection → interaction infrastructure</p></div>`
+},
+
+2: {
+title: "QUANTIZATION OF GAUGE CONNECTION FIELD $A_\\mu$",
+result: "Fields to Particles",
+resultSize: "0.95rem",
+
+brief: `<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">BRIEFING — Quantization of Gauge Connection Field</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.6; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">1. CORE STATEMENT</h3>
+<p>A continuous gauge connection field, when quantized, produces discrete excitation modes that manifest as gauge bosons.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">2. CONCEPTUAL SETUP</h3>
+<p>From Module 1:</p>
+<p>$$A_\\mu^a(x)$$</p>
+<p>is established as:</p>
+<ul>
+<li>A connection field</li>
+<li>A continuous structure</li>
+<li>The infrastructure of interaction</li>
+</ul>
+<p>At this stage:</p>
+<p>$$\\text{Field exists, but no discrete interaction carriers yet}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">3. NECESSITY OF QUANTIZATION</h3>
+<p>A purely classical field implies:</p>
+<ul>
+<li>Continuous energy distribution</li>
+<li>No discrete exchange events</li>
+<li>No particle interpretation</li>
+</ul>
+<p>However, physical interactions are observed as:</p>
+<ul>
+<li>Discrete scattering events</li>
+<li>Quantized energy transfer</li>
+<li>Particle-mediated processes</li>
+</ul>
+<p>Therefore:</p>
+<p>$$\\text{Field must admit discrete excitation states}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">4. QUANTIZATION PRINCIPLE</h3>
+<p>Promote field to operator:</p>
+<p>$$A_\\mu^a(x) \\rightarrow \\hat{A}_\\mu^a(x)$$</p>
+<p>Expand in modes:</p>
+<p>$$\\hat{A}_\\mu^a(x) = \\sum_k \\left( a_k^a \\epsilon_\\mu(k)e^{-ikx} + a_k^{a\\dagger} \\epsilon_\\mu^*(k)e^{ikx} \\right)$$</p>
+<p>Where:</p>
+<ul>
+<li>$$a_k^a$$ → annihilation operator</li>
+<li>$$a_k^{a\\dagger}$$ → creation operator</li>
+<li>$$\\epsilon_\\mu(k)$$ → polarization vector</li>
+</ul>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">5. COMMUTATION STRUCTURE</h3>
+<p>Bosonic quantization:</p>
+<p>$$[a_k^a, a_{k'}^{b\\dagger}] = \\delta^{ab}\\delta(k-k')$$</p>
+<p>$$[a_k^a, a_{k'}^b] = 0$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">6. PARTICLE EMERGENCE</h3>
+<p>Define vacuum:</p>
+<p>$$|0\\rangle$$</p>
+<p>Single excitation:</p>
+<p>$$|1_k^a\\rangle = a_k^{a\\dagger}|0\\rangle$$</p>
+<p>Interpretation:</p>
+<p>$$\\text{Gauge boson} = \\text{quantized excitation of } A_\\mu^a$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">7. ENERGY QUANTIZATION</h3>
+<p>Each mode carries:</p>
+<p>$$E = \\hbar \\omega$$</p>
+<p>Thus:</p>
+<p>$$\\text{Energy transfer occurs in discrete quanta}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">8. STRUCTURAL RESULT</h3>
+<p>$$\\text{Continuous field} \\;\\Rightarrow\\; \\text{mode decomposition} \\;\\Rightarrow\\; \\text{discrete quanta}$$</p>
+<p>$$A_\\mu^a \\;\\Rightarrow\\; \\text{Bosonic excitations}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">9. GAUGE BOSON IDENTIFICATION (PREVIEW)</h3>
+<p>Each index $$a$$ corresponds to a generator:</p>
+<p>$$a = 1, \\dots, \\dim(G)$$</p>
+<p>Thus:</p>
+<p>$$\\text{Each mode } \\rightarrow \\text{distinct gauge boson species}$$</p>
+<p>(Explicit identification deferred to Module 3)</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">10. GRAPH INTERPRETATION PARAGRAPH</h3>
+<p>The visualization represents the transition from a continuous gauge field to discrete excitation modes.</p>
+<ul>
+<li>Axes correspond to:</li>
+</ul>
+<p>Spatial frequency (momentum space)<br>
+Polarization states<br>
+Field amplitude</p>
+
+<ul>
+<li>The scattered discrete points represent:</li>
+</ul>
+<p>Individual excitation modes<br>
+Quantized energy packets</p>
+
+<ul>
+<li>The transition from smooth surface (implicit field) to discrete points illustrates:</li>
+</ul>
+<p>$$\\text{Field continuity} \\;\\rightarrow\\; \\text{quantized particle spectrum}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">11. NECESSITY / INEVITABILITY STATEMENT</h3>
+<p>If:</p>
+<p>$$\\text{Field exists} \\quad \\text{and} \\quad \\text{energy exchange is discrete}$$</p>
+<p>Then:</p>
+<p>$$\\text{Field must be quantized}$$</p>
+<p>Thus:</p>
+<p>$$\\text{Gauge bosons are not optional entities but necessary excitations}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">12. STRUCTURAL CHAIN</h3>
+<p>$$A_\\mu^a \\;\\rightarrow\\; \\hat{A}_\\mu^a \\;\\rightarrow\\; a^\\dagger \\;\\rightarrow\\; |1\\rangle \\;\\rightarrow\\; \\text{Boson}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">13. WHAT THIS MODULE ESTABLISHES</h3>
+<p>$$\\boxed{ \\text{Gauge connection field} \\;\\rightarrow\\; \\text{quantization} \\;\\rightarrow\\; \\text{gauge boson excitations} }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">14. CONCEPTUAL COMPRESSION</h3>
+<p>$$\\text{Field} \\;\\Rightarrow\\; \\text{Modes} \\;\\Rightarrow\\; \\text{Quanta}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">15. LOGICAL CLOSURE</h3>
+<p>At this stage:</p>
+<ul>
+<li>Interaction infrastructure exists (Module 1)</li>
+<li>Discrete carriers now exist (Module 2)</li>
+</ul>
+<p>However:</p>
+<p>$$\\text{Which specific bosons exist is not yet specified}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">16. TRANSITION TO NEXT MODULE</h3>
+<p>Next necessity:</p>
+<p>$$\\text{Which gauge bosons arise from symmetry?}$$</p>
+<p>Leads to:</p>
+<p>👉 Module 3 — Generator → Gauge Boson Mapping</p>
+
+</div>`,
+
+math: `<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">EXPLICIT MATHEMATICS — Quantization of Gauge Connection Field</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.6; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">1. STARTING POINT: CLASSICAL GAUGE FIELD</h3>
+<p>From Module 1:</p>
+<p>$$A_\\mu^a(x)$$</p>
+<p>with field strength:</p>
+<p>$$F_{\\mu\\nu}^a = \\partial_\\mu A_\\nu^a - \\partial_\\nu A_\\mu^a + g f^{abc} A_\\mu^b A_\\nu^c$$</p>
+<p>Gauge field Lagrangian:</p>
+<p>$$\\mathcal{L}_{gauge} = -\\frac{1}{4} F_{\\mu\\nu}^a F^{\\mu\\nu a}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">2. CANONICAL VARIABLES</h3>
+<p>Define conjugate momentum:</p>
+<p>$$\\Pi^{\\mu a} = \\frac{\\partial \\mathcal{L}}{\\partial(\\partial_0 A_\\mu^a)}$$</p>
+<p>For Yang–Mills field:</p>
+<p>$$\\Pi^{i a} = F^{i0 a}$$</p>
+<p>$$\\Pi^{0 a} = 0$$</p>
+<p>✔ Constraint indicates gauge redundancy</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">3. GAUGE FIXING (NECESSARY STEP)</h3>
+<p>To quantize, fix gauge:</p>
+<p>Example: Lorenz gauge</p>
+<p>$$\\partial^\\mu A_\\mu^a = 0$$</p>
+<p>Or Coulomb gauge:</p>
+<p>$$\\nabla \\cdot \\vec{A}^a = 0$$</p>
+<p>✔ Removes non-physical degrees of freedom</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">4. FIELD PROMOTION TO OPERATOR</h3>
+<p>$$A_\\mu^a(x) \\rightarrow \\hat{A}_\\mu^a(x)$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">5. MODE EXPANSION</h3>
+<p>Expand field in Fourier modes:</p>
+<p>$$\\hat{A}_\\mu^a(x) = \\int \\frac{d^3k}{(2\\pi)^3} \\frac{1}{\\sqrt{2\\omega_k}} \\sum_{\\lambda} \\left[ a^a_{\\mathbf{k},\\lambda} \\,\\epsilon_\\mu^{(\\lambda)}(k)e^{-ikx} + a^{a\\dagger}_{\\mathbf{k},\\lambda} \\,\\epsilon_\\mu^{(\\lambda)*}(k)e^{ikx} \\right]$$</p>
+<p>Where:</p>
+<ul>
+<li>$\\lambda$= polarization index</li>
+<li>$\\epsilon\_\\mu\^\{\(\\lambda\)\} \$= polarization vectors</li>
+<li>$\\omega\_k \= \|\\mathbf\{k\}\|$ (massless case)</li>
+</ul>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">6. COMMUTATION RELATIONS</h3>
+<p>Bosonic commutation:</p>
+<p>$$[a^a_{\\mathbf{k},\\lambda}, a^{b\\dagger}_{\\mathbf{k}',\\lambda'}] = \\delta^{ab} \\delta_{\\lambda\\lambda'} \\delta^{(3)}(\\mathbf{k} - \\mathbf{k}')$$</p>
+<p>$$[a, a] = 0, \\quad [a^\\dagger, a^\\dagger] = 0$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">7. HAMILTONIAN STRUCTURE</h3>
+<p>Hamiltonian:</p>
+<p>$$H = \\int d^3k \\sum_{\\lambda,a} \\omega_k \\left( a^{a\\dagger}_{\\mathbf{k},\\lambda} a^a_{\\mathbf{k},\\lambda} + \\frac{1}{2} \\right)$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">8. VACUUM STATE</h3>
+<p>$$a^a_{\\mathbf{k},\\lambda} |0\\rangle = 0$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">9. SINGLE-PARTICLE STATES</h3>
+<p>$$|\\mathbf{k}, \\lambda, a\\rangle = a^{a\\dagger}_{\\mathbf{k},\\lambda} |0\\rangle$$</p>
+<p>Interpretation:</p>
+<p>$$\\text{One quantum of } A_\\mu^a$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">10. MULTI-PARTICLE STATES</h3>
+<p>$$|\\mathbf{k}_1, \\mathbf{k}_2, \\dots\\rangle = a^\\dagger_{\\mathbf{k}_1} a^\\dagger_{\\mathbf{k}_2} \\cdots |0\\rangle$$</p>
+<p>✔ Bosonic symmetry:</p>
+<p>$$|\\mathbf{k}_1, \\mathbf{k}_2\\rangle = |\\mathbf{k}_2, \\mathbf{k}_1\\rangle$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">11. PROPAGATOR (FIELD CORRELATION)</h3>
+<p>$$D_{\\mu\\nu}^{ab}(x-y) = \\langle 0 | T\\{A_\\mu^a(x) A_\\nu^b(y)\\} | 0 \\rangle$$</p>
+<p>Momentum space (Feynman gauge):</p>
+<p>$$D_{\\mu\\nu}^{ab}(k) = \\frac{-i \\delta^{ab} g_{\\mu\\nu}}{k^2 + i\\epsilon}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">12. INTERACTION PREVIEW (COUPLING STRUCTURE)</h3>
+<p>From covariant derivative:</p>
+<p>$$D_\\mu = \\partial_\\mu + i g A_\\mu^a T^a$$</p>
+<p>Interaction term:</p>
+<p>$$\\mathcal{L}_{int} = g \\bar{\\psi}\\gamma^\\mu A_\\mu^a T^a \\psi$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">13. ENERGY QUANTIZATION</h3>
+<p>Each excitation carries:</p>
+<p>$$E = \\hbar \\omega_k$$</p>
+<p>Thus:</p>
+<p>$$\\Delta E = n \\hbar \\omega$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">14. STRUCTURAL RESULT</h3>
+<p>$$A_\\mu^a(x) \\;\\rightarrow\\; \\hat{A}_\\mu^a(x)$$</p>
+<p>$$\\hat{A}_\\mu^a \\;\\rightarrow\\; a^\\dagger, a$$</p>
+<p>$$a^\\dagger |0\\rangle \\;\\rightarrow\\; \\text{bosonic quantum}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">15. NECESSITY STATEMENT</h3>
+<p>If:</p>
+<p>$$\\text{Field carries energy}$$</p>
+<p>and:</p>
+<p>$$\\text{Energy exchange is discrete}$$</p>
+<p>Then:</p>
+<p>$$\\text{Field must admit quantized excitations}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">16. CONCEPTUAL COMPRESSION</h3>
+<p>$$\\mathcal{L}_{gauge} \\;\\Rightarrow\\; \\Pi \\;\\Rightarrow\\; \\hat{A} \\;\\Rightarrow\\; a^\\dagger \\;\\Rightarrow\\; |1\\rangle$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">17. FINAL STATEMENT</h3>
+<p>$$\\boxed{ \\hat{A}_\\mu^a(x) = \\sum_{\\mathbf{k},\\lambda} \\left( a^a_{\\mathbf{k},\\lambda} \\epsilon_\\mu e^{-ikx} + a^{a\\dagger}_{\\mathbf{k},\\lambda} \\epsilon_\\mu^* e^{ikx} \\right) \\;\\Rightarrow\\; \\text{Gauge bosons are quantized excitations of the gauge connection field} }$$</p>
+
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>QUANTA DENSITY</span><input type="number" id="q_in" class="digital-entry" value="0" oninput="syncVal(this.value, 'q_sl')"></div><input type="range" id="q_sl" min="0" max="100" step="1" value="0" oninput="syncVal(this.value, 'q_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.8rem;">Gauge Field Mode &rarr; Bosonic Quanta</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Energy is Grainy</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Process</span><span class="const-val">QUANTIZATION</span></div><div class="const-item"><span class="const-label">Entity</span><span class="const-val">BOSON</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-quant);">FIELD: QUANTIZED GAUGE EXCITATION</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Continuous Gauge Field<br>↓<br>Discrete Mode Excitations<br>↓<br>Bosonic Quanta`,
+hierarchy: `<div style="color: var(--accent-quant); font-weight: bold; font-size: 0.95rem;">Quanta: Gauge Boson Excitations</div>`,
+footer: "Quantized excitations of the gauge connection field manifest as bosons.",
+rightNote: `<div style="color: #c084fc; line-height: 1.3; margin-top: 8px; padding: 10px; font-size: 0.9rem;">The visualization transitions from smooth field to discrete quanta.<p>Quantization converts interaction infrastructure into interaction carriers.</p><p>👉 This Module Establishes:<br>Gauge connection field → quantization → gauge boson excitations</p></div>`
+},
+
+3: {
+title: "IDENTIFICATION OF GAUGE BOSONS",
+result: "The Mediator Spectrum",
+resultSize: "0.85rem",
+
+brief: `<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">BRIEFING — Generator → Gauge Boson Mapping</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.6; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">1. CORE STATEMENT</h3>
+<p>Each generator of the gauge symmetry group corresponds to one independent gauge field component, and upon quantization, to one gauge boson; therefore, the mediator spectrum is fully determined by the dimension of the symmetry group.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">2. CONCEPTUAL SETUP</h3>
+<p>From Module 1:</p>
+<p>$$A_\\mu = A_\\mu^a T^a$$</p>
+<p>From Module 2:</p>
+<p>$$A_\\mu^a \\;\\rightarrow\\; \\text{quantized excitations (bosons)}$$</p>
+<p>Thus:</p>
+<p>$$\\text{Gauge bosons exist, but their number and identity remain unspecified}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">3. SYMMETRY STRUCTURE</h3>
+<p>The Standard Model gauge group:</p>
+<p>$$G = U(1) \\times SU(2) \\times SU(3)$$</p>
+<p>Dimensions:</p>
+<p>$$\\dim(U(1)) = 1$$</p>
+<p>$$\\dim(SU(2)) = 3$$</p>
+<p>$$\\dim(SU(3)) = 8$$</p>
+<p>Thus:</p>
+<p>$$\\dim(G) = 1 + 3 + 8 = 12$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">4. GENERATOR BASIS</h3>
+<p>Each group has generators:</p>
+<p>$$\\{T^a\\}, \\quad a = 1, \\dots, \\dim(G)$$</p>
+<p>Lie algebra:</p>
+<p>$$[T^a, T^b] = i f^{abc} T^c$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">5. GAUGE FIELD DECOMPOSITION</h3>
+<p>Gauge field expands over generators:</p>
+<p>$$A_\\mu = A_\\mu^a T^a$$</p>
+<p>Thus:</p>
+<p>$$\\text{Each } A_\\mu^a \\leftrightarrow \\text{one generator } T^a$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">6. PARTICLE IDENTIFICATION</h3>
+<p>From quantization:</p>
+<p>$$A_\\mu^a \\;\\rightarrow\\; \\text{bosonic quantum}$$</p>
+<p>Thus:</p>
+<p>$$T^a \\;\\Rightarrow\\; A_\\mu^a \\;\\Rightarrow\\; \\text{Gauge Boson}_a$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">7. MEDIATOR SPECTRUM</h3>
+
+<p><b>U(1)</b></p>
+<p>$$1 \\text{ generator} \\;\\Rightarrow\\; 1 \\text{ boson}$$</p>
+<p>→ Photon ($$\\gamma$$)</p>
+
+<p><b>SU(2)</b></p>
+<p>$$3 \\text{ generators} \\;\\Rightarrow\\; 3 \\text{ bosons}$$</p>
+<p>→ $$W^1, W^2, W^3$$ (later → $$W^\\pm, Z$$)</p>
+
+<p><b>SU(3)</b></p>
+<p>$$8 \\text{ generators} \\;\\Rightarrow\\; 8 \\text{ bosons}$$</p>
+<p>→ Gluons ($$g^1 \\dots g^8$$)</p>
+
+<p><b>TOTAL</b></p>
+<p>$$12 \\text{ generators} \\;\\Rightarrow\\; 12 \\text{ gauge bosons}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">8. STRUCTURAL RESULT</h3>
+<p>$$\\text{Symmetry group} \\;\\Rightarrow\\; \\text{Generators} \\;\\Rightarrow\\; \\text{Gauge fields} \\;\\Rightarrow\\; \\text{Gauge bosons}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">9. GRAPH INTERPRETATION PARAGRAPH</h3>
+<p>The visualization represents the mediator spectrum as discrete points in a structured internal space.</p>
+
+<ul>
+<li>Axes correspond to:</li>
+</ul>
+<p>U(1) hypercharge direction<br>
+SU(2) weak isospin space<br>
+SU(3) color charge space</p>
+
+<ul>
+<li>Each point corresponds to:</li>
+</ul>
+<p>One generator $$T^a$$<br>
+One gauge field component $$A_\\mu^a$$<br>
+One gauge boson</p>
+
+<ul>
+<li>The isolated point labeled “Photon” represents:</li>
+</ul>
+<p>The single U(1) generator<br>
+The simplest symmetry direction</p>
+
+<ul>
+<li>The full structure represents:</li>
+</ul>
+<p>$$\\text{Complete mediator basis of interaction space}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">10. NECESSITY / INEVITABILITY</h3>
+<p>Given:</p>
+<p>$$G = U(1)\\times SU(2)\\times SU(3)$$</p>
+<p>Then:</p>
+<p>$$\\dim(G) = 12$$</p>
+<p>Thus:</p>
+<p>$$\\text{Exactly 12 independent interaction directions must exist}$$</p>
+<p>Therefore:</p>
+<p>$$\\text{Exactly 12 gauge bosons must exist}$$</p>
+<p>✔ No arbitrariness</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">11. DEEP STRUCTURAL INSIGHT</h3>
+<p>Gauge bosons are not “introduced” entities.</p>
+<p>$$\\text{They are the basis vectors of symmetry transformation space}$$</p>
+<p>Thus:</p>
+<p>$$\\text{Interaction} = \\text{motion along symmetry directions}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">12. WHAT THIS MODULE ESTABLISHES</h3>
+<p>$$\\boxed{ \\text{Symmetry generators} \\;\\rightarrow\\; \\text{gauge fields} \\;\\rightarrow\\; \\text{gauge bosons} \\;\\rightarrow\\; \\text{discrete interaction channels} }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">13. CONCEPTUAL COMPRESSION</h3>
+<p>$$G \\;\\Rightarrow\\; \\dim(G) \\;\\Rightarrow\\; T^a \\;\\Rightarrow\\; A_\\mu^a \\;\\Rightarrow\\; \\text{Bosons}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">14. LOGICAL CLOSURE</h3>
+<p>At this stage:</p>
+<ul>
+<li>Interaction infrastructure exists (Module 1)</li>
+<li>Discrete quanta exist (Module 2)</li>
+<li>Mediator spectrum is fully identified (Module 3)</li>
+</ul>
+<p>However:</p>
+<p>$$\\text{How interactions actually occur between matter fields is not yet established}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">15. TRANSITION TO NEXT MODULE</h3>
+<p>Next necessity:</p>
+<p>$$\\text{How do these bosons mediate interaction?}$$</p>
+<p>Leads to:</p>
+<p>👉 Module 4 — Interaction via Gauge Boson Exchange</p>
+
+</div>`,
+
+math: `<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">EXPLICIT MATHEMATICS — Generator → Gauge Boson Mapping</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.6; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">1. GAUGE GROUP STRUCTURE</h3>
+<p>$$G = U(1) \\times SU(2) \\times SU(3)$$</p>
+<p>$$\\dim(G) = 1 + 3 + 8 = 12$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">2. LIE ALGEBRA GENERATORS</h3>
+<p>Let:</p>
+<p>$$\\{T^a\\}, \\quad a = 1, \\dots, 12$$</p>
+<p>satisfy:</p>
+<p>$$[T^a, T^b] = i f^{abc} T^c$$</p>
+
+<p>Component decomposition</p>
+<p>$$T^a = \\begin{cases} Y & \\text{(U(1), } a=1\\text{)} \\\\ \\tau^i/2 & \\text{(SU(2), } i=1,2,3\\text{)} \\\\ \\lambda^A/2 & \\text{(SU(3), } A=1,\\dots,8\\text{)} \\end{cases}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">3. GAUGE FIELD EXPANSION</h3>
+<p>$$A_\\mu(x) = A_\\mu^a(x) T^a$$</p>
+<p>Explicitly:</p>
+<p>$$A_\\mu = B_\\mu Y + W_\\mu^i \\frac{\\tau^i}{2} + G_\\mu^A \\frac{\\lambda^A}{2}$$</p>
+<p>Where:</p>
+<ul>
+<li>$$B_\\mu$$ → U(1) field</li>
+<li>$$W_\\mu^i$$ → SU(2) fields</li>
+<li>$$G_\\mu^A$$ → SU(3) fields</li>
+</ul>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">4. COVARIANT DERIVATIVE</h3>
+<p>$$D_\\mu = \\partial_\\mu + i g_1 B_\\mu Y + i g_2 W_\\mu^i \\frac{\\tau^i}{2} + i g_3 G_\\mu^A \\frac{\\lambda^A}{2}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">5. FIELD STRENGTH TENSOR</h3>
+<p>General:</p>
+<p>$$F_{\\mu\\nu} = F_{\\mu\\nu}^a T^a$$</p>
+
+<p><b>U(1)</b></p>
+<p>$$B_{\\mu\\nu} = \\partial_\\mu B_\\nu - \\partial_\\nu B_\\mu$$</p>
+
+<p><b>SU(2)</b></p>
+<p>$$W_{\\mu\\nu}^i = \\partial_\\mu W_\\nu^i - \\partial_\\nu W_\\mu^i + g_2 \\epsilon^{ijk} W_\\mu^j W_\\nu^k$$</p>
+
+<p><b>SU(3)</b></p>
+<p>$$G_{\\mu\\nu}^A = \\partial_\\mu G_\\nu^A - \\partial_\\nu G_\\mu^A + g_3 f^{ABC} G_\\mu^B G_\\nu^C$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">6. GAUGE FIELD LAGRANGIAN</h3>
+<p>$$\\mathcal{L}_{gauge} = -\\frac{1}{4} B_{\\mu\\nu} B^{\\mu\\nu} -\\frac{1}{4} W_{\\mu\\nu}^i W^{\\mu\\nu i} -\\frac{1}{4} G_{\\mu\\nu}^A G^{\\mu\\nu A}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">7. GENERATOR → FIELD CORRESPONDENCE</h3>
+<p>$$T^a \\;\\leftrightarrow\\; A_\\mu^a$$</p>
+<p>$$A_\\mu^a \\;\\leftrightarrow\\; \\text{gauge field component}$$</p>
+<p>Thus:</p>
+<p>$$\\boxed{ \\dim(G) = N \\;\\Rightarrow\\; N \\text{ independent gauge fields} }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">8. QUANTIZATION CONNECTION (FROM MODULE 2)</h3>
+<p>$$A_\\mu^a(x) \\rightarrow \\hat{A}_\\mu^a(x)$$</p>
+<p>$$\\hat{A}_\\mu^a \\rightarrow a^{a\\dagger} \\Rightarrow |1^a\\rangle$$</p>
+<p>Thus:</p>
+<p>$$T^a \\;\\Rightarrow\\; \\text{Gauge Boson}_a$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">9. PARTICLE IDENTIFICATION</h3>
+<p>$$\\begin{aligned} U(1): & \\quad B_\\mu \\Rightarrow \\gamma \\ (\\text{photon}) \\\\ SU(2): & \\quad W_\\mu^i \\Rightarrow W^1, W^2, W^3 \\\\ SU(3): & \\quad G_\\mu^A \\Rightarrow g^1,\\dots,g^8 \\end{aligned}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">10. ELECTROWEAK MIXING (PREVIEW STRUCTURE)</h3>
+<p>Define:</p>
+<p>$$\\begin{aligned} A_\\mu &= B_\\mu \\cos\\theta_W + W_\\mu^3 \\sin\\theta_W \\\\ Z_\\mu &= -B_\\mu \\sin\\theta_W + W_\\mu^3 \\cos\\theta_W \\end{aligned}$$</p>
+<p>$$W^\\pm_\\mu = \\frac{1}{\\sqrt{2}}(W_\\mu^1 \\mp i W_\\mu^2)$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">11. STRUCTURAL COUNTING</h3>
+<p>$$\\dim(U(1)) = 1 \\Rightarrow 1 \\text{ boson}$$</p>
+<p>$$\\dim(SU(2)) = 3 \\Rightarrow 3 \\text{ bosons}$$</p>
+<p>$$\\dim(SU(3)) = 8 \\Rightarrow 8 \\text{ bosons}$$</p>
+<p>$$\\boxed{ 1 + 3 + 8 = 12 \\text{ gauge bosons} }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">12. NECESSITY RELATION</h3>
+<p>$$\\text{Lie Algebra Dimension} \\;\\Rightarrow\\; \\text{Number of Gauge Fields}$$</p>
+<p>$$\\text{Gauge Fields} \\;\\Rightarrow\\; \\text{Quantized Bosons}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">13. CONCEPTUAL COMPRESSION</h3>
+<p>$$G \\;\\Rightarrow\\; T^a \\;\\Rightarrow\\; A_\\mu^a \\;\\Rightarrow\\; a^\\dagger \\;\\Rightarrow\\; \\text{Bosons}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">14. FINAL STATEMENT</h3>
+<p>$$\\boxed{ \\dim(G) = N \\;\\Rightarrow\\; A_\\mu^a \\ (a=1,\\dots,N) \\;\\Rightarrow\\; N \\text{ gauge bosons determined by symmetry} }$$</p>
+
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>GENERATOR LABEL a = 1,....12</span><input type="number" id="g_in" class="digital-entry" value="1" oninput="syncVal(this.value, 'g_sl')"></div><input type="range" id="g_sl" min="1" max="12" step="1" value="1" oninput="syncVal(this.value, 'g_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.8rem;">Generator $T^a$ &rarr; Gauge Field $A_\\mu^a$</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Symmetry generators determine interaction carriers</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Group</span><span class="const-val">U(1) x SU(2) x SU(3)</span></div><div class="const-item"><span class="const-label">Total</span><span class="const-val">12 (1+3+8)</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-boson);">GAUGE SPECTRUM: 12 BOSONIC MEDIATORS</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Lie Algebra Generators<br>↓<br>Gauge Field Components $A_\\mu^a$<br>↓<br>Physical Gauge Bosons`,
+hierarchy: `<div style="color: var(--accent-boson); font-weight: bold; font-size: 0.95rem;">Identity: Gauge Bosons Correspond to Symmetry Generators</div>`,
+footer: "The structure of the force is the shape of the symmetry group.",
+rightNote: `<div style="color: #fbbf24; line-height: 1.3; margin-top: 5px; margin-bottom: 5px; padding: 5px; font-size: 0.9rem;">Each generator defines an independent interaction direction in gauge space.<p>👉 This Module Establishes:<br>Symmetry generators → gauge bosons → discrete interaction channels</p></div>`
+},
+
+4: {
+title: "INTERACTION MECHANISM",
+result: "Exchange Principle",
+resultSize: "0.85rem",
+
+brief: `<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">BRIEFING — Interaction via Gauge Boson Exchange</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.6; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">1. CORE STATEMENT</h3>
+<p>Interactions arise through the exchange of quantized gauge bosons between fermionic currents, and this exchange is encoded structurally as a local interaction vertex in the gauge-invariant Lagrangian.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">2. CONCEPTUAL SETUP</h3>
+<p>From previous modules:</p>
+<ul>
+<li>Module 1:</li>
+</ul>
+<p>$$A_\\mu^a \\quad \\text{(connection field)}$$</p>
+
+<ul>
+<li>Module 2:</li>
+</ul>
+<p>$$A_\\mu^a \\rightarrow \\text{quantized excitations (bosons)}$$</p>
+
+<ul>
+<li>Module 3:</li>
+</ul>
+<p>$$\\text{Each boson corresponds to a symmetry generator}$$</p>
+
+<p>Thus:</p>
+<p>$$\\text{Mediators exist, but interaction mechanism is not yet defined}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">3. ORIGIN OF INTERACTION</h3>
+<p>From covariant derivative:</p>
+<p>$$D_\\mu = \\partial_\\mu + i g A_\\mu^a T^a$$</p>
+
+<p>Insert into matter Lagrangian:</p>
+<p>$$\\mathcal{L}_{matter} = \\bar{\\psi}(i\\gamma^\\mu D_\\mu)\\psi$$</p>
+
+<p>Expands to:</p>
+<p>$$\\mathcal{L}_{int} = g \\bar{\\psi}\\gamma^\\mu A_\\mu^a T^a \\psi$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">4. INTERACTION STRUCTURE</h3>
+<p>Define fermion current:</p>
+<p>$$J^\\mu_a = \\bar{\\psi}\\gamma^\\mu T^a \\psi$$</p>
+
+<p>Thus:</p>
+<p>$$\\mathcal{L}_{int} = g J^\\mu_a A_\\mu^a$$</p>
+
+<p>✔ Interaction term emerges directly from symmetry requirement</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">5. EXCHANGE MECHANISM</h3>
+<p>Interaction between two fermions:</p>
+<p>$$\\psi_1 + \\psi_2 \\rightarrow \\psi_1 + \\psi_2$$</p>
+
+<p>mediated by:</p>
+<p>$$\\text{virtual gauge boson exchange}$$</p>
+
+<p><b>Amplitude structure</b></p>
+<p>$$\\mathcal{M} \\sim J^\\mu_a \\; D_{\\mu\\nu}^{ab}(k) \\; J^\\nu_b$$</p>
+
+<p>Where:</p>
+<ul>
+<li>$$D_{\\mu\\nu}^{ab}(k) = \\text{gauge boson propagator}$$</li>
+<li>$$J^\\mu_a = \\text{fermion current}$$</li>
+</ul>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">6. VERTEX STRUCTURE</h3>
+<p>From Lagrangian:</p>
+<p>$$\\mathcal{L}_{int} = g \\bar{\\psi}\\gamma^\\mu T^a \\psi \\, A_\\mu^a$$</p>
+
+<p>Vertex factor:</p>
+<p>$$i g \\gamma^\\mu T^a$$</p>
+
+<p>✔ Defines local interaction point</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">7. MOMENTUM TRANSFER</h3>
+<p>At vertex:</p>
+<p>$$p_{\\text{in}} = p_{\\text{out}} + k$$</p>
+
+<p>Gauge boson carries:</p>
+<p>$$k^\\mu = \\text{momentum transfer}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">8. STRUCTURAL RESULT</h3>
+<p>$$\\text{Fermion current} \\;\\Rightarrow\\; \\text{boson emission/absorption}$$</p>
+<p>$$\\text{Boson exchange} \\;\\Rightarrow\\; \\text{interaction between fermions}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">9. GRAPH INTERPRETATION PARAGRAPH</h3>
+<p>The visualization represents an interaction event as a vertex-mediated exchange process.</p>
+
+<ul>
+<li>Axes correspond to:</li>
+</ul>
+<p>Interaction vertex space<br>
+Matter trajectory space<br>
+Momentum transfer direction</p>
+
+<ul>
+<li>The two lines represent:</li>
+</ul>
+<p>Incoming and outgoing fermionic trajectories</p>
+
+<ul>
+<li>The central point represents:</li>
+</ul>
+<p>The interaction vertex</p>
+
+<ul>
+<li>The highlighted point represents:</li>
+</ul>
+<p>The exchanged gauge quantum</p>
+
+<p>Thus, the visualization encodes:</p>
+<p>$$\\text{Interaction} = \\text{exchange of gauge boson at vertex}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">10. NECESSITY / INEVITABILITY</h3>
+<p>Given:</p>
+<p>$$D_\\mu = \\partial_\\mu + i g A_\\mu^a T^a$$</p>
+
+<p>Then:</p>
+<p>$$\\mathcal{L}_{int} = g J^\\mu_a A_\\mu^a$$</p>
+
+<p>Thus:</p>
+<p>$$\\text{Interaction is not added externally}$$</p>
+<p>$$\\text{Interaction is structurally enforced by gauge symmetry}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">11. DEEP STRUCTURAL INSIGHT</h3>
+<p>$$\\text{Force} \\neq \\text{primitive concept}$$</p>
+<p>$$\\text{Force} = \\text{exchange of symmetry quanta}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">12. WHAT THIS MODULE ESTABLISHES</h3>
+<p>$$\\boxed{ \\text{Gauge boson exchange} \\;\\rightarrow\\; \\text{interaction vertex} \\;\\rightarrow\\; \\text{physical force transmission} }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">13. CONCEPTUAL COMPRESSION</h3>
+<p>$$D_\\mu \\Rightarrow J^\\mu A_\\mu \\Rightarrow \\text{Vertex} \\Rightarrow \\text{Exchange} \\Rightarrow \\text{Interaction}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">14. LOGICAL CLOSURE</h3>
+<p>At this stage:</p>
+<ul>
+<li>Mediators are identified (Module 3)</li>
+<li>Interaction mechanism is established (Module 4)</li>
+</ul>
+<p>However:</p>
+<p>$$\\text{Full integrated interaction structure is not yet assembled}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">15. TRANSITION TO NEXT MODULE</h3>
+<p>Next necessity:</p>
+<p>$$\\text{Combine symmetry, matter, and gauge fields into complete structure}$$</p>
+
+<p>Leads to:</p>
+<p>👉 Module 5 — Complete Interaction Sector</p>
+
+</div>`,
+
+math: `<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">EXPLICIT MATHEMATICS — Interaction via Gauge Boson Exchange</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.6; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">1. STARTING POINT: COVARIANT DERIVATIVE</h3>
+<p>$$D_\\mu = \\partial_\\mu + i g A_\\mu^a T^a$$</p>
+<p>Matter Lagrangian:</p>
+<p>$$\\mathcal{L}_{matter} = \\bar{\\psi}(i\\gamma^\\mu D_\\mu - m)\\psi$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">2. EXPANSION OF LAGRANGIAN</h3>
+<p>$$\\mathcal{L}_{matter} = \\bar{\\psi}(i\\gamma^\\mu \\partial_\\mu - m)\\psi + g \\bar{\\psi}\\gamma^\\mu A_\\mu^a T^a \\psi$$</p>
+<p>Thus:</p>
+<p>$$\\mathcal{L}_{int} = g \\bar{\\psi}\\gamma^\\mu T^a \\psi \\, A_\\mu^a$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">3. DEFINITION OF CURRENT</h3>
+<p>$$J^\\mu_a = \\bar{\\psi}\\gamma^\\mu T^a \\psi$$</p>
+<p>Thus:</p>
+<p>$$\\mathcal{L}_{int} = g J^\\mu_a A_\\mu^a$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">4. GAUGE BOSON PROPAGATOR</h3>
+<p>In momentum space (Feynman gauge):</p>
+<p>$$D_{\\mu\\nu}^{ab}(k) = \\frac{-i \\delta^{ab} g_{\\mu\\nu}}{k^2 + i\\epsilon}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">5. TREE-LEVEL SCATTERING AMPLITUDE</h3>
+<p>For fermion scattering:</p>
+<p>$$\\psi_1(p_1) + \\psi_2(p_2) \\rightarrow \\psi_1(p_3) + \\psi_2(p_4)$$</p>
+<p>Amplitude:</p>
+<p>$$\\mathcal{M} = \\bar{u}(p_3)(i g \\gamma^\\mu T^a)u(p_1) \\; D_{\\mu\\nu}^{ab}(k) \\; \\bar{u}(p_4)(i g \\gamma^\\nu T^b)u(p_2)$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">6. SIMPLIFIED STRUCTURE</h3>
+<p>$$\\mathcal{M} \\sim J^\\mu_a \\; D_{\\mu\\nu}^{ab}(k) \\; J^\\nu_b$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">7. MOMENTUM TRANSFER</h3>
+<p>$$k^\\mu = p_1^\\mu - p_3^\\mu$$</p>
+<p>$$k^2 = (p_1 - p_3)^2$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">8. VERTEX FACTOR</h3>
+<p>From interaction Lagrangian:</p>
+<p>$$\\mathcal{L}_{int} = g \\bar{\\psi}\\gamma^\\mu T^a \\psi A_\\mu^a$$</p>
+<p>Vertex rule:</p>
+<p>$$i g \\gamma^\\mu T^a$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">9. FULL FEYNMAN STRUCTURE</h3>
+<p>Each interaction contains:</p>
+<ul>
+<li>Incoming fermion line</li>
+<li>Outgoing fermion line</li>
+<li>Gauge boson propagator</li>
+<li>Two vertices</li>
+</ul>
+<p>Mathematically:</p>
+<p>$$\\text{Vertex} \\times \\text{Propagator} \\times \\text{Vertex}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">10. EFFECTIVE INTERACTION (LOW-ENERGY LIMIT)</h3>
+<p>For large mediator mass $$M$$:</p>
+<p>$$D(k) \\approx \\frac{1}{M^2}$$</p>
+<p>Thus:</p>
+<p>$$\\mathcal{L}_{eff} \\sim \\frac{g^2}{M^2} J^\\mu J_\\mu$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">11. NON-ABELIAN SELF-INTERACTION (IMPORTANT)</h3>
+<p>From field strength:</p>
+<p>$$F_{\\mu\\nu}^a = \\partial_\\mu A_\\nu^a - \\partial_\\nu A_\\mu^a + g f^{abc} A_\\mu^b A_\\nu^c$$</p>
+<p>Leads to:</p>
+<p>$$\\mathcal{L}_{gauge} \\supset g f^{abc} (\\partial_\\mu A_\\nu^a) A^{\\mu b} A^{\\nu c}$$</p>
+<p>✔ Gauge bosons interact with each other (SU(2), SU(3))</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">12. CONSERVATION LAW</h3>
+<p>Current conservation:</p>
+<p>$$\\partial_\\mu J^\\mu_a = 0$$</p>
+<p>Ensures:</p>
+<p>$$k_\\mu J^\\mu_a = 0$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">13. STRUCTURAL RESULT</h3>
+<p>$$\\mathcal{L}_{int} \\;\\Rightarrow\\; \\text{vertex}$$</p>
+<p>$$\\text{vertex + propagator} \\;\\Rightarrow\\; \\text{exchange interaction}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">14. CONCEPTUAL COMPRESSION</h3>
+<p>$$J^\\mu A_\\mu \\;\\Rightarrow\\; (ig\\gamma^\\mu T^a) \\;\\Rightarrow\\; D_{\\mu\\nu} \\;\\Rightarrow\\; \\mathcal{M}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">15. FINAL STATEMENT</h3>
+<p>$$\\boxed{ \\mathcal{M} = J^\\mu_a \\, D_{\\mu\\nu}^{ab}(k) \\, J^\\nu_b \\;\\Rightarrow\\; \\text{Interaction arises through gauge boson exchange between fermionic currents} }$$</p>
+
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>EXCHANGE RATE</span><input type="number" id="x_in" class="digital-entry" value="0" oninput="syncVal(this.value, 'x_sl')"></div><input type="range" id="x_sl" min="0" max="100" step="1" value="0" oninput="syncVal(this.value, 'x_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.8rem;">Vertex &rarr;  Local Interaction Term</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Reality is a Conversation</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Mode</span><span class="const-val">EXCHANGE</span></div><div class="const-item"><span class="const-label">Link</span><span class="const-val">MATTER-GAUGE</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-mech);">MECHANISM: GAUGE INTERACTION VERTEX</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Fermion Current $J^\\mu$<br>↓<br>Gauge Boson Exchange<br>↓<br>Momentum Transfer`,
+hierarchy: `<div style="color: var(--accent-mech); font-weight: bold; font-size: 0.95rem;">Mechanism: Gauge Interaction via Vertex</div>`,
+footer: "Force arises from gauge field exchange between fermionic currents.",
+rightNote: `<div style="color: #f87171; line-height: 1.3; margin-top: 8px; padding: 10px; font-size: 0.9rem;">Visualizing the flow of quanta between matter trajectories.<p>👉 This Module Establishes:<br>Gauge boson exchange → interaction vertex → physical force transmission</p></div>`
+},
+
+5: {
+title: "COMPLETE INTERACTION STRUCTURE",
+result: "Standard Model Mediation",
+resultSize: "0.85rem",
+
+brief: `<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">BRIEFING — Complete Interaction Structure (Gauge–Matter Sector Closure)</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.6; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">1. CORE STATEMENT</h3>
+<p>Gauge symmetry, matter fields, and gauge fields combine uniquely into a gauge-invariant Lagrangian that fully defines the interaction sector; no additional arbitrary structure is required.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">2. CONCEPTUAL SETUP</h3>
+<p>From previous modules:</p>
+
+<ul>
+<li>Module 1:</li>
+</ul>
+<p>$$A_\\mu^a \\quad \\text{(connection infrastructure)}$$</p>
+
+<ul>
+<li>Module 2:</li>
+</ul>
+<p>$$A_\\mu^a \\rightarrow \\text{quantized bosons}$$</p>
+
+<ul>
+<li>Module 3:</li>
+</ul>
+<p>$$\\dim(G)=12 \\Rightarrow \\text{12 mediators}$$</p>
+
+<ul>
+<li>Module 4:</li>
+</ul>
+<p>$$\\mathcal{L}_{int} = g J^\\mu_a A_\\mu^a$$</p>
+
+<p>Thus:</p>
+<p>$$\\text{All ingredients exist, but full unified structure is not yet assembled}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">3. FULL GAUGE-INVARIANT STRUCTURE</h3>
+<p>The complete interaction sector is defined by:</p>
+<p>$$\\mathcal{L} = \\bar{\\psi}(i\\gamma^\\mu D_\\mu - m)\\psi -\\frac{1}{4}F_{\\mu\\nu}^a F^{\\mu\\nu a}$$</p>
+
+<p>Where:</p>
+<p>$$D_\\mu = \\partial_\\mu + i g A_\\mu^a T^a$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">4. STRUCTURAL DECOMPOSITION</h3>
+<p>$$\\mathcal{L} = \\underbrace{\\bar{\\psi}(i\\gamma^\\mu \\partial_\\mu - m)\\psi}_{\\text{Free matter}} + \\underbrace{g \\bar{\\psi}\\gamma^\\mu T^a \\psi A_\\mu^a}_{\\text{Interaction}} - \\underbrace{\\frac{1}{4}F_{\\mu\\nu}^a F^{\\mu\\nu a}}_{\\text{Gauge dynamics}}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">5. GAUGE INVARIANCE CONDITION</h3>
+<p>Under local transformation:</p>
+<p>$$\\psi \\rightarrow U(x)\\psi$$</p>
+<p>$$A_\\mu \\rightarrow U A_\\mu U^{-1} - \\frac{i}{g}(\\partial_\\mu U)U^{-1}$$</p>
+
+<p>Then:</p>
+<p>$$\\mathcal{L} \\rightarrow \\mathcal{L}$$</p>
+
+<p>✔ Full invariance preserved</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">6. UNIQUENESS</h3>
+<p>Given:</p>
+<ul>
+<li>Local gauge symmetry</li>
+<li>Lorentz invariance</li>
+<li>Renormalizability</li>
+</ul>
+
+<p>Then:</p>
+<p>$$\\text{The interaction Lagrangian is uniquely fixed}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">7. STRUCTURAL RESULT</h3>
+<p>$$\\text{Gauge symmetry} + \\text{Matter fields} + \\text{Gauge fields} \\;\\Rightarrow\\; \\text{Complete interaction sector}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">8. GRAPH INTERPRETATION PARAGRAPH</h3>
+<p>The visualization represents the integrated gauge–matter structure as a unified continuous circuit.</p>
+
+<ul>
+<li>Axes correspond to:</li>
+</ul>
+<p>Representation density (matter content)<br>
+Gauge invariance scale<br>
+Lagrangian density</p>
+
+<ul>
+<li>The continuous helical structure represents:</li>
+</ul>
+<p>The inseparable coupling between symmetry, fields, and interaction</p>
+
+<ul>
+<li>The closed looping geometry indicates:</li>
+</ul>
+<p>$$\\text{Structural closure of the interaction sector}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">9. NECESSITY / INEVITABILITY</h3>
+<p>If:</p>
+<p>$$\\text{Local symmetry exists}$$</p>
+
+<p>Then:</p>
+<p>$$A_\\mu^a \\text{ must exist}$$</p>
+
+<p>If:</p>
+<p>$$A_\\mu^a \\text{ exists}$$</p>
+
+<p>Then:</p>
+<p>$$\\mathcal{L}_{int} = g J^\\mu_a A_\\mu^a$$</p>
+
+<p>Thus:</p>
+<p>$$\\text{Complete interaction Lagrangian is inevitable}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">10. DEEP STRUCTURAL INSIGHT</h3>
+<p>$$\\text{Interaction is not an addition to reality}$$</p>
+<p>$$\\text{Interaction is the manifestation of symmetry consistency}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">11. WHAT THIS MODULE ESTABLISHES</h3>
+<p>$$\\boxed{ \\text{Gauge symmetry} + \\text{matter fields} + \\text{gauge fields} \\;\\rightarrow\\; \\text{gauge-invariant interaction Lagrangian} \\;\\rightarrow\\; \\text{complete interaction sector} }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">12. CONCEPTUAL COMPRESSION</h3>
+<p>$$G \\Rightarrow A_\\mu \\Rightarrow D_\\mu \\Rightarrow \\mathcal{L} \\Rightarrow \\text{Complete Interaction}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">13. LOGICAL CLOSURE</h3>
+<p>At this stage:</p>
+<ul>
+<li>Interaction infrastructure exists</li>
+<li>Mediators exist</li>
+<li>Exchange mechanism exists</li>
+<li>Full Lagrangian structure exists</li>
+</ul>
+
+<p>Thus:</p>
+<p>$$\\text{Interaction sector is structurally complete}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">14. TRANSITION</h3>
+<p>Next stage necessity:</p>
+<p>$$\\text{How masses arise (symmetry breaking)}$$</p>
+
+<p>Leads to:</p>
+<p>👉 Stage 53 — Higgs Mechanism (Mass Generation)</p>
+
+</div>`,
+
+math: `<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">EXPLICIT MATHEMATICS — Complete Interaction Sector (Gauge–Matter Lagrangian Closure)</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.6; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">1. FULL GAUGE-INVARIANT LAGRANGIAN</h3>
+<p>$$\\boxed{ \\mathcal{L} = \\bar{\\psi}(i\\gamma^\\mu D_\\mu - m)\\psi -\\frac{1}{4}F_{\\mu\\nu}^a F^{\\mu\\nu a} }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">2. COVARIANT DERIVATIVE (FULL EXPANSION)</h3>
+<p>$$D_\\mu = \\partial_\\mu + i g_1 B_\\mu Y + i g_2 W_\\mu^i \\frac{\\tau^i}{2} + i g_3 G_\\mu^A \\frac{\\lambda^A}{2}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">3. MATTER TERM EXPANSION</h3>
+<p>$$\\bar{\\psi}(i\\gamma^\\mu D_\\mu - m)\\psi = \\bar{\\psi}(i\\gamma^\\mu \\partial_\\mu - m)\\psi + g_1 \\bar{\\psi}\\gamma^\\mu Y \\psi B_\\mu + g_2 \\bar{\\psi}\\gamma^\\mu \\frac{\\tau^i}{2} \\psi W_\\mu^i + g_3 \\bar{\\psi}\\gamma^\\mu \\frac{\\lambda^A}{2} \\psi G_\\mu^A$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">4. CURRENT FORMULATION</h3>
+<p>$$J^\\mu_{(1)} = \\bar{\\psi}\\gamma^\\mu Y \\psi$$</p>
+<p>$$J^\\mu_{(2)i} = \\bar{\\psi}\\gamma^\\mu \\frac{\\tau^i}{2} \\psi$$</p>
+<p>$$J^\\mu_{(3)A} = \\bar{\\psi}\\gamma^\\mu \\frac{\\lambda^A}{2} \\psi$$</p>
+
+<p>Thus:</p>
+<p>$$\\mathcal{L}_{int} = g_1 J^\\mu_{(1)} B_\\mu + g_2 J^\\mu_{(2)i} W_\\mu^i + g_3 J^\\mu_{(3)A} G_\\mu^A$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">5. GAUGE FIELD DYNAMICS</h3>
+<p>$$\\mathcal{L}_{gauge} = -\\frac{1}{4} B_{\\mu\\nu} B^{\\mu\\nu} -\\frac{1}{4} W_{\\mu\\nu}^i W^{\\mu\\nu i} -\\frac{1}{4} G_{\\mu\\nu}^A G^{\\mu\\nu A}$$</p>
+
+<p>Field strengths</p>
+
+<p>$$B_{\\mu\\nu} = \\partial_\\mu B_\\nu - \\partial_\\nu B_\\mu$$</p>
+
+<p>$$W_{\\mu\\nu}^i = \\partial_\\mu W_\\nu^i - \\partial_\\nu W_\\mu^i + g_2 \\epsilon^{ijk} W_\\mu^j W_\\nu^k$$</p>
+
+<p>$$G_{\\mu\\nu}^A = \\partial_\\mu G_\\nu^A - \\partial_\\nu G_\\mu^A + g_3 f^{ABC} G_\\mu^B G_\\nu^C$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">6. FULL STANDARD MODEL INTERACTION STRUCTURE (WITHOUT HIGGS)</h3>
+<p>$$\\boxed{ \\mathcal{L} = \\bar{\\psi}(i\\gamma^\\mu \\partial_\\mu - m)\\psi + g_1 J^\\mu_{(1)} B_\\mu + g_2 J^\\mu_{(2)i} W_\\mu^i + g_3 J^\\mu_{(3)A} G_\\mu^A -\\frac{1}{4} B_{\\mu\\nu}^2 -\\frac{1}{4} W_{\\mu\\nu}^2 -\\frac{1}{4} G_{\\mu\\nu}^2 }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">7. GAUGE TRANSFORMATION LAWS</h3>
+<p>$$\\psi \\rightarrow U(x)\\psi$$</p>
+<p>$$A_\\mu \\rightarrow U A_\\mu U^{-1} - \\frac{i}{g}(\\partial_\\mu U)U^{-1}$$</p>
+
+<p>Check invariance</p>
+
+<p>$$D_\\mu \\psi \\rightarrow U(x) D_\\mu \\psi$$</p>
+<p>$$F_{\\mu\\nu} \\rightarrow U F_{\\mu\\nu} U^{-1}$$</p>
+
+<p>Thus:</p>
+<p>$$\\mathcal{L} \\rightarrow \\mathcal{L}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">8. EQUATIONS OF MOTION</h3>
+
+<p><b>Dirac equation with gauge coupling</b></p>
+<p>$$(i\\gamma^\\mu D_\\mu - m)\\psi = 0$$</p>
+
+<p><b>Yang–Mills equation</b></p>
+<p>$$D^\\mu F_{\\mu\\nu}^a = g J_\\nu^a$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">9. CONSERVATION LAW</h3>
+<p>$$D_\\mu J^\\mu_a = 0$$</p>
+<p>✔ Gauge-covariant conservation</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">10. SELF-INTERACTION TERMS</h3>
+<p>From non-Abelian field strength:</p>
+<p>$$\\mathcal{L} \\supset g f^{abc} (\\partial_\\mu A_\\nu^a) A^{\\mu b} A^{\\nu c} + g^2 f^{abc} f^{ade} A_\\mu^b A_\\nu^c A^{\\mu d} A^{\\nu e}$$</p>
+<p>✔ Triple and quartic gauge interactions</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">11. STRUCTURAL RESULT</h3>
+<p>$$\\text{Matter dynamics} + \\text{Gauge dynamics} + \\text{Interaction terms} \\;\\Rightarrow\\; \\text{Complete interaction sector}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">12. NECESSITY STATEMENT</h3>
+<p>Given:</p>
+<p>$$D_\\mu = \\partial_\\mu + i g A_\\mu^a T^a$$</p>
+
+<p>Then:</p>
+<p>$$\\mathcal{L}_{matter} \\Rightarrow \\mathcal{L}_{int}$$</p>
+
+<p>And:</p>
+<p>$$F_{\\mu\\nu} \\Rightarrow \\mathcal{L}_{gauge}$$</p>
+
+<p>Thus:</p>
+<p>$$\\mathcal{L} \\text{ is uniquely determined}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">13. CONCEPTUAL COMPRESSION</h3>
+<p>$$G \\Rightarrow T^a \\Rightarrow A_\\mu^a \\Rightarrow D_\\mu \\Rightarrow \\mathcal{L}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">14. FINAL STATEMENT</h3>
+<p>$$\\boxed{ \\mathcal{L} = \\bar{\\psi}(i\\gamma^\\mu D_\\mu - m)\\psi -\\frac{1}{4}F_{\\mu\\nu}^a F^{\\mu\\nu a} \\;\\Rightarrow\\; \\text{Complete gauge-invariant interaction structure} }$$</p>
+
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>INTEGRATION LEVEL</span><input type="number" id="i_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'i_sl')"></div><input type="range" id="i_sl" min="0" max="100" step="1" value="100" oninput="syncVal(this.value, 'i_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.8rem;">Gauge Symmetry + Matter Fields + Gauge Fields → Gauge-Invariant Interaction Lagrangian</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Unity is the final state</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Status</span><span class="const-val">COMPLETE</span></div><div class="const-item"><span class="const-label">Suite</span><span class="const-val">GAUGE-MATTER</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-total);">SYSTEM: GAUGE INTERACTION SECTOR COMPLETE</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Gauge Invariance<br>↓<br>Lagrangian Structure<br>↓<br>Physical Interaction Sector`,
+hierarchy: `<div style="color: var(--accent-total); font-weight: bold; font-size: 0.95rem;">Closure: Full Interaction Sector</div>`,
+footer: "All interaction components are now unified in a single gauge-invariant structure.",
+rightNote: `<div style="color: var(--accent-total); line-height: 1.3; margin-top: 8px; padding: 10px; font-size: 0.9rem;">Final visualization of the integrated gauge-matter network.<p>👉 This Module Establishes:<br>Gauge symmetry + matter fields + gauge fields → complete interaction structure</P></div>`
+}
+};
+
+function syncVal(val, id) {
+const sliderId = id.includes('_in') ? id.replace('_in', '_sl') : id;
+const inputId = id.includes('_sl') ? id.replace('_sl', '_in') : id;
+if(document.getElementById(sliderId)) document.getElementById(sliderId).value = val;
+if(document.getElementById(inputId)) document.getElementById(inputId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+document.getElementById('brief-box-content').innerHTML = content.brief;
+document.getElementById('math-box-content').innerHTML = content.math;
+document.getElementById('control-sliders').innerHTML = content.sliders;
+
+document.getElementById('active-module-title').innerText = content.title;
+const resultEl = document.getElementById('active-module-result');
+resultEl.innerText = content.result;
+resultEl.style.fontSize = content.resultSize || "0.65rem";
+
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('metrics-content').innerHTML = content.metricsContent;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+document.getElementById('structure-box-area').innerHTML = content.structure;
+document.getElementById('telemetry-area').innerHTML = content.telemetry;
+showScreen('briefing');
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() {
+showScreen('lab');
+setTimeout(() => { runLab(); window.dispatchEvent(new Event('resize')); }, 100);
+}
+
+function runLab() {
+const target = document.getElementById('plot-area');
+if (!target) return;
+let data = [];
+let layout = {
+paper_bgcolor: 'black', plot_bgcolor: 'black', margin: {t:60,b:10,l:0,r:0},
+showlegend: true, font: { family: 'sans-serif', size: 10 },
+legend: { font: { color: '#e5e7eb' }, x: 0.7, y: 0.9, bgcolor: 'rgba(0,0,0,0.5)' },
+scene: {
+xaxis: { gridcolor: '#222', color: '#94a3b8' },
+yaxis: { gridcolor: '#222', color: '#94a3b8' },
+zaxis: { gridcolor: '#222', color: '#94a3b8' }
+}
+};
+
+if (currentTool === 1) { // GAUGE FIELD
+let c = parseFloat(document.getElementById('c_sl')?.value || 0) / 100;
+let x = Array.from({length: 30}, (_, i) => i - 15);
+let y = Array.from({length: 30}, (_, i) => i - 15);
+let z = [];
+for(let i=0; i<x.length; i++) {
+let row = [];
+for(let j=0; j<y.length; j++) {
+row.push(c * Math.sin(x[i]/5) * Math.cos(y[j]/5));
+}
+z.push(row);
+}
+
+data.push({
+type: 'surface',
+z: z,
+x: x,
+y: y,
+colorscale: 'Blues',
+showscale: false,
+showlegend: true, // MANDATORY for surfaces to show in legend
+name: 'Connection Manifold (Physical Infrastructure)'
+});
+
+layout.showlegend = true;
+layout.title = { text: "GAUGE FIELD MANIFOLD", font: { color: '#60a5fa' } };
+layout.scene.xaxis.title = "Spacetime Coordinate (x)";
+layout.scene.yaxis.title = "Internal Field Phase (φ)";
+layout.scene.zaxis.title = "Gauge Potential (Aᵤ)";
+
+
+
+} else if (currentTool === 2) { // QUANTIZATION
+let q = parseFloat(document.getElementById('q_sl')?.value || 0) / 100;
+let x = [], y = [], z = [];
+for(let i=0; i<20; i++) {
+x.push(Math.random() * 20 - 10);
+y.push(Math.random() * 20 - 10);
+z.push(Math.random() * 20 - 10);
+}
+data.push({ type: 'scatter3d', mode: 'markers', x: x, y: y, z: z, marker: { size: q * 10, color: '#c084fc', opacity: q }, name: 'Field Quanta (Boson Emergence)' });
+layout.title = { text: "FIELD QUANTIZATION", font: { color: '#c084fc' } };
+layout.scene.xaxis.title = "Spatial Frequency (k)";
+layout.scene.yaxis.title = "Polarization State (λ)";
+layout.scene.zaxis.title = "Excitation Amplitude (â†)";
+
+
+} else if (currentTool === 3) { // IDENTIFICATION
+let gIndex = parseInt(document.getElementById('g_sl')?.value || 1);
+let colors = ['#fbbf24', '#f87171', '#3b82f6'];
+let labels = ["Photon", "W+", "W-", "Z", "Gluon 1", "Gluon 2", "Gluon 3", "Gluon 4", "Gluon 5", "Gluon 6", "Gluon 7", "Gluon 8"];
+
+data.push({
+type: 'scatter3d',
+mode: 'markers+text',
+x: [0],
+y: [0],
+z: [0],
+text: [labels[gIndex-1]],
+textposition: 'top center',
+textfont: { color: '#FFFFFF', size: 20, weight: 'bold' },
+marker: {
+size: 20,
+color: gIndex <= 1 ? colors[0] : (gIndex <= 4 ? colors[1] : colors[2]),
+line: { color: '#FFFFFF', width: 2 } // Adds a bright boundary for clarity
+},
+name: 'Generator Mapping (The Mediator Spectrum)'
+});
+
+layout.title = { text: "MEDIATOR IDENTIFICATION", font: { color: '#fbbf24' } };
+layout.scene.xaxis.title = "SU(3)꜀ Color Charge";
+layout.scene.yaxis.title = "SU(2)ₗ Weak Isospin";
+layout.scene.zaxis.title = "U(1)ᵧ Hypercharge";
+
+
+} else if (currentTool === 4) { // INTERACTION
+let xRate = parseFloat(document.getElementById('x_sl')?.value || 0) / 50;
+data.push({ type: 'scatter3d', mode: 'lines', x: [-5, 5], y: [-5, 5], z: [0, 0], line: { color: '#fff' }, name: 'Fermion A' });
+data.push({ type: 'scatter3d', mode: 'lines', x: [-5, 5], y: [5, -5], z: [0, 0], line: { color: '#fff' }, name: 'Fermion B' });
+if(xRate > 0) {
+data.push({ type: 'scatter3d', mode: 'markers', x: [0], y: [0], z: [Math.sin(Date.now()/200)*2], marker: { size: 10, color: '#f87171' }, name: 'Exchange Quanta (Interaction Event)' });
+}
+layout.title = { text: "EXCHANGE MECHANISM", font: { color: '#f87171' } };
+layout.scene.xaxis.title = "Matter Field Trajectory";
+layout.scene.yaxis.title = "Interaction Vertex (ψ̄ A ψ)";
+layout.scene.zaxis.title = "Momentum Transfer (q²)";
+
+
+} else if (currentTool === 5) { // COMPLETE
+let iLevel = parseFloat(document.getElementById('i_sl')?.value || 0) / 100;
+let theta = Array.from({length: 100}, (_, i) => i * 0.2);
+
+data.push({
+type: 'scatter3d',
+mode: 'lines',
+x: theta.map(t => Math.cos(t)),
+y: theta.map(t => Math.sin(t)),
+z: theta.map(t => t * iLevel),
+line: { color: '#2dd4bf', width: 5 },
+name: 'Unified Gauge Circuit (Complete Sector)'
+});
+
+layout.title = { text: "INTEGRATED GAUGE CIRCUIT", font: { color: '#2dd4bf' } };
+layout.scene.xaxis.title = "Gauge Invariance Scale";
+layout.scene.yaxis.title = "Representation Depth";
+layout.scene.zaxis.title = "Lagrangian Density (ℒ)";
+}
+
+Plotly.react('plot-area', data, layout, {responsive: true, displayModeBar: false});
+}
+
+function resetLab() {
+if(currentTool===1) syncVal(0, 'c_sl');
+if(currentTool===2) syncVal(0, 'q_sl');
+if(currentTool===3) syncVal(1, 'g_sl');
+if(currentTool===4) syncVal(0, 'x_sl');
+if(currentTool===5) syncVal(100, 'i_sl');
+}
+
+window.onload = () => { showScreen('portal'); };
+</script>
+</body>
+</html>

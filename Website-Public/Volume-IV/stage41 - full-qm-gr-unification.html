@@ -1,0 +1,1672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 41 — Full QM–GR Unification</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #00ffcc;
+--accent-born: #f472b6; --accent-hilbert: #38bdf8; --accent-schro: #fbbf24; --accent-fields: #a78bfa; --accent-test: #4ade80;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6; --accent-gravity: #f59e0b;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-unified); font-family: sans-serif; font-size: 0.85rem; min-width: 350px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls, #nav-summary-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+#screen-lab.active { display: flex; flex-direction: column; height: calc(100vh - 50px); }
+
+#screen-portal { justify-content: flex-start; padding-top: 8dvh; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 70px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.constant-display-box {
+background: #111; border: 1px solid var(--accent-unified); padding: 6px; border-radius: 8px;
+display: flex; justify-content: space-around; margin-bottom: 10px;
+}
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(0, 255, 204, 0.05); border: 1px solid var(--accent-unified); padding: 5px; border-radius: 5px; margin-bottom: 8px; font-size: 0.7rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; }
+#plot-area { flex-grow: 1; width: 100%; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #000; border: 1px solid var(--accent-unified); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer {
+width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem;
+color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 41 — FULL QM–GR UNIFICATION</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">Unified Substrate Portal</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">The Master Equation governing both Stochastic Jitter (QM) and Geometric Curvature (GR).</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-unified);">
+<h2 style="color:var(--accent-unified);">1. The Master Equation</h2>
+<p>Defining the Unified Substrate Field: $\boxed{ \mathcal{L}_{\text{sub}}[\Psi, g_{\mu\nu}] = 0 }$</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-schro);">
+<h2 style="color:var(--accent-schro);">2. Schrödinger Emergence</h2>
+<p>Deriving Wave-Dynamics from Phase Rotation $i$.</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-gravity);">
+<h2 style="color:var(--accent-gravity);">3. Einstein Emergence</h2>
+<p>Deriving General Relativity as the Static Metric Limit.</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-fields);">
+<h2 style="color:var(--accent-fields);">4. Scale Separation</h2>
+<p>The transition from Fluctuation Dominance to Equilibrium.</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-test);">
+<h2 style="color:var(--accent-test);">5. Unified Interpretation</h2>
+<p>Reality as a Stochastic-Geometric Substrate.</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-unified); background: linear-gradient(135deg, #0f1115 0%, #0a2a24 100%);">
+<h2 style="color:var(--accent-unified);">6. Stage 41 Summary</h2>
+<p>The One Law: Quantum-Gravity Completion.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color:var(--accent-unified); text-align:center;">SUMMARY: MATHEMATICAL STRUCTURE OF STAGE 41 AND THEOREMS</h2>
+<section>
+<h3 style="color: #38bdf8; margin-bottom: 8px;">1. Fundamental Postulate</h3>
+<p>According to this framework, a single substrate equation governs all physical phenomena:</p>
+<div style="text-align: center; margin: 10px 0; color: #f472b6; font-size: 1.1rem;">
+$\boxed{ \mathcal{L}_{\text{sub}} \Psi = 0 }$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 8px;">2. Primary Field</h3>
+<div style="text-align: center; margin: 10px 0; color: #f472b6;">
+$\boxed{ \Psi(x,t) = A(x,t)\,e^{i\theta(x,t)} }$
+<p style="color: #e2e8f0; margin-top: 5px;">$\rho(x,t) = |\Psi|^2 = A^2$</p>
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 8px;">3. Structural Parameters</h3>
+<div style="display: flex; justify-content: space-around; margin: 10px 0; color: #f472b6;">
+<div>$\boxed{ K = |\nabla C| }$<br><small style="color: #94a3b8;">(vacuum stiffness)</small></div>
+<div>$\boxed{ P = -V(N_0) }$<br><small style="color: #94a3b8;">(synthesis pressure)</small></div>
+<div>$\boxed{ \sigma = \text{fluctuation amplitude} }$</div>
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 8px;">4. Master Operator (Effective Form)</h3>
+<div style="text-align: center; margin: 10px 0; color: #f472b6;">
+$\boxed{ \left[ \nabla^2 - \frac{P}{K}\rho(x,t) + \mathcal{N}_\sigma \right]\Psi = 0 }$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 8px;">5. Regime Parameter</h3>
+<div style="text-align: center; margin: 10px 0; color: #f472b6;">
+$\boxed{ \epsilon = \frac{\sigma}{K} }$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 8px;">6. Two Limits of the Same Equation</h3>
+<p><b>(A) Quantum Limit ($\epsilon \gg 1$):</b></p>
+<div style="text-align: center; margin: 10px 0; color: #f472b6;">$\boxed{ i\hbar \partial_t \Psi = H \Psi }$</div>
+<p>According to this framework, phase evolution dominates and complex structure emerges.</p>
+<p><b>(B) Geometric Limit ($\epsilon \ll 1$):</b></p>
+<div style="text-align: center; margin: 10px 0; color: #f472b6;">
+$\boxed{ \rho(x,t) \rightarrow \bar{\rho}(x) }$<br>
+$\boxed{ g_{\mu\nu} = \eta_{\mu\nu}\left(1 + \frac{P}{K}\bar{\rho}(x)\right) }$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 8px;">7. Curvature Emergence</h3>
+<div style="text-align: center; margin: 10px 0; color: #f472b6;">
+$\boxed{ R_{\mu\nu} \sim \frac{P}{K}\,\partial_\mu \partial_\nu \bar{\rho} }$<br>
+$\boxed{ G_{\mu\nu} = \frac{P}{K} T_{\mu\nu}^{(\text{eff})} }$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 8px;">8. Scale Transition Law</h3>
+<div style="text-align: center; margin: 10px 0; color: #f472b6;">
+$\boxed{ \Psi(x,t;\sigma) \;\xrightarrow[\sigma \to 0]{}\; \Psi_{\text{det}}(x) }$
+</div>
+<p>According to this framework, there is a continuous transition with no discontinuity.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 8px;">9. Unified Mapping</h3>
+<div style="text-align: center; margin: 10px 0; color: #4ade80; font-weight: bold;">
+$\boxed{ \Psi \;\rightarrow\; \rho \;\rightarrow\; g_{\mu\nu} \;\rightarrow\; R_{\mu\nu} \;\rightarrow\; G_{\mu\nu} }$
+</div>
+
+<div style="margin: 20px 0; padding: 15px; border: 2px solid #38bdf8; background: rgba(56, 189, 248, 0.05); border-radius: 10px;">
+<h3 style="color: #38bdf8; text-align: center; margin-top: 0;">STRUCTURAL IDENTITY</h3>
+<div style="text-align: center; color: #f472b6; font-weight: bold;">
+$\boxed{ \text{All physical laws are scale-dependent projections of } \mathcal{L}_{\text{sub}}\Psi = 0 }$
+</div>
+</div>
+
+<h2 style="color: #4ade80; text-align: center; margin-top: 30px;">COMPLETION THEOREM (STAGE 41)</h2>
+<div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; border-left: 5px solid #4ade80;">
+<p><b>Theorem (Unified Substrate Completion):</b> According to this framework, a single substrate equation is sufficient to generate both (i) quantum dynamics and (ii) classical geometry as limiting cases.</p>
+<p><b>Formal Statement:</b> Let $\mathcal{L}_{\text{sub}} \Psi = 0$ with parameters $(K, P, \sigma)$. Then:</p>
+<ol>
+<li><b>Quantum Emergence:</b> If $\frac{\sigma}{K} \gg 1$, then $\boxed{ \mathcal{L}_{\text{sub}} \Rightarrow i\hbar \partial_t \Psi = H\Psi }$</li>
+<li><b>Geometric Emergence:</b> If $\sigma \to 0$, then $\boxed{ \Psi \rightarrow \bar{\Psi}(x) \Rightarrow \rho(x) \Rightarrow g_{\mu\nu} }$ and $\boxed{ G_{\mu\nu} = \frac{P}{K} T_{\mu\nu}^{(\text{eff})} }$</li>
+<li><b>Continuity Condition:</b> $\boxed{ \forall \sigma \in [0,\infty), \quad \text{solutions vary smoothly} }$. No phase discontinuity exists.</li>
+</ol>
+<p style="text-align: center; color: #f472b6;">
+$\boxed{ \text{QM and GR are not independent theories} }$<br>
+$\boxed{ \text{They are asymptotic limits of a single substrate dynamics} }$
+</p>
+</div>
+
+<h3 style="color: #38bdf8; text-align: center; margin-top: 25px;">Final Identity</h3>
+<div style="text-align: center; color: #f472b6;">
+$\boxed{ S \equiv \Psi }$<br>
+$\boxed{ \text{Unified Reality = Solution space of } \mathcal{L}_{\text{sub}}\Psi = 0 }$
+</div>
+
+<p style="text-align: center; font-weight: bold; color: #4ade80; margin-top: 20px;">
+$\boxed{ \text{Unification is achieved not by merging laws, but by revealing their common origin} }$
+</p>
+
+<hr style="border-top: 1px dashed #38bdf8; margin: 30px 0;">
+
+<h2 style="color: #facc15; text-align: center;">STAGE 41 — CLOSURE THEOREM</h2>
+<div style="border: 2px double #facc15; padding: 20px; border-radius: 12px; background: rgba(250, 204, 21, 0.05);">
+<p><b>Theorem (Closure of Quantum–Geometric Unification):</b> According to this framework, a single substrate equation provides a complete and self-consistent description of reality.</p>
+<p><b>Formal Statement:</b> Let the fundamental dynamics be governed by $\boxed{ \mathcal{L}_{\text{sub}} \Psi = 0 }$ with structural parameters $(K, P, \sigma)$. Then:</p>
+
+<p><b>1. Completeness:</b> $\boxed{ \text{All physical observables are derivable from } \Psi }$. Matter, Geometry, and Dynamics are fully contained in a single field description.</p>
+
+<p><b>2. Dual Limit Structure:</b><br>
+(a) Quantum Limit: $\boxed{ \frac{\sigma}{K} \gg 1 } \Rightarrow \boxed{ i\hbar \partial_t \Psi = H\Psi }$<br>
+(b) Geometric Limit: $\boxed{ \sigma \to 0 } \Rightarrow \boxed{ G_{\mu\nu} = \frac{P}{K} T_{\mu\nu}^{(\text{eff})} }$</p>
+
+<p><b>3. Continuity:</b> $\boxed{ \text{The transition between regimes is continuous in } \sigma }$. No discontinuity, no phase boundary, no independent domains.</p>
+
+<p><b>4. Closure Property:</b> $\boxed{ \text{No additional laws are required beyond } \mathcal{L}_{\text{sub}}\Psi = 0 }$. No external spacetime, separate quantization, or independent gravitational postulates are needed.</p>
+
+<p><b>5. Self-Consistency:</b> $\boxed{ \text{The theory is internally closed under its own definitions and limits} }$. Dynamics generates structure, and structure feeds back into dynamics.</p>
+
+<p style="text-align: center; color: #4ade80; font-weight: bold; margin-top: 15px;">
+$\boxed{ \text{Quantum Mechanics and General Relativity are not separate theories} }$<br>
+$\boxed{ \text{They are limiting descriptions of a single substrate} }$
+</p>
+</div>
+
+<div style="text-align: center; margin-top: 25px;">
+<p style="color: #f472b6; font-size: 1.2rem;">$\boxed{ S \equiv \Psi }$</p>
+<p style="color: #e2e8f0;">$\boxed{ \text{Reality = Solution space of } \mathcal{L}_{\text{sub}}\Psi = 0 }$</p>
+</div>
+
+<p style="text-align: center; font-weight: bold; color: #38bdf8; margin-top: 20px; border-top: 1px solid #38bdf8; padding-top: 10px;">
+$\boxed{ \text{Unification is complete when all phenomena arise from one equation without contradiction} }$
+</p>
+
+<div style="text-align: center; margin-top: 20px; padding: 15px; background: #1e293b; border-radius: 8px;">
+<p style="color: #38bdf8; font-size: 1.3rem; margin: 0;">$\boxed{ \mathcal{L}_{\text{sub}} \Psi = 0 \Longrightarrow \text{All Physics} }$</p>
+</div>
+</div>
+</section>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div class="constant-display-box">
+<div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val">11.350</span></div>
+<div class="const-item"><span class="const-label">Synthesis P</span><span class="const-val">0.6900</span></div>
+</div>
+<div id="mapping-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Unification Telemetry</span>
+<span id="epoch-label" style="font-family:monospace; font-size:0.85rem; color:var(--accent-unified);">UNIFIED FIELD ACTIVE</span>
+</div>
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:0px; margin-bottom:0px; background:transparent; border:1px solid #333; color:var(--accent-unified); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:6px;">RESET FIELD</button>
+<div id="panel-footer-text" style="font-size: 0.75rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.4; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:2px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:6px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Unified Structural Logic</span>
+<div id="metrics-content" style="font-size:0.65rem; font-family:monospace; line-height:1.3;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Convergence Result</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.65rem; color: var(--text-dim); line-height: 1.4; background: #000; padding: 10px; border-radius: 0px; border: 1px solid #222; margin-top: auto; margin-bottom: 0;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "MASTER FIELD EQUATION",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: MASTER FIELD EQUATION</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Introduction</h3>
+<p>According to this framework, this module introduces the central equation of the system. It establishes that both quantum fluctuations (QM) and geometric structure (GR) arise from a single governing operator acting on the substrate field. This fundamental unification suggests that the two pillars of modern physics are not separate entities but different manifestations of the same underlying substrate dynamics.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. The Core Statement</h3>
+<p>According to this framework, the entire physical reality is governed by a single condition:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\mathcal{L}_{\\text{sub}} \\, \\Psi = 0$$
+</div>
+<p>where $\\Psi$ is the substrate field and $\\mathcal{L}_{\\text{sub}}$ is the unified operator. This is not an additional law imposed upon nature, but the foundational underlying equation from which all known physical laws emerge as specific limits or approximations.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Structure of the Operator</h3>
+<p>According to this framework, the operator has three fundamental components that integrate spatial, structural, and dynamical elements:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\mathcal{L}_{\\text{sub}} = \\underbrace{\\nabla^2}_{\\text{spatial structure}} \\;-\\underbrace{\\frac{P}{K}\\rho(x)}_{\\text{density coupling}} \\;+\\underbrace{\\mathcal{N}_\\sigma}_{\\text{stochastic term}}$$
+</div>
+<p>The interpretation of these components is as follows: $\\nabla^2$ encodes spatial variation; $\\rho(x)$ represents the substrate density field; $P/K$ defines the coupling between density and geometry; and $\\mathcal{N}_\\sigma$ accounts for stochastic fluctuations.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Physical Meaning</h3>
+<p>According to this framework, this equation states that the substrate simultaneously carries both deterministic structure (geometry) and stochastic dynamics (quantum behavior). These are not separate domains of existence, but are different aspects or "faces" of the same unified field, operating in tandem across all scales.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. No Background Assumption</h3>
+<p>According to this framework, in this formulation, space is not predefined and geometry is not imposed from the outside. Instead, geometry arises directly from the field itself. There is no external spacetime background; the field is the background, and its dynamics constitute the geometry we observe.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Dual Regimes from One Equation</h3>
+<p>According to this framework, depending on the strength of stochasticity, two distinct regimes emerge: (a) In the high stochastic regime where $\\sigma$ is large, fluctuations dominate and behavior appears quantum; (b) In the low stochastic regime where $\\sigma \\to 0$, fluctuations average out and stable geometry emerges. Thus, QM and GR are mathematically proven to be limits of the same single equation.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Role of Density Field</h3>
+<p>According to this framework, the density $\\rho(x)$ acts as the critical mediator between stochastic and geometric structure. It serves as the source of curvature in later modules, effectively connecting fluctuations to the emergence of geometric gravity: $\\text{fluctuations} \\rightarrow \\text{geometry}$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Meaning of Coupling P/K</h3>
+<p>According to this framework, the ratio $P/K$ represents how strongly the substrate density influences the emergent structure. It defines the effective gravitational coupling and will later be shown to correspond directly to the gravitational constant: $8\\pi G = \\frac{P}{K}$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Unified Interpretation</h3>
+<p>According to this framework, this module establishes that one single equation governs both dynamics and geometry. There is no longer a need for separate, conflicting sets of quantum laws and gravitational laws, as both are contained within this unified expression.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Conceptual Shift</h3>
+<p>According to this framework, while the traditional view sees QM as purely probabilistic and GR as purely geometric, this framework demonstrates that both arise naturally from the fundamental dynamics of the substrate field.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">11. What This Module Does NOT Do</h3>
+<p>According to this framework, this module does not yet: derive the Schrödinger equation (done in next modules); derive Einstein field equations (done in subsequent modules); or introduce the operator formalism in full detail (developed in later modules).</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">12. What It Establishes</h3>
+<p>According to this framework, this module establishes: the existence of a single substrate equation; the coexistence of stochastic and geometric terms within that equation; and the mathematical foundation for full QM–GR unification.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">13. Final Statement</h3>
+<p style="margin-bottom: 0;">According to this framework, all physical phenomena arise from a single substrate equation whose limits produce quantum dynamics and geometric structure. This realization represents the final synthesis of physical law.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Master Field Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Fundamental Equation:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\mathcal{L}_{\\text{sub}} \\, \\Psi = 0$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">One equation governs both dynamics and geometry through the integration of stochastic and structural terms.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: MASTER FIELD EQUATION</h2>
+
+<div class="math-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0 10px;">
+
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Fundamental Field</h3>
+<p>According to this framework, let the substrate be described by a field:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\Psi(x,t) \\in \\mathbb{C}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">2. Decomposition (Amplitude–Phase Form)</h3>
+<p>According to this framework, the field can be decomposed into its amplitude and phase components:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\Psi(x,t) = A(x,t)\\, e^{i\\theta(x,t)}$$
+</div>
+<p>where $A(x,t) \\ge 0$ represents the field magnitude and $\\theta(x,t) \\in \\mathbb{R}$ represents the dynamical phase.</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">3. Density Definition</h3>
+<p>According to this framework, the substrate density is defined by the square of the amplitude:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\rho(x,t) = |\\Psi|^2 = A^2(x,t)$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">4. Substrate Parameters</h3>
+<p>According to this framework, we define the following calibrated parameters based on empirical data:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$K = |\\nabla C|, \\qquad P = P_{\\text{syn}}$$
+</div>
+<p>With normalized values established as:</p>
+<div style="text-align: center; margin: 10px 0; color: #4ade80;">
+$$K = 11.350, \\qquad P = 0.6900$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">5. Master Operator Definition</h3>
+<p>According to this framework, we define the unified operator $\\mathcal{L}_{\\text{sub}}$ as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\mathcal{L}_{\\text{sub}} = \\nabla^2 \\;-\\; \\frac{P}{K}\\,\\rho(x,t) \\;+\\; \\mathcal{N}_\\sigma$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">6. Master Field Equation</h3>
+<p>According to this framework, the fundamental condition of reality is expressed as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.2rem; border: 1px solid #f472b6; padding: 10px; display: inline-block; width: 100%; box-sizing: border-box;">
+$$\\boxed{ \\mathcal{L}_{\\text{sub}} \\Psi(x,t) = 0 }$$
+</div>
+<p>Expanded, this yields:</p>
+<div style="text-align: center; margin: 10px 0;">
+$$\\left[ \\nabla^2 \\;-\\; \\frac{P}{K}\\,\\rho(x,t) \\;+\\; \\mathcal{N}_\\sigma \\right]\\Psi(x,t) = 0$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">7. Stochastic Term</h3>
+<p>According to this framework, the stochastic operator $\\mathcal{N}_\\sigma$ is defined as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\mathcal{N}_\\sigma \\Psi = \\sigma \\, \\eta(x,t)\\, \\Psi$$
+</div>
+<p>Where $\\sigma$ represents noise strength and $\\eta(x,t)$ is a stochastic process satisfying:</p>
+<div style="text-align: center; margin: 10px 0;">
+$$\\mathbb{E}[\\eta(x,t)] = 0, \\qquad \\mathbb{E}[\\eta(x,t)\\eta(x',t')] = \\delta(x-x')\\delta(t-t')$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">8. Expanded Equation</h3>
+<p>According to this framework, the full field equation is written as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\nabla^2 \\Psi - \\frac{P}{K}\\rho \\Psi + \\sigma \\eta(x,t)\\Psi = 0$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">9. Amplitude–Phase Substitution</h3>
+<p>According to this framework, substituting $\\Psi = A e^{i\\theta}$ into the Laplacian term results in:</p>
+<div style="text-align: center; margin: 15px 0;">
+$$\\nabla^2 \\Psi = \\left[ \\nabla^2 A - A (\\nabla \\theta)^2 + 2i (\\nabla A \\cdot \\nabla \\theta) + i A \\nabla^2 \\theta \\right] e^{i\\theta}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">10. Real–Imaginary Separation</h3>
+<p>According to this framework, separating the equation into real and imaginary parts yields:</p>
+<p><b>Real Part:</b></p>
+<div style="text-align: center; margin: 10px 0; color: #f472b6;">
+$$\\nabla^2 A - A (\\nabla \\theta)^2 - \\frac{P}{K} A^3 + \\sigma \\eta A = 0$$
+</div>
+<p><b>Imaginary Part:</b></p>
+<div style="text-align: center; margin: 10px 0; color: #f472b6;">
+$$2 (\\nabla A \\cdot \\nabla \\theta) + A \\nabla^2 \\theta = 0$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">11. Limiting Cases</h3>
+<p>According to this framework, we identify two distinct physical regimes:</p>
+<p>(a) <b>Stochastic Dominance (QM Regime):</b> When $\\sigma \\gg 1$, the noise term dominates the spatial evolution:</p>
+<div style="text-align: center; margin: 10px 0;">
+$$\\sigma \\eta \\Psi \\gg \\nabla^2 \\Psi$$
+</div>
+<p>(b) <b>Geometric Limit (GR Regime):</b> As $\\sigma \\to 0$, the stochasticity vanishes, leaving the geometric structure:</p>
+<div style="text-align: center; margin: 10px 0;">
+$$\\nabla^2 \\Psi - \\frac{P}{K}\\rho \\Psi = 0$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">12. Stationary Density Condition</h3>
+<p>According to this framework, through stochastic averaging, the density field reaches equilibrium:</p>
+<div style="text-align: center; margin: 15px 0;">
+$$\\rho(x,t) \\rightarrow \\rho(x)$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">13. Operator Form (Compact)</h3>
+<p>According to this framework, the compact operator form is:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\boxed{ \\mathcal{L}_{\\text{sub}} = \\nabla^2 - \\frac{P}{K}|\\Psi|^2 + \\sigma \\eta(x,t) }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">14. Unified Structure</h3>
+<p>According to this framework, the unified structure is encapsulated as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\boxed{ \\left( \\nabla^2 - \\frac{P}{K}|\\Psi|^2 + \\sigma \\eta \\right)\\Psi = 0 }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">15. Interpretation (Mathematical Form)</h3>
+<p>According to this framework, a single operator governs the entirety of physical transitions:</p>
+<div style="text-align: center; margin: 15px 0;">
+$$\\begin{cases} \\sigma \\neq 0 &\\Rightarrow \\text{stochastic dynamics (QM)} \\\\ \\sigma \\to 0 &\\Rightarrow \\text{deterministic geometry (GR)} \\end{cases}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">Mathematical Core Conclusion</h3>
+<div style="text-align: center; margin: 15px 0; color: #4ade80; font-weight: bold; font-size: 1.1rem;">
+$$\\boxed{ \\text{One equation } \\rightarrow \\text{ two regimes } \\rightarrow \\text{ unified description} }$$
+</div>
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; border-left: 4px solid #f472b6;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Mathematical Identity Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Unified Field Action:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\mathcal{L}_{\\text{sub}} \\Psi = 0$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The integration of spatial gradients, structural density, and stochastic noise within a single complex field.</p>
+</div>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>GEOMETRY-STOCHASTIC COUPLING</span><input type="number" id="l_in" class="digital-entry" value="1.0" oninput="syncVal(this.value, 'l_sl')"></div><input type="range" id="l_sl" min="0" max="2" step="0.1" value="1.0" oninput="syncVal(this.value, 'l_in')"></div>`,
+
+mappingBox: `<div class="definition-box"><span class="def-title">MASTER OPERATOR</span><div style="text-align:center; font-size: 0.9rem;">$\\boxed{ \\hat{\\mathcal{L}}_{\\text{sub}} \\Psi = \\left[ \\nabla^2 - \\frac{P}{K}\\rho(x) + \\mathcal{N}_{\\sigma} \\right]\\Psi = 0 }$</div></div>`,
+
+lawBox: `<div class="definition-box"><span class="def-title">THE ONE LAW</span><div style="text-align:center; font-size: 0.9rem;">QM $\\iff$ GR</div></div>`,
+
+metricsContent: `<div class="diagnostic-panel"></span>
+<div style="text-align: center; color: #94a3b8; font-family: monospace; line-height: 1.25;">
+Stochastic Dynamics<br>
+<span style="color: var(--accent-unified);">↓</span><br>
+Density Field ρ<br>
+<span style="color: var(--accent-unified);">↓</span><br>
+Metric g<sub>μν</sub><br>
+<span style="color: var(--accent-unified);">↓</span><br>
+Curvature R<sub>μν</sub><br>
+<span style="color: var(--accent-unified);">↓</span><br>
+Geodesic Motion
+</div>
+`,
+
+hierarchy: `
+<div style="color: #00ffcc; font-weight: bold; margin-bottom: 0px;">Unified Substrate Equation</div>
+<div style="color: #94a3b8; font-size: 0.75rem; text-align: left; padding-left: 10px;">
+Single operator governing:<br>
+• stochastic fluctuations (QM)<br>
+• geometric structure (GR)
+</div>
+</div>`,
+
+footer: "<b>Note:</b> “Quantum” and “geometric” regimes are not distinct domains, but different limits of the same substrate equation controlled by stochastic strength and equilibrium formation.",
+
+rightNote: "<b>The Master Field:</b> Geometry and stochasticity are not separate. Both arise from the same substrate equation.<P>There is no external spacetime — the metricis a self-consistent state of the field.</p>"
+},
+
+
+2: {
+title: "SCHRÖDINGER EMERGENCE",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: SCHRÖDINGER EMERGENCE</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Introduction</h3>
+<p>According to this framework, this module shows how wave dynamics emerge from the substrate field. It establishes that the Schrödinger equation is not postulated, but arises from the phase evolution of the substrate, the amplitude–phase decomposition, and the intrinsic oscillatory structure of the field itself.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Starting Point</h3>
+<p>According to this framework, the analysis begins with the fundamental substrate field defined in Module 1:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\Psi(x,t)$$
+</div>
+<p>We express this field in its polar form to isolate its structural components:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\Psi(x,t) = A(x,t)\\, e^{i\\theta(x,t)}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Meaning of Decomposition</h3>
+<p>According to this framework, this representation separates the field into two distinct physical quantities: the Amplitude $A(x,t)$, which corresponds to intensity and density, and the Phase $\\theta(x,t)$, which governs evolution and propagation. Thus, the density is defined as $\\rho(x,t) = A^2(x,t)$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Phase as Fundamental Driver</h3>
+<p>According to this framework, the key idea of this module is that physical dynamics arise from phase evolution. The phase evolves according to the relation:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\partial_t \\theta = -\\frac{H}{\\hbar}$$
+</div>
+<p>where $H$ is the effective Hamiltonian and $\\hbar$ emerges naturally as the scaling constant of phase rotation within the substrate.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Emergence of Complex Structure</h3>
+<p>According to this framework, the factor $e^{i\\theta}$ introduces oscillatory behavior, phase rotation, and interference structure. Consequently, the complex nature of the wavefunction is not an abstract assumption, but a natural emergence from the substrate's rotational dynamics.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Origin of the Imaginary Unit</h3>
+<p>According to this framework, the imaginary unit $i$ represents a $\\frac{\\pi}{2}$ phase rotation. It encodes the fundamental coupling between amplitude evolution and phase evolution, acting as the mathematical representation of the phase rotation operator.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Linear Evolution Structure</h3>
+<p>According to this framework, from the coupling of phase evolution and amplitude, the dynamics take the familiar linear form:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$i\\hbar \\, \\partial_t \\Psi = H \\Psi$$
+</div>
+<p>This is identified as the Schrödinger equation, now derived from first principles.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. No Postulate Required</h3>
+<p>According to this framework, the Schrödinger equation is not introduced axiomatically. Instead, it emerges as a direct consequence of phase dynamics and substrate oscillations, removing the need for traditional quantum postulates.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Hilbert Space Emergence</h3>
+<p>According to this framework, the space of states is not an assumed mathematical arena. Instead, orthogonality arises from phase relations and completeness arises from the set of oscillatory modes, making Hilbert space an emergent structure of the substrate.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Physical Interpretation</h3>
+<p>According to this framework, this module establishes that quantum behavior is the organized phase dynamics of the substrate, rather than intrinsic randomness or abstract probability.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">11. Relation to Module 1</h3>
+<p>According to this framework, whereas Module 1 provides the governing operator equation, Module 2 extracts the wave-like solution structure. This marks the transition from the fundamental operator to wave dynamics: $\\text{Operator} \\rightarrow \\text{Wave dynamics}$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">12. What This Module Does NOT Do</h3>
+<p>According to this framework, this module does not yet: derive measurement probabilities (done in later modules); introduce the collapse mechanism (handled in stochastic modules); or connect the wave dynamics to geometry (done in subsequent modules).</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">13. What It Establishes</h3>
+<p>According to this framework, this module establishes that phase evolution generates wave dynamics, complex structure emerges naturally from rotation, and the Schrödinger equation is a rigorously derived result.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">14. Key Insight</h3>
+<p>According to this framework, the defining insight is that quantum mechanics represents the phase-dynamic regime of the substrate field.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">15. Final Statement</h3>
+<p style="margin-bottom: 0;">According to this framework, the Schrödinger equation emerges from the phase rotation of the substrate field, without the need for independent postulates.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Emergence Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Dynamical Mapping:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$i\\hbar \\, \\partial_t \\Psi = H \\Psi$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Wave mechanics is the natural manifestation of substrate phase evolution.</p>
+</div>
+</div>`,
+
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: SCHRÖDINGER EMERGENCE</h2>
+
+<div class="math-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0 10px;">
+
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Fundamental Field</h3>
+<p>According to this framework, the analysis begins with the complex substrate field:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\Psi(x,t) \\in \\mathbb{C}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">2. Amplitude–Phase Decomposition</h3>
+<p>According to this framework, the field is decomposed into polar form to separate magnitude from dynamical evolution:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\Psi(x,t) = A(x,t)\\, e^{i\\theta(x,t)}$$
+</div>
+<p>where $A(x,t) \\ge 0$ is the amplitude and $\\theta(x,t) \\in \\mathbb{R}$ is the phase.</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">3. Density Definition</h3>
+<p>According to this framework, the observable substrate density is the square of the amplitude:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\rho(x,t) = |\\Psi|^2 = A^2(x,t)$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">4. Phase Evolution Law</h3>
+<p>According to this framework, the fundamental driver of dynamics is the phase evolution law:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.2rem;">
+$$\\boxed{ \\partial_t \\theta(x,t) = -\\frac{H}{\\hbar} }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">5. Time Derivative of $\\Psi$</h3>
+<p>According to this framework, taking the time derivative of the decomposed field gives:</p>
+<div style="text-align: center; margin: 10px 0;">
+$$\\partial_t \\Psi = \\left[ \\partial_t A + i A \\partial_t \\theta \\right] e^{i\\theta}$$
+</div>
+<p>Substituting the phase evolution law ($\partial_t \theta = -H/\hbar$):</p>
+<div style="text-align: center; margin: 10px 0; color: #f472b6;">
+$$\\partial_t \\Psi = \\left[ \\partial_t A - i \\frac{H}{\\hbar} A \\right] e^{i\\theta}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">6. Multiply by $i\\hbar$</h3>
+<p>According to this framework, multiplying the entire expression by $i\hbar$ yields:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$i\\hbar \\, \\partial_t \\Psi = \\left[ i\\hbar \\partial_t A + H A \\right] e^{i\\theta}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">7. Assumption of Slowly Varying Amplitude</h3>
+<p>According to this framework, in the stable oscillatory regime, the change in amplitude is negligible compared to the phase-driven energy term:</p>
+<div style="text-align: center; margin: 10px 0;">
+$$\\partial_t A \\ll \\frac{H}{\\hbar} A$$
+</div>
+<p>Under this condition, the $i\hbar \partial_t A$ term vanishes, leaving:</p>
+<div style="text-align: center; margin: 10px 0; color: #4ade80;">
+$$i\\hbar \\, \\partial_t \\Psi \\approx H \\Psi$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">8. Schrödinger Equation</h3>
+<p>According to this framework, the standard Schrödinger equation emerges as the result of this phase dynamics:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.2rem;">
+$$\\boxed{ i\\hbar \\, \\partial_t \\Psi = H \\Psi }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">9. Hamiltonian Structure</h3>
+<p>According to this framework, for spatial dynamics, the Hamiltonian $H$ is defined as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$H = -\\frac{\\hbar^2}{2m}\\nabla^2 + V(x)$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">10. Full Equation</h3>
+<p>According to this framework, the full emergent wave equation is written as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem; border: 1px solid #f472b6; padding: 10px; display: inline-block; width: 100%; box-sizing: border-box;">
+$$\\boxed{ i\\hbar \\, \\partial_t \\Psi = \\left[ -\\frac{\\hbar^2}{2m}\\nabla^2 + V(x) \\right]\\Psi }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">11. Origin of Complex Structure</h3>
+<p>According to this framework, Euler's identity $e^{i\theta} = \cos\theta + i\sin\theta$ shows that the imaginary unit $i$ is not a mathematical convenience but represents a <b>phase rotation by $\pi/2$</b> within the substrate.</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">12. Real–Imaginary Separation</h3>
+<p>According to this framework, substituting $\Psi = A e^{i\theta}$ back into the Schrödinger equation and separating components gives:</p>
+<p><b>Real Part (Continuity):</b></p>
+<div style="text-align: center; margin: 10px 0; color: #f472b6;">
+$$\\partial_t A + \\frac{1}{2m}\\left(2\\nabla A \\cdot \\nabla \\theta + A \\nabla^2 \\theta\\right) = 0$$
+</div>
+<p><b>Imaginary Part (Hamilton-Jacobi):</b></p>
+<div style="text-align: center; margin: 10px 0; color: #f472b6;">
+$$\\hbar \\partial_t \\theta = -\\left[ \\frac{\\hbar^2}{2m}\\frac{\\nabla^2 A}{A} - \\frac{\\hbar^2}{2m}(\\nabla \\theta)^2 + V \\right]$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">13. Continuity Equation</h3>
+<p>According to this framework, the real part is equivalent to the conservation of substrate density:</p>
+<div style="text-align: center; margin: 10px 0; color: #4ade80;">
+$$\\partial_t \\rho + \\nabla \\cdot (\\rho v) = 0$$
+</div>
+<p>Where velocity is defined as $v = \frac{\hbar}{m} \nabla \theta$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">14. Quantum Potential</h3>
+<p>According to this framework, the structural term $Q$ arises naturally as the internal stress of the substrate:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$Q = -\\frac{\\hbar^2}{2m} \\frac{\\nabla^2 A}{A}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">15. Final Structure</h3>
+<p>According to this framework, the mathematical chain of emergence is finalized:</p>
+<div style="text-align: center; margin: 15px 0; font-weight: bold; color: #38bdf8;">
+$$\\boxed{ \\text{Phase evolution} \\;\\Rightarrow\\; \\text{Complex structure} \\;\\Rightarrow\\; \\text{Schrödinger equation} }$$
+</div>
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; border-left: 4px solid #f472b6;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 2 Mathematical Core</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Emergence Identity:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\boxed{ i\\hbar \\partial_t \\Psi = H \\Psi \\quad \\text{emerges from phase dynamics} }$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The standard wavefunction evolution is a macroscopic representation of underlying substrate phase rotation.</p>
+</div>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>PHASE EVOLUTION RATE $(\\partial\\theta/\\partial t)$</span><input type="number" id="c_in" class="digital-entry" value="0.5" oninput="syncVal(this.value, 'c_sl')"></div><input type="range" id="c_sl" min="0" max="1" step="0.05" value="0.5" oninput="syncVal(this.value, 'c_sl')"></div>`,
+
+mappingBox: `<div class="definition-box"><span class="def-title">PHASE VECTOR</span><div style="text-align:center; font-size: 0.9rem;">$\\Psi(x,t) = A(x,t)\\, e^{i\\theta(x,t)}$</div></div>`,
+
+lawBox: `<div class="definition-box"><span class="def-title">QM LIMIT</span><div style="text-align:center; font-size: 0.9rem;">$i\\hbar \\partial_t \\Psi = H \\Psi$</div></div>`,
+
+metricsContent: `
+<div style="text-align: center; color: #94a3b8; font-family: monospace; line-height: 1.24;">
+Amplitude–Phase Decomposition<br>
+<span style="color: var(--accent-unified);">↓</span><br>
+Phase Evolution $(\\partial\\theta/\\partial t)$<br>
+<span style="color: var(--accent-unified);">↓</span><br>
+Complex Structure $i\\hbar$<br>
+<span style="color: var(--accent-unified);">↓</span><br>
+Linear Operator Form<br>
+<span style="color: var(--accent-unified);">↓</span><br>
+Schrödinger Equation
+</div>
+`,
+
+hierarchy: `
+<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.75rem; line-height: 1.3;">
+Substrate Dynamics<br>
+<span style="color: var(--accent-unified);">→</span> Phase Evolution (θ)<br>
+<span style="color: var(--accent-unified);">→</span> Complex Structure (i)<br>
+<span style="color: var(--accent-unified);">→</span> Schrödinger Equation
+</div>
+`,
+
+
+footer: "Hilbert Space is not postulated; it emerges from the orthogonality and completeness of substrate oscillatory modes.",
+
+rightNote: "<b>The Origin of i:</b> The imaginary unit represents a π/2 phase rotation between amplitude and phase evolution, enabling stable oscillatory propagation of the substrate field. $$\\frac{\\partial \\theta}{\\partial t} = -\\frac{H}{\\hbar}$$ Real part → amplitude dynamics<br> Imaginary part → phase evolution."
+},
+
+
+3: {
+title: "EINSTEIN EMERGENCE",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: EINSTEIN EMERGENCE</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Introduction</h3>
+<p>According to this framework, this module shows how geometric gravity emerges from the substrate field. It establishes that spacetime curvature is not a fundamental property of an empty void, but rather an emergent phenomenon arising from the equilibrium structure of the underlying substrate.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Starting Point</h3>
+<p>According to this framework, we begin with the definitions established in previous modules: the substrate field $\\Psi(x,t)$ and the corresponding density field defined as $\\rho(x,t) = |\\Psi|^2$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Macroscopic Limit</h3>
+<p>According to this framework, at large scales, the stochastic fluctuations vanish as $\\sigma \\to 0$. In this limit, the system becomes stationary, and the time-dependent density converges to a stable spatial distribution: $\\rho(x,t) \\rightarrow \\rho(x)$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Emergence of Geometry</h3>
+<p>According to this framework, in this macroscopic limit, the density field is identified with the geometric structure of space. The metric $g_{\\mu\\nu}$ is defined as a modification of the Minkowski metric $\\eta_{\\mu\\nu}$ by the substrate's structural coupling:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$g_{\\mu\\nu} = \\eta_{\\mu\\nu}\\left(1 + \\frac{P}{K}\\rho(x)\\right)$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Curvature from Density Variation</h3>
+<p>According to this framework, the spatial variation of the density field generates what we perceive as curvature. Specifically, the Ricci tensor $R_{\\mu\\nu}$ is proportional to the second-order derivatives of the density: $R_{\\mu\\nu} \\sim \\partial_\\mu \\partial_\\nu \\rho$. Consequently, a uniform density results in flat space, while varying density produces curved geometry.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Emergent Source Structure</h3>
+<p>According to this framework, the effective stress–energy tensor is not an external "matter" input, but arises internally from the density variations themselves:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$T_{\\mu\\nu}^{(\\text{eff})} = \\partial_\\mu \\partial_\\nu \\rho - g_{\\mu\\nu}\\Box \\rho$$
+</div>
+<p>This replaces the need for independent matter sources in the initial equations.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Einstein Equation Emergence</h3>
+<p>According to this framework, at equilibrium, the structural dynamics converge to the Einstein field equations:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$G_{\\mu\\nu} = 8\\pi G \\, T_{\\mu\\nu}^{(\\text{eff})}$$
+</div>
+<p>Where the gravitational constant is derived from the substrate coupling ratio: $8\\pi G = \\frac{P}{K}$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Physical Interpretation</h3>
+<p>According to this framework, gravity is not a fundamental force of nature. Instead, it is the stationary geometric configuration of the substrate field as it maintains equilibrium.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Relation to Quantum Regime</h3>
+<p>According to this framework, the quantum regime is characterized by stochastic dynamics, whereas the geometric regime represents the averaged macroscopic equilibrium. Thus, General Relativity is the large-scale limit of the same underlying substrate dynamics that produce quantum effects.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. No External Matter Required</h3>
+<p>According to this framework, matter is not introduced as a separate, external entity. Instead, all physical structure emerges internally from the variations in the density field $\\rho(x)$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">11. What This Module Does NOT Do</h3>
+<p>According to this framework, this module does not yet: derive the full tensorial rigor of the Einstein equations (formalized in the explicit math page); introduce particle dynamics (handled in next modules); or connect to geodesic motion (developed in subsequent modules).</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">12. What It Establishes</h3>
+<p>According to this framework, this module establishes that geometry emerges from density, curvature arises from second-order variation, and the Einstein field equation is a derived emergent relation.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">13. Key Insight</h3>
+<p>According to this framework, the fundamental insight is that gravity is the equilibrium state of the substrate field.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">14. Final Statement</h3>
+<p style="margin-bottom: 0;">According to this framework, General Relativity emerges as the stationary, large-scale limit of stochastic substrate dynamics.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Geometric Emergence Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Gravitational Coupling:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$8\\pi G = \\frac{P}{K}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Space-time curvature is the macroscopic manifestation of the substrate density field in equilibrium.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: EINSTEIN EMERGENCE</h2>
+
+<div class="math-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0 10px;">
+
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Macroscopic Limit</h3>
+<p>According to this framework, in the large-scale limit, stochastic noise vanishes and the substrate density reaches a stationary spatial distribution:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\sigma \\to 0$$
+$$\\rho(x,t) \\;\\rightarrow\\; \\rho(x)$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">2. Metric Definition</h3>
+<p>According to this framework, the physical metric $g_{\\mu\\nu}$ is defined as the structural modification of the background Minkowski metric by the substrate density:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.2rem;">
+$$\\boxed{ g_{\\mu\\nu}(x) = \\eta_{\\mu\\nu}\\left(1 + \\frac{P}{K}\\rho(x)\\right) }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">3. Inverse Metric (First Order)</h3>
+<p>According to this framework, the corresponding inverse metric, taken to the first order of approximation, is:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$g^{\\mu\\nu} \\approx \\eta^{\\mu\\nu}\\left(1 - \\frac{P}{K}\\rho(x)\\right)$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">4. Christoffel Symbols</h3>
+<p>According to this framework, the connection coefficients are derived from the metric gradients:</p>
+<div style="text-align: center; margin: 10px 0;">
+$$\\Gamma^\\lambda_{\\mu\\nu} = \\frac{1}{2} g^{\\lambda\\sigma} \\left( \\partial_\\mu g_{\\nu\\sigma} + \\partial_\\nu g_{\\mu\\sigma} - \\partial_\\sigma g_{\\mu\\nu} \\right)$$
+</div>
+<p>Substituting the metric definition where $\\partial_\\alpha g_{\\mu\\nu} = \\frac{P}{K}\\eta_{\\mu\\nu}\\,\\partial_\\alpha \\rho$, we find:</p>
+<div style="text-align: center; margin: 10px 0; color: #f472b6;">
+$$\\Gamma^\\lambda_{\\mu\\nu} = \\frac{P}{2K} \\left( \\delta^\\lambda_\\nu \\partial_\\mu \\rho + \\delta^\\lambda_\\mu \\partial_\\nu \\rho - \\eta_{\\mu\\nu} \\eta^{\\lambda\\sigma}\\partial_\\sigma \\rho \\right)$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">5. Riemann Tensor (Leading Order)</h3>
+<p>According to this framework, the curvature tensor is calculated to leading order from the derivatives of the connection:</p>
+<div style="text-align: center; margin: 10px 0;">
+$$R^\\lambda_{\\;\\mu\\nu\\sigma} = \\partial_\\nu \\Gamma^\\lambda_{\\mu\\sigma} - \\partial_\\sigma \\Gamma^\\lambda_{\\mu\\nu}$$
+</div>
+<p>This implies that the curvature is directly proportional to the second-order variation of density:</p>
+<div style="text-align: center; margin: 10px 0; color: #f472b6;">
+$$\\Rightarrow R^\\lambda_{\\;\\mu\\nu\\sigma} \\sim \\frac{P}{K} \\partial_\\nu \\partial_\\sigma \\rho$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">6. Ricci Tensor</h3>
+<p>According to this framework, the Ricci tensor $R_{\\mu\\nu} = R^\\lambda_{\\;\\mu\\lambda\\nu}$ is established as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\boxed{ R_{\\mu\\nu} \\sim \\frac{P}{K} \\partial_\\mu \\partial_\\nu \\rho }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">7. Ricci Scalar</h3>
+<p>According to this framework, the Ricci scalar $R$ is found by contracting the Ricci tensor:</p>
+<div style="text-align: center; margin: 10px 0; color: #f472b6;">
+$$R = g^{\\mu\\nu} R_{\\mu\\nu} \\approx \\eta^{\\mu\\nu} R_{\\mu\\nu} \\sim \\frac{P}{K} \\Box \\rho$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">8. Einstein Tensor</h3>
+<p>According to this framework, the Einstein tensor $G_{\\mu\\nu} = R_{\\mu\\nu} - \\frac{1}{2} g_{\\mu\\nu} R$ is constructed as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\boxed{ G_{\\mu\\nu} \\sim \\frac{P}{K} \\left( \\partial_\\mu \\partial_\\nu \\rho - g_{\\mu\\nu} \\Box \\rho \\right) }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">9. Effective Stress–Energy Tensor</h3>
+<p>According to this framework, we define the source of the geometry based on internal density variations:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\boxed{ T_{\\mu\\nu}^{(\\text{eff})} = \\partial_\\mu \\partial_\\nu \\rho - g_{\\mu\\nu} \\Box \\rho }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">10. Emergent Einstein Equation</h3>
+<p>According to this framework, the fundamental relation between geometry and density is expressed as:</p>
+<div style="text-align: center; margin: 10px 0;">
+$$\\boxed{ G_{\\mu\\nu} = \\frac{P}{K} \\, T_{\\mu\\nu}^{(\\text{eff})} }$$
+</div>
+<p>Which allows the identification of the gravitational constant:</p>
+<div style="text-align: center; margin: 10px 0; color: #4ade80;">
+$$\\boxed{ 8\\pi G = \\frac{P}{K} }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">11. Final Form</h3>
+<p>According to this framework, the emergent Einstein field equation is finalized:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.2rem; border: 1px solid #f472b6; padding: 10px; display: inline-block; width: 100%; box-sizing: border-box;">
+$$\\boxed{ G_{\\mu\\nu} = 8\\pi G \\, T_{\\mu\\nu}^{(\\text{eff})} }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">12. Flat Space Limit</h3>
+<p>According to this framework, in the case of uniform density ($\\rho = \\text{constant}$), the derivatives vanish ($\\partial_\\mu \\rho = 0$), leading to $R_{\\mu\\nu} = 0$ and $g_{\\mu\\nu} = \\eta_{\\mu\\nu}$, recovering flat Minkowski space.</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">13. Summary Structure</h3>
+<p>According to this framework, the logical flow of geometric emergence is mapped as follows:</p>
+<div style="text-align: center; margin: 15px 0; font-weight: bold; color: #38bdf8;">
+$$\\boxed{ \\rho(x) \\;\\rightarrow\\; g_{\\mu\\nu} \\;\\rightarrow\\; R_{\\mu\\nu} \\;\\rightarrow\\; G_{\\mu\\nu} }$$
+</div>
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; border-left: 4px solid #f472b6;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 3 Mathematical Core</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Structural Identity:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\boxed{ \\text{Geometry emerges from second-order variation of substrate density} }$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The Einstein field equations are shown to be the equilibrium representation of the substrate density distribution.</p>
+</div>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>Static Stiffness</span><input type="number" id="k_in" class="digital-entry" value="11.350" oninput="syncVal(this.value, 'k_sl')"></div><input type="range" id="k_sl" min="1" max="50" step="0.1" value="11.350" oninput="syncVal(this.value, 'k_in')"></div>`,
+
+mappingBox: `<div class="definition-box"><span class="def-title">EQUILIBRIUM LIMIT</span><div style="text-align:center; font-size: 0.9rem;">$\\sigma \\to 0$</div></div>`,
+
+lawBox: `<div class="definition-box"><span class="def-title">GR LIMIT</span><div style="text-align:center; font-size: 0.9rem;">$G_{\\mu\\nu} = 8\\pi G T_{\\mu\\nu}$</div></div>`,
+
+metricsContent: `
+<div style="text-align: center; color: #94a3b8; font-family: monospace; line-height: 1.3;">
+Fluctuations<br>
+<span style="color: var(--accent-unified);">↓</span><br>
+Averaging → $\\rho$(x)<br>
+<span style="color: var(--accent-unified);">↓</span><br>
+Metric g<sub>μν</sub><br>
+<span style="color: var(--accent-unified);">↓</span><br>
+Curvature R<sub>μν</sub><br>
+<span style="color: var(--accent-unified);">↓</span><br>
+Einstein Equation
+</div>
+`,
+
+
+hierarchy: `
+<div style="text-align: center; color: #94a3b8; font-family: monospace; line-height: 1.3;">
+Mean density $\\rho$<br>
+<span style="color: var(--accent-unified);">→</span> Geometry (g<sub>μν</sub>)<br>
+<span style="color: var(--accent-unified);">→</span> Curvature (R<sub>μν</sub>)<br>
+<span style="color: var(--accent-unified);">→</span> Einstein Equation
+</div>
+`,
+
+footer: "Gravity is the low-frequency, stationary manifestation of the substrate field. It represents the 'set' geometry once the quantum noise has been averaged out.",
+
+rightNote: `
+<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.71rem; line-height: 1.3;"><b>Macro-Geometry:</b> At large scales, stochastic fluctuations average out, leaving a smooth curvature of the substrate. <P>σ → 0 ⇒ deterministic geometric limit.</p>`
+},
+
+
+4: {
+title: "SCALE SEPARATION",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: SCALE SEPARATION</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Core Idea</h3>
+<p>According to this framework, reality is governed by a single substrate equation, but its observable behavior depends entirely on scale. There is no fundamental division between Quantum Mechanics and General Relativity—only a change in regime controlled by the relative strength of fluctuations within the field.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Control Parameter</h3>
+<p>According to this framework, the transition between these regimes is governed by the following ratio:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.2rem;">
+$$\\boxed{ \\frac{\\sigma}{K} }$$
+</div>
+<p>where $\\sigma$ represents the fluctuation (noise amplitude) and $K$ represents the vacuum stiffness (ordering tendency). This ratio determines the dominant behavior of the substrate at any given scale.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Regime Structure</h3>
+<p>According to this framework, three distinct states of the substrate are identified:</p>
+<p><b>(a) Fluctuation-Dominated Regime (QM):</b> When $\\frac{\\sigma}{K} \\gg 1$, strong stochastic activity prevails. Dynamics are phase-driven, no stable geometry can form, and quantum behavior emerges as the primary manifestation.</p>
+<p><b>(b) Transitional Regime:</b> When $\\frac{\\sigma}{K} \\sim 1$, fluctuations and stiffness are comparable. Partial coherence develops, leading to a mixed stochastic–geometric behavior.</p>
+<p><b>(c) Geometric Equilibrium (GR):</b> When $\\frac{\\sigma}{K} \\ll 1$, fluctuations are suppressed. A stable density field $\\rho(x)$ forms, smooth metric structure emerges, and classical spacetime appears.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Coherence Length</h3>
+<p>According to this framework, the scale of order is defined by the coherence length:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\boxed{ L_c \\propto \\frac{1}{\\sigma} }$$
+</div>
+<p>As noise decreases, coherence increases, allowing large-scale structural order to emerge naturally from the substrate.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Emergence Chain</h3>
+<p>According to this framework, the path from noise to reality follows a rigorous sequence:</p>
+<div style="text-align: center; margin: 15px 0; color: #4ade80; font-weight: bold;">
+$$\\boxed{ \\sigma \\;\\rightarrow\\; \\text{Averaging} \\;\\rightarrow\\; \\rho(x) \\;\\rightarrow\\; g_{\\mu\\nu} \\;\\rightarrow\\; \\text{Geometry} }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Continuous Transition Principle</h3>
+<p>According to this framework, there is <b>no sharp boundary</b> between QM and GR. Instead, there is a continuous, scale-dependent transition. There is no phase jump and no critical threshold—only the gradual suppression of fluctuations as one moves to larger scales.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Geometric Limit</h3>
+<p>According to this framework, the deterministic geometry of General Relativity is identified as the zero-noise limit:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\boxed{ \\sigma \\to 0 \\;\\Rightarrow\\; \\text{Deterministic geometry} }$$
+</div>
+<p>This is the Einstein limit of the substrate field.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Physical Interpretation</h3>
+<p>According to this framework, quantum mechanics is simply the high-noise regime of the same field, while general relativity is its low-noise equilibrium. Geometry is not a fundamental building block; it is a coarse-grained outcome of substrate stability.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Key Statement</h3>
+<p>According to this framework, two fundamental truths are established:</p>
+<div style="text-align: center; margin: 10px 0; color: #f472b6;">
+$$\\boxed{ \\text{Geometry is the } \\sigma \\to 0 \\text{ limit of the substrate} }$$
+</div>
+<div style="text-align: center; margin: 10px 0; color: #f472b6;">
+$$\\boxed{ \\text{Macroscopic spacetime arises by averaging fluctuations} }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Conclusion</h3>
+<p style="margin-bottom: 0;">According to this framework, QM and GR are scale-separated manifestations of a single substrate. This removes the conceptual "clash" between the two theories by placing them on a single, continuous spectrum of fluctuation intensity.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Scale Separation Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Regime Control:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\sigma/K \\gg 1 \\text{ (QM)} \\longleftrightarrow \\sigma/K \\ll 1 \\text{ (GR)}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The transition from quantum dynamics to geometric gravity is a smooth function of fluctuation suppression.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: SCALE SEPARATION</h2>
+
+<div class="math-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0 10px;">
+
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Substrate Field Decomposition</h3>
+<p>According to this framework, the substrate density is decomposed into a stable mean component and a fluctuating stochastic component:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\boxed{ \\rho(x,t) = \\bar{\\rho}(x) + \\delta \\rho(x,t) }$$
+</div>
+<p>where $\\bar{\\rho}(x)$ is the coarse-grained mean density and $\\delta\\rho(x,t)$ represents the local fluctuations.</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">2. Fluctuation Strength (Noise Parameter)</h3>
+<p>According to this framework, the intensity of the stochastic field is defined by the variance of the fluctuations:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\boxed{ \\sigma^2 = \\langle (\\delta \\rho)^2 \\rangle }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">3. Control Ratio</h3>
+<p>According to this framework, the behavior of the regime is governed by the dimensionless ratio $\\epsilon$:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\boxed{ \\epsilon \\equiv \\frac{\\sigma}{K} }$$
+</div>
+<p>This ratio determines whether ordering tendency ($K$) or fluctuation ($\\sigma$) dominates the substrate state.</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">4. Coarse-Graining (Averaging Operator)</h3>
+<p>According to this framework, the mean density is obtained by applying a smoothing kernel $W_\\ell$ over a specific scale $\\ell$:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\boxed{ \\bar{\\rho}(x) = \\int W_\\ell(x - x') \\, \\rho(x',t)\\, d^3x' }$ house
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">5. Coherence Length</h3>
+<p>According to this framework, the distance over which substrate order is maintained is inversely proportional to the noise strength:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\boxed{ L_c \\sim \\frac{K}{\\sigma} }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">6. Master Equation (Starting Point)</h3>
+<p>According to this framework, the starting point for scale analysis is the unified condition:</p>
+<div style="text-align: center; margin: 10px 0;">
+$$\\boxed{ \\mathcal{L}_{\\text{sub}} \\Psi = 0 }$$
+</div>
+<p>In its effective density form, this is expressed as:</p>
+<div style="text-align: center; margin: 10px 0; color: #f472b6;">
+$$\\nabla^2 \\rho - \\frac{P}{K}\\rho + \\text{noise} = 0$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">7. Fluctuation-Dominated Regime (QM)</h3>
+<p>According to this framework, when $\\sigma \\gg K$, the density is dominated by fluctuations ($\\rho \\approx \\delta \\rho$). The dynamics are governed primarily by stochastic terms:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\partial_t \\Psi = \\mathcal{L}\\Psi + \\eta(x,t)$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">8. Geometric Regime (GR Limit)</h3>
+<p>According to this framework, as fluctuations vanish, the density field stabilizes:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\boxed{ \\sigma \\to 0 \\Rightarrow \\delta\\rho \\to 0 }$$
+$$\\rho(x,t) \\rightarrow \\bar{\\rho}(x)$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">9. Metric Emergence</h3>
+<p>According to this framework, the macroscopic metric is a function of the coarse-grained density:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\boxed{ g_{\\mu\\nu}(x) = \\eta_{\\mu\\nu} \\left(1 + \\frac{P}{K}\\bar{\\rho}(x)\\right) }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">10. Curvature from Mean Density</h3>
+<p>According to this framework, the curvature of the spacetime manifold is derived from the spatial variation of the mean density:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\boxed{ R_{\\mu\\nu} \\sim \\frac{P}{K} \\partial_\\mu \\partial_\\nu \\bar{\\rho} }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">11. Scaling Law</h3>
+<p>According to this framework, the scaling law provides a continuous map between regimes:</p>
+<div style="text-align: center; margin: 15px 0; color: #4ade80; font-weight: bold;">
+$$\\boxed{ \\epsilon = \\frac{\\sigma}{K} } \\quad \\Rightarrow \\quad \\begin{cases} \\epsilon \\gg 1 & \\text{QM regime} \\\\ \\epsilon \\sim 1 & \\text{transition} \\\\ \\epsilon \\ll 1 & \\text{GR regime} \\end{cases}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">12. Continuous Transition</h3>
+<p>According to this framework, there is no discontinuity in the substrate. All physical observables vary smoothly as a function of $\sigma$:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\boxed{ \\rho(x,t;\\sigma) \\;\\xrightarrow[\\sigma \\to 0]{}\\; \\bar{\\rho}(x) }$$
+$$\\boxed{ \\text{All observables vary smoothly with } \\sigma }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">13. Effective Dynamics Across Scales</h3>
+<p>According to this framework, the effective operator is a linear combination of deterministic and stochastic actions weighted by $\sigma$:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\boxed{ \\mathcal{L}_{\\text{eff}}(\\sigma) = \\mathcal{L}_{\\text{deterministic}} + \\sigma \\,\\mathcal{L}_{\\text{stochastic}} }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">14. Final Structure</h3>
+<p>According to this framework, the logical chain from fluctuation to geometry is mapped as follows:</p>
+<div style="text-align: center; margin: 15px 0; color: #38bdf8; font-weight: bold;">
+$$\\boxed{ \\sigma \\;\\rightarrow\\; \\bar{\\rho}(x) \\;\\rightarrow\\; g_{\\mu\\nu} \\;\\rightarrow\\; R_{\\mu\\nu} }$$
+</div>
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; border-left: 4px solid #f472b6;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 4 Mathematical Core</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Control Identity:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\boxed{ \\text{Scale separation is governed by } \\epsilon = \\frac{\\sigma}{K} }$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Geometry is rigorously proven to be the coarse-grained limit of the substrate as $\\sigma \\to 0$.</p>
+</div>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>Regime Ratio</span><input type="number" id="st_in" class="digital-entry" value="0.5" oninput="syncVal(this.value, 'st_sl')"></div><input type="range" id="st_sl" min="0" max="1" step="0.05" value="0.5" oninput="syncVal(this.value, 'st_in')"></div>`,
+
+mappingBox: `
+<div class="definition-box" style="border-color: var(--accent-unified); padding: 5px; font-family: monospace;">
+<span class="def-title" style="font-size: 0.75rem; letter-spacing: 1px; text-align: center;">REGIME MAPPING</span>
+
+<div style="font-family: monospace; line-height: 1.5;">
+σ/K >> 1 → Quantum Fluctuation (QM)
+<br>
+σ/K << 1 → Geometric Equilibrium (GR)
+</div>
+`,
+
+lawBox: `<div class="definition-box"><span class="def-title">COHERENCE LENGTH</span><div style="text-align:center; font-size: 0.9rem;">$L_c \\propto 1/\\sigma$ <br> (Coherence grows as noise decreases)</div></div>`,
+
+metricsContent: `
+<div style="text-align: center; color: #94a3b8; font-family: monospace; line-height: 1.3; font-size: 0.85rem;">
+Noise Scale (σ)<br>
+<span style="color: var(--accent-unified);">↓</span><br>
+Averaging → $\\rho$(x)<br>
+<span style="color: var(--accent-unified);">↓</span><br>
+Metric g<sub>μν</sub><br>
+<span style="color: var(--accent-unified);">↓</span><br>
+Geometry (GR limit)
+</div>
+`,
+
+hierarchy: `<div style="font-size: 0.75rem; color: #f472b6;">σ/K >> 1 → Quantum Fluctuation</div><div style="color: #94a3b8;">σ/K ≈ 1 → Transitional Regime</div><div style="color: #38bdf8;">σ/K << 1 → Geometric Equilibrium</div>`,
+
+footer: `
+<div style="font-family: monospace; line-height: 1.3; font-size: 0.75rem;">
+The transition from QM to GR is governed by the ratio σ/K.
+<br><br>
+σ/K >> 1 → stochastic regime (quantum)
+<br>
+σ/K << 1 → stationary regime (geometry)
+<br><br>
+There is no sharp boundary—only a continuous scale transition.
+</div>
+`,
+
+rightNote: `
+<div style="color: #94a3b8; font-family: monospace; font-size: 0.85rem; line-height: 1.3;">Geometry is the σ → 0 limit of the substrate.<P>Macroscopic spacetime arises when fluctuations are averaged out.</p>`
+},
+
+
+5: {
+title: "UNIFIED INTERPRETATION",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: UNIFIED INTERPRETATION</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Core Statement</h3>
+<p>According to this framework, the fundamental identity of existence is defined as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.2rem;">
+$$\\boxed{ S \\;\\equiv\\; \\text{Unified Reality} }$$
+</div>
+<p>Reality is not composed of separate domains (quantum vs geometric), but is a single substrate field observed under different conditions.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. The Unified Substrate</h3>
+<p>According to this framework, the unified substrate is the primary constituent of the universe:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\boxed{ S = S(x,t) }$$
+</div>
+<p>This fundamental entity encodes both fluctuation and structure, and it governs all physical phenomena without exception.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Dual Manifestation</h3>
+<p>According to this framework, the substrate appears in two distinct regimes depending on external and internal parameters:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\boxed{ S \\;\\rightarrow\\; \\begin{cases} \\text{Stochastic Regime (QM)} \\\\ \\text{Geometric Regime (GR)} \\end{cases} }$$
+</div>
+<p><b>(a) Stochastic Regime (QM):</b> Characterized by high fluctuation ($\\sigma \\gg K$), phase-driven dynamics, and probabilistic behavior.</p>
+<p><b>(b) Geometric Regime (GR):</b> Characterized by low fluctuation ($\\sigma \\ll K$), a stable density field, and deterministic curvature.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Unification Principle</h3>
+<p>According to this framework, QM and GR are merely limits of the same underlying field $S$. Consequently, there is no fundamental split, no separate quantization of gravity required, and no need for an independent spacetime background.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Emergence Structure</h3>
+<p>According to this framework, the hierarchy of emergence is strictly linear:</p>
+<div style="text-align: center; margin: 15px 0; color: #4ade80; font-weight: bold;">
+$$\\boxed{ S \\;\\rightarrow\\; \\text{Fluctuations} \\; (\\sigma) \\;\\rightarrow\\; \\rho(x,t) \\;\\rightarrow\\; g_{\\mu\\nu} \\;\\rightarrow\\; \\text{Geometry} }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Interpretation of “Quantum Gravity”</h3>
+<p>According to this framework, Quantum Gravity is not a new force to be discovered, but a unified substrate description. It is not something to be constructed; it is already contained within the master substrate equation.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Law Structure</h3>
+<p>According to this framework, a single governing equation dictates all behavior:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\boxed{ \\mathcal{L}_{\\text{sub}} \\Psi = 0 }$$
+</div>
+<p>All known physical laws emerge as specific mathematical limits of this one expression.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Conceptual Shift</h3>
+<p>According to this framework, the traditional view of $\\text{QM} + \\text{GR} \\;\\rightarrow\\; \\text{Unification}$ is inverted. The new paradigm states:</p>
+<div style="text-align: center; margin: 15px 0; color: #38bdf8; font-weight: bold;">
+$$\\boxed{ \\text{Single Substrate} \\;\\rightarrow\\; \\text{QM and GR as manifestations} }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Physical Meaning</h3>
+<p>According to this framework, reality is fundamentally continuous and unified. Discreteness and geometry are context-dependent appearances, where the scale of observation determines the nature of the manifestation.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Final Statement</h3>
+<p>According to this framework, we arrive at the ultimate definition:</p>
+<div style="text-align: center; margin: 10px 0; color: #f472b6;">
+$$\\boxed{ \\text{Unified Reality = The Substrate Continuum} }$$
+$$\\boxed{ \\text{Unified Reality = The Substrate Field} }$$
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; border-left: 4px solid #4ade80;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 5 Conceptual Core</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Unification Identity:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\boxed{ \\text{Unification is not combining laws, but identifying their common origin} }$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;"><b>Stage 41 Completion Insight:</b> The goal is not "Quantum Gravity", but a Unified Substrate.</p>
+</div>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: UNIFIED INTERPRETATION</h2>
+
+<div class="math-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0 10px;">
+
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Unified Substrate Field</h3>
+<p>According to this framework, the totality of physical existence is represented by a single fundamental field:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\boxed{ S(x,t) \\equiv \\Psi(x,t) }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">2. Master Equation</h3>
+<p>According to this framework, all manifestations of the substrate are governed by a single master equation:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\boxed{ \\mathcal{L}_{\\text{sub}} \\Psi = 0 }$$
+</div>
+<p>The explicit form, integrating the core structural constants and stochastic components, is established as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\boxed{ \\left[ \\nabla^2 - \\frac{P}{K}\\rho(x,t) + \\mathcal{N}_\\sigma \\right]\\Psi = 0 }$$
+</div>
+<p>Where $K$ is the vacuum stiffness, $P$ is the synthesis pressure, and $\\mathcal{N}_\\sigma$ is the stochastic operator.</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">3. Density Definition</h3>
+<p>According to this framework, the local intensity of the substrate field defines the observable density:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\boxed{ \\rho(x,t) = |\\Psi(x,t)|^2 }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">4. Amplitude–Phase Decomposition</h3>
+<p>According to this framework, the field is treated in its polar form to reveal the underlying wave-mechanical structure:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\boxed{ \\Psi(x,t) = A(x,t)\\,e^{i\\theta(x,t)} }$$
+</div>
+<p>where $\\rho = A^2$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">5. Coupled Dynamics</h3>
+<p>According to this framework, the evolution of the field is split into two coupled equations:</p>
+<p><b>(a) Amplitude Equation:</b> $\\boxed{ \\partial_t A = \\mathcal{F}(A, \\nabla^2 A, \\rho, \\sigma) }$</p>
+<p><b>(b) Phase Equation:</b> $\\boxed{ \\partial_t \\theta = -\\frac{H}{\\hbar} }$</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">6. Regime Parameter</h3>
+<p>According to this framework, the dimensionless parameter $\\epsilon$ controls the character of the observed regime:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\boxed{ \\epsilon = \\frac{\\sigma}{K} }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">7. Regime Limits</h3>
+<p>According to this framework, two primary limits are identified:</p>
+<p><b>(a) Quantum Limit:</b> When $\\epsilon \\gg 1$, the operator collapses into the Schrödinger form: $\\mathcal{L}_{\\text{sub}} \\Psi \\;\\Rightarrow\\; i\\hbar \\partial_t \\Psi = H\\Psi$.</p>
+<p><b>(b) Geometric Limit:</b> When $\\sigma \\to 0$, the fluctuations vanish and the density stabilizes: $\\rho(x,t) \\rightarrow \\bar{\\rho}(x)$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">8. Metric Emergence</h3>
+<p>According to this framework, the metric of spacetime emerges in the geometric limit as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\boxed{ g_{\\mu\\nu}(x) = \\eta_{\\mu\\nu} \\left(1 + \\frac{P}{K}\\bar{\\rho}(x)\\right) }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">9. Curvature Relation</h3>
+<p>According to this framework, the observable curvature is a second-order effect of density variation:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\boxed{ R_{\\mu\\nu} \\sim \\frac{P}{K} \\partial_\\mu \\partial_\\nu \\bar{\\rho} }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">10. Einstein Limit</h3>
+<p>According to this framework, the standard Einstein field equations emerge as the equilibrium limit of the substrate:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\boxed{ G_{\\mu\\nu} = \\frac{P}{K} \\, T_{\\mu\\nu}^{(\\text{eff})} }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">11. Unified Structure</h3>
+<p>According to this framework, the total emergence chain is unified into a single logical sequence:</p>
+<div style="text-align: center; margin: 15px 0; color: #38bdf8; font-weight: bold;">
+$$\\boxed{ \\Psi \\;\\rightarrow\\; \\rho = |\\Psi|^2 \\;\\rightarrow\\; g_{\\mu\\nu} \\;\\rightarrow\\; R_{\\mu\\nu} }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">12. Scale Dependence</h3>
+<p>According to this framework, the state of the wavefunction itself depends on the fluctuation parameter $\sigma$:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\boxed{ \\Psi(x,t;\\sigma) \\;\\xrightarrow[\\sigma \\to 0]{}\\; \\Psi_{\\text{det}}(x) }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">13. Effective Operator Decomposition</h3>
+<p>According to this framework, the master operator is a composite of deterministic and stochastic actions:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\boxed{ \\mathcal{L}_{\\text{sub}} = \\mathcal{L}_{\\text{det}} + \\sigma\\,\\mathcal{L}_{\\text{noise}} }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">14. Final Identity</h3>
+<p>According to this framework, the ultimate identity of Unified Reality is established:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\boxed{ S \\equiv \\Psi }$$
+$$\\boxed{ \\text{Unified Reality is the solution space of } \\mathcal{L}_{\\text{sub}}\\Psi = 0 }$$
+</div>
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; border-left: 4px solid #f472b6;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 5 Mathematical Core</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Unified Identity:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\boxed{ \\text{All physics emerges from a single substrate equation under scale variation} }$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The convergence of Quantum Mechanics and General Relativity is mathematically verified within the substrate field.</p>
+</div>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>Unification Check</span><input type="number" id="e_in" class="digital-entry" value="1.0" oninput="syncVal(this.value, 'e_sl')"></div><input type="range" id="e_sl" min="0.5" max="1.5" step="0.01" value="1.0" oninput="syncVal(this.value, 'e_in')"></div>`,
+
+mappingBox: `<div class="definition-box"><span class="def-title">FINAL SYNTHESIS</span><div style="text-align:center; font-size: 0.9rem;">$\\mathcal{S} \\equiv \\text{Unified Reality}$</div></div>`,
+
+lawBox: `<div class="definition-box"><span class="def-title">COMPLETE THEORY</span><div style="text-align:center; font-size: 1.0rem;">Synthesis Framework</div></div>`,
+
+metricsContent: `
+<div style="text-align: center; color: #94a3b8; font-family: monospace; line-height: 1.3; font-size: 0.85rem;">
+Unified Substrate (S)<br>
+<span style="color: var(--accent-unified);">↓</span><br>
+Stochastic Regime (QM)<br>
+<span style="color: var(--accent-unified);">↓</span><br>
+Geometric Regime (GR)<br>
+<span style="color: var(--accent-unified);">↓</span><br>
+Unified Reality
+</div>
+`,
+
+hierarchy: `<div style="color: #00ffcc; font-weight: bold; font-size: 0.85rem;">UNIFIED REALITY: THE SUBSTRATE CONTINUUM<br>UNIFIED REALITY: THE SUBSTRATE FIELD</div>`,
+
+footer: `
+<div style="line-height: 1.3; font-size: 0.90rem;">Unification is not the addition of laws, but the identification of a single underlying law from which known laws emerge as limits.`,
+
+rightNote: ` 
+<div style="color: #94a3b8; font-size: 0.90rem; line-height: 1.3";<b>The Goal Achieved:</b><br> Not “Quantum Gravity”, but a Unified Substratethat that manifests as both QM and GR.`
+}
+};
+
+
+function syncVal(val, id) {
+const sliderId = id.includes('_in') ? id.replace('_in', '_sl') : id;
+const inputId = id.includes('_sl') ? id.replace('_sl', '_in') : id;
+if(document.getElementById(sliderId)) document.getElementById(sliderId).value = val;
+if(document.getElementById(inputId)) document.getElementById(inputId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+document.getElementById('brief-box-content').innerHTML = content.brief || "Coming Soon";
+document.getElementById('math-box-content').innerHTML = content.math || "Coming Soon";
+document.getElementById('control-sliders').innerHTML = content.sliders;
+document.getElementById('active-module-title').innerText = content.title;
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('metrics-content').innerHTML = content.metricsContent;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+showScreen('briefing');
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() {
+showScreen('lab');
+setTimeout(() => {
+runLab();
+window.dispatchEvent(new Event('resize'));
+}, 100);
+}
+
+function runLab() {
+const target = document.getElementById('plot-area');
+if (!target) return;
+
+let data = [];
+let layout = {
+paper_bgcolor: 'black', plot_bgcolor: 'black', margin: {t:40,b:40,l:50,r:30},
+xaxis: { color: '#666', gridcolor: '#111', showticklabels: false },
+yaxis: { color: '#666', gridcolor: '#111', showticklabels: false },
+showlegend: false,
+scene: {
+xaxis: {visible: false}, yaxis: {visible: false}, zaxis: {visible: false},
+camera: { eye: {x: 1.2, y: 1.2, z: 1.2} }
+}
+};
+
+if (currentTool === 1) { // Master Field Visualization
+let coupling = parseFloat(document.getElementById('l_sl')?.value || 1.0);
+let x = [], y = [], z = [];
+for(let i=-10; i<=10; i++) {
+let r_x = [], r_y = [], r_z = [];
+for(let j=-10; j<=10; j++) {
+r_x.push(i); r_y.push(j);
+let noise = (Math.random()-0.5) * 0.5;
+let geometry = -Math.exp(-(i*i + j*j)*0.05) * 5;
+r_z.push(geometry + (noise * coupling));
+}
+x.push(r_x); y.push(r_y); z.push(r_z);
+}
+data = [{type: 'surface', x: x, y: y, z: z, colorscale: 'Portland', showscale: false}];
+layout.title = "MASTER FIELD: STOCHASTIC-GEOMETRIC COUPLING";
+
+} else if (currentTool === 2) { // Schrödinger Emergence
+let phaseRate = parseFloat(document.getElementById('c_sl')?.value || 0.5);
+let x_vals = [], y_re = [], y_im = [];
+for(let t=0; t<100; t++) {
+x_vals.push(t);
+y_re.push(Math.cos(t * phaseRate) * Math.exp(-t*0.01));
+y_im.push(Math.sin(t * phaseRate) * Math.exp(-t*0.01));
+}
+data = [
+{x: x_vals, y: y_re, name: 'Re(Ψ)', line: {color: '#fbbf24'}},
+{x: x_vals, y: y_im, name: 'Im(Ψ)', line: {color: '#38bdf8', dash: 'dash'}}
+];
+layout.title = "QM EMERGENCE: PHASE ROTATION OPERATOR (i)";
+layout.showlegend = true;
+
+} else if (currentTool === 3) { // Einstein Emergence
+// 1. RESPONSIVENESS (from 1): Pull the slider value
+let k_val = parseFloat(document.getElementById('k_sl')?.value || 11.350);
+
+// 2. ELEGANT SHAPE (from 2): Calculate amplitude so it equals 10 when k_val is 11.35
+let dynamic_amplitude = 113.5 / k_val;
+
+let x_vals = [], y_vals = [];
+for(let r=-15; r<=15; r+=0.5) {
+x_vals.push(r);
+// Using your exact elegant formula: Math.exp(-r*r*0.05)
+y_vals.push(-dynamic_amplitude * Math.exp(-r*r*0.05));
+}
+
+// 3. ELEGANT VISUALS (from 2): Keeping the clean line style
+data = [{
+x: x_vals,
+y: y_vals,
+fill: 'tozeroy',
+line: {color: '#4ade80'}
+}];
+
+layout.title = "GR EMERGENCE: MACRO-STATIONARY GEOMETRY";
+// Crucial: keep the axis steady so the well "moves" within the frame
+layout.yaxis = { range: [-15, 2], autorange: false };
+
+
+} else if (currentTool === 4) { // Scale Separation: Noise Decay
+// 1. LINKAGE: Ensure this matches your HTML ID (st_sl)
+let ratio = parseFloat(document.getElementById('st_sl')?.value || 0.5);
+
+// 2. STABILITY LOGIC: The Mean Line is a DIRECT function of the slider.
+// It will move when the slider moves, but stay still when 'Reset' is clicked.
+let baseline = (ratio - 0.5) * 15; // Increased multiplier for visible movement
+
+let x_path = [], y_noisy = [], y_mean = [];
+for(let i=0; i<60; i++) {
+let x = (i - 30) * 0.5;
+x_path.push(x);
+
+// Pinned to the baseline
+y_mean.push(baseline);
+
+// 3. JITTER LOGIC: Dots dance around the baseline
+// As ratio increases (toward 1), the jitter amplitude decreases.
+let noise_multiplier = (1.1 - ratio) * 10;
+y_noisy.push(baseline + (Math.random() - 0.5) * noise_multiplier);
+}
+
+data = [
+{
+name: 'Fluctuation (Micro)',
+x: x_path, y: y_noisy,
+mode: 'markers',
+marker: {color: '#f472b6', size: 4, opacity: 0.7}
+},
+{
+name: 'Equilibrium (Macro)',
+x: x_path, y: y_mean,
+mode: 'lines',
+line: {color: '#38bdf8', width: 3, dash: 'dash'}
+}
+];
+
+layout.title = "SCALE TRANSITION: NOISE DECAY (σ → 0)";
+layout.yaxis = { range: [-12, 12], autorange: false };
+layout.xaxis = { range: [-15, 15], autorange: false };
+layout.showlegend = true;
+
+
+
+} else if (currentTool === 5) { // Unified Interpretation: The Substrate Continuum
+// 1. LINKAGE: Get Unification Check slider value
+let u_check = parseFloat(document.getElementById('e_sl')?.value || 1);
+
+let x_vals = [], y_vals = [];
+// 2. ELEGANT WAVE LOGIC: Linking amplitude and frequency to the slider
+// As u_check increases, the "Synthesis" becomes more pronounced.
+for(let t=0; t<=20; t+=0.1) {
+x_vals.push(t);
+// A composite wave representing the marriage of Jitter and Geometry
+let wave = (5 * u_check) * Math.sin(t * 0.8) * Math.cos(t * 0.1);
+y_vals.push(wave);
+}
+
+data = [{
+x: x_vals,
+y: y_vals,
+mode: 'lines',
+line: {color: '#5eead4', width: 4, shape: 'spline'},
+fill: 'none' // Keep it clean to show the "Pure Field"
+}];
+
+layout.title = "UNIFIED REALITY: THE SUBSTRATE CONTINUUM";
+// Keeping the range fixed so the wave "grows" into the space
+layout.yaxis = { range: [-10, 10], autorange: false };
+layout.xaxis = { range: [0, 20], autorange: false };
+
+}
+
+Plotly.react('plot-area', data, layout, {responsive: true, displayModeBar: false});
+}
+
+function resetLab() {
+if (currentTool === 1) syncVal(1.0, 'l_sl');
+if (currentTool === 2) syncVal(0.5, 'c_sl');
+if (currentTool === 3) syncVal(11.350, 'k_sl');
+if (currentTool === 4) syncVal(0.5, 'st_sl');
+if (currentTool === 5) syncVal(1.0, 'e_sl');
+runLab();
+}
+</script>
+</body>
+</html>

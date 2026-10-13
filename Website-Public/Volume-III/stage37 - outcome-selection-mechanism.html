@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 37 — Outcome Selection Mechanism</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #00ffcc;
+--accent-entangled: #38bdf8; --accent-meta: #fbbf24; --accent-trigger: #f87171;
+--accent-nonlinear: #a78bfa; --accent-stabilize: #4ade80; --accent-transition: #f472b6;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-unified); font-family: sans-serif; font-size: 0.85rem; min-width: 350px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls, #nav-summary-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+#screen-lab.active { display: flex; flex-direction: column; height: calc(100vh - 50px); }
+
+#screen-portal { justify-content: flex-start; padding-top: 5dvh; }
+
+/* 3-3-1 Grid Arrangement */
+.portal-grid {
+display: grid;
+grid-template-columns: repeat(3, 300px);
+justify-content: center;
+gap: 15px;
+width: 100%;
+max-width: 1100px;
+margin-top: 20px;
+margin-bottom: 50px;
+}
+
+.portal-card {
+background: var(--bg-card);
+border: 1px solid var(--border);
+padding: 15px 20px;
+border-radius: 12px;
+cursor: pointer;
+transition: all 0.3s ease;
+text-align: center;
+box-sizing: border-box;
+display: flex;
+flex-direction: column;
+justify-content: center;
+}
+
+/* Centering the 7th card in the 3rd row */
+.portal-card.summary-card {
+grid-column: 2;
+border-color: var(--accent-unified);
+background: linear-gradient(135deg, #0f1115 0%, #1a1a0a 100%);
+}
+
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.85rem; margin: 6px 0; color: #fff; line-height: 1.3; }
+.portal-card p { font-size: 0.75rem; color: var(--text-dim); margin: 4px 0; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.constant-display-box {
+background: #111; border: 1px solid var(--accent-unified); padding: 6px; border-radius: 8px;
+display: flex; justify-content: space-around; margin-bottom: 10px;
+}
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(0, 255, 204, 0.05); border: 1px solid var(--accent-unified); padding: 8px; border-radius: 8px; margin-bottom: 8px; font-size: 0.6rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; }
+#plot-area { flex-grow: 1; width: 100%; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #000; border: 1px solid var(--accent-unified); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer {
+width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem;
+color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 37 — OUTCOME SELECTION MECHANISM</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">Outcome Selection Lab</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">The Dynamical Emergence of Classical Reality from Substrate Instability.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-entangled);">
+<h2 style="color:var(--accent-entangled);">1. Entangled State</h2>
+<p>Mapping competitive outcome channels.</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-meta);">
+<h2 style="color:var(--accent-meta);">2. Metastable Dynamics</h2>
+<p>The potential landscape of the substrate.</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-trigger);">
+<h2 style="color:var(--accent-trigger);">3. Fluctuation Trigger</h2>
+<p>Stochastic perturbations in the vacuum.</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-nonlinear);">
+<h2 style="color:var(--accent-nonlinear);">4. Nonlinear Growth</h2>
+<p>Runaway selection of the dominant state.</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-stabilize);">
+<h2 style="color:var(--accent-stabilize);">5. Outcome Stabilization</h2>
+<p>Settling into the robust macroscopic basin.</p>
+</div>
+<div class="portal-card" onclick="openTool(6)" style="border-color: var(--accent-transition);">
+<h2 style="color:var(--accent-transition);">6. Substrate Phase Transition</h2>
+<p>Collapse as an emergent symmetry breaking.</p>
+</div>
+<div class="portal-card summary-card" onclick="showScreen('summary')">
+<h2 style="color:var(--accent-unified);">7. Stage 37 Mathematical Summary</h2>
+<p>Synthesis Logic of Non-Linear Collapse Dynamics.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color:var(--accent-unified); text-align:center;">Summary - Mathematical Structure of Stage 37</h2>
+<section>
+<h4 style="color:var(--accent-unified);">Outcome Selection Mechanism</h4>
+<p>According to this framework, Stage 37 provides the complete dynamical bridge from multi-channel quantum potentiality to a single realized outcome through a sequence of mathematically connected processes.</p>
+
+<h4 style="color:var(--accent-unified);">1. Multi-Channel State Representation</h4>
+<p>According to this framework, the system is described by competing channel amplitudes:</p>
+<p style="text-align:center;">$$\sum_i A_i = 1, \quad A_i \ge 0$$</p>
+<p>or equivalently by a density structure:</p>
+<p style="text-align:center;">$$\rho = \sum_{ij} A_{ij} |i\rangle \langle j|$$</p>
+<p>This encodes the physical coexistence of multiple possible outcomes.</p>
+
+<h4 style="color:var(--accent-unified);">2. Metastable Potential Landscape</h4>
+<p>According to this framework, the substrate is governed by an effective potential $V(x)$ with multiple minima satisfying:</p>
+<p style="text-align:center;">$$\frac{\partial V}{\partial x} = 0$$</p>
+<p>This defines the competing outcome basins (metastable structure) prior to selection.</p>
+
+<h4 style="color:var(--accent-unified);">3. Fluctuation-Driven Trigger</h4>
+<p>According to this framework, stochastic dynamics initiate the selection process:</p>
+<p style="text-align:center;">$$dx = -\frac{\partial V}{\partial x}dt + \sigma dW_t$$</p>
+<p>where $\sigma \propto P$. Thus, synthesis pressure $P$ controls the fluctuation strength that triggers the departure from symmetry.</p>
+
+<h4 style="color:var(--accent-unified);">4. Nonlinear Competitive Growth</h4>
+<p>According to this framework, channel evolution follows nonlinear amplification via replicator dynamics:</p>
+<p style="text-align:center;">$$\frac{dA_i}{dt} = A_i\left(\lambda_i - \sum_j \lambda_j A_j\right)$$</p>
+<p>The solution form $A_i(t) = \frac{A_i(0)e^{\lambda_i t}}{\sum_j A_j(0)e^{\lambda_j t}}$ leads to the eventual dominance of a single channel: $A_k \rightarrow 1$.</p>
+
+<h4 style="color:var(--accent-unified);">5. Stabilization Dynamics</h4>
+<p>According to this framework, the system relaxes into a stable configuration via dissipative evolution:</p>
+<p style="text-align:center;">$$\frac{dx}{dt} = -\gamma \frac{\partial V}{\partial x}$$</p>
+<p>with monotonic energy decrease $\frac{dV}{dt} \le 0$. The final condition is defined by $\frac{\partial V}{\partial x} = 0$ and $\frac{\partial^2 V}{\partial x^2} > 0$.</p>
+
+<h4 style="color:var(--accent-unified);">6. Phase Transition Structure</h4>
+<p>According to this framework, the final realization is a symmetry-breaking transition governed by a Landau-type potential:</p>
+<p style="text-align:center;">$$V(\phi) = a\phi^2 + b\phi^4 \implies \phi_* = \pm \sqrt{\frac{-a}{2b}} \quad (a<0)$$</p>
+<p>The dynamic equation for the order parameter is $\frac{\partial \phi}{\partial t} = -\Gamma (2a\phi + 4b\phi^3)$.</p>
+
+<h4 style="color:var(--accent-unified);">7. Final Collapse Structure</h4>
+<p>According to this framework, the system converges to a single outcome where $A_k = 1$ and $A_{j \neq k} = 0$, causing the density matrix to reduce: $\rho \rightarrow |k\rangle \langle k|$. Localization is governed by vacuum stiffness $K$:</p>
+<p style="text-align:center;">$$\sigma_x^2 \sim \frac{1}{K}$$</p>
+
+<h4 style="color:var(--accent-unified);">8. Unified Evolution Chain</h4>
+<p style="text-align:center;">$$\boxed{\text{Fluctuation} \rightarrow \text{Instability} \rightarrow \text{Nonlinear Growth} \rightarrow \text{Dominance} \rightarrow \text{Stabilization} \rightarrow \text{Phase Transition}}$$</p>
+
+<h4 style="color:var(--accent-unified);">Final Insight</h4>
+<p>According to this framework, Stage 37 mathematically establishes that:</p>
+<ul>
+<li>Randomness originates from controlled stochastic fluctuations.</li>
+<li>Selection arises from nonlinear deterministic amplification.</li>
+<li>Collapse is a physical phase transition.</li>
+</ul>
+<p>Thus, quantum measurement is not postulated but derived as a continuous dynamical process governed by substrate equations.</p>
+</div>
+
+<div class="briefing-content" style="border-left: 4px solid var(--accent-energy); background: rgba(255,255,255,0.05); padding: 20px; border-radius: 0 8px 8px 0;">
+<h2 style="color:var(--accent-energy); margin-top: 0;">Note on Visual Similarity Across Modules</h2>
+
+<h4 style="color:var(--accent-unified);">Why visuals look similar</h4>
+<p>Across Stage 37, many modules use:</p>
+<ul>
+<li>same potential curve (double well)</li>
+<li>same central point / particle marker</li>
+<li>similar Gaussian / peak shapes</li>
+</ul>
+<p>This is intentional because:</p>
+<p>According to this framework, all modules operate on the same substrate landscape $V(x)$.</p>
+<p>So visually:</p>
+<ul>
+<li>same geometry</li>
+<li>same coordinate space</li>
+<li>same system</li>
+</ul>
+
+<h4 style="color:var(--accent-unified);">What actually changes (the real content)</h4>
+<p>Although visuals look similar, each module represents a different equation acting on the same structure.</p>
+
+<h4 style="color:var(--accent-unified);">Module-wise distinction</h4>
+
+<p><strong>(1) Metastable Dynamics</strong><br>
+Same double-well visual<br>
+BUT math is: $$\frac{\partial V}{\partial x} = 0$$
+👉 Meaning: structure of possibilities</p>
+
+<p><strong>(2) Fluctuation Trigger</strong><br>
+Same central point: $$dx = -\frac{\partial V}{\partial x}dt + \sigma dW_t$$
+👉 Meaning: stochastic perturbation</p>
+
+<p><strong>(3) Nonlinear Growth</strong><br>
+Same wells: $$\frac{dA_i}{dt} = A_i(\lambda_i - \bar{\lambda})$$
+👉 Meaning: amplification between channels</p>
+
+<p><strong>(4) Outcome Stabilization</strong><br>
+Same minimum: $$\frac{dx}{dt} = -\gamma \frac{\partial V}{\partial x}$$
+👉 Meaning: settling</p>
+
+<p><strong>(5) Phase Transition</strong><br>
+Same double-well — but now interpreted differently: $$V(\phi) = a\phi^2 + b\phi^4$$
+👉 Meaning: symmetry breaking</p>
+
+<h4 style="color:var(--accent-unified);">Deep insight</h4>
+<p>According to this framework:</p>
+<p><strong>The geometry stays constant — the governing equation changes.</strong></p>
+<p>This is actually a major strength, because:</p>
+<ul>
+<li>It shows one substrate, not multiple theories</li>
+<li>It shows different physics emerging from same structure</li>
+<li>It avoids artificial fragmentation</li>
+</ul>
+
+<h4 style="color:var(--accent-unified);">Why this is scientifically powerful</h4>
+<p>This approach mirrors real physics:</p>
+<ul>
+<li>Same spacetime → different equations (GR vs QFT)</li>
+<li>Same potential → different regimes (thermal vs quantum vs critical)</li>
+</ul>
+<p>It is doing the same at a deeper level:</p>
+<p><strong>One substrate → multiple dynamical regimes</strong></p>
+</div>
+
+</section>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div class="constant-display-box">
+<div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val">11.350</span></div>
+<div class="const-item"><span class="const-label">Pressure P</span><span class="const-val">0.690</span></div>
+</div>
+<div id="mapping-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Selection Telemetry</span>
+<span id="epoch-label" style="font-family:monospace; font-size:0.85rem; color:var(--accent-unified);">EQUILIBRIUM</span>
+</div>
+<div id="control-sliders"></div>
+<button id="trigger-btn" onclick="runSelection()" style="width:100%; margin-top:8px; background:var(--accent-trigger); border:none; color:#000; font-weight:bold; font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:8px; border-radius:4px;">TRIGGER SELECTION</button>
+<button onclick="resetLab()" style="width:100%; margin-top:8px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:6px;">RESET LANDSCAPE</button>
+<div id="panel-footer-text" style="font-size: 0.75rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.4; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:8px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:6px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Selection Logic</span>
+<div id="metrics-content" style="font-size:0.75rem; font-family:monospace; line-height:1.7;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Causal Hierarchy</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.75rem; color: var(--text-dim); line-height: 1.4; background: #000; padding: 10px; border-radius: 8px; border: 1px solid #222; margin-top: auto;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+let selectionInterval = null;
+let systemState = 0;
+
+const toolContent = {
+1: {
+title: "Entangled Detector State",
+brief: `<div class="briefing-content">
+<h2 style="color:var(--accent-energy); margin-top: 20px;">Detailed Briefing: Entangled Detector State</h2>
+
+<h4 style="color:var(--accent-unified);">Conceptual Basis</h4>
+<p>According to this framework, the entangled detector state is not an abstract superposition but a physically real multi-channel configuration of the substrate. The system and detector are coupled through the interaction field, producing multiple simultaneous outcome channels, each represented as a distinct oscillatory mode of the substrate.</p>
+<p>At this stage, no selection has occurred. All channels coexist coherently.</p>
+
+<h4 style="color:var(--accent-unified);">State Representation</h4>
+<p>According to this framework, the composite state is:</p>
+<p style="text-align:center;">$$|\\Psi\\rangle = \\sum_{i} c_i\\,|s_i\\rangle \\otimes |d_i\\rangle$$</p>
+<p>Where:</p>
+<ul>
+<li><strong>$|s_i\\rangle$</strong> = system state</li>
+<li><strong>$|d_i\\rangle$</strong> = corresponding detector state</li>
+<li><strong>$c_i$</strong> = amplitude of the channel</li>
+</ul>
+<p>This represents a one-to-one mapping between system outcomes and detector configurations.</p>
+
+<h4 style="color:var(--accent-unified);">Substrate Mode Representation</h4>
+<p>According to this framework, the same state can be expressed as a superposition of substrate modes:</p>
+<p style="text-align:center;">$$\\Psi(x,t) = \\sum_i A_i(t)\\,\\psi_i(x)$$</p>
+<p>where each $\\psi_i(x)$ is a spatial mode corresponding to a specific outcome channel, and $A_i$ is its amplitude.</p>
+
+<h4 style="color:var(--accent-unified);">Normalization Condition</h4>
+<p style="text-align:center;">$$\\sum_i |A_i|^2 = 1$$</p>
+<p>This ensures the conservation of total substrate excitation across all channels.</p>
+
+<h4 style="color:var(--accent-unified);">Coupling Origin</h4>
+<p>According to this framework, entanglement arises from the interaction Hamiltonian:</p>
+<p style="text-align:center;">$$H_{\\text{int}} = \\sum_i g_i\\,|s_i\\rangle\\langle s_i| \\otimes \\hat{O}_d$$</p>
+<p>Where:</p>
+<ul>
+<li><strong>$g_i$</strong> = coupling strength</li>
+<li><strong>$\\hat{O}_d$</strong> = detector observable</li>
+</ul>
+<p>This interaction correlates system states with distinct detector configurations.</p>
+
+<h4 style="color:var(--accent-unified);">Mode Correlation Structure</h4>
+<p>According to this framework, each channel satisfies the relationship:</p>
+<p style="text-align:center;">$$\\psi_i(x) \\leftrightarrow (s_i, d_i)$$</p>
+<p>This implies that the system and detector are not separate entities, but are jointly encoded within a single substrate mode.</p>
+
+<h4 style="color:var(--accent-unified);">Coherence Condition</h4>
+<p>According to this framework, coherence across channels requires:</p>
+<p style="text-align:center;">$$\\rho_{ij} = A_i A_j^* \\neq 0 \\quad (i \\neq j)$$</p>
+<p>This means that the phase relationships between channels are strictly preserved at this stage.</p>
+
+<h4 style="color:var(--accent-unified);">Energy Distribution</h4>
+<p>According to this framework, total substrate energy is distributed across channels:</p>
+<p style="text-align:center;">$$E = \\sum_i |A_i|^2 E_i$$</p>
+<p>Currently, there is no preference for any single outcome; the energy is shared among all modes.</p>
+
+<h4 style="color:var(--accent-unified);">Physical Interpretation</h4>
+<p>According to this framework:</p>
+<ul>
+<li>Entanglement is the real physical coexistence of multiple detector-configurations.</li>
+<li>Each outcome is already present as a substrate mode.</li>
+<li>Measurement has not yet selected an outcome; it has only expanded the system into multiple correlated channels.</li>
+</ul>
+
+<h4 style="color:var(--accent-unified);">Structural Role</h4>
+<p>According to this framework, this module establishes:</p>
+<ul>
+<li>Multi-channel reality.</li>
+<li>System–detector unity.</li>
+<li>The basis for later instability and selection.</li>
+</ul>
+<p>It serves as the starting point of the selection mechanism.</p>
+
+<h4 style="color:var(--accent-unified);">Conclusion</h4>
+<p>According to this framework, the entangled detector state is a coherent, multi-channel substrate configuration where all possible outcomes exist simultaneously as physically real modes, awaiting instability-driven selection in subsequent stages.</p>
+</div>`
+,
+math: `<div class="math-process">
+<h2 style="color:var(--accent-energy); margin-top: 20px;">Explicit Mathematics: Entangled Detector State</h2>
+
+<h4 style="color:var(--accent-unified);">Composite State</h4>
+<p>According to this framework, the coupled system–detector state is:</p>
+<p style="text-align:center;">$$|\\Psi\\rangle = \\sum_{i} c_i\\,|s_i\\rangle \\otimes |d_i\\rangle$$</p>
+<p>with the normalization condition:</p>
+<p style="text-align:center;">$$\\sum_i |c_i|^2 = 1$$</p>
+
+<h4 style="color:var(--accent-unified);">Substrate Mode Decomposition</h4>
+<p>According to this framework, the same state is expressed in substrate form as:</p>
+<p style="text-align:center;">$$\\Psi(x,t) = \\sum_i A_i(t)\\,\\psi_i(x)$$</p>
+<p>Where the time-dependent amplitude is defined as:</p>
+<p style="text-align:center;">$$A_i(t) \\equiv c_i\\,e^{-i\\omega_i t}$$</p>
+<p>And the total integrated intensity remains conserved:</p>
+<p style="text-align:center;">$$\\int |\\Psi(x,t)|^2 dx = \\sum_i |A_i|^2 = 1$$</p>
+
+<h4 style="color:var(--accent-unified);">Interaction-Induced Entanglement</h4>
+<p>According to this framework, entanglement arises from the interaction Hamiltonian:</p>
+<p style="text-align:center;">$$H_{\\text{int}} = \\sum_i g_i\\,|s_i\\rangle\\langle s_i| \\otimes \\hat{O}_d$$</p>
+<p>The time evolution of the state is governed by:</p>
+<p style="text-align:center;">$$|\\Psi(t)\\rangle = e^{-iH_{\\text{int}}t/\\hbar}|\\Psi(0)\\rangle$$</p>
+<p>If the initial state is a product state $|\\Psi(0)\\rangle = \\left(\\sum_i c_i |s_i\\rangle\\right)\\otimes |d_0\\rangle$, then the evolved state becomes:</p>
+<p style="text-align:center;">$$|\\Psi(t)\\rangle = \\sum_i c_i |s_i\\rangle \\otimes |d_i(t)\\rangle$$</p>
+
+<h4 style="color:var(--accent-unified);">Mode–Channel Mapping</h4>
+<p>According to this framework, there is a direct structural correspondence:</p>
+<p style="text-align:center;">$$\\psi_i(x) \\leftrightarrow |s_i\\rangle \\otimes |d_i\\rangle$$</p>
+<p>This implies that each substrate mode corresponds to exactly one outcome channel.</p>
+
+<h4 style="color:var(--accent-unified);">Density Matrix (Coherent State)</h4>
+<p>According to this framework, the density matrix representing the full state is:</p>
+<p style="text-align:center;">$$\\rho = |\\Psi\\rangle\\langle\\Psi| = \\sum_{i,j} c_i c_j^*\\, |s_i d_i\\rangle \\langle s_j d_j|$$</p>
+<p>The off-diagonal terms, representing full coherence, are non-zero:</p>
+<p style="text-align:center;">$$\\rho_{ij} = c_i c_j^* \\neq 0 \\quad (i \\neq j)$$</p>
+
+<h4 style="color:var(--accent-unified);">Overlap / Coherence Measure</h4>
+<p>According to this framework, the overlap between detector states is measured by:</p>
+<p style="text-align:center;">$$\\mathcal{C}_{ij} = \\langle d_i | d_j \\rangle$$</p>
+<p>For ideal entanglement, $\\mathcal{C}_{ij} \\approx \\delta_{ij}$, but the critical substrate phase coherence is preserved in the amplitudes $c_i$.</p>
+
+<h4 style="color:var(--accent-unified);">Energy Distribution Across Channels</h4>
+<p>According to this framework, total energy is shared among the modes:</p>
+<p style="text-align:center;">$$E = \\sum_i |A_i|^2 E_i$$</p>
+<p>where $E_i = \\hbar \\omega_i$. At this stage, no single channel is energetically dominant.</p>
+
+<h4 style="color:var(--accent-unified);">Phase Structure</h4>
+<p>The complex amplitude is expressed as $A_i = |A_i| e^{i\\phi_i}$. The relative phases govern the interference between channels:</p>
+<p style="text-align:center;">$$\\phi_{ij} = \\phi_i - \\phi_j$$</p>
+
+<h4 style="color:var(--accent-unified);">Correlation Function</h4>
+<p>According to this framework, the spatial correlation function is defined as:</p>
+<p style="text-align:center;">$$G(x,x') = \\Psi(x)\\Psi^*(x') = \\sum_{i,j} A_i A_j^*\\,\\psi_i(x)\\psi_j^*(x')$$</p>
+<p>The cross-terms where $i \\neq j$ encode the fundamental entanglement structure of the substrate.</p>
+
+<h4 style="color:var(--accent-unified);">Compact Structural Form</h4>
+<p>According to this framework, the entangled state is fully defined by:</p>
+<p style="text-align:center;">$$\\boxed{\\Psi(x,t) = \\sum_i A_i(t)\\,\\psi_i(x), \\quad \\sum_i |A_i|^2 = 1}$$</p>
+<p>subject to coherent coupling where $\\rho_{ij} = A_i A_j^* \\neq 0$.</p>
+
+<h4 style="color:var(--accent-unified);">Final Statement</h4>
+<p>According to this framework, Module 1 establishes a fully coherent multi-channel substrate state where system and detector are jointly encoded, all outcomes coexist as real modes, and no selection or instability has yet begun.</p>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>Channel Mixing</span><input type="number" id="a_in" class="digital-entry" value="0.5" oninput="syncVal(this.value, 'a_sl')"></div><input type="range" id="a_sl" min="0" max="1" step="0.1" value="0.5" oninput="syncVal(this.value, 'a_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">State</span><div style="text-align:center; font-size: 0.9rem;">$\\sum c_i |detector_i\\rangle$</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Global Phase</span><div style="text-align:center; font-size: 1.0rem;">Coherent Multi-Channel</div>`,
+hierarchy: "Entanglement<br>↓<br>Multi-Channel<br>↓<br>Potentiality",
+footer: "The system contains several competing macroscopic states simultaneously.",
+rightNote: "Quantum probability is a multi-modal substrate oscillation."
+},
+2: {
+title: "Metastable Dynamics",
+brief: `<div class="briefing-content">
+<h2 style="color:var(--accent-energy); margin-top: 20px;">Detailed Briefing: Metastable Dynamics</h2>
+
+<h4 style="color:var(--accent-unified);">Conceptual Basis</h4>
+<p>According to this framework, after the formation of the entangled multi-channel state, the system enters a regime of metastability. At this stage, multiple outcome channels coexist simultaneously, not as abstract possibilities but as physically real configurations embedded in the substrate.</p>
+<p>The system is not yet selecting any outcome. Instead, it is temporarily balanced in a condition where all channels are structurally allowed and dynamically sustained.</p>
+
+<h4 style="color:var(--accent-unified);">Nature of Metastability</h4>
+<p>According to this framework, metastability means that the system is in a condition that appears stable over short times but is fundamentally unstable over longer timescales. The system resides near a symmetric configuration where competing channels are equally viable.</p>
+<p>This is not equilibrium in the final sense, but a poised condition awaiting perturbation.</p>
+
+<h4 style="color:var(--accent-unified);">Basins of Attraction</h4>
+<p>According to this framework, each possible outcome corresponds to a basin of attraction in the substrate configuration space. These basins represent stable configurations toward which the system can evolve.</p>
+<p>At this stage:</p>
+<ul>
+<li>Multiple basins coexist</li>
+<li>None is yet selected</li>
+<li>The system is positioned in a region where transitions between basins are still possible</li>
+</ul>
+<p>The central configuration represents symmetry, while the basins represent differentiated outcomes.</p>
+
+<h4 style="color:var(--accent-unified);">Role of Symmetry</h4>
+<p>According to this framework, the metastable state is characterized by an approximate symmetry between channels. This symmetry ensures that no outcome is initially preferred.</p>
+<p>However, this symmetry is not absolute. It is inherently fragile and can be broken by even small perturbations.</p>
+
+<h4 style="color:var(--accent-unified);">Detector as an Unstable System</h4>
+<p>According to this framework, the detector is not a passive measuring device but an active, unstable system. It is deliberately poised in a configuration where small influences can produce large effects.</p>
+<p>This instability is essential. Without it, no selection process could occur.</p>
+
+<h4 style="color:var(--accent-unified);">Barrier Structure</h4>
+<p>According to this framework, the basins of attraction are separated by barriers. These barriers determine how easily the system can transition from one potential outcome to another.</p>
+<p>At this stage:</p>
+<ul>
+<li>Barriers are finite</li>
+<li>Transitions are possible</li>
+<li>The system is confined but not locked</li>
+</ul>
+<p>The height and shape of these barriers are governed by the structural parameters of the substrate.</p>
+
+<h4 style="color:var(--accent-unified);">Role of Fluctuations</h4>
+<p>According to this framework, small fluctuations continuously act on the system. These fluctuations arise from intrinsic substrate activity and are not external disturbances.</p>
+<p>While the system remains metastable:</p>
+<ul>
+<li>Fluctuations explore nearby configurations</li>
+<li>No irreversible transition has yet occurred</li>
+</ul>
+<p>These fluctuations prepare the system for the next stage, where one channel begins to dominate.</p>
+
+<h4 style="color:var(--accent-unified);">Dynamic Picture</h4>
+<p>According to this framework, the system can be visualized as a point moving within a structured landscape:</p>
+<ul>
+<li>It is temporarily located near a symmetric region</li>
+<li>It can drift toward different basins</li>
+<li>It has not yet committed to any one basin</li>
+</ul>
+<p>This motion is constrained but not deterministic at this stage.</p>
+
+<h4 style="color:var(--accent-unified);">Structural Role in the Framework</h4>
+<p>According to this framework, this module establishes:</p>
+<ul>
+<li>The existence of multiple stable outcome configurations</li>
+<li>The instability of the symmetric state</li>
+<li>The readiness of the system for transition</li>
+</ul>
+<p>It provides the essential intermediate step between coexistence (Module 1) and selection (subsequent modules).</p>
+
+<h4 style="color:var(--accent-unified);">Transition Readiness</h4>
+<p>According to this framework, the key feature of this stage is readiness. The system is prepared for selection but has not yet undergone the decisive transition.</p>
+<p>A small perturbation, properly amplified, will be sufficient to break symmetry and initiate outcome selection.</p>
+
+<h4 style="color:var(--accent-unified);">Conclusion</h4>
+<p>According to this framework, metastable dynamics describe a condition in which multiple outcome channels coexist as structurally stable possibilities within the substrate, while the overall system remains delicately balanced and inherently unstable. This stage defines the landscape of possibilities and sets the stage for the emergence of a single realized outcome in subsequent dynamics.</p>
+</div>`,
+
+math: `<div class="math-process">
+<h2 style="color:var(--accent-energy); margin-top: 20px;">Explicit Mathematics: Metastable Dynamics</h2>
+
+<h4 style="color:var(--accent-unified);">Effective Potential Structure</h4>
+<p>According to this framework, the substrate configuration is governed by an effective potential:</p>
+<p style="text-align:center;">$$V(x; K, P) = \\alpha K x^4 - \\beta P x^2$$</p>
+<p>This produces a multi-well landscape where the shape is determined by the substrate stiffness $K$ and pressure $P$.</p>
+
+<h4 style="color:var(--accent-unified);">Equilibrium Condition</h4>
+<p>Extrema are found where the first derivative vanishes:</p>
+<p style="text-align:center;">$$\\frac{\\partial V}{\\partial x} = 4\\alpha K x^3 - 2\\beta P x = 0$$</p>
+<p style="text-align:center;">$$x\\left(4\\alpha K x^2 - 2\\beta P\\right) = 0$$</p>
+<p>The solutions for equilibrium positions are:</p>
+<p style="text-align:center;">$$x = 0 \\quad \\text{and} \\quad x = \\pm \\sqrt{\\frac{\\beta P}{2\\alpha K}}$$</p>
+
+<h4 style="color:var(--accent-unified);">Stability Criterion</h4>
+<p>The stability is determined by the second derivative (curvature) of the potential:</p>
+<p style="text-align:center;">$$\\frac{\\partial^2 V}{\\partial x^2} = 12\\alpha K x^2 - 2\\beta P$$</p>
+<ul>
+<li>At $x=0$: $\\frac{\\partial^2 V}{\\partial x^2} = -2\\beta P < 0$ (Unstable/Metastable symmetry point)</li>
+<li>At minima: $\\frac{\\partial^2 V}{\\partial x^2} = 4\\beta P > 0$ (Stable basins)</li>
+</ul>
+
+<h4 style="color:var(--accent-unified);">Barrier Height</h4>
+<p>According to this framework, the energy barrier $\\Delta V$ between the symmetric point and the basins is:</p>
+<p style="text-align:center;">$$\\Delta V = V(0) - V(x_{\\text{min}})$$</p>
+<p>With $V(0) = 0$ and $V(x_{\\text{min}}) = -\\frac{\\beta^2 P^2}{4\\alpha K}$, the barrier height is:</p>
+<p style="text-align:center;">$$\\Delta V = \\frac{\\beta^2 P^2}{4\\alpha K}$$</p>
+
+<h4 style="color:var(--accent-unified);">Stochastic Dynamics</h4>
+<p>According to this framework, the evolution follows a Langevin-type equation:</p>
+<p style="text-align:center;">$$\\frac{dx}{dt} = -\\frac{\\partial V}{\\partial x} + \\eta(t) = -\\left(4\\alpha K x^3 - 2\\beta P x\\right) + \\eta(t)$$</p>
+
+<h4 style="color:var(--accent-unified);">Noise Statistics</h4>
+<p>The stochastic term represents intrinsic substrate fluctuations with the following properties:</p>
+<p style="text-align:center;">$$\\langle \\eta(t) \\rangle = 0, \\quad \\langle \\eta(t)\\eta(t') \\rangle = 2P\\,\\delta(t - t')$$</p>
+
+<h4 style="color:var(--accent-unified);">Fokker–Planck Equation</h4>
+<p>According to this framework, the evolution of the probability distribution $P(x,t)$ is governed by:</p>
+<p style="text-align:center;">$$\\frac{\\partial P}{\\partial t} = \\frac{\\partial}{\\partial x}\\left(\\frac{\\partial V}{\\partial x} P\\right) + P \\frac{\\partial^2 P}{\\partial x^2}$$</p>
+<p>The stationary solution follows a Boltzmann-like distribution: $P(x) \\propto e^{-V(x)/P}$.</p>
+
+<h4 style="color:var(--accent-unified);">Metastability Condition</h4>
+<p>The condition $\\Delta V \\gg P$ ensures that the system remains temporarily confined within a basin before a transition occurs.</p>
+
+<h4 style="color:var(--accent-unified);">Transition Rate</h4>
+<p>According to this framework, the rate of transition between configurations follows a Kramers-like law:</p>
+<p style="text-align:center;">$$\\Gamma \\sim \\exp\\left(-\\frac{\\Delta V}{P}\\right)$$</p>
+
+<h4 style="color:var(--accent-unified);">Multi-Channel Generalization</h4>
+<p>For $N$ outcome channels $x_i$, the total potential includes interaction terms $\\gamma_{ij}$:</p>
+<p style="text-align:center;">$$V(\\{x_i\\}) = \\sum_i \\left(\\alpha K x_i^4 - \\beta P x_i^2\\right) + \\sum_{i\\neq j} \\gamma_{ij} x_i x_j$$</p>
+
+<h4 style="color:var(--accent-unified);">Compact Structural Form</h4>
+<p style="text-align:center;">$$\\boxed{\\frac{dx}{dt} = -\\frac{\\partial V}{\\partial x} + \\eta(t), \\quad V(x) = \\alpha K x^4 - \\beta P x^2}$$</p>
+
+<h4 style="color:var(--accent-unified);">Final Statement</h4>
+<p>According to this framework, metastable dynamics arise from a double-well substrate potential governed by $K$ and $P$, where a symmetric unstable state coexists with multiple stable basins, and stochastic fluctuations drive transitions between these configurations prior to selection.</p>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>Barrier Height</span><input type="number" id="b_in" class="digital-entry" value="2.0" oninput="syncVal(this.value, 'b_sl')"></div><input type="range" id="b_sl" min="0" max="5" step="0.2" value="2.0" oninput="syncVal(this.value, 'b_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Topology</span><div style="text-align:center; font-size: 1.0rem;">Basins of Attraction</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Stability</span><div style="text-align:center; font-size: 1.0rem;">$\\partial V / \\partial x = 0$</div>`,
+hierarchy: "Metastability<br>↓<br>Potential Wells<br>↓<br>Symmetry",
+footer: "Small perturbations trigger transitions between potential minima.",
+rightNote: "The detector is an unstable system primed for transition."
+},
+3: {
+title: "Fluctuation Trigger",
+brief: `<div class="briefing-content">
+<h2 style="color:var(--accent-energy); margin-top: 20px;">Detailed Briefing: Fluctuation Trigger</h2>
+
+<h4 style="color:var(--accent-unified);">Conceptual Basis</h4>
+<p>According to this framework, the transition from metastable coexistence to outcome selection begins with a fluctuation trigger. The system, already poised in an unstable equilibrium with multiple accessible basins, requires only a minimal perturbation to initiate directional evolution.</p>
+<p>This trigger is not external. It arises intrinsically from the substrate itself.</p>
+
+<h4 style="color:var(--accent-unified);">Nature of Fluctuations</h4>
+<p>According to this framework, fluctuations are fundamental expressions of synthesis pressure. They are ever-present, microscopic variations within the substrate that continuously perturb the system.</p>
+<p>These fluctuations:</p>
+<ul>
+<li>Are unavoidable</li>
+<li>Are intrinsic to the substrate</li>
+<li>Carry no preferred direction initially</li>
+</ul>
+<p>They act as the initiating disturbance in an otherwise symmetric configuration.</p>
+
+<h4 style="color:var(--accent-unified);">Symmetry Breaking</h4>
+<p>According to this framework, the metastable state maintains an approximate symmetry between competing outcome channels. The fluctuation trigger breaks this symmetry.</p>
+<p>A tiny imbalance introduced by fluctuation:</p>
+<ul>
+<li>Slightly favors one channel over others</li>
+<li>Disrupts perfect equivalence</li>
+<li>Initiates directional evolution</li>
+</ul>
+<p>This is the first irreversible step toward outcome selection.</p>
+
+<h4 style="color:var(--accent-unified);">Amplification Readiness</h4>
+<p>According to this framework, the system is already prepared for amplification. The metastable condition ensures that even a very small perturbation is sufficient to grow under subsequent nonlinear dynamics.</p>
+<p>Thus, the fluctuation itself does not determine the final outcome, but it determines the initial direction of growth.</p>
+
+<h4 style="color:var(--accent-unified);">Randomness and Determinism</h4>
+<p>According to this framework, the fluctuation introduces apparent randomness. However, this randomness is not fundamental indeterminacy but reflects sensitivity to initial microscopic conditions.</p>
+<p>The system remains governed by deterministic substrate laws, but the exact trigger event appears stochastic due to underlying complexity.</p>
+
+<h4 style="color:var(--accent-unified);">Role of Synthesis Pressure</h4>
+<p>According to this framework, synthesis pressure is the source of fluctuation activity. It determines:</p>
+<ul>
+<li>The intensity of perturbations</li>
+<li>The frequency of triggering events</li>
+<li>The likelihood of escaping symmetric configuration</li>
+</ul>
+<p>Higher synthesis pressure leads to more frequent and stronger fluctuations.</p>
+
+<h4 style="color:var(--accent-unified);">Trigger Event</h4>
+<p>According to this framework, the trigger event is the moment when a fluctuation successfully displaces the system from its symmetric position into the direction of one basin of attraction.</p>
+<p>At this point:</p>
+<ul>
+<li>Symmetry is broken</li>
+<li>Neutrality is lost</li>
+<li>Evolution becomes biased</li>
+</ul>
+<p>This marks the true beginning of outcome selection.</p>
+
+<h4 style="color:var(--accent-unified);">Direction Selection</h4>
+<p>According to this framework, the fluctuation determines which direction the system initially moves. Since multiple basins exist, the initial perturbation selects the trajectory toward one of them.</p>
+<p>Different realizations of fluctuation would lead to different outcomes.</p>
+
+<h4 style="color:var(--accent-unified);">Structural Role in the Framework</h4>
+<p>According to this framework, this module establishes:</p>
+<ul>
+<li>The origin of asymmetry</li>
+<li>The initiation of selection</li>
+<li>The bridge between metastability and nonlinear growth</li>
+</ul>
+<p>Without this stage, the system would remain indefinitely in symmetric coexistence.</p>
+
+<h4 style="color:var(--accent-unified);">Transition to Next Stage</h4>
+<p>According to this framework, once a fluctuation has introduced asymmetry, the system enters a regime where nonlinear effects amplify this imbalance.</p>
+<p>The fluctuation itself is small, but its consequence becomes dominant in subsequent evolution.</p>
+
+<h4 style="color:var(--accent-unified);">Conclusion</h4>
+<p>According to this framework, the fluctuation trigger is the intrinsic mechanism by which a metastable, symmetric system is perturbed into directional evolution. It provides the initial asymmetry required for outcome selection, arising naturally from synthesis pressure within the substrate and initiating the transition toward a single realized state.</p>
+</div>`,
+
+math: `<div class="math-process">
+<h2 style="color:var(--accent-energy); margin-top: 20px;">Explicit Mathematics: Fluctuation Trigger</h2>
+
+<h4 style="color:var(--accent-unified);">Stochastic Dynamical Equation</h4>
+<p>According to this framework, the system near the metastable symmetric point is described by a stochastic dynamical equation:</p>
+<p style="text-align:center;">$$dx = -\\frac{\\partial V(x)}{\\partial x}\\,dt + \\sigma\\,dW_t$$</p>
+<p>where $dW_t$ is a Wiener process and $\\sigma \\sim \\sqrt{P}$ represents the fluctuation strength governed by synthesis pressure $P$.</p>
+
+<h4 style="color:var(--accent-unified);">Potential Approximation</h4>
+<p>The effective potential near the symmetric point $x \\approx 0$ can be approximated as:</p>
+<p style="text-align:center;">$$V(x) \\approx -\\frac{1}{2}\\mu x^2 + \\frac{1}{4}\\lambda x^4$$</p>
+<p>with $\\mu \\propto P$ and $\\lambda \\propto K$. Thus, the stochastic evolution becomes:</p>
+<p style="text-align:center;">$$dx = (\\mu x - \\lambda x^3)\\,dt + \\sqrt{P}\\,dW_t$$</p>
+
+<h4 style="color:var(--accent-unified);">Instability at Symmetry</h4>
+<p>According to this framework, the symmetric state corresponds to $x = 0$ and is fundamentally unstable since the second derivative of the potential is negative:</p>
+<p style="text-align:center;">$$\\left.\\frac{d^2 V}{dx^2}\\right|_{x=0} = -\\mu < 0$$</p>
+
+<h4 style="color:var(--accent-unified);">Fluctuation-Induced Displacement</h4>
+<p>A fluctuation induces a displacement over a small time interval $\\Delta t$:</p>
+<p style="text-align:center;">$$x(t+\\Delta t) = x(t) + \\sqrt{P}\\,\\xi \\sqrt{\\Delta t}$$</p>
+<p>where $\\xi \\sim \\mathcal{N}(0,1)$ is a normally distributed random variable.</p>
+
+<h4 style="color:var(--accent-unified);">Fokker–Planck Evolution</h4>
+<p>The probability distribution $\\rho(x,t)$ evolves according to the Fokker–Planck equation:</p>
+<p style="text-align:center;">$$\\frac{\\partial \\rho(x,t)}{\\partial t} = \\frac{\\partial}{\\partial x}\\left(\\frac{\\partial V}{\\partial x}\\rho\\right) + \\frac{P}{2}\\frac{\\partial^2 \\rho}{\\partial x^2}$$</p>
+
+<h4 style="color:var(--accent-unified);">Symmetry Breaking Threshold</h4>
+<p>According to this framework, symmetry breaking occurs when the fluctuation displaces the system beyond the unstable region defined by $|x| > x_c$, where:</p>
+<p style="text-align:center;">$$x_c \\sim \\sqrt{\\frac{\\mu}{\\lambda}} \\sim \\sqrt{\\frac{P}{K}}$$</p>
+<p>Once this threshold is crossed, deterministic drift dominates over stochastic noise: $|\\mu x| \\gg \\sqrt{P}$.</p>
+
+<h4 style="color:var(--accent-unified);">Direction and Escape Probability</h4>
+<p>The initial direction of selection is determined by the sign of the fluctuation: $\\text{sign}(x) = \\text{sign}(\\xi)$. The escape probability from the symmetric point follows:</p>
+<p style="text-align:center;">$$\\mathbb{P}(\\text{escape}) \\sim \\exp\\left(-\\frac{\\Delta V}{P}\\right)$$</p>
+<p>with the barrier height defined as $\\Delta V \\sim \\frac{\\mu^2}{4\\lambda} \\sim \\frac{P^2}{K}$.</p>
+
+<h4 style="color:var(--accent-unified);">Triggering Condition</h4>
+<p>According to this framework, the triggering condition is satisfied when stochastic displacement dominates local curvature, $\\sqrt{P\\,\\Delta t} > x_{\\text{sym}}$, initiating irreversible departure from symmetry.</p>
+
+<h4 style="color:var(--accent-unified);">Compact Structural Form</h4>
+<p style="text-align:center;">$$\\boxed{dx = (\\mu x - \\lambda x^3)\\,dt + \\sqrt{P}\\,dW_t}$$</p>
+
+<h4 style="color:var(--accent-unified);">Final Statement</h4>
+<p>According to this framework, this equation encodes fluctuation-induced symmetry breaking, where synthesis pressure $P$ generates stochastic perturbations and stiffness $K$ governs restoring structure, jointly determining the onset of outcome selection.</p>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>Jitter (σ)</span><input type="number" id="s_in" class="digital-entry" value="0.2" oninput="syncVal(this.value, 's_sl')"></div><input type="range" id="s_sl" min="0" max="1" step="0.05" value="0.2" oninput="syncVal(this.value, 's_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Noise</span><div style="text-align:center; font-size: 1.0rem;">Synthesis Pressure</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Trigger</span><div style="text-align:center; font-size: 1.0rem;">$dx = ... + \\sigma dW_t$</div>`,
+hierarchy: "Fluctuation<br>↓<br>Instability<br>↓<br>Symmetry Breaking",
+footer: "Random vacuum fluctuations decide the direction of the transition.",
+rightNote: "Selection begins with a microscopic substrate perturbation."
+},
+4: {
+title: "Nonlinear Growth",
+brief: `<div class="briefing-content">
+<h2 style="color:var(--accent-energy); margin-top: 20px;">Detailed Briefing: Nonlinear Growth</h2>
+
+<h4 style="color:var(--accent-unified);">Conceptual Basis</h4>
+<p>According to this framework, once a fluctuation has broken the symmetry of the metastable state, the system enters a regime of nonlinear growth. At this stage, the initially small imbalance between competing outcome channels is no longer neutral. It begins to amplify.</p>
+<p>The system transitions from passive coexistence to active competition.</p>
+
+<h4 style="color:var(--accent-unified);">Seed Formation</h4>
+<p>According to this framework, the fluctuation creates a small “seed” — a slight dominance of one channel over others. This seed is initially microscopic and would be insignificant in a linear system.</p>
+<p>However, the substrate is inherently nonlinear, so even a tiny advantage becomes dynamically important.</p>
+
+<h4 style="color:var(--accent-unified);">Positive Feedback Mechanism</h4>
+<p>According to this framework, nonlinear growth is driven by positive feedback. The channel that gains a slight advantage begins to grow faster, and this growth further enhances its advantage.</p>
+<p>This creates a reinforcing cycle:</p>
+<ul>
+<li>Slight dominance → increased growth</li>
+<li>Increased growth → stronger dominance</li>
+</ul>
+<p>Thus, the process is self-amplifying.</p>
+
+<h4 style="color:var(--accent-unified);">Competitive Suppression</h4>
+<p>According to this framework, channels do not grow independently. They compete for the same substrate resources. As one channel grows, it suppresses the growth of others.</p>
+<p>This introduces a “winner-takes-all” dynamic:</p>
+<ul>
+<li>Dominant channel expands</li>
+<li>Competing channels diminish</li>
+</ul>
+<p>The interaction is inherently competitive, not cooperative.</p>
+
+<h4 style="color:var(--accent-unified);">Instability of Symmetry</h4>
+<p>According to this framework, once nonlinear growth begins, the symmetric state becomes dynamically inaccessible. The system cannot return to equal coexistence because the amplification process continuously increases asymmetry.</p>
+<p>This marks a point of no return in the evolution.</p>
+
+<h4 style="color:var(--accent-unified);">Growth Dynamics</h4>
+<p>According to this framework, the dominant channel exhibits rapid expansion, often resembling exponential growth in the early phase. As it grows, it begins to saturate the available substrate configuration space.</p>
+<p>Meanwhile:</p>
+<ul>
+<li>Weaker channels decay</li>
+<li>Coherence between channels diminishes</li>
+</ul>
+<p>The system becomes increasingly localized in one configuration.</p>
+
+<h4 style="color:var(--accent-unified);">Role of Stiffness and Pressure</h4>
+<p>According to this framework:</p>
+<ul>
+<li>Stiffness $K$ determines how sharply the system locks into the growing channel</li>
+<li>Synthesis pressure $P$ determines the initial fluctuation but becomes less relevant once growth dominates</li>
+</ul>
+<p>Thus, the system shifts from fluctuation-driven to structure-driven evolution.</p>
+
+<h4 style="color:var(--accent-unified);">Emergence of Dominance</h4>
+<p>According to this framework, the outcome is not yet fully stabilized, but dominance has clearly emerged. One channel now overwhelmingly exceeds others in amplitude and influence.</p>
+<p>The system is effectively committed to a particular outcome, even if final stabilization is still pending.</p>
+
+<h4 style="color:var(--accent-unified);">Structural Role in the Framework</h4>
+<p>According to this framework, this module establishes:</p>
+<ul>
+<li>The amplification of microscopic asymmetry</li>
+<li>The competitive elimination of alternative channels</li>
+<li>The irreversible direction of evolution toward a single outcome</li>
+</ul>
+<p>It is the decisive dynamic phase of selection.</p>
+
+<h4 style="color:var(--accent-unified);">Transition to Next Stage</h4>
+<p>According to this framework, once nonlinear growth has sufficiently amplified one channel, the system moves into stabilization. The dominant channel settles into a robust, macroscopic configuration.</p>
+<p>The competition phase ends, and persistence begins.</p>
+
+<h4 style="color:var(--accent-unified);">Conclusion</h4>
+<p>According to this framework, nonlinear growth is the mechanism by which a tiny fluctuation is transformed into a dominant macroscopic outcome. Through positive feedback and competitive suppression, the system evolves irreversibly from near-symmetry to clear dominance, establishing the foundation for final outcome stabilization.</p>
+</div>`,
+
+math: `<div class="math-process">
+<h2 style="color:var(--accent-energy); margin-top: 20px;">Explicit Mathematics: Nonlinear Growth</h2>
+
+<h4 style="color:var(--accent-unified);">Competitive Dynamics and Normalization</h4>
+<p>According to this framework, the amplitudes of competing channels are represented by $A_i(t)$ with the following normalization and positivity constraints:</p>
+<p style="text-align:center;">$$\\sum_i A_i(t) = 1, \\quad A_i \\ge 0$$</p>
+<p>The evolution follows nonlinear competitive dynamics of replicator form:</p>
+<p style="text-align:center;">$$\\frac{dA_i}{dt} = A_i\\left(\\lambda_i - \\sum_j \\lambda_j A_j\\right)$$</p>
+<p>where $\\lambda_i$ is the growth rate of channel $i$.</p>
+
+<h4 style="color:var(--accent-unified);">Explicit Channel Competition</h4>
+<p>Including explicit competition between channels, the dynamical equation is expressed as:</p>
+<p style="text-align:center;">$$\\frac{dA_i}{dt} = \\lambda_i A_i - \\sum_{j \\neq i} \\gamma_{ij} A_i A_j$$</p>
+<p>where $\\gamma_{ij} > 0$ represents the suppression of channel $i$ by channel $j$.</p>
+
+<h4 style="color:var(--accent-unified);">Initial Asymmetry and Early-Time Growth</h4>
+<p>According to this framework, initial asymmetry from fluctuation implies that for some dominant channel $k$:</p>
+<p style="text-align:center;">$$A_k(0) > A_j(0)$$</p>
+<p>The early-time solution behaves approximately as exponential growth, $A_i(t) \\approx A_i(0)e^{\\lambda_i t}$. The normalized solution becomes:</p>
+<p style="text-align:center;">$$A_i(t) = \\frac{A_i(0)e^{\\lambda_i t}}{\\sum_j A_j(0)e^{\\lambda_j t}}$$</p>
+
+<h4 style="color:var(--accent-unified);">Asymptotic Dominance</h4>
+<p>As $t \\to \\infty$, the channel with the largest growth rate $\\lambda_i$ dominates the system:</p>
+<p style="text-align:center;">$$A_k \\rightarrow 1, \\quad A_{j \\neq k} \\rightarrow 0$$</p>
+<p>According to this framework, the nonlinear amplification condition is satisfied if:</p>
+<p style="text-align:center;">$$\\frac{d}{dt}(A_k - A_j) > 0 \\quad \\text{if} \\quad \\lambda_k > \\lambda_j$$</p>
+
+<h4 style="color:var(--accent-unified);">Instability of the Symmetric State</h4>
+<p>The instability of the symmetric state ($A_i = \\frac{1}{N} \\; \\forall i$) is seen by introducing a perturbation $A_i = \\frac{1}{N} + \\delta_i$, yielding:</p>
+<p style="text-align:center;">$$\\frac{d\\delta_i}{dt} = \\delta_i(\\lambda_i - \\bar{\\lambda})$$</p>
+<p>where the mean growth rate is $\\bar{\\lambda} = \\sum_j \\lambda_j A_j$. Thus, any positive deviation grows exponentially: $\\delta_i(t) \\sim e^{(\\lambda_i - \\bar{\\lambda})t}$.</p>
+
+<h4 style="color:var(--accent-unified);">Saturation and Decay</h4>
+<p>According to this framework, saturation occurs when $A_k \\approx 1$, at which point all other amplitudes decay exponentially:</p>
+<p style="text-align:center;">$$A_j(t) \\sim e^{-(\\lambda_k - \\lambda_j)t}$$</p>
+
+<h4 style="color:var(--accent-unified);">Compact Structural Form</h4>
+<p style="text-align:center;">$$\\boxed{\\frac{dA_i}{dt} = A_i\\left(\\lambda_i - \\sum_j \\lambda_j A_j\\right)}$$</p>
+
+<h4 style="color:var(--accent-unified);">Final Statement</h4>
+<p>According to this framework, this equation describes nonlinear positive feedback and competitive suppression, converting a small fluctuation-induced asymmetry into a dominant single-channel outcome.</p>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>Gain (α)</span><input type="number" id="g_in" class="digital-entry" value="1.0" oninput="syncVal(this.value, 'g_sl')"></div><input type="range" id="g_sl" min="0.1" max="3" step="0.1" value="1.0" oninput="syncVal(this.value, 'g_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Growth</span><div style="text-align:center; font-size: 1.0rem;">Positive Feedback</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Selection</span><div style="text-align:center; font-size: 1.0rem;">$\\Delta x \\propto e^{\\alpha t}$</div>`,
+hierarchy: "Seed<br>↓<br>Nonlinear Growth<br>↓<br>Dominance",
+footer: "One channel expands rapidly while others decay due to nonlinear competition.",
+rightNote: "Selection is a winner-take-all substrate process."
+},
+5: {
+title: "Outcome Stabilization",
+
+brief: `<div class="briefing-content">
+<h2 style="color:var(--accent-energy); margin-top: 20px;">Detailed Briefing: Outcome Stabilization</h2>
+
+<h4 style="color:var(--accent-unified);">Conceptual Basis</h4>
+<p>According to this framework, outcome stabilization is the final phase of the measurement process, where the previously amplified dominant channel settles into a stable configuration of the substrate. At this stage, the system is no longer evolving through competition or fluctuation, but through structural locking into a definite state.</p>
+
+<h4 style="color:var(--accent-unified);">Transition from Growth to Stability</h4>
+<p>According to this framework, after nonlinear growth has produced a dominant channel, the system undergoes a transition from dynamic amplification to equilibrium stabilization. The rapid changes of earlier stages slow down as the system approaches a minimum-energy configuration.</p>
+<p>The system ceases to explore multiple possibilities and instead consolidates into one realized outcome.</p>
+
+<h4 style="color:var(--accent-unified);">Potential Landscape Interpretation</h4>
+<p>According to this framework, the substrate can be described by an effective potential landscape $V(x)$. During earlier stages, the system moves across this landscape, but in this stage it settles into one of its minima.</p>
+<p>The selected outcome corresponds to a stable minimum:</p>
+<ul>
+<li><strong>Local minimum</strong> → metastable outcome</li>
+<li><strong>Global minimum</strong> → fully stable outcome</li>
+</ul>
+<p>The system naturally evolves toward configurations where the potential is minimized.</p>
+
+<h4 style="color:var(--accent-unified);">Stationary Condition</h4>
+<p>According to this framework, stabilization is defined by the stationary condition of the substrate:</p>
+<ul>
+<li>No further net evolution</li>
+<li>No competing channel growth</li>
+<li>No phase redistribution</li>
+</ul>
+<p>The system reaches a point where all dynamical forces balance.</p>
+
+<h4 style="color:var(--accent-unified);">Suppression of Alternatives</h4>
+<p>According to this framework, all competing channels that survived earlier stages are now fully suppressed. Their amplitudes approach zero and no longer influence the system.</p>
+<p>Only the dominant channel remains physically relevant.</p>
+
+<h4 style="color:var(--accent-unified);">Role of Stiffness $K$</h4>
+<p>According to this framework, vacuum stiffness $K$ governs how sharply the system locks into the selected configuration.</p>
+<ul>
+<li><strong>Higher $K$</strong> → sharper confinement → stronger stability</li>
+<li><strong>Lower $K$</strong> → broader minimum → weaker stability</li>
+</ul>
+<p>Thus, stiffness determines the rigidity of the realized outcome.</p>
+
+<h4 style="color:var(--accent-unified);">Role of Synthesis Pressure $P$</h4>
+<p>According to this framework, synthesis pressure $P$ played a crucial role in initiating fluctuations earlier, but in this stage its role becomes secondary. The system is no longer fluctuation-driven but structure-dominated.</p>
+<p>However, residual pressure may influence stability margins and susceptibility to future perturbations.</p>
+
+<h4 style="color:var(--accent-unified);">Irreversibility</h4>
+<p>According to this framework, outcome stabilization is effectively irreversible. Once the system reaches a stable minimum, returning to a superposition of states would require overcoming significant structural barriers.</p>
+<p>This explains the apparent collapse of the wavefunction as a physical process rather than an abstract postulate.</p>
+
+<h4 style="color:var(--accent-unified);">Measurement Interpretation</h4>
+<p>According to this framework, measurement is completed at this stage. The observed value corresponds to the stabilized configuration of the substrate.</p>
+<ul>
+<li><strong>Quantum superposition</strong> → earlier stages</li>
+<li><strong>Classical definiteness</strong> → stabilization stage</li>
+</ul>
+<p>Measurement is therefore a physical transition, not an external intervention.</p>
+
+<h4 style="color:var(--accent-unified);">Final State Representation</h4>
+<p>According to this framework, the final state can be described as a single dominant configuration with negligible contributions from other channels. The system has transitioned from multi-channel potentiality to single-channel actuality.</p>
+
+<h4 style="color:var(--accent-unified);">Structural Role in the Framework</h4>
+<p>According to this framework, this module establishes:</p>
+<ul>
+<li>The completion of outcome selection</li>
+<li>The emergence of classical reality</li>
+<li>The physical meaning of measurement</li>
+</ul>
+<p>It provides the final closure of the measurement chain.</p>
+
+<h4 style="color:var(--accent-unified);">Conclusion</h4>
+<p>According to this framework, outcome stabilization represents the endpoint of the dynamical measurement process. Through settling into a minimum of the substrate potential, the system achieves a stable, definite state. This stage transforms probabilistic quantum behavior into concrete physical reality, completing the causal chain from fluctuation to observation.</p>
+</div>`,
+
+math: `<div class="math-process">
+<h2 style="color:var(--accent-energy); margin-top: 20px;">Explicit Mathematics: Outcome Stabilization</h2>
+
+<h4 style="color:var(--accent-unified);">Stationary Condition</h4>
+<p>According to this framework, the substrate state is represented by a configuration variable $x(t)$ evolving in an effective potential $V(x)$. The stabilization condition is given by the stationary requirement:</p>
+<p style="text-align:center;">$$\\frac{d x}{d t} = 0$$</p>
+<p>which implies equilibrium at the extrema of the potential:</p>
+<p style="text-align:center;">$$\\frac{\\partial V(x)}{\\partial x} = 0$$</p>
+
+<h4 style="color:var(--accent-unified);">Stability and Minima</h4>
+<p>Stability requires the second variation to be positive:</p>
+<p style="text-align:center;">$$\\frac{\\partial^2 V(x)}{\\partial x^2} > 0$$</p>
+<p>According to this framework, the final outcome corresponds to a minimum $x_*$ such that:</p>
+<p style="text-align:center;">$$x \\rightarrow x_* \\quad \\text{such that} \\quad V(x_*) = \\min V(x)$$</p>
+
+<h4 style="color:var(--accent-unified);">Dissipative Evolution</h4>
+<p>The dynamical relaxation toward equilibrium can be modeled as dissipative evolution:</p>
+<p style="text-align:center;">$$\\frac{d x}{d t} = -\\gamma \\frac{\\partial V(x)}{\\partial x}$$</p>
+<p>where $\\gamma > 0$ is a relaxation coefficient. It follows that the potential energy decreases monotonically:</p>
+<p style="text-align:center;">$$\\frac{dV}{dt} = \\frac{\\partial V}{\\partial x}\\frac{dx}{dt} = -\\gamma \\left(\\frac{\\partial V}{\\partial x}\\right)^2 \\le 0$$</p>
+
+<h4 style="color:var(--accent-unified);">Stochastic Limit</h4>
+<p>According to this framework, in the presence of residual fluctuations:</p>
+<p style="text-align:center;">$$dx = -\\gamma \\frac{\\partial V}{\\partial x} dt + \\sigma dW_t$$</p>
+<p>where $dW_t$ is a stochastic term and $\\sigma \\propto P$. In the stabilization limit, $\\sigma \\rightarrow 0$ and deterministic settling dominates.</p>
+
+<h4 style="color:var(--accent-unified);">Amplitude and Density Matrix Convergence</h4>
+<p>According to this framework, the channel amplitudes $A_i$ from the previous stage satisfy:</p>
+<p style="text-align:center;">$$A_k \\rightarrow 1, \\quad A_{j \\neq k} \\rightarrow 0$$</p>
+<p>which can be expressed as $A_i(t) = \\delta_{ik} + \\epsilon_i(t)$, where $\\epsilon_i \\rightarrow 0$. The density matrix reduces to a classical form $\\rho = |k\\rangle \\langle k|$ with off-diagonal elements suppressed: $\\rho_{ij} \\rightarrow 0 \\quad (i \\neq j)$.</p>
+
+<h4 style="color:var(--accent-unified);">Localization and Stiffness</h4>
+<p>According to this framework, the localization width is controlled by stiffness $K$:</p>
+<p style="text-align:center;">$$\\psi(x) \\sim e^{-K(x - x_*)^2}$$</p>
+<p>Thus, the variance $\\sigma_x^2 \\sim \\frac{1}{K}$. Higher $K$ implies tighter localization around the equilibrium point $x_*$.</p>
+
+<h4 style="color:var(--accent-unified);">Compact Stabilization Summary</h4>
+<p>According to this framework, the stabilization condition can be summarized as:</p>
+<p style="text-align:center;">$$\\boxed{\\frac{\\partial V}{\\partial x} = 0, \\quad \\frac{\\partial^2 V}{\\partial x^2} > 0, \\quad A_k = 1}$$</p>
+
+<h4 style="color:var(--accent-unified);">Final Statement</h4>
+<p>According to this framework, this mathematical structure represents the final locking of the system into a stable substrate configuration, completing the transition from probabilistic dynamics to a definite measurement outcome.</p>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>Finality</span><input type="number" id="f_in" class="digital-entry" value="1.0" oninput="syncVal(this.value, 'f_sl')"></div><input type="range" id="f_sl" min="0" max="1" step="0.1" value="1.0" oninput="syncVal(this.value, 'f_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Result</span><div style="text-align:center; font-size: 1.0rem;">Realized Outcome</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Stationary</span><div style="text-align:center; font-size: 1.0rem;">$V(x) = Min$</div>`,
+hierarchy: "Transition<br>↓<br>Stabilization<br>↓<br>Measurement",
+footer: "Collapse is reinterpreted as the finality of a substrate phase transition.",
+rightNote: "Measurement ends when the substrate reaches a stable configuration."
+},
+6: {
+title: "Substrate Phase Transition",
+
+brief: `<div class="briefing-content">
+<h2 style="color:var(--accent-energy); margin-top: 20px;">Detailed Briefing: Substrate Phase Transition</h2>
+
+<h4 style="color:var(--accent-unified);">Conceptual Basis</h4>
+<p>According to this framework, the final realization of a measurement outcome is not merely stabilization but a genuine phase transition of the substrate. The system does not just settle—it transforms. The transition marks the emergence of a new structural state of the substrate corresponding to the observed outcome.</p>
+
+<h4 style="color:var(--accent-unified);">Symmetry Breaking</h4>
+<p>According to this framework, prior to transition, the system exists in a symmetric configuration where multiple outcomes are equally possible. This symmetry reflects the coexistence of competing channels.</p>
+<p>The phase transition breaks this symmetry:</p>
+<ul>
+<li>One configuration becomes realized</li>
+<li>Others become inaccessible</li>
+</ul>
+<p>Thus, measurement corresponds to symmetry breaking in the substrate.</p>
+
+<h4 style="color:var(--accent-unified);">Criticality</h4>
+<p>According to this framework, the system approaches a critical point during nonlinear growth. At this point:</p>
+<ul>
+<li>The system is highly sensitive to perturbations</li>
+<li>Small fluctuations determine the final outcome</li>
+<li>The system is poised between multiple stable states</li>
+</ul>
+<p>This critical condition is necessary for transition.</p>
+
+<h4 style="color:var(--accent-unified);">Nucleation Analogy</h4>
+<p>According to this framework, the transition resembles nucleation in phase transitions (e.g., ferromagnetism or crystallization). A small localized fluctuation grows and triggers a global reconfiguration:</p>
+<ul>
+<li>Initial fluctuation → seed</li>
+<li>Seed → expanding domain</li>
+<li>Domain → full phase transition</li>
+</ul>
+<p>The outcome emerges as a macroscopic phase.</p>
+
+<h4 style="color:var(--accent-unified);">Phase Jump</h4>
+<p>According to this framework, the transition is not gradual but discontinuous in structure. The system undergoes a phase jump:</p>
+<ul>
+<li>From symmetric potential landscape</li>
+<li>To asymmetric stable basin</li>
+</ul>
+<p>This corresponds to the selection of a definite outcome.</p>
+
+<h4 style="color:var(--accent-unified);">Formation of Stable Basin</h4>
+<p>According to this framework, after the phase transition, the system resides in a stable basin of the potential landscape. This basin represents the realized physical state.</p>
+<p>The basin has the following properties:</p>
+<ul>
+<li>Stability against small perturbations</li>
+<li>Persistence over time</li>
+<li>Macroscopic definiteness</li>
+</ul>
+
+<h4 style="color:var(--accent-unified);">Role of Stiffness $K$</h4>
+<p>According to this framework, stiffness determines how sharply defined the new phase is:</p>
+<ul>
+<li><strong>High $K$</strong> → sharply defined phase boundary</li>
+<li><strong>Low $K$</strong> → smoother transition</li>
+</ul>
+<p>Thus, stiffness governs the rigidity of the phase transition.</p>
+
+<h4 style="color:var(--accent-unified);">Role of Synthesis Pressure $P$</h4>
+<p>According to this framework, synthesis pressure plays a key role in driving the system toward criticality:</p>
+<ul>
+<li><strong>Higher $P$</strong> → stronger fluctuations → faster transition</li>
+<li><strong>Lower $P$</strong> → slower approach to critical point</li>
+</ul>
+<p>Pressure acts as the driving force for transition.</p>
+
+<h4 style="color:var(--accent-unified);">Irreversibility of Transition</h4>
+<p>According to this framework, once the phase transition occurs, the system cannot return to the previous symmetric state without external intervention.</p>
+<p>This irreversibility explains:</p>
+<ul>
+<li>Definiteness of measurement</li>
+<li>Absence of observable superposition at the macroscopic level</li>
+</ul>
+
+<h4 style="color:var(--accent-unified);">Measurement as Phase Transition</h4>
+<p>According to this framework, measurement is reinterpreted as a physical phase transition:</p>
+<ul>
+<li>Not collapse of the wavefunction</li>
+<li>But the emergence of a new substrate phase</li>
+</ul>
+<p>This provides a causal and structural explanation of measurement.</p>
+
+<h4 style="color:var(--accent-unified);">Structural Role in the Framework</h4>
+<p>According to this framework, this module establishes:</p>
+<ul>
+<li>Symmetry breaking as the core of measurement</li>
+<li>Critical dynamics leading to outcome realization</li>
+<li>Phase transition as the final physical mechanism</li>
+</ul>
+<p>It completes the entire causal chain from quantum uncertainty to classical definiteness.</p>
+
+<h4 style="color:var(--accent-unified);">Conclusion</h4>
+<p>According to this framework, substrate phase transition is the ultimate event in the measurement process. Through criticality and symmetry breaking, the system undergoes a structural transformation into a new stable phase. This phase encodes the observed outcome, providing a physically grounded explanation of quantum measurement as a real dynamical transition in the substrate.</p>
+</div>`,
+
+math: `<div class="math-process">
+<h2 style="color:var(--accent-energy); margin-top: 20px;">Explicit Mathematics: Substrate Phase Transition</h2>
+
+<h4 style="color:var(--accent-unified);">Order Parameter and Landau Potential</h4>
+<p>According to this framework, the substrate is described by an order parameter $\\phi(x,t)$ representing the emergent macroscopic state. The effective potential governing the substrate near transition is of Landau form:</p>
+<p style="text-align:center;">$$V(\\phi) = a\\,\\phi^2 + b\\,\\phi^4$$</p>
+<p>with $b > 0$ and control parameter $a$.</p>
+
+<h4 style="color:var(--accent-unified);">Symmetry Breaking Conditions</h4>
+<p>The symmetric phase corresponds to:</p>
+<p style="text-align:center;">$$a > 0 \\quad \\Rightarrow \\quad \\phi = 0$$</p>
+<p>The broken-symmetry phase occurs when $a < 0$. Minima are obtained from the first derivative:</p>
+<p style="text-align:center;">$$\\frac{dV}{d\\phi} = 2a\\phi + 4b\\phi^3 = 0$$</p>
+<p>yielding the solutions:</p>
+<p style="text-align:center;">$$\\phi = 0 \\quad \\text{or} \\quad \\phi = \\pm \\sqrt{\\frac{-a}{2b}}$$</p>
+<p>For $a < 0$, the stable minima are $\\phi_* = \\pm \\sqrt{\\frac{-a}{2b}}$. According to this framework, symmetry breaking corresponds to the selection of one branch: $\\phi \\rightarrow \\phi_*$ or $\\phi \\rightarrow -\\phi_*$.</p>
+
+<h4 style="color:var(--accent-unified);">Dynamical Evolution</h4>
+<p>The dynamical evolution of the order parameter is governed by the gradient flow:</p>
+<p style="text-align:center;">$$\\frac{\\partial \\phi}{\\partial t} = -\\Gamma \\frac{\\delta V}{\\delta \\phi} = -\\Gamma (2a\\phi + 4b\\phi^3)$$</p>
+<p>where $\\Gamma > 0$ is a relaxation coefficient.</p>
+
+<h4 style="color:var(--accent-unified);">Spatial Variation and Free Energy</h4>
+<p>Including spatial variation, the free energy functional becomes:</p>
+<p style="text-align:center;">$$F[\\phi] = \\int \\left[ \\frac{1}{2}(\\nabla \\phi)^2 + V(\\phi) \\right] d^3x$$</p>
+<p>and the resulting evolution equation is:</p>
+<p style="text-align:center;">$$\\frac{\\partial \\phi}{\\partial t} = -\\Gamma \\left(-\\nabla^2 \\phi + 2a\\phi + 4b\\phi^3 \\right)$$</p>
+
+<h4 style="color:var(--accent-unified);">Nucleation Dynamics</h4>
+<p>According to this framework, nucleation occurs when a fluctuation exceeds a critical size. The critical radius $R_c$ satisfies:</p>
+<p style="text-align:center;">$$R_c \\sim \\frac{\\sigma}{\\Delta V}$$</p>
+<p>where $\\sigma$ is surface tension and $\\Delta V$ is the potential difference between phases. The probability of nucleation is $P \\sim e^{-\\Delta F / kT}$, interpreted here as fluctuation-driven substrate activation.</p>
+
+<h4 style="color:var(--accent-unified);">Criticality and Susceptibility</h4>
+<p>According to this framework, near criticality ($a \\rightarrow 0$), the susceptibility diverges:</p>
+<p style="text-align:center;">$$\\chi \\sim \\frac{1}{|a|}$$</p>
+<p>This shows extreme sensitivity to fluctuations at the moment of transition.</p>
+
+<h4 style="color:var(--accent-unified);">Compact Phase Transition Summary</h4>
+<p style="text-align:center;">$$\\boxed{a > 0 \\Rightarrow \\phi = 0 \\quad \\longrightarrow \\quad a < 0 \\Rightarrow \\phi = \\pm \\sqrt{\\frac{-a}{2b}}}$$</p>
+
+<h4 style="color:var(--accent-unified);">Final Statement</h4>
+<p>According to this framework, this mathematical structure represents symmetry breaking and the emergence of a stable macroscopic phase, completing the transformation from probabilistic substrate dynamics to a definite physical outcome.</p>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>Susceptibility</span><input type="number" id="chi_in" class="digital-entry" value="1.0" oninput="syncVal(this.value, 'chi_sl')"></div><input type="range" id="chi_sl" min="0.1" max="10" step="0.5" value="1.0" oninput="syncVal(this.value, 'chi_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Analogy</span><div style="text-align:center; font-size: 0.8rem;">Ferromagnet / Nucleation</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Global Event</span><div style="text-align:center; font-size: 1.0rem;">Symmetry Breaking</div>`,
+hierarchy: "Criticality<br>↓<br>Phase Jump<br>↓<br>Stable Basin",
+footer: "The system transitions from a symmetric state to a broken-symmetry outcome.",
+rightNote: "Realization is the emergence of a new substrate phase."
+}
+};
+
+function syncVal(val, id) {
+const sliderId = id.includes('_in') ? id.replace('_in', '_sl') : id;
+const inputId = id.includes('_sl') ? id.replace('_sl', '_in') : id;
+if(document.getElementById(sliderId)) document.getElementById(sliderId).value = val;
+if(document.getElementById(inputId)) document.getElementById(inputId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+document.getElementById('brief-box-content').innerHTML = content.brief || "Coming Soon";
+document.getElementById('math-box-content').innerHTML = content.math || "Coming Soon";
+document.getElementById('control-sliders').innerHTML = content.sliders;
+document.getElementById('active-module-title').innerText = content.title;
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+showScreen('briefing');
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() {
+showScreen('lab');
+setTimeout(() => {
+runLab();
+window.dispatchEvent(new Event('resize'));
+}, 100);
+}
+
+function runSelection() {
+clearInterval(selectionInterval);
+let x = systemState; // Start from current position
+
+// Physical parameters
+let alpha = parseFloat(document.getElementById('g_sl')?.value || 1);
+let sigma = parseFloat(document.getElementById('s_sl')?.value || 0.2);
+let chi = parseFloat(document.getElementById('chi_sl')?.value || 1);
+let b_val = parseFloat(document.getElementById('b_sl')?.value || 2.0);
+let finality = parseFloat(document.getElementById('f_sl')?.value || 1.0);
+
+let dt = 0.05;
+
+selectionInterval = setInterval(() => {
+let dw = (Math.random() - 0.5) * 2;
+let noise = sigma * dw * (currentTool == 6 ? chi : 1);
+
+// Define instability k based on the module logic
+let k = b_val;
+if (currentTool === 4) k = b_val * alpha;
+if (currentTool === 5) k = b_val * finality;
+
+let dx = (k * x - Math.pow(x, 3)) * dt + noise;
+x += dx;
+systemState = x;
+runLab(x);
+
+// AUTHENTIC LANDING LOGIC
+// The mathematical minimum of the well is at sqrt(k)
+let basinCenter = Math.sqrt(k);
+
+if (Math.abs(x) >= basinCenter * 0.95) {
+clearInterval(selectionInterval);
+// Snap to the exact physical minimum for a clean "Stabilized" look
+systemState = x > 0 ? basinCenter : -basinCenter;
+runLab(systemState);
+
+document.getElementById('epoch-label').innerText = x > 0 ? "OUTCOME: STATE A" : "OUTCOME: STATE B";
+document.getElementById('epoch-label').style.color = "var(--accent-stabilize)";
+}
+}, 50);
+}
+
+
+
+
+function runLab(statePos = systemState) {
+const target = document.getElementById('plot-area');
+if (!target) return;
+
+// --- Physical Constants pulled from Sliders ---
+// These define the Lagrangian of the substrate
+const barrier = parseFloat(document.getElementById('b_sl')?.value || 2.0);
+const sigma = parseFloat(document.getElementById('s_sl')?.value || 0.2);
+const alpha = parseFloat(document.getElementById('g_sl')?.value || 1.0);
+const finality = parseFloat(document.getElementById('f_sl')?.value || 1.0);
+const chi = parseFloat(document.getElementById('chi_sl')?.value || 1.0);
+
+let data = [];
+const layout = {
+paper_bgcolor: 'black', plot_bgcolor: 'black',
+margin: {t:40,b:40,l:50,r:30},
+xaxis: { color: '#444', gridcolor: '#111', range: [-2.5, 2.5], title: {text: "Substrate Coordinate (x)", font: {size: 10}} },
+yaxis: { color: '#444', gridcolor: '#111', range: [-2.5, 2.5], title: {text: "Potential V(x)", font: {size: 10}} },
+showlegend: false
+};
+
+// --- 1. The Potential Landscape V(x) Calculation ---
+// Logic: V(x) = (1/4)x^4 - (1/2)k*x^2
+// We adjust 'k' (the instability coefficient) based on the module's focus.
+let xv = [], yv = [];
+let k = barrier;
+if (currentTool === 4) k = barrier * alpha; // Nonlinear Growth expands the wells
+if (currentTool === 5) k = barrier * finality; // Stabilization deepens the basins
+
+for(let i=-2.6; i<=2.6; i+=0.05) {
+xv.push(i);
+let energy = 0.25 * Math.pow(i, 4) - 0.5 * k * Math.pow(i, 2);
+yv.push(energy);
+}
+data.push({ x: xv, y: yv, line: {color: '#262626', width: 3} });
+
+// --- 2. The Dynamic State (The Ball) ---
+let visualX = statePos;
+
+// AUTHENTIC JITTER: Only applies at equilibrium (statePos approx 0)
+// Reflects the uncertainty before the symmetry-breaking trigger.
+if (Math.abs(statePos) < 0.01) {
+let noisePower = (currentTool === 6) ? (sigma * chi) : sigma;
+if (noisePower > 0.1) {
+visualX += (Math.random() - 0.5) * (noisePower * 0.5);
+}
+}
+
+let ballY = 0.25 * Math.pow(visualX, 4) - 0.5 * k * Math.pow(visualX, 2);
+
+data.push({
+x: [visualX], y: [ballY],
+mode: 'markers',
+marker: {
+size: 18,
+color: varColor(currentTool),
+line: {color: '#fff', width: 1},
+shadowblur: 10, shadowcolor: varColor(currentTool)
+}
+});
+
+// --- 3. Module 1: Superposition Overlay ---
+if (currentTool === 1) {
+let mixing = parseFloat(document.getElementById('a_sl')?.value) || 0.5;
+let waveX = [], waveY = [];
+for(let i=-5; i<=5; i+=0.1) {
+waveX.push(i/2);
+// Sum of two Gaussians representing the entangled outcome channels
+let psi = (mixing * Math.exp(-Math.pow(i+2.2, 2))) + ((1-mixing) * Math.exp(-Math.pow(i-2.2, 2)));
+waveY.push(psi - 1.8);
+}
+data.push({ x: waveX, y: waveY, fill: 'tozeroy', line: {color: 'rgba(56, 189, 248, 0.5)', width: 1}, fillcolor: 'rgba(56, 189, 248, 0.15)' });
+}
+
+Plotly.react('plot-area', data, layout, {responsive: true, displayModeBar: false});
+}
+
+
+function varColor(toolId) {
+if (toolId == 2) return '#fbbf24';
+if (toolId == 3) return '#f87171';
+if (toolId == 4) return '#a78bfa';
+if (toolId == 6) return '#f472b6';
+return '#4ade80';
+}
+
+function resetLab() {
+clearInterval(selectionInterval);
+selectionInterval = null;
+systemState = 0;
+
+// Reset Sliders
+if (currentTool === 1) syncVal(0.5, 'a_sl');
+if (currentTool === 2) syncVal(2.0, 'b_sl');
+if (currentTool === 3) syncVal(0.2, 's_sl');
+if (currentTool === 4) syncVal(1.0, 'g_sl');
+if (currentTool === 5) syncVal(1.0, 'f_sl'); // Reset Finality to 1.0
+if (currentTool === 6) syncVal(1.0, 'chi_sl');
+
+const epoch = document.getElementById('epoch-label');
+epoch.innerText = "EQUILIBRIUM";
+epoch.style.color = "var(--accent-unified)";
+
+runLab(0);
+}
+
+
+</script>
+</body>
+</html>
