@@ -1,10 +1,8 @@
 /* ==================================================
-ISFP WEBSITE — CANONICAL STYLESHEET
-FLUID RESPONSIVE VERSION
+ISFP WEBSITE — CANONICAL STYLESHEET (FINAL FLUID FIT)
 ================================================== */
 
 /* ---------- RESET ---------- */
-
 * {
 box-sizing: border-box;
 margin: 0;
@@ -12,7 +10,6 @@ padding: 0;
 }
 
 /* ---------- BODY ---------- */
-
 body {
 font-family: Georgia, "Times New Roman", serif;
 color: #222;
@@ -20,55 +17,40 @@ min-height: 100vh;
 background: #b9d3e8;
 }
 
-/* ---------- RESPONSIVE MEDIA ---------- */
-
-img,
-video,
-iframe {
-max-width: 100%;
-}
-
 /* ---------- HEADER ---------- */
-
 header {
 background: linear-gradient(135deg, #0b1c2d, #142f4f);
 color: #ffffff;
-padding: clamp(10px, 2vw, 20px) clamp(12px, 3vw, 35px);
+padding: 10px clamp(15px, 3vw, 35px) 5px;
 position: relative;
 z-index: 10000;
 }
 
 header h1 {
-font-size: clamp(1.1rem, 2.2vw, 1.6rem);
+font-size: clamp(1.1em, 2.2vw, 1.6em);
 font-weight: normal;
 text-align: center;
-line-height: 1.3;
-overflow-wrap: anywhere;
 }
 
 /* ---------- NAV BAR ---------- */
-
 nav.main-nav {
-width: 100%;
 margin-top: 10px;
-margin-bottom: 0;
+margin-bottom: 0px;
 display: flex;
 justify-content: center;
 align-items: center;
-gap: clamp(10px, 1.5vw, 20px);
+gap: 20px;
 flex-wrap: wrap;
 }
 
 /* NAV LINKS */
-
 nav.main-nav a,
 nav.main-nav .dropbtn {
 color: #dbe6f5;
 text-decoration: none;
-font-size: clamp(0.82rem, 0.95vw, 0.95rem);
+font-size: 0.95em;
 cursor: pointer;
-white-space: normal;
-line-height: 1.4;
+white-space: nowrap;
 }
 
 nav.main-nav a:hover,
@@ -78,7 +60,6 @@ text-decoration: underline;
 }
 
 /* ---------- DROPDOWN ---------- */
-
 .dropdown {
 position: relative;
 }
@@ -90,10 +71,9 @@ top: 100%;
 left: 0;
 background-color: #142f4f;
 min-width: 220px;
-max-width: min(320px, calc(100vw - 24px));
 border-radius: 4px;
 padding: 6px 0;
-box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+box-shadow: 0 8px 20px rgba(0,0,0,0.35);
 z-index: 10001;
 }
 
@@ -103,8 +83,6 @@ padding: 8px 14px;
 color: #e6eefb;
 text-decoration: none;
 font-size: 0.9em;
-white-space: normal;
-overflow-wrap: anywhere;
 }
 
 .dropdown-content a:hover {
@@ -113,55 +91,47 @@ color: #ffffff;
 }
 
 /* SHOW DROPDOWN */
-
-.dropdown:hover .dropdown-content,
-.dropdown:focus-within .dropdown-content {
+.dropdown:hover .dropdown-content {
 display: block;
 }
 
-/* ---------- MAIN CONTENT ---------- */
-
+/* ---------- MAIN CONTENT (FLUID SCREEN-FIT) ---------- */
 main {
-width: min(94%, 1650px);
-margin: clamp(16px, 3vw, 50px) auto;
-padding: clamp(16px, 3.5vw, 64px);
+width: 92%;
+max-width: clamp(650px, 75vw, 1650px);
+margin-top: 0;
+margin-bottom: clamp(20px, 3vw, 50px);
+margin-left: auto;
+margin-right: auto;
+padding: clamp(20px, 3.5vw, 64px);
 background: rgba(250, 248, 245, 0.94);
 border-radius: 6px;
 font-size: clamp(0.95rem, 1vw, 1.25rem);
-min-width: 0;
 }
 
 /* ---------- TEXT (GLOBAL) ---------- */
-
 h2 {
 font-weight: normal;
 margin-bottom: 16px;
 font-size: clamp(1.3em, 2vw, 1.8em);
-line-height: 1.3;
-overflow-wrap: anywhere;
 }
 
 h3 {
 margin-top: 28px;
 margin-bottom: 10px;
 font-size: clamp(1.1em, 1.5vw, 1.4em);
-line-height: 1.35;
-overflow-wrap: anywhere;
 }
 
 /* ---------- PARAGRAPHS ---------- */
-
 p {
 line-height: 1.65;
 margin-bottom: 1.25em;
 text-align: justify;
 text-justify: inter-word;
-overflow-wrap: anywhere;
 }
 
 ul {
 margin-left: 22px;
-padding-left: 0;
 }
 
 li {
@@ -169,28 +139,23 @@ margin-bottom: 6px;
 }
 
 /* ---------- FOOTER ---------- */
-
 footer {
-width: 100%;
 margin-top: 40px;
 margin-bottom: 100px;
 text-align: center;
-padding: clamp(12px, 2vw, 20px);
+padding: 15px;
 background: #e8edf3;
-font-size: clamp(0.8rem, 0.9vw, 0.9rem);
+font-size: 0.9em;
 color: #333;
-overflow-wrap: anywhere;
 }
 
 /* ---------- SUBMENU ---------- */
-
 .submenu-content a {
 display: block;
 text-align: left;
 }
 
-.submenu:hover .submenu-content,
-.submenu:focus-within .submenu-content {
+.submenu:hover .submenu-content {
 display: block;
 }
 
@@ -209,7 +174,7 @@ text-align: left;
 color: #e6eefb;
 text-decoration: none;
 font-size: 0.9em;
-white-space: normal;
+white-space: nowrap;
 }
 
 .dropdown-sub > a:hover {
@@ -222,12 +187,11 @@ display: none;
 position: absolute;
 top: 0;
 left: 100%;
-min-width: 240px;
-max-width: min(320px, calc(100vw - 24px));
 background-color: #142f4f;
+min-width: 240px;
 border-radius: 4px;
 padding: 6px 0;
-box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+box-shadow: 0 8px 20px rgba(0,0,0,0.35);
 z-index: 10002;
 }
 
@@ -238,8 +202,7 @@ color: #e6eefb;
 text-decoration: none;
 font-size: 0.9em;
 text-align: left;
-white-space: normal;
-overflow-wrap: anywhere;
+white-space: nowrap;
 }
 
 .dropdown-content-sub a:hover {
@@ -247,28 +210,12 @@ background-color: #1d3f66;
 color: #ffffff;
 }
 
-.dropdown-sub:hover .dropdown-content-sub,
-.dropdown-sub:focus-within .dropdown-content-sub {
+.dropdown-sub:hover .dropdown-content-sub {
 display: block;
 }
 
 /* ========================================= */
-/* RESPONSIVE TABLES */
-/* ========================================= */
-
-table {
-width: 100%;
-max-width: 100%;
-border-collapse: collapse;
-}
-
-th,
-td {
-overflow-wrap: anywhere;
-}
-
-/* ========================================= */
-/* MOBILE AND NARROW-SCREEN SUPPORT */
+/* MOBILE RESPONSIVE SUPPORT */
 /* ========================================= */
 
 @media (max-width: 768px) {
@@ -278,12 +225,11 @@ padding: 18px 15px;
 }
 
 header h1 {
-font-size: clamp(1.1rem, 4vw, 1.25rem);
+font-size: 1.25em;
 line-height: 1.3;
 }
 
-/* HORIZONTAL, LEFT-ALIGNED, WRAPPING NAVIGATION */
-
+/* HORIZONTAL, WRAPPING MOBILE NAVIGATION */
 nav.main-nav {
 width: 100%;
 flex-direction: row;
@@ -295,19 +241,17 @@ gap: 12px 18px;
 
 nav.main-nav a,
 nav.main-nav .dropbtn {
-font-size: 0.9rem;
+font-size: 0.9em;
 white-space: normal;
 text-align: left;
 line-height: 1.4;
 }
 
-/* FLUID MAIN CONTENT */
-
 main {
 width: calc(100% - 24px);
 max-width: none;
 margin: 24px auto;
-padding: clamp(16px, 3vw, 24px);
+padding: 24px 20px;
 font-size: 1rem;
 }
 
@@ -334,46 +278,39 @@ footer {
 margin-top: 30px;
 margin-bottom: 50px;
 padding: 15px 12px;
-font-size: 0.85rem;
+font-size: 0.85em;
 }
 
 /* KEEP DROPDOWNS WITHIN THE MOBILE SCREEN */
-
 .dropdown-content {
 position: absolute;
 left: 50%;
 transform: translateX(-50%);
-width: max-content;
-min-width: min(200px, calc(100vw - 24px));
-max-width: calc(100vw - 24px);
+max-width: calc(100vw - 20px);
+min-width: 200px;
 }
 
 .dropdown-content-sub {
 position: relative;
 left: 0;
 top: 0;
-width: 100%;
 min-width: 0;
-max-width: 100%;
+width: 100%;
 box-shadow: none;
 }
 
-.dropdown-sub > a,
-.dropdown-content-sub a {
+.dropdown-sub > a {
 white-space: normal;
 }
 
-/* KEEP SECOND-LEVEL MENUS INSIDE THE VIEWPORT */
-
-.dropdown-sub:hover .dropdown-content-sub,
-.dropdown-sub:focus-within .dropdown-content-sub {
-display: block;
+.dropdown-content-sub a {
+white-space: normal;
 }
 
 }
 
 /* ========================================= */
-/* VERY NARROW SCREENS */
+/* SMALL MOBILE SCREENS */
 /* ========================================= */
 
 @media (max-width: 480px) {
@@ -383,23 +320,21 @@ padding: 16px 10px;
 }
 
 header h1 {
-font-size: 1.1rem;
+font-size: 1.1em;
 }
 
-/* COMPACT HORIZONTAL NAVIGATION */
-
+/* COMPACT HORIZONTAL NAVIGATION ON PHONES */
 nav.main-nav {
 width: 100%;
 flex-direction: row;
 flex-wrap: wrap;
 justify-content: flex-start;
-align-items: flex-start;
 gap: 10px 14px;
 }
 
 nav.main-nav a,
 nav.main-nav .dropbtn {
-font-size: 0.82rem;
+font-size: 0.82em;
 line-height: 1.4;
 text-align: left;
 }
@@ -407,11 +342,7 @@ text-align: left;
 main {
 width: calc(100% - 16px);
 margin: 18px auto;
-padding: 16px;
-}
-
-h2 {
-overflow-wrap: anywhere;
+padding: 20px 15px;
 }
 
 h3 {
@@ -424,7 +355,7 @@ margin-bottom: 1.25em;
 }
 
 footer {
-font-size: 0.8rem;
+font-size: 0.8em;
 }
 
 }
@@ -433,19 +364,14 @@ font-size: 0.8rem;
 /* MATHJAX RESPONSIVE SUPPORT */
 /* ========================================= */
 
-/* Allow long display equations to scroll horizontally */
-
-.MathJax_Display,
-mjx-container[jax="CHTML"][display="true"] {
-max-width: 100%;
-}
-
+/* Ensure long MathJax equations scroll cleanly on small screens */
 @media (max-width: 768px) {
 
 .MathJax_Display,
 mjx-container[jax="CHTML"][display="true"] {
 overflow-x: auto;
 overflow-y: hidden;
+max-width: 100%;
 padding-bottom: 4px;
 }
 
