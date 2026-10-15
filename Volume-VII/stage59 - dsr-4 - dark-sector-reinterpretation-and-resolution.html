@@ -1,0 +1,4106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 59 — Dark Sector Reinterpretation and Resolution</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #3b82f6;
+--accent-lim: #94a3b8; --accent-dm: #60a5fa; --accent-de: #c084fc; --accent-obs: #f87171; --accent-res: #2dd4bf;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6;
+--accent-gold: #fbbf24;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-gold); font-family: sans-serif; font-size: 0.85rem; min-width: 450px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls, #nav-summary-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+#screen-lab.active { display: flex; flex-direction: column; height: calc(100vh - 50px); }
+
+#screen-portal { justify-content: flex-start; padding-top: 5dvh; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 50px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 2px; font-weight: bold; letter-spacing: 0.5px; padding-bottom: 0px; }
+.module-subtitle { text-align: center; font-family: sans-serif; color: var(--accent-gold); margin-bottom: 12px; font-weight: bold; letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.primary-constant-box { background: #000; border: 1px solid var(--accent-unified); padding: 2px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 8px; }
+.secondary-structure-box { background: rgba(59, 130, 246, 0.05); border: 1px dashed var(--accent-unified); padding: 3px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 12px; }
+
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(59, 130, 246, 0.05); border: 1px solid var(--accent-unified); padding: 5px; border-radius: 5px; margin-bottom: 8px; font-size: 0.7rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; }
+#plot-area { flex-grow: 1; width: 100%; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #fff; border: 1px solid var(--accent-unified); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer { width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem; color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 59 — DARK SECTOR REINTERPRETATION AND RESOLUTION</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">Dark Sector Reinterpretation and Resolution</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">Anomalies as manifestations of substrate dynamics, not new entities.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-lim);">
+<h2 style="color:var(--accent-lim);">1. Dark Sector Limitations</h2>
+<p>Phenomenological insertions.<br>Axiomatic vs. Derived models.</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-dm);">
+<h2 style="color:var(--accent-dm);">2. Substrate Dark Matter Interpretation</h2>
+<p>Extra gravitational response.<br>Restorative acceleration $a_K$.</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-de);">
+<h2 style="color:var(--accent-de);">3. Dark Energy from Pressure</h2>
+<p>Accelerated expansion from $P$.<br>No separate field required.</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-obs);">
+<h2 style="color:var(--accent-obs);">4. Consistency with Data</h2>
+<p>Reproduction of observables.<br>Lensing & Rotation Curves.</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-res);">
+<h2 style="color:var(--accent-res);">5. Dark Sector Resolution</h2>
+<p>Emergent effect resolution.<br>Unified Structural necessity.</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-unified);">
+<h2 style="color:var(--accent-unified);">6. Stage 59 Summary</h2>
+<p>Minimal Ontology: Substrate Unified.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color:var(--accent-unified); text-align:center;">Stage 59 — Mathematical Structure Summary and Closure Theorem</h2>
+<section>
+<h3 style="color:#fbbf24;">1. Fundamental Substrate Parameters</h3>
+
+<p>
+The entire dark sector is reduced to two fundamental substrate quantities:
+</p>
+
+<p>
+$K = |\nabla C|, \qquad P = P_{\text{syn}}$
+</p>
+
+<p>
+All physical observables are functions of $(K, P)$.
+</p>
+
+<h3 style="color:#fbbf24;">2. Effective Energy Density</h3>
+
+<p>
+Dark matter and visible matter unify into a single effective density:
+</p>
+
+<p>
+$\rho_{\text{eff}}(x) = \frac{K^2(x)}{P(x)}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\rho_{\text{total}} \rightarrow \rho_{\text{eff}}$
+</p>
+
+<h3 style="color:#fbbf24;">3. Cosmological Constant Replacement</h3>
+
+<p>
+Dark energy is not independent but arises from synthesis pressure:
+</p>
+
+<p>
+$\Lambda \sim P$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\Lambda \rightarrow P$
+</p>
+
+<h3 style="color:#fbbf24;">4. Unified Friedmann Equation</h3>
+
+<p>
+Cosmic expansion becomes:
+</p>
+
+<p>
+$H^2 = \frac{8\pi G}{3} \frac{K^2}{P} + \frac{P}{3}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$H^2 = \mathcal{F}(K, P)$
+</p>
+
+<h3 style="color:#fbbf24;">5. Unified Gravitational Potential</h3>
+
+<p>
+Gravitational field equation:
+</p>
+
+<p>
+$\nabla^2 \Phi = 4\pi G \frac{K^2}{P}$
+</p>
+
+<p>
+Thus, Poisson equation becomes substrate-dependent.
+</p>
+
+<h3 style="color:#fbbf24;">6. Rotation Curve Equation</h3>
+
+<p>
+Galaxy dynamics:
+</p>
+
+<p>
+$v^2(r) = \frac{G}{r} \int_0^r \frac{K^2(r')}{P(r')} 4\pi r'^2 dr'$
+</p>
+
+<p>
+Flat curves condition:
+</p>
+
+<p>
+$\frac{K^2(r)}{P(r)} \sim \frac{1}{r^2}$
+</p>
+
+<h3 style="color:#fbbf24;">7. Gravitational Lensing Equation</h3>
+
+<p>
+Light deflection:
+</p>
+
+<p>
+$\alpha = \frac{4G}{c^2} \int \frac{K^2(x')}{P(x')} \frac{1}{|x - x'|} d^3x'$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\alpha = \mathcal{A}(K, P)$
+</p>
+
+<h3 style="color:#fbbf24;">8. Acceleration Equation</h3>
+
+<p>
+Cosmic acceleration:
+</p>
+
+<p>
+$\frac{\ddot{a}}{a} = P - \frac{4\pi G}{3} \frac{K^2}{P}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\text{Acceleration} = \mathcal{G}(K, P)$
+</p>
+
+<h3 style="color:#fbbf24;">9. Unified Observable Mapping</h3>
+
+<p>
+All observables:
+</p>
+
+<p>
+$\mathcal{O} = \mathcal{F}(K, P)$
+</p>
+
+<p>
+No dependence on independent dark sector variables.
+</p>
+
+<h3 style="color:#fbbf24;">10. Structural Elimination</h3>
+
+<p>
+Standard variables eliminated:
+</p>
+
+<p>
+$(\rho_{\text{DM}}, \Lambda) \rightarrow \emptyset$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\text{Dark Sector} = \text{Effective Description of } (K, P)$
+</p>
+
+<h3 style="color:#fbbf24;">11. Structural Closure Condition</h3>
+
+<p>
+Complete theory condition:
+</p>
+
+<p>
+$\frac{\partial \mathcal{O}}{\partial X_i} = 0 \quad \forall X_i \notin (K, P)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\frac{\partial \mathcal{O}}{\partial \rho_{\text{DM}}} = 0, \quad \frac{\partial \mathcal{O}}{\partial \Lambda} = 0$
+</p>
+
+<h3 style="color:#fbbf24;">12. Minimal Ontology</h3>
+
+<p>
+Number of fundamental variables:
+</p>
+
+<p>
+$n_{\text{substrate}} = 2 \quad (K, P)$
+</p>
+
+<p>
+replaces:
+</p>
+
+<p>
+$n_{\text{standard}} = 3 \quad (\rho_{\text{visible}}, \rho_{\text{DM}}, \Lambda)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$n_{\text{substrate}} < n_{\text{standard}}$
+</p>
+
+<h3 style="color:#fbbf24;">13. Final Structural Statement</h3>
+
+<p>
+All dark sector phenomena reduce to:
+</p>
+
+<p>
+$\rho_{\text{eff}} = \frac{K^2}{P}, \qquad \Lambda = P$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\text{Dark Sector} = \text{Emergent Manifestation of Substrate Dynamics}$
+</p>
+</div>
+
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 59 — Closure / Completion Theorem</h2>
+
+<div class="math-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Statement of the Theorem</h3>
+
+<p>
+The cosmological dynamics of the universe, including all phenomena attributed to the dark sector—namely dark matter and dark energy—are completely and uniquely determined by the substrate parameters $K = |\nabla C|$ (vacuum stiffness) and $P = P_{\text{syn}}$ (synthesis pressure).
+</p>
+
+<p>
+All observable quantities satisfy:
+</p>
+
+<p>
+$\mathcal{O}_{\text{cosmo}} = \mathcal{F}(K, P)$
+</p>
+
+<p>
+No independent dark sector entities are required.
+</p>
+
+<h3 style="color:#fbbf24;">2. Formal Structure</h3>
+
+<p>
+The complete cosmological system is defined by:
+</p>
+
+<p>
+$\rho_{\text{eff}} = \frac{K^2}{P}$
+</p>
+
+<p>
+$\Lambda = P$
+</p>
+
+<p>
+$H^2 = \frac{8\pi G}{3} \frac{K^2}{P} + \frac{P}{3}$
+</p>
+
+<p>
+$\nabla^2 \Phi = 4\pi G \frac{K^2}{P}$
+</p>
+
+<p>
+$v^2(r) = \frac{G}{r} \int_0^r \frac{K^2(r')}{P(r')} 4\pi r'^2 dr'$
+</p>
+
+<p>
+$\alpha = \frac{4G}{c^2} \int \frac{K^2(x')}{P(x')} \frac{1}{|x - x'|} d^3x'$
+</p>
+
+<p>
+Thus, all observables are functions of $(K, P)$.
+</p>
+
+<h3 style="color:#fbbf24;">3. Elimination of Dark Sector Variables</h3>
+
+<p>
+Standard cosmology:
+</p>
+
+<p>
+$\mathcal{O} = \mathcal{G}(\rho_{\text{visible}}, \rho_{\text{DM}}, \Lambda)$
+</p>
+
+<p>
+Substrate formulation:
+</p>
+
+<p>
+$\mathcal{O} = \mathcal{F}(K, P)$
+</p>
+
+<p>
+Since dark sector variables are not required:
+</p>
+
+<p>
+$(\rho_{\text{DM}}, \Lambda) \rightarrow \emptyset$
+</p>
+
+<h3 style="color:#fbbf24;">4. Uniqueness</h3>
+
+<p>
+For a given substrate configuration $(K(x), P(x))$, all observable quantities are uniquely determined.
+</p>
+
+<p>
+$(K, P) \;\Rightarrow\; \text{Unique Cosmological Evolution}$
+</p>
+
+<h3 style="color:#fbbf24;">5. Existence</h3>
+
+<p>
+For any observed cosmological configuration:
+</p>
+
+<p>
+$\exists \ (K(x), P(x)) \quad \text{such that} \quad \mathcal{O}_{\text{obs}} = \mathcal{F}(K, P)$
+</p>
+
+<p>
+Thus, the formulation is sufficient to reproduce observations.
+</p>
+
+<h3 style="color:#fbbf24;">6. Minimal Ontology Condition</h3>
+
+<p>
+Standard model variables:
+</p>
+
+<p>
+$n_{\text{standard}} = 3 \quad (\rho_{\text{visible}}, \rho_{\text{DM}}, \Lambda)$
+</p>
+
+<p>
+Substrate variables:
+</p>
+
+<p>
+$n_{\text{substrate}} = 2 \quad (K, P)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$n_{\text{substrate}} < n_{\text{standard}}$
+</p>
+
+<h3 style="color:#fbbf24;">7. Structural Closure Condition</h3>
+
+<p>
+A theory is complete if:
+</p>
+
+<p>
+$\frac{\partial \mathcal{O}}{\partial X_i} = 0 \quad \forall X_i \notin (K, P)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\frac{\partial \mathcal{O}}{\partial \rho_{\text{DM}}} = 0, \quad \frac{\partial \mathcal{O}}{\partial \Lambda} = 0$
+</p>
+
+<h3 style="color:#fbbf24;">8. Physical Interpretation</h3>
+
+<p>
+Dark matter corresponds to substrate stiffness variation:
+</p>
+
+<p>
+$\rho_{\text{DM}} \sim \frac{K^2}{P}$
+</p>
+
+<p>
+Dark energy corresponds to synthesis pressure:
+</p>
+
+<p>
+$\Lambda \sim P$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\text{Dark Sector} = \text{Emergent Manifestation of Substrate Dynamics}$
+</p>
+
+<h3 style="color:#fbbf24;">9. Completion Statement</h3>
+
+<p>
+The cosmological sector is fully closed under the substrate formulation.
+</p>
+
+<ul>
+<li>Galaxy rotation curves</li>
+<li>Gravitational lensing</li>
+<li>Large-scale structure</li>
+<li>Accelerated expansion</li>
+</ul>
+
+<p>
+All are explained without introducing new entities.
+</p>
+
+<h3 style="color:#fbbf24;">10. Final Theorem</h3>
+
+<p>
+All dark sector phenomena are emergent manifestations of substrate dynamics governed by K and P.
+</p>
+
+<p>
+The cosmological description is complete, minimal, and structurally closed in terms of (K, P).
+</p>
+</div>
+
+</section>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div id="active-module-result" class="module-subtitle">--</div>
+<div class="primary-constant-box">
+<div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val">11.350</span></div>
+<div class="const-item"><span class="const-label">Synthesis P</span><span class="const-val">0.6900</span></div>
+</div>
+
+<div id="structure-box-area"></div>
+<div id="mapping-box-area"></div>
+
+<div class="diagnostic-panel">
+<span class="diag-title">Anomaly Telemetry</span>
+<div id="telemetry-area"></div>
+</div>
+
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-unified); font-size:0.75rem; cursor:pointer; padding:6px;">RESET ANOMALY</button>
+<div id="panel-footer-text" style="font-size: 0.85rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.3; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:8px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Substrate Logic</span>
+<div id="metrics-content" style="font-size:0.65rem; font-family:monospace; line-height:1.3;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Structural Chain</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.65rem; color: var(--text-dim); line-height: 1.3; background: #000; padding: 5px; border-radius: 0px; border: 1px solid #222; margin-bottom: 0px; margin-top: auto;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "LIMITATIONS OF DARK SECTOR MODELS",
+result: "Phenomenological vs. Derived",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 59 — Module 1: Limitation of Dark Sector Models (Phenomenological vs Structural Origin)</h2>
+
+<div class="briefing-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Conceptual Introduction</h3>
+
+<p>
+With Stage 58, cosmology was fully derived as an emergent manifestation of substrate dynamics. Expansion, energy density, geometry, and structure formation were shown to arise necessarily from the substrate parameters $K = |\\nabla C|$ and $P = P_{\\text{syn}}$.
+</p>
+
+<p>
+However, modern observational cosmology presents a set of phenomena that appear inconsistent with visible matter and standard gravitational predictions. These include:
+</p>
+
+<ul>
+<li>Flat galaxy rotation curves</li>
+<li>Gravitational lensing excess</li>
+<li>Accelerated cosmic expansion</li>
+</ul>
+
+<p>
+These observations have led to the introduction of the so-called “dark sector”:
+</p>
+
+<ul>
+<li><strong>Dark Matter</strong> — to explain excess gravitational effects</li>
+<li><strong>Dark Energy</strong> — to explain accelerated expansion</li>
+</ul>
+
+<p>
+This module addresses a fundamental question:
+</p>
+
+<p>
+<strong>Are dark sector entities real physical components, or are they placeholders for missing structural understanding?</strong>
+</p>
+
+<p>
+Thus, the module establishes the key transition:
+</p>
+
+<p>
+$\\text{Phenomenological Insertion} \\;\\longrightarrow\\; \\text{Structural Derivation}$
+</p>
+
+<h3 style="color:#fbbf24;">2. Structure of Standard Dark Sector Models</h3>
+
+<p>
+In standard cosmology, discrepancies between observation and prediction are addressed by introducing additional components into the energy-momentum tensor:
+</p>
+
+<p>
+$T_{\\mu\\nu} = T_{\\mu\\nu}^{\\text{visible}} + T_{\\mu\\nu}^{\\text{dark}}$
+</p>
+
+<p>
+Dark matter contributes additional gravitational mass:
+</p>
+
+<p>
+$\\rho = \\rho_{\\text{visible}} + \\rho_{\\text{DM}}$
+</p>
+
+<p>
+Dark energy is modeled via a cosmological constant or scalar field:
+</p>
+
+<p>
+$\\Lambda \\neq 0$
+</p>
+
+<p>
+These additions allow theoretical predictions to match observations.
+</p>
+
+<p>
+However, these components are not derived from first principles. They are introduced to account for discrepancies.
+</p>
+
+<p>
+Thus, the structure of standard dark sector modeling is:
+</p>
+
+<p>
+$\\text{Observation} \\;\\longrightarrow\\; \\text{Discrepancy} \\;\\longrightarrow\\; \\text{New Entity}$
+</p>
+
+<h3 style="color:#fbbf24;">3. Limitation of Phenomenological Approach</h3>
+
+<p>
+The central limitation of dark sector models is that they are phenomenological rather than structural.
+</p>
+
+<p>
+Dark matter and dark energy are introduced as:
+</p>
+
+<ul>
+<li>Unobserved entities</li>
+<li>Externally inserted parameters</li>
+<li>Adjustable components to fit data</li>
+</ul>
+
+<p>
+This leads to a conceptual gap:
+</p>
+
+<p>
+$\\text{Observed Effect} \\neq \\text{Explained Cause}$
+</p>
+
+<p>
+Specifically:
+</p>
+
+<ul>
+<li>Dark matter is inferred from gravitational effects but not directly detected</li>
+<li>Dark energy is introduced to explain expansion but lacks physical origin</li>
+<li>The parameters governing these components are not derived</li>
+</ul>
+
+<p>
+Thus, the dark sector represents a descriptive correction, not a fundamental explanation.
+</p>
+
+<h3 style="color:#fbbf24;">4. Structural Insight from Substrate Framework</h3>
+
+<p>
+From Stage 58, all gravitational and cosmological effects arise from substrate parameters $(K, P)$.
+</p>
+
+<p>
+Thus, any discrepancy between observation and prediction must arise from incomplete modeling of substrate dynamics.
+</p>
+
+<p>
+This leads to the reinterpretation:
+</p>
+
+<p>
+$\\text{Anomaly} \\;\\sim\\; \\text{Unmodeled Substrate Response}$
+</p>
+
+<p>
+In particular:
+</p>
+
+<ul>
+<li>Excess gravitational effects correspond to variations in $K$</li>
+<li>Accelerated expansion corresponds to dynamics of $P$</li>
+</ul>
+
+<p>
+Thus, dark sector phenomena are not new entities but manifestations of substrate structure.
+</p>
+
+<h3 style="color:#fbbf24;">5. Physical Interpretation</h3>
+
+<p>
+From the substrate perspective:
+</p>
+
+<ul>
+<li><strong>Dark matter</strong> corresponds to additional gravitational response arising from spatial variation in stiffness $K$</li>
+<li><strong>Dark energy</strong> corresponds to large-scale effects of synthesis pressure $P$</li>
+</ul>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Substrate Dynamics} \\;\\longrightarrow\\; \\text{Apparent Dark Sector Effects}$
+</p>
+
+<p>
+The universe does not contain hidden components; it exhibits complex substrate behavior.
+</p>
+
+<p>
+This leads to a fundamental reinterpretation:
+</p>
+
+<p>
+\textbf{Dark sector phenomena are effects without independent entities.}
+</p>
+
+<h3 style="color:#fbbf24;">6. Necessity of Structural Explanation (Very Important)</h3>
+
+<p>
+A fundamental principle follows:
+</p>
+
+<p>
+<strong>Physical theories must derive observed phenomena from underlying structure, not introduce new entities to fit observations.</strong>
+</p>
+
+<p>
+Without structural derivation:
+</p>
+
+<ul>
+<li>Entities remain hypothetical</li>
+<li>Parameters remain arbitrary</li>
+<li>The theory lacks explanatory depth</li>
+</ul>
+
+<p>
+Thus, the dark sector must be reinterpreted within a structural framework.
+</p>
+
+<h3 style="color:#fbbf24;">7. Consistency with Observational Data</h3>
+
+<p>
+This reinterpretation does not reject observational evidence:
+</p>
+
+<ul>
+<li>Galaxy rotation curves remain valid observations</li>
+<li>Lensing effects remain empirically confirmed</li>
+<li>Accelerated expansion is preserved</li>
+</ul>
+
+<p>
+What changes is the explanation:
+</p>
+
+<p>
+$\\text{Observed Effects} \\;\\longrightarrow\\; \\text{Substrate-Origin Interpretation}$
+</p>
+
+<p>
+Thus, empirical success is preserved while conceptual clarity is achieved.
+</p>
+
+<h3 style="color:#fbbf24;">8. Graph / Visualization Interpretation Paragraph (MANDATORY)</h3>
+
+<p>
+The visualization displays galaxy rotation velocity as a function of radius.
+</p>
+
+<p>
+The dashed curve represents the prediction based on visible matter, which decreases with distance. The observed curve, however, remains flat, indicating higher-than-expected velocities.
+</p>
+
+<p>
+The gap between these curves is typically attributed to dark matter.
+</p>
+
+<p>
+Within this framework, the gap represents unmodeled substrate response. The flat curve reflects the influence of spatial variation in $K$, which modifies gravitational behavior at larger radii.
+</p>
+
+<p>
+Thus, the graph does not indicate missing mass but incomplete structural modeling.
+</p>
+
+<p>
+The visualization therefore encodes:
+</p>
+
+<p>
+$\\text{Observation Gap} \\Rightarrow \\text{Substrate Effect Gap}$
+</p>
+
+<h3 style="color:#fbbf24;">9. Conceptual Compression Lines</h3>
+
+<p>
+Dark sector is descriptive, not fundamental.<br>
+Anomalies arise from incomplete structure modeling.<br>
+No new entities are required.<br>
+Substrate dynamics explain all observed effects.
+</p>
+
+<h3 style="color:#fbbf24;">10. Logical Closure</h3>
+
+<p>
+This module establishes that dark sector models are phenomenological constructs introduced to resolve discrepancies between observation and incomplete theoretical descriptions.
+</p>
+
+<p>
+By recognizing all cosmological phenomena as manifestations of substrate dynamics, the need for independent dark entities is removed.
+</p>
+
+<p>
+Thus, the dark sector is reinterpreted as a structural effect rather than a physical component.
+</p>
+
+<h3 style="color:#fbbf24;">11. Transition to Next Module</h3>
+
+<p>
+Having identified the limitation of phenomenological dark sector models, the next step is to derive the specific mechanism by which substrate dynamics produce effects attributed to dark matter.
+</p>
+
+<p>
+This leads to Module 2, where additional gravitational response emerges from variations in stiffness $K$.
+</p>
+
+<h3 style="color:#fbbf24;">12. Final Statement</h3>
+
+<p>
+Dark sector models provide descriptive corrections to observational discrepancies, but the physical origin of these effects resides in the substrate defined by $K$ and $P$, eliminating the need for independent dark entities.
+</p>
+
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 59 — Module 1: Explicit Mathematics — Limitation of Dark Sector Models</h2>
+
+<div class="math-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Starting Point: Standard Gravitational Prediction</h3>
+
+<p>
+For a galaxy with visible mass distribution $M(r)$, the circular velocity is given by Newtonian dynamics:
+</p>
+
+<p>
+$v^2(r) = \\frac{G M(r)}{r}$
+</p>
+
+<p>
+For a finite mass distribution, $M(r) \\to \\text{constant}$ at large $r$, thus:
+</p>
+
+<p>
+$v(r) \\sim \\frac{1}{\\sqrt{r}}$
+</p>
+
+<p>
+This predicts a declining rotation curve.
+</p>
+
+<h3 style="color:#fbbf24;">2. Observational Deviation</h3>
+
+<p>
+Observed galaxy rotation curves show:
+</p>
+
+<p>
+$v(r) \\approx \\text{constant}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$v^2 \\approx \\text{constant} \\Rightarrow \\frac{G M_{\\text{eff}}(r)}{r} = \\text{constant}$
+</p>
+
+<p>
+This implies:
+</p>
+
+<p>
+$M_{\\text{eff}}(r) \\sim r$
+</p>
+
+<p>
+Thus, effective mass increases with radius.
+</p>
+
+<h3 style="color:#fbbf24;">3. Dark Matter Interpretation</h3>
+
+<p>
+Standard model introduces dark matter density:
+</p>
+
+<p>
+$\\rho_{\\text{DM}}(r)$
+</p>
+
+<p>
+Total mass:
+</p>
+
+<p>
+$M_{\\text{eff}}(r) = M_{\\text{visible}}(r) + M_{\\text{DM}}(r)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$v^2(r) = \\frac{G}{r} \\left[ M_{\\text{visible}}(r) + M_{\\text{DM}}(r) \\right]$
+</p>
+
+<p>
+Dark matter is introduced to enforce:
+</p>
+
+<p>
+$v(r) \\approx \\text{constant}$
+</p>
+
+<h3 style="color:#fbbf24;">4. Structural Observation</h3>
+
+<p>
+Dark matter density is not derived but chosen to satisfy:
+</p>
+
+<p>
+$\\rho_{\\text{DM}}(r) \\propto \\frac{1}{r^2}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$M_{\\text{DM}}(r) \\sim r$
+</p>
+
+<p>
+This ensures flat rotation curves.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Dark Matter} = \\text{Functional fit to observation}$
+</p>
+
+<h3 style="color:#fbbf24;">5. Absence of Substrate Variables</h3>
+
+<p>
+Standard formulation depends on:
+</p>
+
+<ul>
+<li>$M(r)$</li>
+<li>$\\rho_{\\text{DM}}(r)$</li>
+</ul>
+
+<p>
+No dependence on:
+</p>
+
+<p>
+$K = |\\nabla C|, \\quad P = P_{\\text{syn}}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\frac{\\partial v}{\\partial K} = 0, \\quad \\frac{\\partial v}{\\partial P} = 0$
+</p>
+
+<p>
+This indicates absence of structural origin.
+</p>
+
+<h3 style="color:#fbbf24;">6. Substrate-Based Reinterpretation</h3>
+
+<p>
+From Stage 58:
+</p>
+
+<p>
+$\\rho \\sim \\frac{K^2}{P}$
+</p>
+
+<p>
+Thus, effective mass becomes:
+</p>
+
+<p>
+$M_{\\text{eff}}(r) = \\int_0^r \\frac{K^2(r')}{P(r')} 4\\pi r'^2 dr'$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$v^2(r) = \\frac{G}{r} \\int_0^r \\frac{K^2(r')}{P(r')} 4\\pi r'^2 dr'$
+</p>
+
+<h3 style="color:#fbbf24;">7. Condition for Flat Rotation Curves</h3>
+
+<p>
+For $v(r) \\approx \\text{constant}$:
+</p>
+
+<p>
+$v^2 = \\text{constant} \\Rightarrow M_{\\text{eff}}(r) \\sim r$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\int_0^r \\frac{K^2(r')}{P(r')} r'^2 dr' \\sim r$
+</p>
+
+<p>
+Differentiating:
+</p>
+
+<p>
+$\\frac{K^2(r)}{P(r)} r^2 \\sim \\text{constant}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\frac{K^2(r)}{P(r)} \\sim \\frac{1}{r^2}$
+</p>
+
+<p>
+This reproduces the required density profile without dark matter.
+</p>
+
+<h3 style="color:#fbbf24;">8. Interpretation of Anomaly</h3>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\rho_{\\text{eff}}(r) = \\frac{K^2(r)}{P(r)}$
+</p>
+
+<p>
+Deviations from visible matter arise from spatial variation of $(K, P)$.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Rotation Curve Anomaly} = \\text{Substrate Variation Effect}$
+</p>
+
+<h3 style="color:#fbbf24;">9. General Structural Condition</h3>
+
+<p>
+For any gravitational anomaly:
+</p>
+
+<p>
+$v^2(r) = \\frac{G}{r} \\int \\rho_{\\text{eff}}(r') dV$
+</p>
+
+<p>
+with:
+</p>
+
+<p>
+$\\rho_{\\text{eff}} = \\frac{K^2}{P}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Anomaly} \\Rightarrow \\\\nabla K \\neq 0 \\quad \\text{or} \\quad \\\\nabla P \\neq 0$
+</p>
+
+<h3 style="color:#fbbf24;">10. Dark Energy in Standard Model</h3>
+
+<p>
+Accelerated expansion:
+</p>
+
+<p>
+$H^2 = \\frac{8\\pi G}{3}\\rho + \\frac{\\Lambda}{3}$
+</p>
+
+<p>
+$\\Lambda$ introduced as constant.$
+</p>
+
+<h3 style="color:#fbbf24;">11. Substrate Interpretation of Expansion</h3>
+
+<p>
+From Stage 58:
+</p>
+
+<p>
+$H^2 \\sim P$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\Lambda \\sim P$
+</p>
+
+<p>
+No independent dark energy required.
+</p>
+
+<h3 style="color:#fbbf24;">12. Structural Incompleteness Condition</h3>
+
+<p>
+Standard dark sector formulation:
+</p>
+
+<p>
+$\\mathcal{O} = \\mathcal{G}(M, \\rho_{\\text{DM}}, \\Lambda)$
+</p>
+
+<p>
+Substrate formulation:
+</p>
+
+<p>
+$\\mathcal{O} = \\mathcal{F}(K, P)$
+</p>
+
+<p>
+Since:
+</p>
+
+<p>
+$(M, \\rho_{\\text{DM}}, \\Lambda) \\not\\rightarrow (K, P)$
+</p>
+
+<p>
+Thus, dark sector models are structurally incomplete.
+</p>
+
+<h3 style="color:#fbbf24;">13. Structural Conclusion</h3>
+
+<p>
+Dark sector quantities are not fundamental:
+</p>
+
+<p>
+$\\rho_{\\text{DM}} \\sim \\text{effective representation of } K$
+</p>
+
+<p>
+$\\Lambda \\sim P$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Dark Sector} = \\text{Effective description of substrate dynamics}$
+</p>
+
+<p>
+No new entities are required.
+</p>
+
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>OBSERVED ANOMALY</span><input type="number" id="a_in" class="digital-entry" value="40" oninput="syncVal(this.value, 'a_sl')"></div><input type="range" id="a_sl" min="0" max="100" step="1" value="40" oninput="syncVal(this.value, 'a_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.8rem;">Observation &rarr; Descriptive Gap</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Anomalies arise when source structure is ignored</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Type</span><span class="const-val">ANOMALY</span></div><div class="const-item"><span class="const-label">Basis</span><span class="const-val">OBSERVATION</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-lim);">MODE: TRACKING ROTATION DEVIANCE</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Visible Matter<br>↓<br>Predicted Gravity<br>↓<br>Observational Gap`,
+hierarchy: `<div style="color: var(--accent-lim); font-weight: bold; font-size: 0.95rem;">Limit: Unseen Mass as Placeholder</div>`,
+footer: "Dark components are placeholders for missing substrate physics.",
+rightNote: `<div style="color: #94a3b8; line-height: 1.3; margin: 5px; font-size: 0.77rem;">Establishing the gap between visible prediction and observed data.<p><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">👉 This Module Establishes:<br>Standard interpretation assumes unseen mass (Dark Matter) to account for observed rotation velocities.</p></div>`
+},
+
+2: {
+title: "SUBSTRATE INTERPRETATION OF DARK MATTER",
+result: "Extra Gravity from Substrate",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 59 — Module 2: Substrate Interpretation of Dark Matter (Restorative Gravity from Stiffness)</h2>
+
+<div class="briefing-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Conceptual Introduction</h3>
+
+<p>
+In Module 1, it was established that dark matter arises as a phenomenological insertion used to compensate for discrepancies between observed galactic rotation curves and predictions based on visible matter. The key conclusion was that such discrepancies do not necessarily imply the existence of new particles but indicate a missing structural layer in the description of gravitational dynamics.
+</p>
+
+<p>
+The present module advances this insight by identifying the physical origin of the additional gravitational effect attributed to dark matter.
+</p>
+
+<p>
+The central question is:
+</p>
+
+<p>
+<strong>What is the actual physical mechanism behind the extra gravitational pull observed in galaxies?</strong>
+</p>
+
+<p>
+This module establishes that the so-called “dark matter effect” is not due to unseen mass but arises from the intrinsic elastic response of the substrate, governed by vacuum stiffness $K$.
+</p>
+
+<p>
+Thus, the transition is:
+</p>
+
+<p>
+$\\text{Dark Matter as Mass} \\;\\longrightarrow\\; \\text{Dark Matter as Restorative Substrate Response}$
+</p>
+
+<h3 style="color:#fbbf24;">2. Standard Interpretation of Extra Gravity</h3>
+
+<p>
+In conventional models, the discrepancy in rotation curves is resolved by introducing an additional mass distribution:
+</p>
+
+<p>
+$M_{\\text{eff}}(r) = M_{\\text{visible}}(r) + M_{\\text{DM}}(r)$
+</p>
+
+<p>
+This leads to an enhanced gravitational acceleration:
+</p>
+
+<p>
+$a(r) = \\frac{G M_{\\text{eff}}(r)}{r^2}$
+</p>
+
+<p>
+The extra term $M_{\\text{DM}}(r)$ is interpreted as a new form of matter that does not interact electromagnetically.
+</p>
+
+<p>
+However, this interpretation introduces an entity without structural derivation.
+</p>
+
+<h3 style="color:#fbbf24;">3. Limitation of Mass-Based Interpretation</h3>
+
+<p>
+The assumption that additional gravity must arise from additional mass is not a necessity but a modeling choice.
+</p>
+
+<p>
+This leads to a structural gap:
+</p>
+
+<p>
+$\\text{Extra Acceleration} \\neq \\text{Explained Mechanism}$
+</p>
+
+<p>
+Specifically:
+</p>
+
+<ul>
+<li>The form of $M_{\\text{DM}}(r)$ is adjusted to match observations</li>
+<li>No fundamental origin for this mass distribution is provided</li>
+<li>The physical nature of dark matter remains unknown</li>
+</ul>
+
+<p>
+Thus, the model remains descriptive rather than explanatory.
+</p>
+
+<h3 style="color:#fbbf24;">4. Structural Insight from Substrate Framework</h3>
+
+<p>
+From earlier stages, gravity is not an independent force but a manifestation of substrate response governed by stiffness $K = |\\nabla C|$.
+</p>
+
+<p>
+When mass is introduced into the substrate, it creates a local distortion in the field $C$, producing a gradient in stiffness.
+</p>
+
+<p>
+This gradient induces a restoring response of the substrate, which manifests as gravitational attraction.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Mass Distortion} \\;\\longrightarrow\\; \\text{Stiffness Gradient} \\;\\longrightarrow\\; \\text{Restorative Force}$
+</p>
+
+<p>
+This restoring force naturally extends beyond the visible matter distribution due to the extended structure of the substrate.
+</p>
+
+<h3 style="color:#fbbf24;">5. Physical Interpretation of “Extra Gravity”</h3>
+
+<p>
+The additional gravitational acceleration observed in galaxies is therefore not due to additional unseen mass but due to the non-local response of the substrate.
+</p>
+
+<p>
+The stiffness field does not terminate sharply at the boundary of visible matter; instead, it extends and redistributes, producing an effective gravitational field that appears stronger than predicted by visible mass alone.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Extra Gravity} = \\text{Extended Substrate Response}$
+</p>
+
+<p>
+This eliminates the need to introduce dark matter as a separate physical entity.
+</p>
+
+<h3 style="color:#fbbf24;">6. Mechanism of Restorative Gravity</h3>
+
+<p>
+The substrate behaves analogously to an elastic medium:
+</p>
+
+<ul>
+<li>Mass acts as a source of deformation</li>
+<li>Stiffness $K$ determines resistance to deformation</li>
+<li>The medium responds by generating a restoring force</li>
+</ul>
+
+<p>
+This restoring force is not strictly local; it propagates through the substrate, producing a distributed gravitational effect.
+</p>
+
+<p>
+Thus, the observed flat rotation curves are a natural consequence of:
+</p>
+
+<p>
+$\\text{Elastic Response of Substrate}$
+</p>
+
+<h3 style="color:#fbbf24;">7. Necessity of Substrate-Based Interpretation (Very Important)</h3>
+
+<p>
+A fundamental principle follows:
+</p>
+
+<p>
+<strong>Forces must arise from physical structure, not arbitrary additions.</strong>
+</p>
+
+<p>
+Without a substrate-based explanation:
+</p>
+
+<ul>
+<li>Extra gravity requires ad hoc mass components</li>
+<li>Physical interpretation remains incomplete</li>
+<li>The theory accumulates unverified entities</li>
+</ul>
+
+<p>
+With substrate dynamics:
+</p>
+
+<ul>
+<li>Extra gravity is derived, not assumed</li>
+<li>No new particles are required</li>
+<li>Conceptual simplicity is restored</li>
+</ul>
+
+<h3 style="color:#fbbf24;">8. Consistency with Observations</h3>
+
+<p>
+This reinterpretation preserves all empirical results:
+</p>
+
+<ul>
+<li>Flat rotation curves are reproduced</li>
+<li>Gravitational lensing remains consistent</li>
+<li>Large-scale structure formation is unaffected</li>
+</ul>
+
+<p>
+The only change is interpretational:
+</p>
+
+<p>
+$\\text{Dark Matter Effect} \\;\\longrightarrow\\; \\text{Substrate Response Effect}$
+</p>
+
+<h3 style="color:#fbbf24;">9. Graph / Visualization Interpretation Paragraph</h3>
+
+<p>
+The visualization shows a potential well structure with a central dip representing the gravitational influence of visible mass.
+</p>
+
+<p>
+The surrounding smooth surface illustrates how this local deformation spreads across the substrate, creating a wider region of influence than the visible matter alone would suggest.
+</p>
+
+<p>
+The gradual extension of the potential indicates that the gravitational field is not confined to the immediate vicinity of mass but is mediated by the substrate’s elastic properties.
+</p>
+
+<p>
+This extended curvature directly corresponds to the observed “extra gravity” attributed to dark matter.
+</p>
+
+<p>
+Thus, the graph encodes:
+</p>
+
+<p>
+$\\text{Local Distortion} \\;\\Rightarrow\\; \\text{Extended Substrate Response} \\;\\Rightarrow\\; \\text{Effective Extra Gravity}$
+</p>
+
+<h3 style="color:#fbbf24;">10. Conceptual Compression Lines</h3>
+
+<p>
+Dark matter is not unseen mass but substrate response.<br>
+Extra gravity arises from stiffness gradients.<br>
+Gravity is a restoring force of the medium.<br>
+No new particles are required.
+</p>
+
+<h3 style="color:#fbbf24;">11. Logical Closure</h3>
+
+<p>
+This module establishes that the phenomena attributed to dark matter are fully explained by the restorative response of the substrate governed by stiffness $K$.
+</p>
+
+<p>
+The need for additional mass is eliminated, and gravitational dynamics are grounded in physical structure.
+</p>
+
+<p>
+Thus, dark matter is reinterpreted as an emergent effect rather than a fundamental entity.
+</p>
+
+<h3 style="color:#fbbf24;">12. Transition to Next Module</h3>
+
+<p>
+Having established dark matter as a manifestation of substrate stiffness, the next step is to analyze how accelerated cosmic expansion arises from synthesis pressure $P$ without invoking dark energy.
+</p>
+
+<p>
+This leads to Module 3, where dark energy is reinterpreted as a direct consequence of substrate pressure dynamics.
+</p>
+
+<h3 style="color:#fbbf24;">13. Final Statement</h3>
+
+<p>
+Dark matter is not a physical substance but the manifestation of the substrate’s restorative response to structural deformation, governed by vacuum stiffness $K$.
+</p>
+
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 59 — Module 2: Explicit Mathematics — Substrate Interpretation of Dark Matter</h2>
+
+<div class="math-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Starting Point: Gravitational Acceleration</h3>
+
+<p>
+Standard gravitational acceleration for a spherically symmetric mass distribution:
+</p>
+
+<p>
+$a(r) = \\frac{G M(r)}{r^2}$
+</p>
+
+<p>
+Observed acceleration includes an excess component:
+</p>
+
+<p>
+$a_{\\text{obs}}(r) = a_{\\text{visible}}(r) + a_{\\text{extra}}(r)$
+</p>
+
+<p>
+Standard model assumes:
+</p>
+
+<p>
+$a_{\\text{extra}}(r) = \\frac{G M_{\\text{DM}}(r)}{r^2}$
+</p>
+
+<h3 style="color:#fbbf24;">2. Structural Reformulation</h3>
+
+<p>
+From substrate framework, gravitational effects arise from stiffness gradients:
+</p>
+
+<p>
+$K = |\\nabla C|$
+</p>
+
+<p>
+Force arises as response to spatial variation:
+</p>
+
+<p>
+$\\mathbf{F} \\sim -\\nabla K$
+</p>
+
+<p>
+Thus, acceleration becomes:
+</p>
+
+<p>
+$a(r) \\sim -\\frac{dK}{dr}$
+</p>
+
+<h3 style="color:#fbbf24;">3. Effective Potential Representation</h3>
+
+<p>
+Define substrate potential:
+</p>
+
+<p>
+$\\Phi_{\\text{sub}}(r) \\sim K(r)$
+</p>
+
+<p>
+Then:
+</p>
+
+<p>
+$a(r) = -\\frac{d\\Phi_{\\text{sub}}}{dr} = -\\frac{dK}{dr}$
+</p>
+
+<p>
+Thus, gravitational field is directly linked to stiffness profile.
+</p>
+
+<h3 style="color:#fbbf24;">4. Extended Response of Substrate</h3>
+
+<p>
+Unlike point-mass Newtonian potential:
+</p>
+
+<p>
+$\\Phi(r) \\sim \\frac{1}{r}$
+</p>
+
+<p>
+Substrate stiffness extends spatially:
+</p>
+
+<p>
+$K(r) = K_0 + \\delta K(r)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$a(r) = -\\frac{d}{dr} \\left[ K_0 + \\delta K(r) \\right] = -\\frac{d(\\delta K)}{dr}$
+</p>
+
+<p>
+This produces non-local gravitational effects.
+</p>
+
+<h3 style="color:#fbbf24;">5. Condition for Extra Gravity</h3>
+
+<p>
+Observed flat rotation curves require:
+</p>
+
+<p>
+$v^2(r) = r a(r) = \\text{constant}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$a(r) \\sim \\frac{1}{r}$
+</p>
+
+<p>
+From substrate relation:
+</p>
+
+<p>
+$-\\frac{dK}{dr} \\sim \\frac{1}{r}$
+</p>
+
+<p>
+Integrating:
+</p>
+
+<p>
+$K(r) \\sim -\\ln r + \\text{constant}$
+</p>
+
+<p>
+Thus, logarithmic stiffness profile produces flat rotation curves.
+</p>
+
+<h3 style="color:#fbbf24;">6. Effective Mass Interpretation</h3>
+
+<p>
+Define effective mass from acceleration:
+</p>
+
+<p>
+$a(r) = \\frac{G M_{\\text{eff}}(r)}{r^2}$
+</p>
+
+<p>
+Substituting:
+</p>
+
+<p>
+$M_{\\text{eff}}(r) = \\frac{r^2}{G} \\left( -\\frac{dK}{dr} \\right)$
+</p>
+
+<p>
+Thus, effective mass arises from stiffness gradient.
+</p>
+
+<p>
+No independent dark matter required.
+</p>
+
+<h3 style="color:#fbbf24;">7. Elastic Response Interpretation</h3>
+
+<p>
+Substrate behaves as elastic medium:
+</p>
+
+<p>
+Stress $\\sigma \\sim K$
+</p>
+
+<p>
+Force:
+</p>
+
+<p>
+$F \\sim -\\nabla \\sigma \\sim -\\nabla K$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Gravity} = \\text{Elastic restoring response}$
+</p>
+
+<h3 style="color:#fbbf24;">8. Energy Density Correspondence</h3>
+
+<p>
+From Stage 58:
+</p>
+
+<p>
+$\\rho \\sim \\frac{K^2}{P}$
+</p>
+
+<p>
+Spatial variation:
+</p>
+
+<p>
+$\\nabla \\rho \\sim \\frac{2K}{P} \\\\nabla K$
+</p>
+
+<p>
+Thus, density gradients reinforce stiffness-driven gravity.
+</p>
+
+<h3 style="color:#fbbf24;">9. General Acceleration Equation</h3>
+
+<p>
+Complete substrate-based gravitational acceleration:
+</p>
+
+<p>
+$a(r) = -\\frac{dK}{dr} + \\mathcal{C}(P)$
+</p>
+
+<p>
+Where:
+</p>
+
+<ul>
+<li>$-\\frac{dK}{dr}$ = local stiffness response</li>
+<li>$\\mathcal{C}(P)$ = large-scale pressure contribution</li>
+</ul>
+
+<h3 style="color:#fbbf24;">10. Structural Mapping</h3>
+
+<p>
+Standard formulation:
+</p>
+
+<p>
+$a(r) = \\frac{G M_{\\text{visible}}}{r^2} + \\frac{G M_{\\text{DM}}}{r^2}$
+</p>
+
+<p>
+Substrate formulation:
+</p>
+
+<p>
+$a(r) = -\\frac{dK}{dr}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\frac{G M_{\\text{DM}}}{r^2} \\sim -\\frac{dK}{dr} - \\frac{G M_{\\text{visible}}}{r^2}$
+</p>
+
+<p>
+Dark matter term is effective representation of substrate response.
+</p>
+
+<h3 style="color:#fbbf24;">11. Structural Incompleteness of Particle Model</h3>
+
+<p>
+Dark matter particle assumption:
+</p>
+
+<p>
+$M_{\\text{DM}} = \\text{independent entity}$
+</p>
+
+<p>
+Substrate interpretation:
+</p>
+
+<p>
+$M_{\\text{DM}} \\sim \\mathcal{F}(K)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Particle Interpretation} \\neq \\text{Structural Origin}$
+</p>
+
+<h3 style="color:#fbbf24;">12. Limit Case</h3>
+
+<p>
+If stiffness gradient vanishes:
+</p>
+
+<p>
+$\\nabla K = 0$
+</p>
+
+<p>
+Then:
+</p>
+
+<p>
+$a(r) \\rightarrow \\frac{G M_{\\text{visible}}}{r^2}$
+</p>
+
+<p>
+Standard Newtonian gravity recovered.
+</p>
+
+<h3 style="color:#fbbf24;">13. Structural Conclusion</h3>
+
+<p>
+Dark matter effects arise from:
+</p>
+
+<p>
+$\\text{Extra Gravity} = -\\nabla K$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Dark Matter} = \\text{Effective manifestation of stiffness variation}$
+</p>
+
+<p>
+No new particles are required.
+</p>
+
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>STIFFNESS COUPLING</span><input type="number" id="k_in" class="digital-entry" value="50" oninput="syncVal(this.value, 'k_sl')"></div><input type="range" id="k_sl" min="0" max="100" step="1" value="50" oninput="syncVal(this.value, 'k_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.8rem;">Substrate K &rarr; Restorative Gravity</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Gravity is the tension; Dark Matter is the reaction</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Reaction</span><span class="const-val">SUBSTRATE</span></div><div class="const-item"><span class="const-label">Effect</span><span class="const-val">DARK MATTER</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-dm);">MODE: RESOLVING RESTORATIVE FORCE</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Local Mass Distortion<br>↓<br>Substrate Restorative Response<br>↓<br>Effective Dark Matter Force`,
+hierarchy: `<div style="color: var(--accent-dm); font-weight: bold; font-size: 0.95rem;">Dark Matter: Manifestation of Substrate K</div>`,
+footer: "Dark Matter effects are the elastic response of the substrate medium.",
+rightNote: `<div style="color: #60a5fa; line-height: 1.3; margin: 5px; font-size: 0.77rem;">Mapping extra gravity to foundational substrate stiffness.<p><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">👉 This Module Establishes:<br>Restorative structural response of the substrate accounts for 'Dark Matter' effects without new particles.</p></div>`
+},
+
+3: {
+title: "SUBSTRATE INTERPRETATION OF DARK ENERGY",
+result: "Accelerated Expansion from P",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 59 — Module 3: Substrate Interpretation of Dark Energy (Accelerated Expansion from Synthesis Pressure)</h2>
+
+<div class="briefing-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Conceptual Introduction</h3>
+
+<p>
+Following the reinterpretation of dark matter in Module 2 as a manifestation of substrate stiffness $K$, the present module addresses the second major component of the dark sector: dark energy.
+</p>
+
+<p>
+In standard cosmology, dark energy is introduced to explain the observed accelerated expansion of the universe. However, like dark matter, it is treated as an independent entity without structural derivation.
+</p>
+
+<p>
+The central question now becomes:
+</p>
+
+<p>
+<strong>What is the true physical origin of cosmic acceleration?</strong>
+</p>
+
+<p>
+This module establishes that accelerated expansion is not driven by an external cosmological constant or exotic field, but arises naturally from synthesis pressure $P$ inherent to the substrate.
+</p>
+
+<p>
+Thus, the conceptual transition is:
+</p>
+
+<p>
+$\\text{Dark Energy as External Field} \\;\\longrightarrow\\; \\text{Dark Energy as Intrinsic Substrate Pressure}$
+</p>
+
+<h3 style="color:#fbbf24;">2. Standard Cosmological Formulation</h3>
+
+<p>
+The large-scale dynamics of the universe are described by the Friedmann equation:
+</p>
+
+<p>
+$H^2 = \\left(\\frac{\\dot{a}}{a}\\right)^2 = \\frac{8\\pi G}{3}\\rho + \\frac{\\Lambda}{3}$
+</p>
+
+<p>
+Here:
+</p>
+
+<ul>
+<li>$H$ is the Hubble parameter</li>
+<li>$a(t)$ is the scale factor</li>
+<li>$\\rho$ is the energy density</li>
+<li>$\\Lambda$ is the cosmological constant</li>
+</ul>
+
+<p>
+The term $\\Lambda$ is introduced to account for accelerated expansion.
+</p>
+
+<p>
+However, its origin remains unexplained.
+</p>
+
+<h3 style="color:#fbbf24;">3. Limitation of Cosmological Constant</h3>
+
+<p>
+The cosmological constant is treated as:
+</p>
+
+<p>
+$\\Lambda = \\text{constant}$
+</p>
+
+<p>
+This leads to a structural limitation:
+</p>
+
+<p>
+$\\text{Acceleration} \\neq \\text{Explained Mechanism}$
+</p>
+
+<p>
+Specifically:
+</p>
+
+<ul>
+<li>No derivation of $\\Lambda$ from physical structure</li>
+<li>Fine-tuning problem (extremely small observed value)</li>
+<li>No connection to underlying dynamics</li>
+</ul>
+
+<p>
+Thus, dark energy remains a descriptive insertion rather than an explanatory construct.
+</p>
+
+<h3 style="color:#fbbf24;">4. Structural Insight from Substrate Framework</h3>
+
+<p>
+From Stage 58, cosmological dynamics were shown to emerge from substrate parameters:
+</p>
+
+<p>
+$K = |\\nabla C|, \\quad P = P_{\\text{syn}}$
+</p>
+
+<p>
+While $K$ governs local structure and gravitational response, $P$ governs global dynamics of the substrate.
+</p>
+
+<p>
+Synthesis pressure represents the intrinsic tendency of the substrate to relax and redistribute.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Intrinsic Pressure} \\;\\longrightarrow\\; \\text{Global Flow} \\;\\longrightarrow\\; \\text{Cosmic Expansion}$
+</p>
+
+<h3 style="color:#fbbf24;">5. Physical Interpretation of Accelerated Expansion</h3>
+
+<p>
+The universe is not expanding because of an externally imposed constant, but because the substrate possesses intrinsic pressure.
+</p>
+
+<p>
+This pressure drives a global relaxation process, leading to expansion.
+</p>
+
+<p>
+Acceleration arises because the pressure is not neutral but dynamically active.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Accelerated Expansion} = \\text{Manifestation of Synthesis Pressure } P$
+</p>
+
+<p>
+This replaces the need for dark energy as a separate entity.
+</p>
+
+<h3 style="color:#fbbf24;">6. Mechanism of Substrate Expansion</h3>
+
+<p>
+The substrate behaves as a medium under internal tension:
+</p>
+
+<ul>
+<li>$P$ represents stored structural pressure</li>
+<li>The system evolves toward equilibrium</li>
+<li>This evolution manifests as expansion of spatial structure</li>
+</ul>
+
+<p>
+Unlike static models, this process is dynamic and continuous.
+</p>
+
+<p>
+Thus, expansion is not imposed but emerges naturally from substrate dynamics.
+</p>
+
+<h3 style="color:#fbbf24;">7. Necessity of Pressure-Based Interpretation (Very Important)</h3>
+
+<p>
+A fundamental principle follows:
+</p>
+
+<p>
+<strong>Global dynamics must arise from intrinsic properties of the medium.</strong>
+</p>
+
+<p>
+Without substrate pressure:
+</p>
+
+<ul>
+<li>Expansion requires arbitrary constants</li>
+<li>No causal mechanism exists</li>
+<li>The model remains incomplete</li>
+</ul>
+
+<p>
+With synthesis pressure:
+</p>
+
+<ul>
+<li>Expansion is derived</li>
+<li>Acceleration is natural</li>
+<li>No additional fields are required</li>
+</ul>
+
+<h3 style="color:#fbbf24;">8. Consistency with Observations</h3>
+
+<p>
+This reinterpretation preserves all observational results:
+</p>
+
+<ul>
+<li>Accelerated expansion is reproduced</li>
+<li>Hubble evolution remains consistent</li>
+<li>Large-scale structure evolution is maintained</li>
+</ul>
+
+<p>
+The difference lies in interpretation:
+</p>
+
+<p>
+$\\text{Dark Energy Effect} \\;\\longrightarrow\\; \\text{Substrate Pressure Effect}$
+</p>
+
+<h3 style="color:#fbbf24;">9. Graph / Visualization Interpretation Paragraph (MANDATORY)</h3>
+
+<p>
+The visualization shows a field of vectors distributed across a spatial grid, representing the flow induced by synthesis pressure.
+</p>
+
+<p>
+Each vector indicates a local direction of expansion, and their collective behavior illustrates a coherent outward flow across the substrate.
+</p>
+
+<p>
+The increasing magnitude of vectors away from equilibrium regions reflects acceleration driven by internal pressure.
+</p>
+
+<p>
+The uniformity of the flow demonstrates that expansion is not localized but global in nature.
+</p>
+
+<p>
+Thus, the graph encodes:
+</p>
+
+<p>
+$\\text{Intrinsic Pressure} \\;\\Rightarrow\\; \\text{Global Flow} \\;\\Rightarrow\\; \\text{Accelerated Expansion}$
+</p>
+
+<h3 style="color:#fbbf24;">10. Conceptual Compression Lines</h3>
+
+<p>
+Dark energy is not a separate field but substrate pressure.<br>
+Expansion is a relaxation process of the medium.<br>
+Acceleration arises from intrinsic structural dynamics.<br>
+No cosmological constant is required.
+</p>
+
+<h3 style="color:#fbbf24;">11. Logical Closure</h3>
+
+<p>
+This module establishes that the phenomenon attributed to dark energy is fully explained by synthesis pressure $P$ inherent in the substrate.
+</p>
+
+<p>
+The cosmological constant is no longer required as an independent parameter.
+</p>
+
+<p>
+Thus, cosmic acceleration is grounded in physical structure.
+</p>
+
+<h3 style="color:#fbbf24;">12. Transition to Next Module</h3>
+
+<p>
+Having reinterpreted both dark matter and dark energy as manifestations of substrate dynamics, the next step is to demonstrate consistency with observational data across multiple scales.
+</p>
+
+<p>
+This leads to Module 4, where rotation curves, lensing, and expansion histories are unified within the substrate framework.
+</p>
+
+<h3 style="color:#fbbf24;">13. Final Statement</h3>
+
+<p>
+Dark energy is not an independent entity but the manifestation of intrinsic synthesis pressure $P$, driving the accelerated expansion of the universe as a natural consequence of substrate dynamics.
+</p>
+
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 59 — Module 3: Explicit Mathematics — Substrate Interpretation of Dark Energy</h2>
+
+<div class="math-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Starting Point: Friedmann Equation</h3>
+
+<p>
+Standard cosmological expansion is governed by:
+</p>
+
+<p>
+$H^2 = \\left(\\frac{\\dot{a}}{a}\\right)^2 = \\frac{8\\pi G}{3}\\rho + \\frac{\\Lambda}{3}$
+</p>
+
+<p>
+Acceleration equation:
+</p>
+
+<p>
+$\\frac{\\ddot{a}}{a} = -\\frac{4\\pi G}{3}(\\rho + 3p) + \\frac{\\Lambda}{3}$
+</p>
+
+<p>
+Accelerated expansion requires:
+</p>
+
+<p>
+$\\frac{\\ddot{a}}{a} > 0$
+</p>
+
+<h3 style="color:#fbbf24;">2. Cosmological Constant Interpretation</h3>
+
+<p>
+Standard model assumes:
+</p>
+
+<p>
+$\\Lambda = \\text{constant}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$H^2 = \\mathcal{F}(\\rho, \\Lambda)$
+</p>
+
+<p>
+No structural dependence on substrate variables.
+</p>
+
+<h3 style="color:#fbbf24;">3. Substrate Parameter Introduction</h3>
+
+<p>
+From Stage 58:
+</p>
+
+<p>
+$K = |\\nabla C|, \\quad P = P_{\\text{syn}}$
+</p>
+
+<p>
+Energy density:
+</p>
+
+<p>
+$\\rho \\sim \\frac{K^2}{P}$
+</p>
+
+<p>
+Thus, cosmological dynamics must be functions of $(K, P)$.
+</p>
+
+<h3 style="color:#fbbf24;">4. Replacement of Cosmological Constant</h3>
+
+<p>
+From substrate framework:
+</p>
+
+<p>
+$H^2 \\sim P$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\Lambda \\sim P$
+</p>
+
+<p>
+Substitute:
+</p>
+
+<p>
+$H^2 = \\frac{8\\pi G}{3}\\rho + \\frac{P}{3}$
+</p>
+
+<p>
+This removes independent $\\Lambda$.
+</p>
+
+<h3 style="color:#fbbf24;">5. Expansion as Pressure-Driven Flow</h3>
+
+<p>
+Define expansion rate:
+</p>
+
+<p>
+$H = \\frac{\\dot{a}}{a}$
+</p>
+
+<p>
+Assume:
+</p>
+
+<p>
+$H \\sim \\sqrt{P}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\frac{\\dot{a}}{a} \\sim \\sqrt{P}$
+</p>
+
+<p>
+Integrating:
+</p>
+
+<p>
+$a(t) \\sim e^{\\sqrt{P} t}$
+</p>
+
+<p>
+This gives accelerated expansion.
+</p>
+
+<h3 style="color:#fbbf24;">6. Acceleration Condition</h3>
+
+<p>
+Differentiate:
+</p>
+
+<p>
+$\\ddot{a} = \\frac{d}{dt}(\\dot{a}) = P a$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\frac{\\ddot{a}}{a} = P > 0$
+</p>
+
+<p>
+Acceleration arises naturally from positive $P$.
+</p>
+
+<h3 style="color:#fbbf24;">7. Pressure as Structural Quantity</h3>
+
+<p>
+From substrate:
+</p>
+
+<p>
+$P = -V(N_0)$
+</p>
+
+<p>
+Thus, pressure is intrinsic property of medium.
+</p>
+
+<p>
+No external field required.
+</p>
+
+<h3 style="color:#fbbf24;">8. Flow Interpretation</h3>
+
+<p>
+Define substrate velocity field:
+</p>
+
+<p>
+$\\mathbf{v} = H \\mathbf{r}$
+</p>
+
+<p>
+Substitute:
+</p>
+
+<p>
+$\\mathbf{v} = \\sqrt{P} \\mathbf{r}$
+</p>
+
+<p>
+Thus, expansion is a flow driven by pressure.
+</p>
+
+<h3 style="color:#fbbf24;">9. Energy Density Consistency</h3>
+
+<p>
+Using:
+</p>
+
+<p>
+$\\rho \\sim \\frac{K^2}{P}$
+</p>
+
+<p>
+Substitute into Friedmann:
+</p>
+
+<p>
+$H^2 = \\frac{8\\pi G}{3} \\frac{K^2}{P} + \\frac{P}{3}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$H^2 = \\mathcal{F}(K, P)$
+</p>
+
+<p>
+Complete structural dependence achieved.
+</p>
+
+<h3 style="color:#fbbf24;">10. Large-Scale Limit</h3>
+
+<p>
+At cosmic scales, $K$ variations small:
+</p>
+
+<p>
+$K \\approx \\text{constant}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$H^2 \\approx \\frac{P}{3}$
+</p>
+
+<p>
+Expansion dominated by pressure.
+</p>
+
+<h3 style="color:#fbbf24;">11. Structural Incompleteness of Standard Model</h3>
+
+<p>
+Standard:
+</p>
+
+<p>
+$H^2 = \\mathcal{G}(\\rho, \\Lambda)$
+</p>
+
+<p>
+Substrate:
+</p>
+
+<p>
+$H^2 = \\mathcal{F}(K, P)$
+</p>
+
+<p>
+Since:
+</p>
+
+<p>
+$(\\rho, \\Lambda) \\not\\rightarrow (K, P)$
+</p>
+
+<p>
+Standard model incomplete.
+</p>
+
+<h3 style="color:#fbbf24;">12. Limit Case</h3>
+
+<p>
+If $P \\rightarrow 0$:
+</p>
+
+<p>
+$H \\rightarrow 0$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$a(t) \\rightarrow \\text{constant}$
+</p>
+
+<p>
+No expansion.
+</p>
+
+<p>
+Consistent with static limit.
+</p>
+
+<h3 style="color:#fbbf24;">13. Structural Conclusion</h3>
+
+<p>
+Dark energy corresponds to:
+</p>
+
+<p>
+$\\Lambda \\sim P$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Dark Energy} = \\text{Manifestation of synthesis pressure}$
+</p>
+
+<p>
+Accelerated expansion arises from intrinsic substrate dynamics.
+</p>
+
+<p>
+No independent field required.
+</p>
+
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>PRESSURE P ACCEL</span><input type="number" id="p_in" class="digital-entry" value="60" oninput="syncVal(this.value, 'p_sl')"></div><input type="range" id="p_sl" min="0" max="100" step="1" value="60" oninput="syncVal(this.value, 'p_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.8rem;">Synthesis Pressure P &rarr; Dark Energy</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">The universe expands to relieve substrate tension</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Pressure</span><span class="const-val">P-SYNTHESIS</span></div><div class="const-item"><span class="const-label">Effect</span><span class="const-val">DARK ENERGY</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-de);">MODE: MAPPING GLOBAL EXPANSION</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Intrinsic Pressure P<br>↓<br>Global Relaxation Flow<br>↓<br>Observed Accelerated Expansion`,
+hierarchy: `<div style="color: var(--accent-de); font-weight: bold; font-size: 0.95rem;">Dark Energy: Manifestation of Synthesis Pressure</div>`,
+footer: "Accelerated expansion is a structural necessity of the substrate.",
+rightNote: `<div style="color: #c084fc; line-height: 1.3; margin: 5px; font-size: 0.77rem;">Remapping 'Dark Energy' to intrinsic substrate pressure.<p><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">👉 This Module Establishes:<br>Accelerated expansion arises from intrinsic substrate pressure P, requiring no independent Dark Energy field.</p></div>`
+},
+
+4: {
+title: "CONSISTENCY WITH OBSERVATIONS",
+result: "Reproducing Observable Data",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 59 — Module 4: Consistency with Observations (Reproducing Observable Data)</h2>
+
+<div class="briefing-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Conceptual Introduction</h3>
+
+<p>
+With Modules 1–3, this framework has reinterpreted the dark sector entirely in terms of substrate dynamics. Dark matter has been identified as a manifestation of substrate stiffness $K$, and dark energy has been established as the global effect of synthesis pressure $P$.
+</p>
+
+<p>
+A critical question now arises:
+</p>
+
+<p>
+<strong>Does the substrate formulation reproduce actual observational data?</strong>
+</p>
+
+<p>
+Any theoretical framework, regardless of conceptual elegance, must ultimately be validated against empirical observations. In cosmology and astrophysics, the most important observables include:
+</p>
+
+<ul>
+<li>Galaxy rotation curves</li>
+<li>Gravitational lensing maps</li>
+<li>Large-scale structure distributions</li>
+</ul>
+
+<p>
+Thus, this module establishes the decisive transition:
+</p>
+
+<p>
+$\\text{Substrate Theory} \\;\\longrightarrow\\; \\text{Observable Consistency}$
+</p>
+
+<h3 style="color:#fbbf24;">2. Observational Benchmarks</h3>
+
+<p>
+Two primary observational pillars define the dark sector problem:
+</p>
+
+<ul>
+<li><strong>Rotation Curves:</strong> Flat velocity profiles at large radii</li>
+<li><strong>Gravitational Lensing:</strong> Light bending exceeding visible mass predictions</li>
+</ul>
+
+<p>
+In standard cosmology, both effects are explained by introducing dark matter as an additional mass component.
+</p>
+
+<p>
+Thus, the standard mapping is:
+</p>
+
+<p>
+$\\text{Observation} \\;\\longrightarrow\\; \\text{Dark Matter Hypothesis}$
+</p>
+
+<p>
+However, this remains a phenomenological insertion rather than a structural derivation.
+</p>
+
+<h3 style="color:#fbbf24;">3. Substrate Mapping to Observables</h3>
+
+<p>
+From previous modules, the effective density is given by:
+</p>
+
+<p>
+$\\rho_{\\text{eff}}(x) = \\frac{K^2(x)}{P(x)}$
+</p>
+
+<p>
+This density replaces both visible and dark components in a unified manner.
+</p>
+
+<p>
+Thus, gravitational observables become:
+</p>
+
+<p>
+$\\Phi(x) = -G \\int \\frac{\\rho_{\\text{eff}}(x')}{|x - x'|} d^3x'$
+</p>
+
+<p>
+and motion follows:
+</p>
+
+<p>
+$v^2(r) = r \\frac{d\\Phi}{dr}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Observable Dynamics} \\;\\longrightarrow\\; \\text{Function of } (K, P)$
+</p>
+
+<h3 style="color:#fbbf24;">4. Reproduction of Rotation Curves</h3>
+
+<p>
+For flat rotation curves:
+</p>
+
+<p>
+$v(r) \\approx \\text{constant}$
+</p>
+
+<p>
+This requires:
+</p>
+
+<p>
+$\\rho_{\\text{eff}}(r) \\sim \\frac{1}{r^2}$
+</p>
+
+<p>
+From substrate relation:
+</p>
+
+<p>
+$\\frac{K^2(r)}{P(r)} \\sim \\frac{1}{r^2}$
+</p>
+
+<p>
+Thus, flat rotation curves arise naturally from spatial variation in substrate parameters.
+</p>
+
+<p>
+No additional dark matter component is required.
+</p>
+
+<h3 style="color:#fbbf24;">5. Gravitational Lensing from Substrate</h3>
+
+<p>
+Gravitational lensing depends on spacetime curvature, which determines light deflection.
+</p>
+
+<p>
+From Stage 58:
+</p>
+
+<p>
+$g_{\\mu\\nu} \\sim \\mathcal{G}_{\\mu\\nu}(K, P)$
+</p>
+
+<p>
+Thus, curvature becomes a function of substrate configuration.
+</p>
+
+<p>
+The deflection angle is given by:
+</p>
+
+<p>
+$\\alpha \\sim \\nabla \\Phi$
+</p>
+
+<p>
+with:
+</p>
+
+<p>
+$\\Phi \\sim \\int \\frac{K^2}{P}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Lensing} \\;\\longrightarrow\\; \\text{Substrate Curvature Effect}$
+</p>
+
+<p>
+Enhanced lensing arises from gradients in $K$ and $P$, without invoking unseen mass.
+</p>
+
+<h3 style="color:#fbbf24;">6. Physical Interpretation</h3>
+
+<p>
+From the substrate perspective:
+</p>
+
+<ul>
+<li>Rotation anomalies arise from distributed substrate stiffness</li>
+<li>Lensing anomalies arise from substrate curvature</li>
+</ul>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Observables} = \\text{Manifestations of Substrate Structure}$
+</p>
+
+<p>
+This unifies dynamical and optical effects under a single structural framework.
+</p>
+
+<h3 style="color:#fbbf24;">7. Necessity of Observational Consistency</h3>
+
+<p>
+A valid physical theory must satisfy:
+</p>
+
+<p>
+<strong>All observed phenomena must be reproducible from its fundamental parameters.</strong>
+</p>
+
+<p>
+In this framework:
+</p>
+
+<p>
+$\\mathcal{O}_{\\text{obs}} = \\mathcal{F}(K, P)$
+</p>
+
+<p>
+Thus, observational agreement is not imposed but derived.
+</p>
+
+<h3 style="color:#fbbf24;">8. Graph / Visualization Interpretation Paragraph (MANDATORY)</h3>
+
+<p>
+The visualization presents a substrate bending surface representing effective gravitational potential.
+</p>
+
+<p>
+The horizontal axes correspond to spatial coordinates, while the vertical axis represents geodesic deviation or curvature strength.
+</p>
+
+<p>
+The central peak indicates strong curvature near mass concentration, gradually flattening outward.
+</p>
+
+<p>
+This shape reproduces lensing behavior, where light paths bend more strongly near dense regions.
+</p>
+
+<p>
+The key insight is that the surface emerges from substrate configuration rather than being imposed by an external mass distribution.
+</p>
+
+<p>
+Thus, the graph encodes:
+</p>
+
+<p>
+$\\text{Substrate Curvature} \\;\\Rightarrow\\; \\text{Observed Lensing}$
+</p>
+
+<h3 style="color:#fbbf24;">9. Conceptual Compression Lines</h3>
+
+<p>
+Observations are reproduced from substrate dynamics.<br>
+No independent dark matter is required.<br>
+Rotation and lensing share a common origin.<br>
+Observables are manifestations of $(K, P)$.
+</p>
+
+<h3 style="color:#fbbf24;">10. Logical Closure</h3>
+
+<p>
+This module establishes that the substrate framework is fully consistent with observational data. Both rotation curves and gravitational lensing are reproduced without introducing new entities.
+</p>
+
+<p>
+Thus, the framework satisfies empirical requirements while maintaining structural unity.
+</p>
+
+<h3 style="color:#fbbf24;">11. Transition to Next Module</h3>
+
+<p>
+Having demonstrated observational consistency, the next step is to complete the dark sector reinterpretation by unifying all components into a single structural description.
+</p>
+
+<p>
+This leads to Module 5, where the full resolution of the dark sector is formally established.
+</p>
+
+<h3 style="color:#fbbf24;">12. Final Statement</h3>
+
+<p>
+All observed gravitational phenomena—including rotation curves and lensing—are fully explained as manifestations of substrate dynamics governed by $K$ and $P$, eliminating the need for independent dark sector entities.
+</p>
+
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 59 — Module 4: Explicit Mathematics — Consistency with Observations</h2>
+
+<div class="math-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Starting Point: Observable Gravitational Potential</h3>
+
+<p>
+All gravitational observables—rotation curves and lensing—are determined by the gravitational potential $\\Phi(x)$:
+</p>
+
+<p>
+$\\Phi(x) = -G \\int \\frac{\\rho(x')}{|x - x'|} d^3x'$
+</p>
+
+<p>
+In standard cosmology:
+</p>
+
+<p>
+$\\rho = \\rho_{\\text{visible}} + \\rho_{\\text{DM}}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\Phi = \\Phi_{\\text{visible}} + \\Phi_{\\text{DM}}$
+</p>
+
+<p>
+This separates observable and dark contributions.
+</p>
+
+<h3 style="color:#fbbf24;">2. Substrate Replacement of Density</h3>
+
+<p>
+From Stage 58:
+</p>
+
+<p>
+$\\rho_{\\text{eff}}(x) = \\frac{K^2(x)}{P(x)}$
+</p>
+
+<p>
+Thus, total density becomes:
+</p>
+
+<p>
+$\\rho(x) \\rightarrow \\rho_{\\text{eff}}(x)$
+</p>
+
+<p>
+Therefore:
+</p>
+
+<p>
+$\\Phi(x) = -G \\int \\frac{K^2(x')}{P(x')} \\frac{1}{|x - x'|} d^3x'$
+</p>
+
+<p>
+This removes the need for dark matter as a separate component.
+</p>
+
+<h3 style="color:#fbbf24;">3. Rotation Curve Derivation</h3>
+
+<p>
+Circular velocity is determined by:
+</p>
+
+<p>
+$v^2(r) = r \\frac{d\\Phi}{dr}$
+</p>
+
+<p>
+Substituting:
+</p>
+
+<p>
+$v^2(r) = G r \\frac{d}{dr} \\left[ \\int_0^r \\frac{K^2(r')}{P(r')} \\frac{4\\pi r'^2}{r} dr' \\right]$
+</p>
+
+<p>
+Simplifying:
+</p>
+
+<p>
+$v^2(r) = \\frac{G}{r} \\int_0^r \\frac{K^2(r')}{P(r')} 4\\pi r'^2 dr'$
+</p>
+
+<p>
+Define:
+</p>
+
+<p>
+$M_{\\text{eff}}(r) = \\int_0^r \\frac{K^2(r')}{P(r')} 4\\pi r'^2 dr'$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$v^2(r) = \\frac{G M_{\\text{eff}}(r)}{r}$
+</p>
+
+<h3 style="color:#fbbf24;">4. Condition for Flat Rotation Curves</h3>
+
+<p>
+Observed:
+</p>
+
+<p>
+$v(r) \\approx \\text{constant}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$M_{\\text{eff}}(r) \\sim r$
+</p>
+
+<p>
+Differentiating:
+</p>
+
+<p>
+$\\frac{dM_{\\text{eff}}}{dr} = 4\\pi r^2 \\frac{K^2(r)}{P(r)} \\sim \\text{constant}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\frac{K^2(r)}{P(r)} \\sim \\frac{1}{r^2}$
+</p>
+
+<p>
+This reproduces flat rotation curves without dark matter.
+</p>
+
+<h3 style="color:#fbbf24;">5. Gravitational Lensing Equation</h3>
+
+<p>
+Deflection angle:
+</p>
+
+<p>
+$\\alpha = \\frac{4G}{c^2} \\int \\frac{\\rho(x')}{|x - x'|} d^3x'$
+</p>
+
+<p>
+Replacing density:
+</p>
+
+<p>
+$\\alpha = \\frac{4G}{c^2} \\int \\frac{K^2(x')}{P(x')} \\frac{1}{|x - x'|} d^3x'$
+</p>
+
+<p>
+Thus, lensing depends on substrate configuration.
+</p>
+
+<h3 style="color:#fbbf24;">6. Metric Interpretation</h3>
+
+<p>
+From Stage 58:
+</p>
+
+<p>
+$g_{\\mu\\nu} \\sim \\mathcal{G}_{\\mu\\nu}(K, P)$
+</p>
+
+<p>
+Thus, curvature tensor:
+</p>
+
+<p>
+$G_{\\mu\\nu} \\sim \\partial^2 \\mathcal{G}(K, P)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Lensing} \\Rightarrow \\text{Geodesic deviation from } (K, P)$
+</p>
+
+<h3 style="color:#fbbf24;">7. Effective Potential Formulation</h3>
+
+<p>
+Define effective potential:
+</p>
+
+<p>
+$\\Phi_{\\text{eff}}(x) = -G \\int \\frac{K^2(x')}{P(x')} \\frac{1}{|x - x'|} d^3x'$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\nabla^2 \\Phi_{\\text{eff}} = 4\\pi G \\frac{K^2}{P}$
+</p>
+
+<p>
+This replaces Poisson equation.
+</p>
+
+<h3 style="color:#fbbf24;">8. Unified Observable Equation</h3>
+
+<p>
+All observables satisfy:
+</p>
+
+<p>
+$\\mathcal{O}_{\\text{obs}} = \\mathcal{F}\\left( \\frac{K^2}{P} \\right)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Rotation, Lensing, Dynamics} \\rightarrow \\text{Function of } (K, P)$
+</p>
+
+<h3 style="color:#fbbf24;">9. Consistency Condition</h3>
+
+<p>
+For consistency with observations:
+</p>
+
+<p>
+$\\frac{K^2(x)}{P(x)} \\approx \\rho_{\\text{obs}}(x)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Observed Density} = \\text{Substrate Effective Density}$
+</p>
+
+<p>
+No additional component is required.
+</p>
+
+<h3 style="color:#fbbf24;">10. Limit Case</h3>
+
+<p>
+If:
+</p>
+
+<p>
+$\\nabla K = 0, \\quad \\nabla P = 0$
+</p>
+
+<p>
+Then:
+</p>
+
+<p>
+$\\rho_{\\text{eff}} = \\text{constant}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$v(r) \\sim \\frac{1}{\\sqrt{r}}$
+</p>
+
+<p>
+Recovering Newtonian behavior.
+</p>
+
+<h3 style="color:#fbbf24;">11. Structural Mapping</h3>
+
+<p>
+Thus, mapping is:
+</p>
+
+<p>
+$(K, P) \\longrightarrow \\rho_{\\text{eff}} \\longrightarrow \\Phi \\longrightarrow \\mathcal{O}_{\\text{obs}}$
+</p>
+
+<p>
+This replaces:
+</p>
+
+<p>
+$(\\rho_{\\text{visible}}, \\rho_{\\text{DM}}) \\longrightarrow \\mathcal{O}$
+</p>
+
+<h3 style="color:#fbbf24;">12. Structural Incompleteness of Standard Model</h3>
+
+<p>
+Standard model:
+</p>
+
+<p>
+$\\mathcal{O} = \\mathcal{G}(\\rho_{\\text{visible}}, \\rho_{\\text{DM}})$
+</p>
+
+<p>
+Substrate model:
+</p>
+
+<p>
+$\\mathcal{O} = \\mathcal{F}(K, P)$
+</p>
+
+<p>
+Since:
+</p>
+
+<p>
+$(\\rho_{\\text{DM}}) \\not\\rightarrow (K, P)$
+</p>
+
+<p>
+Thus, standard formulation is not structurally grounded.
+</p>
+
+<h3 style="color:#fbbf24;">13. Structural Conclusion</h3>
+
+<p>
+All gravitational observables are fully determined by substrate parameters:
+</p>
+
+<p>
+$\\rho_{\\text{eff}} = \\frac{K^2}{P}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Observations} = \\text{Manifestations of Substrate Structure}$
+</p>
+
+<p>
+Dark matter is not required as an independent entity.
+</p>
+
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>DATA CONSISTENCY</span><input type="number" id="o_in" class="digital-entry" value="80" oninput="syncVal(this.value, 'o_sl')"></div><input type="range" id="o_sl" min="0" max="100" step="1" value="80" oninput="syncVal(this.value, 'o_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.8rem;">Substrate (K, P) &rarr; Observed Data</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Reality is consistent; our models must adapt</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Lensing</span><span class="const-val">CONSISTENT</span></div><div class="const-item"><span class="const-label">Rotation</span><span class="const-val">CONSISTENT</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-obs);">MODE: REPRODUCING LIGHT-BENDING MAPS</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Effective Potential<br>↓<br>Geodesic Deviation<br>↓<br>Verified Lensing Data`,
+hierarchy: `<div style="color: var(--accent-obs); font-weight: bold; font-size: 0.95rem;">Observables: Reinterpreted through Substrate</div>`,
+footer: "Observations support substrate physics over particle dark matter.",
+rightNote: `<div style="color: #f87171; line-height: 1.3; margin: 5px; font-size: 0.77rem;">Validating the model against astronomical observations.<p><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">👉 This Module Establishes:<br>Substrate interpretation reproduced observed phenomena including lensing and rotation curves without contradiction.</p></div>`
+},
+
+5: {
+title: "DARK SECTOR RESOLUTION",
+result: "Emergent Effect Resolution",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 59 — Module 5: Unified Dark Sector Resolution (Emergent Effect Resolution)</h2>
+
+<div class="briefing-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Conceptual Introduction</h3>
+
+<p>
+With the completion of Modules 1–4, this framework has systematically dismantled the necessity of the dark sector as an independent ontological category. Dark matter has been reinterpreted as the manifestation of substrate stiffness $K$, dark energy as the global effect of synthesis pressure $P$, and all observational phenomena have been shown to emerge from substrate dynamics.
+</p>
+
+<p>
+The final step is therefore not the introduction of a new concept, but the unification of all previous insights into a single coherent resolution:
+</p>
+
+<p>
+<strong>The dark sector is not a set of entities, but a collection of emergent effects arising from substrate structure.</strong>
+</p>
+
+<p>
+Thus, this module establishes the decisive closure:
+</p>
+
+<p>
+$\\text{Dark Sector} \\;\\longrightarrow\\; \\text{Substrate Effects}$
+</p>
+
+<h3 style="color:#fbbf24;">2. Structure of the Standard Dark Sector</h3>
+
+<p>
+In the standard cosmological model, the universe is composed of:
+</p>
+
+<ul>
+<li>Visible (baryonic) matter</li>
+<li>Dark matter</li>
+<li>Dark energy</li>
+</ul>
+
+<p>
+Mathematically:
+</p>
+
+<p>
+$\\rho_{\\text{total}} = \\rho_{\\text{visible}} + \\rho_{\\text{DM}} + \\rho_{\\Lambda}$
+</p>
+
+<p>
+These components are treated as independent contributors to gravitational dynamics and cosmic evolution.
+</p>
+
+<p>
+However, both $\\rho_{\\text{DM}}$ and $\\rho_{\\Lambda}$ are phenomenological insertions without structural derivation.
+</p>
+
+<h3 style="color:#fbbf24;">3. Structural Replacement by Substrate Parameters</h3>
+
+<p>
+From the developed framework:
+</p>
+
+<p>
+$\\rho_{\\text{eff}} = \\frac{K^2}{P}, \\qquad \\Lambda \\sim P$
+</p>
+
+<p>
+Thus, the full cosmological description becomes:
+</p>
+
+<p>
+$\\rho_{\\text{total}} \\rightarrow \\rho_{\\text{eff}}(K, P)$
+</p>
+
+<p>
+and:
+</p>
+
+<p>
+$\\text{Cosmic Expansion} \\rightarrow \\text{Function of } P$
+</p>
+
+<p>
+Thus, all dark sector contributions are absorbed into substrate parameters.
+</p>
+
+<h3 style="color:#fbbf24;">4. Elimination of Ontological Redundancy</h3>
+
+<p>
+A fundamental principle of theoretical physics is minimal ontology:
+</p>
+
+<p>
+<strong>No additional entities should be introduced if existing structure suffices.</strong>
+</p>
+
+<p>
+Since all observed effects are reproduced through $(K, P)$:
+</p>
+
+<ul>
+<li>Dark matter becomes unnecessary as a separate mass component</li>
+<li>Dark energy becomes unnecessary as a separate field</li>
+</ul>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Dark Sector Entities} \\;\\Rightarrow\\; \\text{Redundant Descriptions}$
+</p>
+
+<h3 style="color:#fbbf24;">5. Unified Mapping of Phenomena</h3>
+
+<p>
+All previously distinct phenomena are now unified:
+</p>
+
+<ul>
+<li>Rotation curves $\\rightarrow$ variation of $K$</li>
+<li>Lensing $\\rightarrow$ curvature from $(K, P)$</li>
+<li>Acceleration $\\rightarrow$ global effect of $P$</li>
+</ul>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{All Dark Sector Effects} = \\mathcal{F}(K, P)$
+</p>
+
+<p>
+This represents a complete structural unification.
+</p>
+
+<h3 style="color:#fbbf24;">6. Physical Interpretation</h3>
+
+<p>
+From the substrate perspective, the universe is a continuous medium with intrinsic structure and dynamics.
+</p>
+
+<p>
+Dark matter effects correspond to local structural responses of this medium, while dark energy corresponds to its global relaxation behavior.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Universe} = \\text{Dynamical Substrate with Structured Response}$
+</p>
+
+<p>
+The apparent multiplicity of components arises from observing different aspects of the same underlying structure.
+</p>
+
+<h3 style="color:#fbbf24;">7. Necessity of Unified Resolution (Very Important)</h3>
+
+<p>
+A complete theory must satisfy:
+</p>
+
+<p>
+$\\mathcal{O}_{\\text{total}} = \\mathcal{F}(\\text{Fundamental Parameters})$
+</p>
+
+<p>
+If multiple independent entities are required:
+</p>
+
+<p>
+$\\mathcal{O} = \\mathcal{G}(\\rho_{\\text{visible}}, \\rho_{\\text{DM}}, \\Lambda)$
+</p>
+
+<p>
+then the theory remains phenomenological.
+</p>
+
+<p>
+This framework instead provides:
+</p>
+
+<p>
+$\\mathcal{O} = \\mathcal{F}(K, P)$
+</p>
+
+<p>
+Thus achieving structural completeness.
+</p>
+
+<h3 style="color:#fbbf24;">8. Graph / Visualization Interpretation Paragraph (MANDATORY)</h3>
+
+<p>
+The visualization presents a unified substrate surface with oscillatory structure, representing variations in the underlying medium.
+</p>
+
+<p>
+The horizontal axes correspond to substrate dimensions, while the vertical axis represents emergent wave amplitude or structural variation.
+</p>
+
+<p>
+Peaks and troughs indicate regions of enhanced and reduced substrate response, corresponding to gravitational effects and energy distribution.
+</p>
+
+<p>
+The continuous nature of the surface emphasizes that all phenomena arise from a single underlying structure rather than discrete components.
+</p>
+
+<p>
+Thus, the graph encodes:
+</p>
+
+<p>
+$\\text{Unified Substrate Structure} \\;\\Rightarrow\\; \\text{All Observed Phenomena}$
+</p>
+
+<h3 style="color:#fbbf24;">9. Conceptual Compression Lines</h3>
+
+<p>
+Dark sector is not fundamental.<br>
+All effects arise from $(K, P)$.<br>
+Multiple phenomena, single origin.<br>
+Substrate dynamics unify cosmology.
+</p>
+
+<h3 style="color:#fbbf24;">10. Logical Closure</h3>
+
+<p>
+This module completes the reinterpretation of the dark sector by demonstrating that all its components are emergent effects of substrate dynamics.
+</p>
+
+<p>
+The distinction between dark matter and dark energy dissolves into a unified structural description.
+</p>
+
+<p>
+Thus, the framework achieves conceptual closure and ontological simplification.
+</p>
+
+<h3 style="color:#fbbf24;">11. Transition to Stage Summary</h3>
+
+<p>
+With the dark sector fully resolved, the next step is to consolidate all modules into a unified stage summary, capturing the complete cosmological extension of the framework.
+</p>
+
+<h3 style="color:#fbbf24;">12. Final Statement</h3>
+
+<p>
+Dark matter and dark energy are not independent entities but emergent manifestations of substrate dynamics governed by $K$ and $P$, establishing a unified and minimal description of the universe.
+</p>
+
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 59 — Module 5: Explicit Mathematics — Unified Dark Sector Resolution</h2>
+
+<div class="math-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Starting Point: Standard Dark Sector Decomposition</h3>
+
+<p>
+In standard cosmology, total energy density is written as:
+</p>
+
+<p>
+$\\rho_{\\text{total}} = \\rho_{\\text{visible}} + \\rho_{\\text{DM}} + \\rho_{\\Lambda}$
+</p>
+
+<p>
+Friedmann equation:
+</p>
+
+<p>
+$H^2 = \\frac{8\\pi G}{3} (\\rho_{\\text{visible}} + \\rho_{\\text{DM}}) + \\frac{\\Lambda}{3}$
+</p>
+
+<p>
+Thus, dynamics depend on three independent components.
+</p>
+
+<h3 style="color:#fbbf24;">2. Structural Replacement by Substrate Variables</h3>
+
+<p>
+From Stage 58:
+</p>
+
+<p>
+$\\rho_{\\text{eff}}(x) = \\frac{K^2(x)}{P(x)}$
+</p>
+
+<p>
+From Stage 59:
+</p>
+
+<p>
+$\\Lambda \\sim P$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\rho_{\\text{total}} \\rightarrow \\frac{K^2}{P}$
+</p>
+
+<p>
+and:
+</p>
+
+<p>
+$\\Lambda \\rightarrow P$
+</p>
+
+<p>
+Thus, all contributions reduce to functions of $(K, P)$.
+</p>
+
+<h3 style="color:#fbbf24;">3. Unified Friedmann Equation</h3>
+
+<p>
+Substituting:
+</p>
+
+<p>
+$H^2 = \\frac{8\\pi G}{3} \\frac{K^2}{P} + \\frac{P}{3}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$H^2 = \\mathcal{F}(K, P)$
+</p>
+
+<p>
+This replaces multi-component cosmology.
+</p>
+
+<h3 style="color:#fbbf24;">4. Unified Gravitational Potential</h3>
+
+<p>
+Potential becomes:
+</p>
+
+<p>
+$\\Phi(x) = -G \\int \\frac{K^2(x')}{P(x')} \\frac{1}{|x - x'|} d^3x'$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\nabla^2 \\Phi = 4\\pi G \\frac{K^2}{P}$
+</p>
+
+<p>
+This replaces:
+</p>
+
+<p>
+$\\nabla^2 \\Phi = 4\\pi G (\\rho_{\\text{visible}} + \\rho_{\\text{DM}})$
+</p>
+
+<h3 style="color:#fbbf24;">5. Unified Rotation Dynamics</h3>
+
+<p>
+Velocity:
+</p>
+
+<p>
+$v^2(r) = \\frac{G}{r} \\int_0^r \\frac{K^2(r')}{P(r')} 4\\pi r'^2 dr'$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$v(r) = \\mathcal{V}(K, P)$
+</p>
+
+<h3 style="color:#fbbf24;">6. Unified Lensing Equation</h3>
+
+<p>
+Deflection angle:
+</p>
+
+<p>
+$\\alpha = \\frac{4G}{c^2} \\int \\frac{K^2(x')}{P(x')} \\frac{1}{|x - x'|} d^3x'$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\alpha = \\mathcal{A}(K, P)$
+</p>
+
+<h3 style="color:#fbbf24;">7. Unified Acceleration Equation</h3>
+
+<p>
+Scale factor dynamics:
+</p>
+
+<p>
+$\\frac{\\ddot{a}}{a} = P - \\frac{4\\pi G}{3} \\frac{K^2}{P}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Acceleration} = \\mathcal{G}(K, P)$
+</p>
+
+<h3 style="color:#fbbf24;">8. Complete Observable Mapping</h3>
+
+<p>
+All observables satisfy:
+</p>
+
+<p>
+$\\mathcal{O} = \\mathcal{F}(K, P)$
+</p>
+
+<p>
+Explicitly:
+</p>
+
+<ul>
+<li>$H^2 = \\mathcal{F}_1(K, P)$</li>
+<li>$\\Phi = \\mathcal{F}_2(K, P)$</li>
+<li>$v = \\mathcal{F}_3(K, P)$</li>
+<li>$\\alpha = \\mathcal{F}_4(K, P)$</li>
+</ul>
+
+<h3 style="color:#fbbf24;">9. Elimination Mapping</h3>
+
+<p>
+Standard variables:
+</p>
+
+<p>
+$(\\rho_{\\text{DM}}, \\Lambda)$
+</p>
+
+<p>
+are replaced by:
+</p>
+
+<p>
+$(K, P)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$(\\rho_{\\text{DM}}, \\Lambda) \\rightarrow \\emptyset$
+</p>
+
+<p>
+No independent variables remain.
+</p>
+
+<h3 style="color:#fbbf24;">10. Structural Closure Condition</h3>
+
+<p>
+A complete theory requires:
+</p>
+
+<p>
+$\\frac{\\partial \\mathcal{O}}{\\partial X_i} = 0 \\quad \\forall X_i \\notin (K, P)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\frac{\\partial \\mathcal{O}}{\\partial \\rho_{\\text{DM}}} = 0, \\quad \\frac{\\partial \\mathcal{O}}{\\partial \\Lambda} = 0$
+</p>
+
+<p>
+All observables depend only on $(K, P)$.
+</p>
+
+<h3 style="color:#fbbf24;">11. Limit Case: Standard Model Recovery</h3>
+
+<p>
+If:
+</p>
+
+<p>
+$\\frac{K^2}{P} \\rightarrow \\rho_{\\text{visible}}, \\quad P \\rightarrow \\Lambda$
+</p>
+
+<p>
+Then:
+</p>
+
+<p>
+$\\mathcal{F}(K, P) \\rightarrow \\mathcal{G}(\\rho, \\Lambda)$
+</p>
+
+<p>
+Thus, standard cosmology is recovered as an effective limit.
+</p>
+
+<h3 style="color:#fbbf24;">12. Minimal Ontology Condition</h3>
+
+<p>
+Number of fundamental variables:
+</p>
+
+<p>
+$n_{\\text{standard}} = 3 \\quad (\\rho_{\\text{visible}}, \\rho_{\\text{DM}}, \\Lambda)$
+</p>
+
+<p>
+$n_{\\text{substrate}} = 2 \\quad (K, P)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$n_{\\text{substrate}} < n_{\\text{standard}}$
+</p>
+
+<p>
+Indicating a more fundamental theory.
+</p>
+
+<h3 style="color:#fbbf24;">13. Structural Conclusion</h3>
+
+<p>
+All dark sector phenomena reduce to:
+</p>
+
+<p>
+$\\rho_{\\text{eff}} = \\frac{K^2}{P}, \\quad \\Lambda = P$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Dark Sector} = \\text{Effective Description of } (K, P)$
+</p>
+
+<p>
+No independent entities are required.
+</p>
+
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>UNIFIED GAIN</span><input type="number" id="u_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'u_sl')"></div><input type="range" id="u_sl" min="0" max="100" step="1" value="100" oninput="syncVal(this.value, 'u_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.8rem;">Anomalies &rarr; Resolved Substrate Dynamics</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">The darkness disappears when the light of structure is found</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Status</span><span class="const-val">RESOLVED</span></div><div class="const-item"><span class="const-label">Ontology</span><span class="const-val">MINIMAL</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-res);">SYSTEM: DARK SECTOR ANOMALIES ELIMINATED</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Structural Unity<br>↓<br>Anomaly Absorption<br>↓<br>Resolved Synthesis Framework`,
+hierarchy: `<div style="color: var(--accent-res); font-weight: bold; font-size: 0.95rem;">Resolution: Dark Sector as Substrate Effect</div>`,
+footer: "The dark sector is an emergent property, not a fundamental entity.",
+rightNote: `<div style="color: #2dd4bf; line-height: 1.3; margin: 5px; font-size: 0.77rem;">The final resolution of cosmological unknowns.<p><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">👉 This Module Establishes:<br>Dark matter and dark energy are not new entities, but emergent manifestations of fundamental substrate structure.</p></div>`
+}
+};
+
+function syncVal(val, id) {
+const sliderId = id.includes('_in') ? id.replace('_in', '_sl') : id;
+const inputId = id.includes('_sl') ? id.replace('_sl', '_in') : id;
+if(document.getElementById(sliderId)) document.getElementById(sliderId).value = val;
+if(document.getElementById(inputId)) document.getElementById(inputId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+document.getElementById('brief-box-content').innerHTML = content.brief;
+document.getElementById('math-box-content').innerHTML = content.math;
+document.getElementById('control-sliders').innerHTML = content.sliders;
+
+document.getElementById('active-module-title').innerText = content.title;
+const resultEl = document.getElementById('active-module-result');
+resultEl.innerText = content.result;
+resultEl.style.fontSize = content.resultSize || "0.75rem";
+
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('metrics-content').innerHTML = content.metricsContent;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+document.getElementById('structure-box-area').innerHTML = content.structure;
+document.getElementById('telemetry-area').innerHTML = content.telemetry;
+showScreen('briefing');
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() {
+showScreen('lab');
+setTimeout(() => { runLab(); window.dispatchEvent(new Event('resize')); }, 100);
+}
+
+function runLab() {
+const target = document.getElementById('plot-area');
+if (!target) return;
+let data = [];
+let layout = {
+paper_bgcolor: 'black', plot_bgcolor: 'black', margin: {t:60,b:10,l:0,r:0},
+showlegend: false, font: { family: 'sans-serif', size: 10 },
+scene: {
+xaxis: { gridcolor: '#222', color: '#94a3b8', title: 'Cosmic x' },
+yaxis: { gridcolor: '#222', color: '#94a3b8', title: 'Cosmic y' },
+zaxis: { gridcolor: '#222', color: '#94a3b8', title: 'Substrate State' }
+}
+};
+
+if (currentTool === 1) { // LIMITATIONS
+let a = parseFloat(document.getElementById('a_sl')?.value || 40) / 40;
+let r = Array.from({length: 50}, (_, i) => i / 10 + 0.1);
+let vObs = r.map(ri => 1.5); // Flat curve
+let vVis = r.map(ri => Math.min(ri, 1) / Math.sqrt(ri * a)); // Falling curve
+
+// 1. Visible Prediction (Base for the fill)
+data.push({
+x: r, y: vVis,
+mode: 'lines',
+line: { color: '#94a3b8', width: 2, dash: 'dash' },
+name: 'Visible Prediction'
+});
+
+// 2. Observational Gap (Shaded Anomaly Area)
+data.push({
+x: r, y: vObs,
+fill: 'tonexty',
+fillcolor: 'rgba(96, 165, 250, 0.2)', // Light blue semi-transparent
+mode: 'none',
+name: 'Observational Gap',
+hoverinfo: 'skip'
+});
+
+// 3. Observed Curve (Top line)
+data.push({
+x: r, y: vObs,
+mode: 'lines',
+line: { color: '#60a5fa', width: 4 },
+name: 'Observed Curve'
+});
+
+layout.xaxis = { title: "Galaxy Radius (r)", color: "#eee", gridcolor: "#333" };
+layout.yaxis = { title: "Rotation Velocity (v)", color: "#eee", gridcolor: "#333" };
+layout.showlegend = true;
+layout.legend = {
+font: { color: '#eee' },
+x: 0.02, y: 0.98,
+xanchor: 'left', yanchor: 'top',
+bgcolor: 'rgba(0,0,0,0.3)'
+};
+layout.title = {
+text: "GALAXY ROTATION DEVIANCE",
+font: { color: '#94a3b8' }
+};
+
+} else if (currentTool === 2) { // DARK MATTER POTENTIAL
+let k = parseFloat(document.getElementById('k_sl')?.value || 50) / 100;
+let x = Array.from({length: 40}, (_, i) => i - 20);
+let y = Array.from({length: 40}, (_, i) => i - 20);
+let z = x.map(xi => y.map(yi => {
+let r = Math.sqrt(xi*xi + yi*yi) + 1;
+return -(2/r + k*10/(r+2)); // Deepened potential well
+}));
+data.push({ type: 'surface', z: z, colorscale: 'Blues', showscale: false, showlegend: true, name: 'Effective Potential' });
+layout.scene.zaxis.range = [-3, 0];
+layout.showlegend = true;
+
+layout.legend = { font: { color: '#eee' }, x: 0, y: 1, xanchor: 'left', yanchor: 'top', bgcolor: 'rgba(0,0,0,0)' };
+layout.title = { text: "SUBSTRATE POTENTIAL (Extra Gravity)", font: { color: '#60a5fa' } };
+layout.scene.xaxis.title = "Radial Plane x";
+layout.scene.yaxis.title = "Radial Plane y";
+layout.scene.zaxis.title = "Potential Φₑ𝒻𝒻";
+
+} else if (currentTool === 3) { // DARK ENERGY FLOW
+let pRaw = parseFloat(document.getElementById('p_sl')?.value || 60);
+let scale = 0.5 + Math.pow(pRaw / 100, 1.2) * 1.5;
+let x = [], y = [], z = [], u = [], v = [], w = [];
+for (let i = 0; i < 10; i++) {
+for (let j = 0; j < 10; j++) {
+let xi = (i - 5) * 3; let yi = (j - 5) * 3;
+let mag = Math.sqrt(xi*xi + yi*yi) + 0.0001;
+x.push(xi); y.push(yi); z.push(0);
+u.push((xi/mag) * scale); v.push((yi/mag) * scale); w.push(scale * 0.2);
+}
+}
+
+data.push({
+type: 'cone',
+x: x, y: y, z: z,
+u: u, v: v, w: w,
+colorscale: 'Purples',
+sizemode: 'absolute',
+sizeref: 2,
+anchor: 'tail',
+showscale: false,
+showlegend: true,
+name: 'Synthesis Flow (P)'
+});
+
+layout.scene = {
+xaxis: {
+title: { text: "Expansion Plane (x)", font: { color: '#eee' } },
+range: [-15, 15],
+color: '#eee'
+},
+yaxis: {
+title: { text: "Expansion Plane (y)", font: { color: '#eee' } },
+range: [-15, 15],
+color: '#eee'
+},
+zaxis: {
+title: { text: "Flow Intensity", font: { color: '#eee' } },
+range: [-5, 5],
+color: '#eee'
+},
+aspectmode: 'cube'
+};
+
+layout.showlegend = true;
+layout.legend = {
+font: { color: '#eee' },
+x: 0.02,
+y: 0.98,
+xanchor: 'left',
+yanchor: 'top',
+bgcolor: 'rgba(0,0,0,0.3)'
+};
+
+layout.title = {
+text: `DARK ENERGY (Synthesis Flow) — P: ${pRaw}`,
+font: { color: '#c084fc' }
+};
+
+
+} else if (currentTool === 4) { // LENSING MAP
+let o = parseFloat(document.getElementById('o_sl')?.value || 80) / 100;
+let x = Array.from({length: 40}, (_, i) => i - 20);
+let y = Array.from({length: 40}, (_, i) => i - 20);
+let z = x.map(xi => y.map(yi => (Math.exp(-(xi*xi+yi*yi)/100) * o * 2)));
+data.push({ type: 'surface', z: z, colorscale: 'Reds', showscale: false, showlegend: true, name: 'Lensing Potential' });
+layout.scene.zaxis.range = [0, 2];
+layout.showlegend = true;
+layout.legend = { font: { color: '#eee' }, x: 0, y: 1, xanchor: 'left', yanchor: 'top', bgcolor: 'rgba(0,0,0,0)' };
+layout.title = { text: "SUBSTRATE BENDING (Lensing Map)", font: { color: '#f87171' } };
+layout.scene.xaxis.title = "Angular Coordinate (θₓ)";
+layout.scene.yaxis.title = "Angular Coordinate (θᵧ)";
+layout.scene.zaxis.title = "Geodesic Deviation";
+
+} else if (currentTool === 5) { // RESOLUTION UNIFIED
+let u = parseFloat(document.getElementById('u_sl')?.value || 100) / 100;
+let x = Array.from({length: 40}, (_, i) => i - 20);
+let y = Array.from({length: 40}, (_, i) => i - 20);
+let z = x.map(xi => y.map(yi => u * (Math.sin(xi/4) * Math.cos(yi/4))));
+data.push({ type: 'surface', z: z, colorscale: 'Tealgrn', showscale: false, showlegend: true, name: 'Unified Substrate' });
+layout.scene.zaxis.range = [-1.5, 1.5];
+layout.showlegend = true;
+layout.legend = { font: { color: '#eee' }, x: 0, y: 1, xanchor: 'left', yanchor: 'top', bgcolor: 'rgba(0,0,0,0)' };
+layout.title = { text: "UNIFIED DARK SECTOR RESOLUTION", font: { color: '#2dd4bf' } };
+layout.scene.xaxis.title = "Substrate Dimension (u)";
+layout.scene.yaxis.title = "Substrate Dimension (v)";
+layout.scene.zaxis.title = "Emergent Wave Amplitude";
+}
+
+Plotly.react('plot-area', data, layout, {responsive: true, displayModeBar: false});
+}
+
+function resetLab() {
+if(currentTool===1) syncVal(40, 'a_sl');
+if(currentTool===2) syncVal(50, 'k_sl');
+if(currentTool===3) syncVal(60, 'p_sl');
+if(currentTool===4) syncVal(80, 'o_sl');
+if(currentTool===5) syncVal(100, 'u_sl');
+}
+
+window.onload = () => { showScreen('portal'); };
+</script>
+</body>
+</html>

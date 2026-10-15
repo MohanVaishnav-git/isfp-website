@@ -1,0 +1,1602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 38 — Quantum Measurement Completion</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #00ffcc;
+--accent-born: #f472b6; --accent-hilbert: #38bdf8; --accent-schro: #fbbf24; --accent-fields: #a78bfa; --accent-test: #4ade80;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-unified); font-family: sans-serif; font-size: 0.85rem; min-width: 350px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls, #nav-summary-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+#screen-lab.active { display: flex; flex-direction: column; height: calc(100vh - 50px); }
+
+#screen-portal { justify-content: flex-start; padding-top: 8dvh; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 70px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.constant-display-box {
+background: #111; border: 1px solid var(--accent-unified); padding: 6px; border-radius: 8px;
+display: flex; justify-content: space-around; margin-bottom: 10px;
+}
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(0, 255, 204, 0.05); border: 1px solid var(--accent-unified); padding: 5px; border-radius: 5px; margin-bottom: 8px; font-size: 0.7rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; }
+#plot-area { flex-grow: 1; width: 100%; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #000; border: 1px solid var(--accent-unified); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer {
+width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem;
+color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 38 — QUANTUM MEASUREMENT COMPLETION</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">Measurement Formalization Lab</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">Deriving the Born Rule, Hilbert Mapping, and Field-Based Fluctuation Origin.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-born);">
+<h2 style="color:var(--accent-born);">1. Born Rule Emergence</h2>
+<p>Deriving $P_i = |c_i|^2$ from Nonlinear Attractor Dynamics.</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-hilbert);">
+<h2 style="color:var(--accent-hilbert);">2. Hilbert Space Mapping</h2>
+<p>Transforming Substrate Amplitudes to Quantum Orthogonality.</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-schro);">
+<h2 style="color:var(--accent-schro);">3. Schrödinger Dynamics</h2>
+<p>Deriving Unitary Wave Evolution from Substrate Energy Functionals.</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-fields);">
+<h2 style="color:var(--accent-fields);">4. Derived Fluctuation (NCM)</h2>
+<p>Generating Stochastic Triggers from Structural Field Interactions.</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-test);">
+<h2 style="color:var(--accent-test);">5. Experimental Predictions</h2>
+<p>Identifying Measurable Deviations from Standard QM Predictions.</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-unified); background: linear-gradient(135deg, #0f1115 0%, #1a0a1a 100%);">
+<h2 style="color:var(--accent-unified);">6. Stage 38 Summary</h2>
+<p>Formal Legitimacy and Testability.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color:var(--accent-unified); text-align:center;">Summary: Mathematical Structure of Stage 38</h2>
+<section>
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Core Dynamical Equation (Foundation)</h3>
+<p>All modules converge to a single governing stochastic amplitude equation:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\boxed{ dA_i = A_i(\lambda_i - \bar{\lambda})\,dt + \sigma\,A_i\,dW_t }$$
+</div>
+<p>with:</p>
+<div style="text-align: center; margin: 10px 0;">
+$$\bar{\lambda} = \sum_j |A_j|^2 \lambda_j, \qquad \langle dW_t^2 \rangle = \frac{P}{K}\,dt$$
+</div>
+<p style="color: #fbbf24;">👉 This equation unifies: nonlinear selection, structural fluctuation, and substrate parameters K, P.</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">2. Probability Definition</h3>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\boxed{ P_i = |A_i|^2 }$$
+</div>
+<p>This connects amplitude dynamics to observable outcomes.</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">3. Induced Probability Evolution</h3>
+<p>From Itô calculus:</p>
+<div style="text-align: center; margin: 15px 0;">
+$dP_i = 2P_i(\lambda_i - \bar{\lambda})dt + \sigma^2 P_i dt + 2\sigma P_i dW_t$
+</div>
+<p style="color: #fbbf24;">👉 Key structure: Drift: $\propto P_i$, Diffusion: $\propto P_i^2$</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">4. Stationary Measure (Born Rule Emergence)</h3>
+<p>The associated Fokker–Planck equation yields:</p>
+<div style="text-align: center; margin: 15px 0; color: #4ade80;">
+$$\boxed{ \rho_{\text{stationary}}(P_i) \propto P_i }$$
+</div>
+<p>Thus:</p>
+<div style="text-align: center; margin: 15px 0; color: #4ade80;">
+$$\boxed{ P_i = |A_i|^2 }$$
+</div>
+<p style="color: #fbbf24;">👉 Born rule is derived, not postulated.</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">5. Hilbert Space Mapping</h3>
+<p>Define:</p>
+<div style="text-align: center; margin: 10px 0;">
+$\Psi(x,t) = \sum_i A_i(t)\psi_i(x)$
+</div>
+<p>with orthonormal basis: $\langle \psi_i | \psi_j \rangle = \delta_{ij}$. Projection rule follows:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\boxed{ P_i = |\langle \psi_i | \Psi \rangle|^2 }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">6. Schrödinger Dynamics (Unitary Limit)</h3>
+<p>From substrate energy functional:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\boxed{ i\hbar \frac{\partial \Psi}{\partial t} = \hat{H}\Psi }$$
+</div>
+<p style="color: #fbbf24;">👉 arises as: phase-preserving limit and ensemble average of substrate dynamics.</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">7. Fluctuation Origin (N–C–M Fields)</h3>
+<div style="text-align: center; margin: 10px 0;">
+$\eta(t) = f(N, C, M)$
+</div>
+<div style="text-align: center; margin: 15px 0;">
+$$\boxed{ \langle \eta(t)\eta(t') \rangle = \frac{P}{K}\,\delta(t - t') }$$
+</div>
+<p>Mapped to: $dW_t = \eta(t)\,dt$. 👉 Noise is derived, parameter-controlled, and structurally grounded.</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">8. Experimental Correction Structure</h3>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\boxed{ P_i = |c_i|^2 \left(1 + \epsilon_i(K,P)\right) }$$
+</div>
+<p>with constraint:</p>
+<div style="text-align: center; margin: 15px 0;">
+$$\boxed{ \sum_i \epsilon_i(K,P)\,|c_i|^2 = 0, \qquad |\epsilon_i| \ll 1 }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">9. Observable Predictions</h3>
+<ul style="list-style: none; padding-left: 20px; color: #e2e8f0;">
+<li>$\Delta T \propto \left(\frac{K}{P}\right)^{1/2}$</li>
+<li>$S(f) \sim \frac{1}{f}$</li>
+<li>$P_i(\hat{n}) = |c_i|^2 \left(1 + \epsilon_i(K,P(\hat{n}))\right)$</li>
+</ul>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">10. Full Structural Chain</h3>
+<div style="text-align: center; margin: 15px 0; color: #fbbf24; font-family: 'Courier New', monospace;">
+(N, C, M) &rarr; &eta;(t) &rarr; dW_t &rarr; A_i &rarr; P_i &rarr; &Psi; &rarr; Outcomes
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">Final Unified Statement</h3>
+<div style="text-align: center; margin: 20px 0; color: #4ade80; border: 1px solid #4ade80; padding: 10px; border-radius: 8px;">
+<p>Quantum measurement emerges from nonlinear stochastic amplitude dynamics, with fluctuation strength set by $\frac{P}{K}$, yielding the Born rule, Hilbert structure, Schrödinger evolution, and small testable deviations.</p>
+</div>
+
+<p style="font-weight: bold; color: #38bdf8;">One-line conclusion</p>
+<p>👉 Stage 38 establishes a complete mathematical closure of quantum measurement, deriving probability, dynamics, and testable corrections from a single substrate-based stochastic framework.</p>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 30px 0;">
+
+<h2 style="color:var(--accent-blue); text-align: center;">Theorem (Emergence of the Born Rule from Multiplicative Stochastic Dynamics)</h2>
+<p>Let $A_i(t) \in \mathbb{C}$ be a set of amplitudes evolving according to the stochastic differential equation:</p>
+<div style="text-align: center; margin: 10px 0;">
+$$dA_i = A_i(\lambda_i - \bar{\lambda})\,dt + \sigma A_i\,dW_i(t)$$
+</div>
+<p>where $$\bar{\lambda} = \sum_j |A_j|^2 \lambda_j,$$ and $$dW_i(t)$$ are independent Wiener processes satisfying $$\mathbb{E}[dW_i] = 0, \mathbb{E}[dW_i dW_j] = \delta_{ij}\,dt.$$ Assume normalization is preserved: $$\sum_i |A_i|^2 = 1.$$ Define $$P_i = |A_i|^2.$$ Then, under the induced stochastic dynamics, the probability density $$\rho(P_i,t)$$ admits a stationary solution of the form:</p>
+<div style="text-align: center; margin: 10px 0; color: #4ade80;">
+$\rho_{\mathrm{stationary}}(P_i) \propto P_i$
+</div>
+<p>and consequently, the outcome frequencies satisfy: $P_i = |A_i|^2$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px;">Proof</h3>
+<p><b>Step 1: Evolution of $P_i$</b><br>Using Itô calculus: $$dP_i = d(A_i A_i^*) = A_i^* dA_i + A_i dA_i^* + dA_i dA_i^*.$$ Substitute the dynamics: $$dA_i = A_i(\lambda_i - \bar{\lambda})dt + \sigma A_i dW_i$ and $dA_i^* = A_i^*(\lambda_i - \bar{\lambda})dt + \sigma A_i^* dW_i.$$</p>
+
+<p><b>Step 2: Compute Terms</b><br>First two terms: $$A_i^* dA_i + A_i dA_i^* = 2|A_i|^2(\lambda_i - \bar{\lambda})dt + 2\sigma |A_i|^2 dW_i = 2P_i(\lambda_i - \bar{\lambda})dt + 2\sigma P_i dW_i.$$<br>Itô correction: $$dA_i dA_i^* = \sigma^2 |A_i|^2 (dW_i)^2 = \sigma^2 P_i dt.$$</p>
+
+<p><b>Step 3: Complete SDE for $P_i$</b><br>$$dP_i = [2P_i(\lambda_i - \bar{\lambda}) + \sigma^2 P_i]dt + 2\sigma P_i dW_i.$$</p>
+
+<p><b>Step 4: Drift–Diffusion Form</b><br>$$dP_i = \mu(P_i)\,dt + \sqrt{D(P_i)}\,dW_i$$ where $$\mu(P_i) = 2P_i(\lambda_i - \bar{\lambda}) + \sigma^2 P_i$$ and $$D(P_i) = 4\sigma^2 P_i^2.$$</p>
+
+<p><b>Step 5: Fokker–Planck Equation</b><br>The probability density $$\rho(P_i,t)$$ satisfies $$\frac{\partial \rho}{\partial t} = -\frac{\partial}{\partial P_i}[\mu(P_i)\rho] + \frac{1}{2}\frac{\partial^2}{\partial P_i^2}[D(P_i)\rho].$$ Substitute: $$\frac{\partial \rho}{\partial t} = -\frac{\partial}{\partial P_i} [(2P_i(\lambda_i - \bar{\lambda}) + \sigma^2 P_i)\rho] + \frac{1}{2}\frac{\partial^2}{\partial P_i^2} [4\sigma^2 P_i^2 \rho].$$</p>
+
+<p><b>Step 6: Stationary Condition</b><br>At equilibrium: $$\frac{\partial \rho}{\partial t} = 0.$$ Thus: $$\frac{d}{dP_i}[\mu(P_i)\rho] = \frac{1}{2}\frac{d^2}{dP_i^2}[D(P_i)\rho].$$</p>
+
+<p><b>Step 7: Solve for Stationary Distribution</b><br>Observe scaling: $$\mu(P_i) \propto P_i, D(P_i) \propto P_i^2.$$ Assume solution: $$\rho(P_i) = C P_i^\alpha.$$ Substitution yields consistency only for: $$\alpha = 1.$$ Thus: $$\rho_{\mathrm{stationary}}(P_i) \propto P_i.$$</p>
+
+<p><b>Step 8: Normalization and Interpretation</b><br>Given normalization: $$\sum_i P_i = 1,$$ and identification: $$P_i = |A_i|^2,$$ the stationary distribution implies that outcome frequencies follow: $$P_i = |A_i|^2.$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px;">Conclusion</h3>
+<p>The multiplicative stochastic dynamics induce drift and diffusion terms proportional to $P_i$ and $P_i^2$, respectively, uniquely yielding a stationary distribution proportional to $P_i$, thereby establishing the Born rule as an emergent property of the dynamics.</p>
+<div style="text-align: center; margin: 15px 0; color: #4ade80; font-size: 1.2rem;">
+$$\boxed{P_i = |A_i|^2}$$
+</div>
+
+</div>
+</section>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div class="constant-display-box">
+<div class="const-item"><span class="const-label">Field N</span><span class="const-val">0.720</span></div>
+<div class="const-item"><span class="const-label">Variance σ</span><span class="const-val">0.015</span></div>
+</div>
+<div id="mapping-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Formal Telemetry</span>
+<span id="epoch-label" style="font-family:monospace; font-size:0.85rem; color:var(--accent-unified);">DERIVATION ACTIVE</span>
+</div>
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:8px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:6px;">RESET FORMALISM</button>
+<div id="panel-footer-text" style="font-size: 0.75rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.4; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:8px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:6px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Derivation Logic</span>
+<div id="metrics-content" style="font-size:0.75rem; font-family:monospace; line-height:1.7;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Formal Hierarchy</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.75rem; color: var(--text-dim); line-height: 1.4; background: #000; padding: 10px; border-radius: 8px; border: 1px solid #222; margin-top: auto;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "BORN RULE EMERGENCE",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: BORN RULE EMERGENCE</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">Origin of the Born Rule</h3>
+<p>According to this framework, the Born Rule is not introduced as an independent postulate but emerges as a direct consequence of the underlying substrate dynamics. The system is described in terms of competing channel amplitudes $A_i$, each representing a possible outcome within a shared substrate configuration. These amplitudes evolve through a multiplicative process in which both deterministic growth and stochastic fluctuation scale with the amplitude itself.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Multiplicative Dynamical Evolution</h3>
+<p>The evolution follows a nonlinear competitive structure, where each channel grows relative to a collective background determined by all channels. Simultaneously, stochastic perturbations arising from the NCM fields act multiplicatively on $A_i$. Because both the growth and fluctuation terms scale with amplitude, the system exhibits multiplicative stochastic dynamics rather than additive behavior, and this directly governs how probability must arise.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Transition from Amplitude to Probability</h3>
+<p>To connect the dynamics with observable outcomes, the measurable quantity $P_i = |A_i|^2$ is introduced. This is not imposed arbitrarily but follows naturally from the structure of the evolution. When the stochastic dynamics of $A_i$ are translated into the evolution of $P_i$, both the growth and fluctuation terms become proportional to $P_i$ itself. This establishes a multiplicative evolution at the level of probability.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Emergence of Stationary Distribution</h3>
+<p>As the system undergoes repeated stochastic evolution, it approaches a statistical steady state. In this regime, the dynamics admit a stable invariant distribution such that:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\rho_{\\text{stationary}}(P_i) \\propto P_i$$
+</div>
+<p>This means that outcome frequencies stabilize over repeated trials and become directly proportional to $P_i$, which is defined as $|A_i|^2$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Physical Interpretation via Attractor Dynamics</h3>
+<p>Each possible outcome corresponds to an attractor basin in the substrate state space. Fluctuations may initially push the system toward different basins, but the multiplicative growth ensures that once a channel gains advantage, it is nonlinearly amplified while others are suppressed. The effective “volume” of each attractor basin, weighted by this multiplicative amplification process, determines how frequently each outcome is realized.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Role of Stochasticity</h3>
+<p>The stochastic component is essential. Without it, the system would remain in deterministic evolution and would not explore alternative outcomes. The NCM-driven fluctuations ensure that different realizations explore different regions of the state space. Because these fluctuations are multiplicative rather than additive, they generate a structured statistical distribution rather than arbitrary randomness, leading to a stable and reproducible probability law.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Conclusion: Emergence of the Born Rule</h3>
+<p>In this way, the Born Rule emerges as the invariant measure of a nonlinear, multiplicative, stochastic dynamical system. Probability is not externally imposed but arises as the statistical expression of repeated substrate evolution. The convergence of outcome frequencies to $P_i = |A_i|^2$ is therefore a direct consequence of the intrinsic structure of the dynamics, completing the derivation of the quantum probability law within this framework.</p>
+
+<h3 style="color: #38bdf8; margin-top: 0; letter-spacing: 1px;">The Physics of the Equal State and Substrate Stability</h3>
+
+<p>According to this framework, when the initial amplitude ratio is configured such that $A_1 = A_2$, the system begins in a symmetric state across the available channels. Since the probability variable is defined as $P_i = |A_i|^2$, equal amplitudes correspond to equal initial probability weights, yielding a symmetric 50/50 configuration.</p>
+
+<p>From the perspective of substrate dynamics, this state represents a condition in which the driving terms acting on each channel are identical. The effective growth factors $\lambda_i$ remain equal, and therefore no channel possesses a dynamical advantage. The synthesis pressure acts symmetrically, and the stochastic fluctuations continuously redistribute the state without producing a net bias toward any particular outcome.</p>
+
+<p style="margin-bottom: 0;">As a result, although the system undergoes continuous stochastic perturbation, the absence of a fitness gradient prevents preferential amplification. Over repeated realizations, the statistical distribution of outcomes remains balanced across all available modes. This demonstrates that, in the absence of asymmetry in the underlying dynamics, the emergent outcome frequencies reflect the symmetry of the initial amplitude configuration.</p>
+</div>
+
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">Foundational Role of Module 1</h3>
+<p>According to this framework, Module 1 establishes the fundamental basis of the entire Stage 38 structure. It replaces the Born rule $P_i = |c_i|^2$ from an assumed postulate to a derived consequence of the underlying substrate dynamics. This transition from assumption to derivation is critical, because it provides a dynamical origin for quantum probability.</p>
+<p>The validity of this module determines the consistency of the entire framework. If the emergence of the Born rule from multiplicative stochastic dynamics is not established, the subsequent structure lacks foundation. Conversely, once this derivation is secured, it provides a stable base upon which all further modules are constructed.</p>
+<p>All subsequent modules depend directly on this result. The Hilbert space formulation uses the amplitudes $A_i$ as its fundamental components, the Schrödinger dynamics governs the evolution of the composite state $\\Psi$ built from these amplitudes, the NCM fluctuation module provides the structural origin of the stochastic term $\\sigma$, and the experimental predictions arise from measurable deviations in this dynamical law.</p>
+</div>
+`,
+math: `
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Born Rule Derivation Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Stationary Measure:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$P_i = |A_i|^2$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Probability emerges as the invariant density of the multiplicative stochastic field.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: BORN RULE EMERGENCE</h2>
+<div class="math-derivation" style="font-size: 0.85rem; line-height: 1.4; color: #e2e8f0; padding: 10px;">
+<h3 style="color: #38bdf8; margin-bottom: 8px;">Explicit Mathematics: Born Rule Emergence</h3>
+
+<p><strong>Primary Stochastic Amplitude Dynamics</strong><br>
+Each channel amplitude evolves as a multiplicative stochastic process:</p>
+<div style="text-align: center; margin: 10px 0; color: #38bdf8;">
+$$dA_i = A_i(\\lambda_i - \\bar{\\lambda})\\,dt + \\sigma_i A_i\\,dW_i(t)$$
+</div>
+<p>where the collective background $\\bar{\\lambda}$ and independent Wiener processes $dW_i(t)$ satisfy:</p>
+<div style="text-align: center; margin: 10px 0;">
+$$\\bar{\\lambda} = \\sum_j |A_j|^2 \\lambda_j, \\quad \\langle dW_i \\rangle = 0, \\quad \\langle dW_i dW_j \\rangle = \\delta_{ij}\\,dt$$
+</div>
+
+<p><strong>Normalization Constraint</strong><br>
+The amplitudes satisfy the constraint which is preserved by the nonlinear structure:</p>
+<div style="text-align: center; margin: 10px 0;">
+$$\\sum_i |A_i|^2 = 1$$
+</div>
+
+<p><strong>Definition of Probability Variable</strong><br>
+$P_i = |A_i|^2 = A_i A_i^*$</p>
+
+<p><strong>Itô Expansion of $P_i$</strong><br>
+Using Itô calculus:</p>
+<div style="text-align: center; margin: 10px 0;">
+$$dP_i = d(A_i A_i^*) = A_i^*\\,dA_i + A_i\\,dA_i^* + dA_i\\,dA_i^*$$
+</div>
+
+<p><strong>Substitution of Dynamics</strong><br>
+Substituting $dA_i$ and its conjugate $dA_i^*$:</p>
+<div style="text-align: center; margin: 10px 0; color: #94a3b8;">
+$$A_i^* dA_i + A_i dA_i^* = 2P_i(\\lambda_i - \\bar{\\lambda})dt + 2\\sigma_i P_i dW_i$$
+</div>
+
+<p><strong>Itô Correction Term</strong><br>
+Since $(dW_i)^2 = dt$:</p>
+<div style="text-align: center; margin: 10px 0; color: #94a3b8;">
+$$dA_i dA_i^* = \\sigma_i^2 |A_i|^2 (dW_i)^2 = \\sigma_i^2 P_i dt$$
+</div>
+
+<p><strong>Complete Probability Evolution Equation</strong><br>
+Combining terms:</p>
+<div style="text-align: center; margin: 10px 0; color: #f472b6;">
+$$dP_i = 2P_i(\\lambda_i - \\bar{\\lambda})dt + \\sigma_i^2 P_i dt + 2\\sigma_i P_i dW_i$$
+</div>
+
+<p><strong>Drift–Diffusion Structure</strong><br>
+This aligns with $dP_i = \\mu(P_i)\\,dt + \\sqrt{D(P_i)}\\,dW_i$ where:</p>
+<div style="text-align: center; margin: 10px 0;">
+$$\\mu(P_i) = 2P_i(\\lambda_i - \\bar{\\lambda}) + \\sigma_i^2 P_i, \\quad D(P_i) = 4\\sigma_i^2 P_i^2$$
+</div>
+
+<p><strong>Fokker–Planck Equation</strong><br>
+The probability density $\\rho(P_i,t)$ evolves as:</p>
+<div style="text-align: center; margin: 10px 0;">
+$$\\frac{\\partial \\rho}{\\partial t} = -\\frac{\\partial}{\\partial P_i}\\Big[\\big(2P_i(\\lambda_i - \\bar{\\lambda}) + \\sigma_i^2 P_i\\big)\\rho\\Big] + \\frac{1}{2}\\frac{\\partial^2}{\\partial P_i^2}\\big[4\\sigma_i^2 P_i^2 \\rho\\big]$$
+</div>
+
+<p><strong>Stationary Condition</strong><br>
+At equilibrium ($\partial \\rho / \partial t = 0$):</p>
+<div style="text-align: center; margin: 10px 0;">
+$$\\frac{d}{dP_i}\\Big[\\mu(P_i)\\rho\\Big] = \\frac{1}{2}\\frac{d^2}{dP_i^2}\\Big[D(P_i)\\rho\\Big]$$
+</div>
+
+<p><strong>Emergence of Born Rule</strong><br>
+Because $\\mu(P_i) \\propto P_i$ and $D(P_i) \\propto P_i^2$, the stationary solution satisfies:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\rho_{\\text{stationary}}(P_i) \\propto P_i \\implies \\boxed{P_i = |A_i|^2}$$
+</div>
+
+<p style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; font-style: italic;">
+Multiplicative stochastic dynamics of amplitudes produce drift and diffusion terms proportional to $P_i$ and $P_i^2$,
+leading to a stationary invariant measure proportional to $P_i$. This establishes the quadratic probability law
+as an emergent property of the dynamics.
+</p>
+</div>`,
+
+sliders: `
+<div class="control-item">
+<div class="label-group"><span>Trial Count (N)</span>
+<input type="number" id="n_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'n_sl')"></div>
+<input type="range" id="n_sl" min="10" max="1000" step="10" value="100" oninput="syncVal(this.value, 'n_in')">
+</div>`,
+mappingBox: `
+<div class="definition-box">
+<span class="def-title">Emergence</span>
+<div style="text-align:center; font-size: 0.85rem; color: #94a3b8;">
+Nonlinear Selection + Multiplicative NCM Noise → Born Rule
+</div>
+</div>`,
+lawBox: `
+<div class="definition-box">
+<span class="def-title">Emergent Law</span>
+<div style="text-align:center; font-size: 1.00rem; color: #f472b6; font-weight: bold;">
+$P_i = |A_i|^2$
+</div>
+</div>`,
+hierarchy: `
+<div class="logic-box" style="margin-top: 5px;">
+<div style="font-family: 'Courier New', monospace; font-size: 0.85rem; line-height: 1.3; background: rgba(0,0,0,0.3); padding: 1px; border-radius: 4px; border: 1px dashed rgba(56, 189, 248, 0.3);">
+<div style="color: #38bdf8;">$dA_i = A_i(\\lambda_i - \\bar{\\lambda})dt + \\sigma A_i dW_t$</div>
+<div style="color: #94a3b8; font-size: 0.85rem; margin: 2px 0;">↓ (Itô Calculus)</div>
+<div style="color: #f472b6;">$dP_i \\approx 2P_i(\\lambda_i - \\bar{\\lambda})dt + \\sigma^2 P_i dt$ + stochastic term</div>
+</div>
+<div style="font-size: 0.75rem; margin-top: 10px; color: #94a3b8; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1px;">
+Channel $A_i \\rightarrow$ Multiplicative Growth $\\rightarrow$ Measure $P_i$
+</div>
+</div>`,
+rightNote: `
+<div style="margin-top: 0px; font-size: 0.74rem; line-height: 1.4;">
+<b>The Square Emergence:</b> According to this framework, because both growth and fluctuation scale with amplitude $A_i$, the induced evolution of $P_i = |A_i|^2$ becomes multiplicative in $P_i$, leading to a stationary distribution proportional to $P_i = |A_i|^2$. In this regime, the stochastic dynamics admit a stable invariant measure such that
+$\\rho_{\\text{stationary}}(P_i) \\propto P_i$
+thereby establishing that outcome frequencies converge to the Born rule $P_i = |A_i|^2$.
+</div>`,
+footer: "Physical Origin: The Born Rule is the stationary distribution of a nonlinear substrate competitive process where growth and fluctuation scale linearly with amplitude."
+},
+
+2: {
+title: "Hilbert Space Mapping",
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: HILBERT SPACE MAPPING</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">Objective</h3>
+<p>According to this framework, the purpose of this module is to demonstrate that the abstract Hilbert space structure of quantum mechanics is not a postulated mathematical arena, but an emergent representation of the underlying substrate dynamics. The goal is to show that the substrate state-space, when expressed through stable modes and their interactions, naturally acquires the structure of a Hilbert space.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">1. Substrate Modes as Basis Functions</h3>
+<p>According to this framework, the substrate admits a set of stable configurations or modes, denoted by functions $\\psi_i(x)$, which represent distinct realizable states of the system. These modes arise as dynamically stabilized solutions of the substrate potential landscape established in earlier stages. These functions serve as the foundational building blocks of the state-space. Each $\\psi_i(x)$ corresponds to a physically distinguishable configuration, and together they form a complete set capable of representing any admissible substrate state.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Emergence of Inner Product Structure</h3>
+<p>According to this framework, the interaction between substrate modes induces a natural measure of overlap, defined through an inner product of the form:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\langle \\psi_i | \\psi_j \\rangle = \\int \\psi_i^*(x)\\psi_j(x)\\,dx$$
+</div>
+<p>The physical interpretation of this quantity is the degree of overlap between two substrate configurations. For dynamically stable and non-interfering modes, this overlap vanishes when $i \\neq j$, leading to the orthonormality condition:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\langle \\psi_i | \\psi_j \\rangle = \\delta_{ij}$$
+</div>
+<p>This condition is not imposed arbitrarily, but follows from the physical independence and spatial separation of stable substrate modes. As a result, the set $\{\\psi_i\}$ forms an orthonormal basis under the defined inner product.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Construction of the State Function</h3>
+<p>According to this framework, any general substrate configuration can be expressed as a superposition of these basis modes:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\Psi(x,t) = \\sum_i A_i(t)\\psi_i(x)$$
+</div>
+<p>Here, the coefficients $A_i(t)$ are the amplitudes associated with each mode, representing the dynamical weight of that configuration in the total state. These amplitudes are precisely the quantities whose stochastic evolution was analyzed in Module 1. Thus, the state function $\\Psi(x,t)$ is not an abstract entity, but a direct encoding of the substrate’s configuration in terms of its fundamental modes.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Linearity and Superposition</h3>
+<p>According to this framework, the superposition principle emerges from the linear combination of substrate modes. Since the modes form an orthonormal basis, any linear combination remains a valid state of the system. The evolution of the state preserves this linear structure, as the amplitudes $A_i(t)$ evolve independently under the governing dynamics while maintaining normalization. This ensures that the space of states is closed under linear combinations, satisfying the defining property of a Hilbert space.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Projection and Measurement Rule</h3>
+<p>According to this framework, the probability of observing the system in a particular mode $\\psi_i$ is determined by projecting the state $\\Psi$ onto that mode:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$P_i = |\\langle \\psi_i | \\Psi \\rangle|^2$$
+</div>
+<p>This relation is not introduced as a separate postulate. It follows consistently from the orthonormality of the basis $\\psi_i$, the normalization condition $\\sum_i |A_i|^2 = 1$, and the Born rule already derived in Module 1. Thus, the standard projection rule of quantum mechanics emerges as a direct consequence of the substrate representation.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Physical Interpretation of Hilbert Space</h3>
+<p>According to this framework, Hilbert space is not a pre-existing abstract vector space, but the effective linear geometry of the nonlinear substrate state-space. The orthonormal basis corresponds to dynamically stable modes, and the inner product reflects physical overlap between configurations. In this sense, the Hilbert structure is a mathematical encoding of an underlying physical reality, rather than an independent foundational assumption.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Consistency with Module 1</h3>
+<p>According to this framework, the amplitudes $A_i$ used in the Hilbert space expansion are the same quantities whose stochastic dynamics were analyzed in Module 1. The probability rule $P_i = |A_i|^2$, derived from multiplicative stochastic evolution, maps directly onto the projection rule $P_i = |\\langle \\psi_i | \\Psi \\rangle|^2$. This establishes a precise correspondence between dynamical probability emergence and Hilbert space measurement formalism.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Conceptual Outcome</h3>
+<p>According to this framework, the Hilbert space of quantum mechanics emerges as a structured representation of substrate dynamics. The basis, inner product, superposition, and projection rule are all derived features of this representation. This removes the need to postulate Hilbert space as a fundamental starting point and instead situates it as a natural consequence of the underlying physical system.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Conclusion</h3>
+<p style="margin-bottom: 0;">According to this framework, the abstract formalism of Hilbert space is not an independent axiom but an emergent structure arising from the orthonormal organization of substrate modes and their dynamical amplitudes. This establishes a direct bridge between physical substrate dynamics and the mathematical language of quantum mechanics.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Hilbert Space Mapping Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">State Mapping:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\Psi = \\sum_i A_i \\psi_i$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The abstract vector space emerges as the linear geometry of stable substrate configurations.</p>
+</div>
+</div>
+`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: HILBERT SPACE MAPPING</h2>
+
+<div class="math-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0 10px;">
+
+<h3 style="color: #38bdf8; margin-bottom: 10px;">Substrate Mode Definition</h3>
+<p>According to this framework, the substrate admits a set of stable modes:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\psi_i(x)$$
+</div>
+<p>These functions represent dynamically stable configurations of the substrate.</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">Inner Product Structure</h3>
+<p>Define the inner product on the substrate state-space:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\langle \\psi_i | \\psi_j \\rangle = \\int \\psi_i^*(x)\\,\\psi_j(x)\\,dx$$
+</div>
+<p>For dynamically independent modes, this satisfies the <b>orthonormality condition</b>:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\langle \\psi_i | \\psi_j \\rangle = \\delta_{ij}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">Completeness Relation</h3>
+<p>The set $\{\\psi_i\}$ forms a complete basis for the substrate representation:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\sum_i \\psi_i(x)\\psi_i^*(x') = \\delta(x - x')$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">State Expansion</h3>
+<p>The general substrate state is expressed as a superposition of modes:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\Psi(x,t) = \\sum_i A_i(t)\\,\\psi_i(x)$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">Normalization Condition</h3>
+<p>Using orthonormality to ensure the total probability remains unity:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\langle \\Psi | \\Psi \\rangle = \\int \\Psi^*(x,t)\\Psi(x,t)\\,dx$$
+</div>
+<p>Substituting the expansion:</p>
+<div style="text-align: center; margin: 10px 0;">
+$$\\langle \\Psi | \\Psi \\rangle = \\sum_{i,j} A_i^* A_j \\langle \\psi_i | \\psi_j \\rangle$$
+</div>
+<p>Using $\\delta_{ij}$, we find:</p>
+<div style="text-align: center; margin: 10px 0; color: #4ade80;">
+$$\\langle \\Psi | \\Psi \\rangle = \\sum_i |A_i|^2 = 1$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">Projection onto Basis</h3>
+<p>Projecting the state onto a specific mode $\\psi_k$:</p>
+<div style="text-align: center; margin: 15px 0;">
+$$\\langle \\psi_k | \\Psi \\rangle = \\int \\psi_k^*(x)\\Psi(x,t)\\,dx$$
+</div>
+<p>Substituting the state expansion:</p>
+<div style="text-align: center; margin: 10px 0;">
+$$\\langle \\psi_k | \\Psi \\rangle = \\sum_i A_i \\langle \\psi_k | \\psi_i \\rangle = A_k$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">Probability Rule from Projection</h3>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$P_k = |\\langle \\psi_k | \\Psi \\rangle|^2 = |A_k|^2$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">Linear Structure</h3>
+<p>For any two states $\\Psi_1 = \\sum_i A_i \\psi_i$ and $\\Psi_2 = \\sum_i B_i \\psi_i$, the linear combination is:</p>
+<div style="text-align: center; margin: 15px 0;">
+$$\\Psi = \\alpha \\Psi_1 + \\beta \\Psi_2 = \\sum_i (\\alpha A_i + \\beta B_i)\\psi_i$$
+</div>
+<p>Thus, closure under linear combination (linearity) holds naturally.</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">Operator Representation</h3>
+<p>Define a linear operator $\\hat{O}$ acting on basis modes:</p>
+<div style="text-align: center; margin: 15px 0;">
+$$\\hat{O}\\psi_i = \\sum_j O_{ji}\\psi_j$$
+</div>
+<p>Acting on the full state $\\Psi$:</p>
+<div style="text-align: center; margin: 15px 0;">
+$$\\hat{O}\\Psi = \\sum_i A_i \\hat{O}\\psi_i = \\sum_{i,j} O_{ji}A_i \\psi_j$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">Matrix Elements and Expectation Value</h3>
+<p>The matrix elements are defined as $O_{ij} = \\langle \\psi_i | \\hat{O} | \\psi_j \\rangle$. The expectation value is given by:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\langle \\hat{O} \\rangle = \\langle \\Psi | \\hat{O} | \\Psi \\rangle = \\sum_{i,j} A_i^* O_{ij} A_j$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">Hilbert Space Identification</h3>
+<p>The space of states satisfies linearity, inner product structure, completeness, and norm preservation. Thus:</p>
+<div style="text-align: center; margin: 15px 0; font-weight: bold;">
+$$\\mathcal{H} = \\text{span}\\{\\psi_i\\}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">Consistency with Module 1</h3>
+<p>From Module 1, we established $P_i = |A_i|^2$ via stochastic dynamics. From projection, we find $P_i = |\\langle \\psi_i | \\Psi \\rangle|^2$. Therefore:</p>
+<div style="text-align: center; margin: 15px 0; color: #4ade80;">
+$$|\\langle \\psi_i | \\Psi \\rangle|^2 = |A_i|^2$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">Final Mathematical Statement</h3>
+<p style="margin-bottom: 20px;">According to this framework, the orthonormal substrate modes $\\psi_i(x)$, together with the amplitude expansion $\\Psi = \\sum_i A_i \\psi_i$, define a complete inner-product space in which projection yields $P_i = |A_i|^2$. This establishes the Hilbert space structure as a direct representation of substrate dynamics rather than an independent postulate.</p>
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; border-left: 4px solid #f472b6;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Formalism Identification Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Mapping Protocol:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\text{Substrate Dynamics} \\rightarrow \\mathcal{H}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The Hilbert space is the effective linear geometry of the underlying substrate configurations.</p>
+</div>
+</div>
+</div>
+`,
+
+
+sliders: `<div class="control-item"><div class="label-group"><span>Basis Overlap</span><input type="number" id="o_in" class="digital-entry" value="0" oninput="syncVal(this.value, 'o_sl')"></div><input type="range" id="o_sl" min="0" max="1" step="0.05" value="0" oninput="syncVal(this.value, 'o_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Mapping</span><div style="text-align:center; font-size: 1.0rem;">Substrate $\\leftrightarrow$ Hilbert</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">State Vector</span><div style="text-align:center; font-size: 0.9rem;">$\\Psi = \\sum_i A_i\\psi_i$</div>`,
+hierarchy: `
+<div class="logic-flow" style="font-family: monospace; font-size: 1.0rem; border: 1px dashed #a78bfa; padding: 8px;">
+<div style="color: #a78bfa;">1. Basis: $\\psi_i(x)$</div>
+<div style="color: #a78bfa;">2. Inner Product: $\\delta_{ij}$</div>
+<div style="color: #38bdf8;">3. Expansion: $\\Psi = \\sum A_i \\psi_i$</div>
+<div style="color: #f472b6;">4. Projection: $P_i = |\\langle \\psi_i | \\Psi \\rangle|^2$</div>
+</div>`,
+footer: "The substrate field provides the physical realization of the abstract Hilbert space.",
+rightNote: `
+<div style="margin-bottom: 5px; line-height: 1.3; font-size: 0.80rem;">
+<b style="color: #38bdf8;">The Orthogonal Bridge:</b> Because substrate modes are orthonormal, the Born Rule derived in Module 1 maps consistently to the Hilbert Space projection rule $P_i = |\\langle \\psi_i | \\Psi \\rangle|^2$.
+</div>
+
+<hr style="border: none; border-top: 1px dashed rgba(167, 139, 250, 0.4); margin: 0px 0;">
+
+<div style="padding-top: 1px;">
+<p style="font-size: 0.82rem; font-style: italic; color: #94a3b8; margin-bottom: 8px;">
+"Non-overlapping stable substrate modes form an orthonormal basis under the defined inner product."
+</p>
+<div style="text-align: center; color: #fbbf24; font-size: 1.0rem; padding: 0px 0;">
+$\\int \\psi_i^*(x)\\psi_j(x)\\,dx = \\delta_{ij}$
+</div>
+</div>
+`,
+footer: "Hilbert Space is the effective linear geometry of the nonlinear substrate state-space."
+},
+
+
+3: {
+title: "Schrödinger Dynamics",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: SCHRÖDINGER DYNAMICS</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">Objective</h3>
+<p>According to this framework, the purpose of this module is to demonstrate that the dynamical evolution of quantum states, as described by the Schrödinger equation, emerges from the underlying substrate dynamics. The goal is to show that unitary time evolution is not a postulated rule, but a natural consequence of the coupled evolution of amplitude and phase in the substrate.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">1. Substrate State and Phase Structure</h3>
+<p>According to this framework, the substrate state $\\Psi(x,t)$ represents a physical configuration composed of both amplitude and phase components. This state can be expressed in the form:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\Psi(x,t) = R(x,t)e^{i\\theta(x,t)}$$
+</div>
+<p>where $R(x,t)$ represents the magnitude of the configuration, and $\\theta(x,t)$ represents its local phase. These two components correspond to distinct but coupled aspects of the substrate dynamics.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Energy Functional as Generator of Dynamics</h3>
+<p>According to this framework, the evolution of the substrate is governed by an energy functional $H[\\Psi] = \\int \\Psi^*(x,t)\\,\\hat{H}\\,\\Psi(x,t)\\,dx$ which encodes the energetic structure of the substrate. The Hamiltonian operator $\\hat{H}$ represents the local energy density contributions, including kinetic and potential components. Time evolution arises as a response of the substrate to this energy structure.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Phase Evolution as Energy Response</h3>
+<p>According to this framework, the phase of the substrate evolves in response to energy. The rate of change of phase is proportional to the local energy density, establishing a direct connection between energy and temporal evolution. This relation implies that time evolution corresponds to a continuous rotation of the phase of the substrate configuration.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Amplitude Evolution and Probability Conservation</h3>
+<p>According to this framework, the amplitude component $R(x,t)$ determines the probability density $\\rho(x,t) = |\\Psi(x,t)|^2$. The evolution of this density follows a continuity equation, ensuring conservation of total probability. This reflects the physical requirement that the total configuration weight of the substrate remains constant over time.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Coupled Amplitude–Phase Dynamics</h3>
+<p>According to this framework, the amplitude and phase do not evolve independently. Instead, they are coupled through the substrate dynamics. The phase governs the flow of probability, while the amplitude determines the distribution of that probability. This coupling produces a structured evolution in which the configuration evolves without loss or gain of total norm.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Emergence of Complex Representation</h3>
+<p>According to this framework, the combination of amplitude and phase into a single complex function $\\Psi = R e^{i\\theta}$ provides a compact representation of the underlying dynamics. The use of complex numbers is not arbitrary. It reflects the orthogonal relationship between amplitude and phase. A multiplication by the imaginary unit $i$ corresponds to a rotation between these components.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Unitary Time Evolution</h3>
+<p>According to this framework, the evolution of the substrate preserves the total norm of the state. This implies that the evolution is unitary, meaning that the structure of the state-space is preserved over time. This property arises naturally from the conservation of probability and the phase-driven dynamics of the substrate.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Emergence of the Schrödinger Equation</h3>
+<p>According to this framework, when the coupled amplitude–phase dynamics are expressed in their compact complex form, they yield the equation:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$i\\hbar \\frac{\\partial \\Psi}{\\partial t} = \\hat{H}\\Psi$$
+</div>
+<p>This equation is not introduced as a fundamental law, but emerges as a mathematical representation of the underlying substrate evolution.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Interpretation of the Imaginary Unit</h3>
+<p>According to this framework, the imaginary unit $i$ represents the orthogonal relationship between amplitude and phase. It encodes the phase rotation that drives time evolution. In this sense, the presence of $i$ in the Schrödinger equation reflects a geometric property of the substrate dynamics rather than an abstract mathematical artifact.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Consistency with Previous Modules</h3>
+<p>According to this framework, this module is fully consistent with earlier results: The amplitudes $A_i(t)$ used in Hilbert space expansion evolve according to this dynamical law. The probability rule $P_i = |A_i|^2$, derived in Module 1, remains preserved under this evolution. The Hilbert space structure established in Module 2 provides the natural setting in which this evolution operates.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">11. Conceptual Outcome</h3>
+<p>According to this framework, the Schrödinger equation is not an independent postulate but a derived consequence of substrate dynamics. The evolution of quantum states reflects the continuous phase-driven transformation of an underlying physical system.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Final Statement</h3>
+<p>According to this framework, unitary quantum evolution emerges from the coupled dynamics of amplitude and phase within the substrate, with energy acting as the generator of phase rotation. The Schrödinger equation therefore represents a compact encoding of this deeper dynamical structure rather than a fundamental starting assumption.</p>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">The Dynamics of the Unitary State</h3>
+<p>According to this framework, the wave packet is initially positioned on the negative x-axis to represent an incoming state, allowing its temporal evolution to be observed within the substrate. The solid envelope represents the probability density $|\\Psi|^2$, indicating the region where the configuration is most localized. The oscillatory component corresponds to the real part of the state, $\\mathrm{Re}(\\Psi)$, reflecting the phase structure of the substrate.</p>
+<p>The phase oscillation represents the local evolution of the phase field $\\theta(x,t)$, and its frequency is directly related to the energy of the configuration. In this sense, the imaginary unit $i$ encodes the orthogonal relationship between amplitude and phase, allowing the combined state $\\Psi = R e^{i\\theta}$ to represent both components within a single structure. As the phase velocity increases, the spatial frequency of oscillation increases correspondingly, indicating that the Hamiltonian governs the rate of phase evolution. Thus, energy is represented through the temporal and spatial variation of the phase field within the substrate, and unitary evolution corresponds to the continuous, norm-preserving rotation of this phase structure.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">Origin of the Imaginary Unit</h3>
+<p>According to this framework, the appearance of the imaginary unit $i$ in the Schrödinger equation arises from the orthogonal structure of the substrate’s amplitude–phase dynamics. The state is expressed as $\\Psi(x,t) = R(x,t)e^{i\\theta(x,t)}$ where $R$ and $\\theta$ represent two independent but coupled degrees of freedom of the substrate. These components evolve according to distinct equations: a continuity equation governing $R^2$, and a phase evolution equation governing $\\theta$.</p>
+<p>The combination of these two real-valued equations into a single complex equation requires a structure that preserves their independence while encoding their coupling. This is achieved through the complex representation, in which multiplication by $i$ corresponds to a $\\pi/2$ rotation in the amplitude–phase plane. In this sense, the imaginary unit does not introduce new physics, but provides a compact mathematical encoding of the orthogonality between amplitude and phase. Under this representation, the evolution generated by the Hamiltonian corresponds to a continuous rotation in this two-dimensional internal space, ensuring that the norm $|\\Psi|^2$ is preserved. The Schrödinger equation expresses the coupled amplitude–phase dynamics in a form that guarantees unitary evolution. Thus, within this framework, the imaginary unit $i$ reflects the intrinsic geometric structure of the substrate state-space, where amplitude and phase form orthogonal components of a unified dynamical system.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Schrödinger Dynamics Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Evolution Generator:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\hat{H}\\Psi \\rightarrow i\\hbar \\dot{\\Psi}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Unitary evolution is the phase-driven rotation of the substrate configuration preserved by energy constraints.</p>
+</div>
+</div>
+`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: SCHRÖDINGER DYNAMICS</h2>
+
+<div class="math-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0 10px;">
+
+<h3 style="color: #38bdf8; margin-bottom: 10px;">State Decomposition</h3>
+<p>According to this framework, represent the substrate state as a complex function of amplitude and phase:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\Psi(x,t) = R(x,t)\\,e^{i\\theta(x,t)}$$
+</div>
+<p>where $R(x,t) \\ge 0$ and $\\theta(x,t) \\in \\mathbb{R}$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">Probability Density and State Gradients</h3>
+<p>The observable probability density is defined by the square of the amplitude:</p>
+<div style="text-align: center; margin: 10px 0; color: #f472b6;">
+$$\\rho(x,t) = |\\Psi(x,t)|^2 = R^2(x,t)$$
+</div>
+<p>The spatial gradient of the state is given by:</p>
+<div style="text-align: center; margin: 10px 0;">
+$$\\nabla \\Psi = (\\nabla R + i R \\nabla \\theta)e^{i\\theta}$$
+</div>
+<p>Yielding the magnitude squared:</p>
+<div style="text-align: center; margin: 10px 0;">
+$$|\\nabla \\Psi|^2 = (\\nabla R)^2 + R^2(\\nabla \\theta)^2$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">Hamiltonian Functional</h3>
+<p>According to this framework, the energy functional $H[\\Psi]$ is defined as:</p>
+<div style="text-align: center; margin: 15px 0;">
+$$H[\\Psi] = \\int \\left[ \\frac{\\hbar^2}{2m}|\\nabla \\Psi|^2 + V(x)|\\Psi|^2 \\right] dx$$
+</div>
+<p>Substituting the decomposed terms:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$H = \\int \\left[ \\frac{\\hbar^2}{2m}(\\nabla R)^2 + \\frac{\\hbar^2}{2m}R^2(\\nabla \\theta)^2 + V R^2 \\right] dx$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">Continuity and Velocity Field</h3>
+<p>Define the velocity field $v(x,t) = \\frac{\\hbar}{m}\\nabla \\theta(x,t)$. The evolution of the density satisfies:</p>
+<div style="text-align: center; margin: 15px 0; color: #4ade80;">
+$$\\frac{\\partial \\rho}{\\partial t} + \\nabla \\cdot (\\rho v) = 0$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">Coupled Evolution Substitution</h3>
+<p>LHS (Time Derivative):</p>
+<div style="text-align: center; margin: 10px 0;">
+$$i\\hbar \\frac{\\partial \\Psi}{\\partial t} = \\left[ i\\hbar \\frac{\\partial R}{\\partial t} - \\hbar R \\frac{\\partial \\theta}{\\partial t} \\right] e^{i\\theta}$$
+</div>
+<p>RHS (Hamiltonian Action):</p>
+<div style="text-align: center; margin: 10px 0;">
+$$-\\frac{\\hbar^2}{2m}\\nabla^2 \\Psi + V\\Psi = \\left[ -\\frac{\\hbar^2}{2m}\\nabla^2 R + \\frac{\\hbar^2}{2m}R(\\nabla \\theta)^2 - i\\frac{\\hbar^2}{m}\\nabla R \\cdot \\nabla \\theta - i\\frac{\\hbar^2}{2m}R\\nabla^2 \\theta + V R \\right] e^{i\\theta}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">Separate Real and Imaginary Parts</h3>
+<p><b>Imaginary Part (Conservation):</b> By multiplying by $2R$, we recover the continuity equation:</p>
+<div style="text-align: center; margin: 10px 0;">
+$$\\frac{\\partial (R^2)}{\\partial t} = -\\frac{\\hbar}{m}\\nabla \\cdot (R^2 \\nabla \\theta)$$
+</div>
+<p><b>Real Part (Dynamics):</b> Dividing by $R$ yields the <b>Quantum Hamilton–Jacobi Equation</b>:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\frac{\\partial \\theta}{\\t} + \\frac{(\\nabla \\theta)^2}{2m} + V - \\frac{\\hbar^2}{2m}\\frac{\\nabla^2 R}{R} = 0$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">Operator Reconstruction</h3>
+<p>Combining these results into the complex operator form:</p>
+<div style="text-align: center; margin: 15px 0; font-size: 1.15rem; font-weight: bold;">
+$$i\\hbar \\frac{\\partial}{\\partial t}\\Psi(x,t) = \\hat{H}\\Psi(x,t)$$
+</div>
+<p>where $\\hat{H} = -\\frac{\\hbar^2}{2m}\\nabla^2 + V(x)$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">Consistency with Module 2 Coefficients</h3>
+<p>For a state expanded in the Hilbert basis $\\Psi = \\sum_i A_i(t)\\psi_i(x)$, the evolution of the coefficients follows:</p>
+<div style="text-align: center; margin: 15px 0; color: #fbbf24;">
+$$i\\hbar \\frac{dA_i}{dt} = \\sum_j H_{ij} A_j$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">Final Mathematical Statement</h3>
+<p style="margin-bottom: 20px;">According to this framework, the coupled amplitude–phase dynamics of the substrate yield the continuity equation and the quantum Hamilton–Jacobi equation, which together combine into the Schrödinger equation. This establishes unitary evolution as the natural consequence of energy-driven phase rotation within the substrate.</p>
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; border-left: 4px solid #f472b6;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Dynamical Identification Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Evolution Protocol:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\text{Coupled } R,\\theta \\rightarrow \\text{Schrödinger Eq}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Unitary dynamics emerge from substrate configuration weights responding to the local energy landscape.</p>
+</div>
+</div>
+</div>
+`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>Phase Vel.</span><input type="number" id="p_in" class="digital-entry" value="1.0" oninput="syncVal(this.value, 'p_sl')"></div><input type="range" id="p_sl" min="0.1" max="2" step="0.1" value="1.0" oninput="syncVal(this.value, 'p_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Evolution</span><div style="text-align:center; font-size: 1.0rem;">Wave $\\rightarrow$ Unitary</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Hamiltonian</span><div style="text-align:center; font-size: 1.0rem; height: 30px;">$H = \\int \\Psi^* \\hat{H} \\Psi \\, dx$</div>`,
+hierarchy: `
+<div class="logic-flow" style="font-family: monospace; font-size: 0.90em; border: 1px dashed #f472b6; padding: 0px;">
+<div style="color: #f472b6;">1. Energy Functional: $H = \\int \\Psi^* \\hat{H} \\Psi$</div>
+<div style="text-align:center; color: #94a3b8; margin: 0px 0;">↓</div>
+<div style="color: #38bdf8;">2. Phase Map: $\\Psi = R e^{i\\theta}$</div>
+<div style="text-align:center; color: #94a3b8; margin: 0px 0;">↓</div>
+<div style="color: #38bdf8;">3. Rotation: $\\dot{\\theta} \\propto \\text{Energy Density}$</div>
+<div style="text-align:center; color: #94a3b8; margin: 0px 0;">↓</div>
+<div style="color: #4ade80; font-weight: bold;">4. Recovery: $i\\hbar \\partial_t \\Psi = H\\Psi$</div>
+</div>`,
+
+footer: "Complex numbers represent the orthogonal components of the substrate's local oscillation phase.",
+rightNote: `
+<div style="margin-bottom: 0px; line-height: 1.4; font-size: 0.78rem;">
+<b style="color: #f472b6;">Phase-Energy Mapping:</b> The Schrödinger Equation emerges as the ensemble average of substrate phase rotations.
+</div>
+
+<hr style="border: none; border-top: 1px dashed rgba(244, 114, 182, 0.4); margin: 2px 0;">
+
+<div style="padding-top: 2px;">
+<p style="font-size: 0.82rem; font-style: italic; color: #94a3b8; margin-bottom: 0px; margin-top: 0px;">
+The imaginary unit $i$ denotes the $\\pi/2$ phase shift between the substrate's coupled amplitude and phase fields.
+</p>
+<div style="text-align: center; color: #38bdf8; font-size: 1.0rem;">
+$i\\hbar \\frac{\\partial \\Psi}{\\partial t} = \\hat{H}\\Psi$
+</div>
+</div>
+`
+},
+4: {
+title: "Derived Fluctuation (NCM)",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: DERIVED FLUCTUATION (NCM)</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Core Idea</h3>
+<p>In this framework, the randomness observed in quantum measurement is not fundamental. It arises from the underlying interactions of the structural fields: the <b>Stabilizing field (N)</b>, the <b>Conserving field (C)</b>, and the <b>Motive field (M)</b>. Thus, what appears as stochastic behavior is a derived structural fluctuation, not an externally imposed noise.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Structural Origin of Fluctuation</h3>
+<p>According to this framework, the fluctuation term is generated from the combined microscopic variations of the N–C–M fields:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\eta(t) = f(N, C, M)$$
+</div>
+<p>This expresses that randomness is the effective outcome of internal field interactions within the substrate.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Statistical Character</h3>
+<p>The fluctuation exhibits well-defined statistical behavior, characterized by the relation:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\langle \\eta(t)\\eta(t') \\rangle \\propto \\frac{P}{K}$$
+</div>
+<p>where <b>P</b> is the Synthesis Pressure and <b>K</b> is the Vacuum Stiffness. This shows that the strength of stochasticity is not arbitrary, but controlled by the physical properties of the substrate.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Role in Dynamics</h3>
+<p>The fluctuation enters directly into the evolution of amplitudes as a multiplicative effect. It continuously perturbs competing channels, enables transitions between possible outcomes, and prevents deterministic locking in symmetric or near-symmetric states. This stochastic influence is essential for generating realistic probabilistic behavior within the substrate.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Physical Interpretation</h3>
+<p>The apparent “randomness” of measurement is the macroscopic signature of microscopic field activity: The <b>M-field</b> introduces dynamic perturbations, the <b>C-field</b> regulates conservation constraints, and the <b>N-field</b> maintains structural stability. Their interaction produces a fluctuating environment that manifests as stochastic behavior at the observable level.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Role in the Overall Framework</h3>
+<p>This module provides the physical basis for stochasticity in the system:</p>
+<div style="text-align: center; margin: 15px 0; color: #fbbf24; font-family: 'Courier New', monospace;">
+(N, C, M) &rarr; Fluctuation &rarr; Amplitude Dynamics &rarr; Probabilistic Outcomes
+</div>
+<p>It ensures that randomness is derived rather than assumed, its strength is physically constrained, and its effect is consistent with the emergence of the Born rule.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Final Insight</h3>
+<p>Fluctuation is not an ad-hoc addition to the theory. It is the inevitable macroscopic expression of microscopic N–C–M field interactions, with its magnitude governed by the structural parameters of the substrate.</p>
+
+<div style="background: rgba(56, 189, 248, 0.1); padding: 15px; border-radius: 8px; border-left: 4px solid #38bdf8; margin-top: 20px;">
+<p style="margin: 0; color: #e2e8f0; font-weight: bold;">
+👉 Quantum randomness, in this framework, is a structured and parameter-controlled consequence of underlying field dynamics, not a fundamental indeterminacy.
+</p>
+</div>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">NCM Fluctuation Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Stochastic Origin:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\sigma^2 = \mathcal{F}(P, K)$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Randomness is a derived macroscopic signature of microscopic field perturbations (N-C-M).</p>
+</div>
+</div>
+`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: DERIVED FLUCTUATION – NCM</h2>
+
+<div class="math-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0 10px;">
+
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Field-Level Fluctuation Definition</h3>
+<p>The effective stochastic term is defined as a linear combination of microscopic field fluctuations:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\eta(t) = \\alpha\\,\\delta M(t) + \\beta\\,\\delta C(t) + \\gamma\\,\\delta N(t)$$
+</div>
+<p>Where $\\delta M, \\delta C, \\delta N$ are fluctuations of the Motive, Conserving, and Stabilizing fields, and $\\alpha, \\beta, \\gamma$ are their respective coupling coefficients.</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">2. Statistical Properties of Individual Fields</h3>
+<p>Each field fluctuation satisfies the zero-mean and delta-correlation conditions:</p>
+<div style="text-align: center; margin: 10px 0;">
+$$\\langle \\delta X(t) \\rangle = 0$$
+</div>
+<div style="text-align: center; margin: 10px 0;">
+$$\\langle \\delta X(t)\\,\\delta X(t') \\rangle = D_X\\,\\delta(t - t') \\quad \\text{for } X \\in \\{N, C, M\\}$$
+</div>
+<p>Assuming cross-correlations vanish: $\\langle \\delta X\\,\\delta Y \\rangle = 0$ for $X \\neq Y$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">3. Correlation of Composite Fluctuation</h3>
+<p>Taking the expectation of the squared composite term:</p>
+<div style="text-align: center; margin: 15px 0;">
+$$\\langle \\eta(t)\\eta(t') \\rangle = (\\alpha^2 D_M + \\beta^2 D_C + \\gamma^2 D_N)\\,\\delta(t - t')$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">4. Structural Constraint (Link to K and P)</h3>
+<p>By framework constraint, the sum of field variances is governed by the substrate parameters:</p>
+<div style="text-align: center; margin: 15px 0; color: #4ade80; font-size: 1.1rem;">
+$$\\boxed{ \\langle \\eta(t)\\eta(t') \\rangle = \\frac{P}{K}\\,\\delta(t - t') }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">5. Mapping to Wiener Process</h3>
+<p>Define the stochastic increment $dW_t \\equiv \\eta(t)\\,dt$. This establishes a Wiener process where:</p>
+<div style="text-align: center; margin: 10px 0;">
+$$\\langle dW_t \\rangle = 0, \\qquad \\langle dW_t^2 \\rangle = \\frac{P}{K}\\,dt$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">6. Amplitude Dynamics with Derived Fluctuation</h3>
+<p>The evolution of amplitudes is driven by the synthesis drift and the NCM-derived fluctuation:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\boxed{ dA_i = A_i(\\lambda_i - \\bar{\\lambda})\\,dt + \\sigma\\,A_i\\,dW_t }$$
+</div>
+<p>Where $\\bar{\\lambda} = \\sum_j |A_j|^2 \\lambda_j$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">7. Multiplicative Noise Structure</h3>
+<p>Because the noise scales with $A_i$, the system exhibits specific drift and diffusion scaling:</p>
+<ul style="list-style: none; padding-left: 20px; color: #e2e8f0;">
+<li>&bull; Drift: $\\propto A_i$</li>
+<li>&bull; Diffusion: $\\propto A_i^2 \\rightarrow D(P_i) \\propto P_i^2$</li>
+</ul>
+<p>This is the required mathematical structure for <b>Born Rule Emergence</b>.</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">8. Induced Probability Dynamics</h3>
+<p>With $P_i = |A_i|^2$, the stochastic evolution (via Itô calculus) yields:</p>
+<div style="text-align: center; margin: 15px 0;">
+$$dP_i = 2P_i(\\lambda_i - \\bar{\\lambda})dt + \\sigma^2 P_i dt + 2\\sigma P_i dW_t$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">9. Resulting Fokker–Planck Structure</h3>
+<p>The probability density $\\rho(P_i, t)$ evolves as:</p>
+<div style="text-align: center; margin: 15px 0;">
+$$\\frac{\\partial \\rho}{\\partial t} = -\\frac{\\partial}{\\partial P_i}[\\mu(P_i)\\rho] + \\frac{1}{2}\\frac{\\partial^2}{\\partial P_i^2}[D(P_i)\\rho]$$
+</div>
+<p>With $\\mu(P_i) \\propto P_i$ and $D(P_i) \\propto P_i^2$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">10. Structural Closure</h3>
+<p>The full logical chain of the framework is now closed:</p>
+<div style="text-align: center; margin: 15px 0; color: #fbbf24; font-family: 'Courier New', monospace;">
+(N, C, M) &rarr; &eta;(t) &rarr; dW_t &rarr; dA_i &rarr; P_i
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">Final Mathematical Statement</h3>
+<div style="text-align: center; margin: 20px 0; color: #4ade80;">
+$$\\boxed{ \\langle \\eta(t)\\eta(t') \\rangle = \\frac{P}{K}\\,\\delta(t - t'), \\quad dA_i = A_i(\\lambda_i - \\bar{\\lambda})\\,dt + \\sigma A_i\\,dW_t }$$
+</div>
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; border-left: 4px solid #f472b6;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Stochastic Coupling Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Fluctuation Control:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\text{Var}(\\eta) = P/K$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Multiplicative stochastic dynamics, derived from N–C–M field fluctuations, provide a structurally grounded origin of quantum randomness.</p>
+</div>
+</div>
+</div>
+`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>Field Coupling</span><input type="number" id="c_in" class="digital-entry" value="0.5" oninput="syncVal(this.value, 'c_sl')"></div><input type="range" id="c_sl" min="0" max="1" step="0.05" value="0.5" oninput="syncVal(this.value, 'c_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Structural Noise</span><div style="text-align:center; font-size: 1.0rem;">$\\eta(N,C,M)$</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Field-Derived Noise</span><div style="text-align:center; font-size: 1.0rem;">$\\eta(t) = \\alpha \\delta M + \\beta \\delta C + \\gamma \\delta N$</div>`,
+hierarchy: `
+<div class="logic-flow" style="font-family: monospace; font-size: 0.75rem; border: 1px solid rgba(251, 191, 36, 0.3); padding: 2px;">
+<div style="color: #4ade80;">1. Field Stats: $\\langle \\delta X \\delta X' \\rangle = D_X \\delta(t-t')$</div>
+<div style="text-align:center; color: #64748b;">↓</div>
+<div style="color: #fbbf24;">2. Combined: $\\sum_{X \\in \\{N,C,M\\}} \\gamma_X^2 D_X = \\frac{P}{K}$</div>
+<div style="text-align:center; color: #64748b;">↓</div>
+<div style="color: #38bdf8;">3. Correlation: $\\langle \\eta \\eta' \\rangle = \\frac{P_s}{K} \\delta(t-t')$</div>
+<div style="text-align:center; color: #64748b;">↓</div>
+<div style="color: #f472b6; font-weight: bold;">4. Dynamics: $\\boxed{dA_i = A_i(\\lambda_i - \\bar{\\lambda})\\,dt + \\sigma\\,A_i\\,dW_t}$</div>
+</div>
+`,
+footer: "The 'randomness' of measurement is actually a deep structural signature of the NCM fields.",
+rightNote: `
+<div style="margin-bottom: 8px; line-height: 1.4; font-size: 0.80rem;">
+<b style="color: #fbbf24;">The NCM Synthesis:</b> Fluctuation is the effective macroscopic signature of microscopic $N$–$C$–$M$ field interactions, with variance determined by the ratio $P_s/K$.
+</div>
+
+<hr style="border: none; border-top: 1px dashed rgba(251, 191, 36, 0.4); margin: 2px 0;">
+
+<div style="text-align: center; color: #4ade80; font-size: 1.0rem; padding: 1px 0;">
+$\\langle \\eta(t)\\eta(t') \\rangle = \\frac{P_s}{K} \\delta(t-t')$
+</div>
+<p style="font-size: 0.75rem; color: #94a3b8; margin-top: 1px; margin-bottom: 2px; text-align: center;">
+Where $P_s$ is Synthesis Pressure and $K$ is Substrate Stiffness.
+</p>
+`,
+},
+5: {
+title: "Experimental Predictions",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: EXPERIMENTAL PREDICTIONS</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Core Objective</h3>
+<p>According to this framework, the purpose of this module is to identify how the framework can be experimentally distinguished from standard quantum mechanics. The central idea is that while standard QM provides exact probabilities $P_i = |c_i|^2$, this framework predicts a structured deviation:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$P_i = |c_i|^2 + \\epsilon_i(K,P)\\,|c_i|^2$$
+</div>
+<p>where $\\epsilon_i(K,P)$ is a correction determined by the substrate parameters: <b>K (Vacuum Stiffness)</b> and <b>P (Synthesis Pressure)</b>.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Nature of the Deviation</h3>
+<p>The correction term $\\epsilon_i(K,P)$ is not random or an additional noise term, but a structured, deterministic correction arising from substrate dynamics. This ensures that the framework reduces to standard QM in ordinary regimes and deviates only under specific structural conditions.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Smallness and Regime Dependence</h3>
+<p>The correction satisfies $\\epsilon_i(K,P) \\ll 1$ in standard experimental regimes. Deviations become relevant only near critical substrate conditions, guaranteeing consistency with existing experimental data and the absence of large, already-excluded deviations.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Probability Conservation (Unitarity Guardrail)</h3>
+<p>The corrections are constrained such that total probability remains conserved. Deviations redistribute probability rather than create or destroy it, ensuring compatibility with the fundamental probabilistic structure of quantum theory.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Observable Signatures</h3>
+<p>The framework predicts three distinct and testable classes of deviations:</p>
+<ul style="color: #e2e8f0; margin-left: 20px;">
+<li><b style="color: #fbbf24;">(1) Collapse Time Scaling:</b> The time for outcome stabilization scales with substrate parameters: $\\Delta T \\propto (K/P)^{1/2}$. Systems with different substrate conditions should exhibit measurable differences in collapse dynamics.</li>
+<li><b style="color: #fbbf24;">(2) Noise Spectrum Signature:</b> The fluctuation spectrum is not purely white noise, but exhibits a non-white 1/f-type structure arising from correlated N–C–M field interactions.</li>
+<li><b style="color: #fbbf24;">(3) Propagation Anisotropy:</b> Measurement outcomes exhibit subtle directional dependence, where probabilities vary slightly with orientation, reflecting asymmetry in the substrate structure.</li>
+</ul>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Physical Interpretation of ε(K, P)</h3>
+<p>The correction term represents a structured deviation determined by substrate parameters, not an independent stochastic contribution. It encodes the influence of vacuum stiffness (K), the effect of synthesis pressure (P), and the residual asymmetry of N–C–M interactions.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Experimental Signature (Graph Interpretation)</h3>
+<p>In the visual comparison, the <b>dashed line</b> represents the standard QM prediction, while the <b>solid curve</b> represents the framework prediction. Shaded regions represent a systematic deviation zone—indicating consistent, parameter-dependent divergence rather than random scatter.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Role in the Overall Framework</h3>
+<p>This module provides the final step: <b>Theory &rarr; Prediction &rarr; Testability</b>. It connects the structural derivations of Modules 1–4 to observable experimental consequences, providing the bridge between mathematical formulation and physical verification.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Final Insight</h3>
+<p>The framework does not reject quantum mechanics; instead, it proposes that standard QM is a limiting case. Small, structured corrections emerge from deeper substrate dynamics.</p>
+
+<div style="background: rgba(56, 189, 248, 0.1); padding: 15px; border-radius: 8px; border-left: 4px solid #38bdf8; margin-top: 20px;">
+<p style="margin: 0; color: #e2e8f0; font-weight: bold;">
+👉 Quantum probabilities are not exact absolutes but leading-order approximations of a deeper substrate-dependent structure, with measurable deviations governed by K and P.
+</p>
+</div>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Experimental Verification Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Deviation Metric:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\delta P \\propto \\epsilon(K, P)$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Testable signatures arise in collapse timing, noise spectra, and directional anisotropy.</p>
+</div>
+</div>
+`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: EXPERIMENTAL PREDICTIONS</h2>
+
+<div class="math-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0 10px;">
+
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Modified Probability Law</h3>
+<p>The framework predicts that measured probabilities take the form of the standard Born rule plus a structured correction:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\boxed{ P_i = |c_i|^2 + \\epsilon_i(K,P)\\,|c_i|^2 }$$
+</div>
+<p>Or equivalently, expressed as a scaling factor:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\boxed{ P_i = |c_i|^2 \\left(1 + \\epsilon_i(K,P)\\right) }$$
+</div>
+<p>where $|c_i|^2$ is the standard quantum probability and $\\epsilon_i(K,P)$ is a small, dimensionless correction.</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">2. Normalization Constraint</h3>
+<p>To preserve total probability $\\sum_i P_i = 1$, the corrections must satisfy:</p>
+<div style="text-align: center; margin: 15px 0;">
+$$\\sum_i |c_i|^2 (1 + \\epsilon_i) = 1$$
+</div>
+<p>Since $\\sum_i |c_i|^2 = 1$, we obtain the fundamental constraint on the deviation term:</p>
+<div style="text-align: center; margin: 15px 0; color: #4ade80;">
+$$\\boxed{ \\sum_i \\epsilon_i(K,P)\\,|c_i|^2 = 0 }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">3. Smallness and Functional Dependence</h3>
+<p>The correction satisfies $|\\epsilon_i(K,P)| \\ll 1$, ensuring consistency with standard QM in ordinary regimes. To leading order, the scaling behavior is determined by the ratio of <b>Synthesis Pressure (P)</b> to <b>Vacuum Stiffness (K)</b>:</p>
+<div style="text-align: center; margin: 15px 0;">
+$$\\epsilon_i(K,P) \\sim \\alpha_i \\left(\\frac{P}{K}\\right)^\\nu$$
+</div>
+<p>where $\\alpha_i$ encodes channel-dependent sensitivity and $\\nu > 0$ determines the scaling behavior.</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">4. Collapse Time Scaling</h3>
+<p>The characteristic collapse (selection) time $\\Delta T$ follows from the stochastic amplitude equation diffusion strength $\\langle dW_t^2 \\rangle = \\frac{P}{K} dt$:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6; font-size: 1.1rem;">
+$$\\boxed{ \\Delta T \\propto \\left(\\frac{K}{P}\\right)^{1/2} }$$
+</div>
+<p>This implies that larger <b>P</b> leads to faster collapse, while larger <b>K</b> leads to slower collapse dynamics.</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">5. Non-White Noise Spectrum</h3>
+<p>While the basic fluctuation $\\eta(t)$ is delta-correlated, N–C–M field interactions induce an effective spectral density $S(f)$:</p>
+<div style="text-align: center; margin: 15px 0;">
+$$\\boxed{ S(f) \\sim \\frac{1}{f^\\alpha}, \\quad \\alpha \\approx 1 }$$
+</div>
+<p>This indicates a structured, non-white (1/f-type) noise signature.</p>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">6. Directional (Anisotropic) Correction</h3>
+<p>If substrate parameters exhibit directional dependence $P = P(\\hat{n})$, probabilities will vary with orientation:</p>
+<div style="text-align: center; margin: 15px 0;">
+$$\\boxed{ P_i(\\hat{n}) = |c_i|^2 \\left(1 + \\epsilon_i(K,P(\\hat{n}))\\right) }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">7. Deviation Analysis</h3>
+<p>The deviation from the standard Born rule $\\Delta P_i = P_i - |c_i|^2$ scales linearly with the base probability, controlled strictly by substrate parameters:</p>
+<div style="text-align: center; margin: 15px 0; color: #4ade80;">
+$$\\boxed{ \\Delta P_i = \\epsilon_i(K,P)\\,|c_i|^2 }$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 20px; margin-bottom: 10px;">Final Mathematical Statement</h3>
+<div style="text-align: center; margin: 20px 0; color: #f472b6;">
+$$\\boxed{ P_i = |c_i|^2 \\left(1 + \\epsilon_i(K,P)\\right), \\quad \\sum_i \\epsilon_i(K,P)|c_i|^2 = 0, \\quad |\\epsilon_i| \\ll 1 }$$
+</div>
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; border-left: 4px solid #f472b6;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Predictive Identification Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Deviation Scaling:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\delta P \\sim (P/K)^\\nu$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Quantum probabilities are leading-order approximations of a substrate-dependent structure with measurable deviations governed by K and P.</p>
+</div>
+</div>
+</div>
+`,
+
+
+sliders: `<div class="control-item"><div class="label-group"><span>Criticality (a)</span><input type="number" id="a_in" class="digital-entry" value="0.05" oninput="syncVal(this.value, 'a_sl')"></div><input type="range" id="a_sl" min="0.001" max="0.2" step="0.001" value="0.05" oninput="syncVal(this.value, 'a_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Divergence</span><div style="text-align:center; font-size: 1.0rem;">Standard vs Substrate</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Prediction</span><div style="text-align:center; font-size: 0.9rem;">$\\boxed{P_i = |c_i|^2 + \\epsilon_i(K,P)|c_i|^2}$</div>`,
+hierarchy: `
+<div class="logic-flow" style="font-family: monospace; font-size: 0.72rem; border: 1px solid rgba(244, 114, 182, 0.3); padding: 2px;">
+<div style="color: #4ade80;">1. COLLAPSE TIME SCALING: $\\Delta T \\propto (K/P)^{1/2}$</div>
+<div style="text-align:center; color: #64748b;">↓</div>
+<div style="color: #fbbf24;">2. NOISE SPECTRUM: Non-white $1/f$ from N–C–M correlations</div>
+<div style="text-align:center; color: #64748b;">↓</div>
+<div style="color: #38bdf8;">3. PROPAGATION ANISOTROPY: Directional $P_s$ bias</div>
+</div>
+`,
+footer: "Predictions include anomalous collapse times and noise spectrum signatures.",
+rightNote: `
+<div style="margin-bottom: 0px; line-height: 1.4; font-size: 0.72rem;">
+<b style="color: #f472b6;">Physical Interpretation:</b> $\\epsilon_i(K,P)$ represents a structured deviation determined by substrate parameters, not an independent stochastic term.
+</div>
+<hr style="border: none; border-top: 1px dashed rgba(244, 114, 182, 0.4); margin: 2px 0;">
+<div style="font-size: 0.75rem; color: #94a3b8; font-style: italic; margin-bottom: 2px;">
+Note: $\\epsilon_i \\ll 1$ in standard regimes; deviations emerge only near critical substrate limits.
+</div>
+<ul style="font-size: 0.75rem; color: #cbd5e1; margin-bottom: 2px; padding-left: 10px;">
+<li><b>Unitary Guardrail:</b> The sum of corrections remains zero to preserve total probability.</li>
+<li><b>Inertial Signature:</b> Traces the asymmetric flow of Synthesis Pressure ($P_s$).</li>
+</ul>
+`,
+}
+};
+
+function syncVal(val, id) {
+const sliderId = id.includes('_in') ? id.replace('_in', '_sl') : id;
+const inputId = id.includes('_sl') ? id.replace('_sl', '_in') : id;
+if(document.getElementById(sliderId)) document.getElementById(sliderId).value = val;
+if(document.getElementById(inputId)) document.getElementById(inputId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+document.getElementById('brief-box-content').innerHTML = content.brief || "Coming Soon";
+document.getElementById('math-box-content').innerHTML = content.math || "Coming Soon";
+document.getElementById('control-sliders').innerHTML = content.sliders;
+document.getElementById('active-module-title').innerText = content.title;
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+showScreen('briefing');
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() {
+showScreen('lab');
+setTimeout(() => {
+runLab();
+window.dispatchEvent(new Event('resize'));
+}, 100);
+}
+
+function runLab() {
+const target = document.getElementById('plot-area');
+if (!target) return;
+let data = [];
+let layout = {
+paper_bgcolor: 'black', plot_bgcolor: 'black', margin: {t:40,b:40,l:50,r:30},
+xaxis: { color: '#666', gridcolor: '#111', title: {text: 'Outcome State', font: {size: 10}} },
+yaxis: { color: '#666', gridcolor: '#111', title: {text: 'Frequency/Prob', font: {size: 10}} },
+showlegend: false
+};
+
+if (currentTool === 1) {
+// Inputs: n = Trial Count (N), field_n = Initial Amplitude Ratio
+let n = parseInt(document.getElementById('n_sl')?.value) || 100;
+let field_n = parseFloat(document.getElementById('field_n')?.value) || 0.5;
+
+// Step 1 & 2: Define initial amplitudes (A) and ensure normalization
+let A1 = Math.sqrt(field_n);
+let A2 = Math.sqrt(1 - field_n);
+
+// Simulation parameters for Selection Dynamics (Step 3)
+let dt = 0.1;
+let sigma = 0.05; // NCM-driven fluctuation strength
+let counts = [0, 0];
+
+// Running N trials to see the stationary distribution (Step 6)
+for (let i = 0; i < n; i++) {
+let tempA1 = A1;
+let tempA2 = A2;
+
+// Short-burst Selection competition
+for (let t = 0; t < 5; t++) {
+let lambda1 = 1.0; // Fitness of Outcome A
+let lambda2 = 1.0; // Fitness of Outcome B (Symmetry)
+let avg_lambda = (tempA1*tempA1*lambda1) + (tempA2*tempA2*lambda2);
+
+// Step 3: Multiplicative Growth + Stochastic Jitter (dW)
+let dW1 = Math.sin(i * 13 + t * 7) * Math.sqrt(dt);
+let dW2 = Math.cos(i * 17 + t * 11) * Math.sqrt(dt);
+
+
+tempA1 += tempA1 * (lambda1 - avg_lambda) * dt + (sigma * tempA1 * dW1);
+tempA2 += tempA2 * (lambda2 - avg_lambda) * dt + (sigma * tempA2 * dW2);
+
+// Renormalize to keep sum of squares = 1
+let norm = Math.sqrt(tempA1*tempA1 + tempA2*tempA2);
+tempA1 /= norm; tempA2 /= norm;
+}
+
+// Selection: Which basin did it fall into?
+let fixedCoinFlip = (Math.sin(i * 821.43) + 1) / 2;
+if (fixedCoinFlip < tempA1 * tempA1) counts[0]++;
+else counts[1]++;
+}
+
+data = [{
+x: ['Outcome A', 'Outcome B'],
+y: counts,
+type: 'bar',
+marker: {
+color: ['#f472b6', '#38bdf8'],
+line: { width: 1, color: '#fff' }
+}
+}];
+layout.yaxis.title = "Frequency (Stationary Dist)";
+
+
+
+} else if (currentTool === 2) {
+// 1. Get the Orthonormality/Overlap value from your slider
+// We use delta_sl (or your slider ID) to control the 'separation'
+let o = parseFloat(document.getElementById('o_sl')?.value) || 0.0;
+
+let x = [], y1 = [], y2 = [];
+
+// PHYSICAL MAPPING:
+// When overlap is 1.0 (max), separation is 0.
+// When overlap is 0 (orthogonal), separation is 3.0.
+let separation = 3.0 * (1 - o);
+
+for (let i = -4; i <= 4; i += 0.05) {
+x.push(i);
+// Mode psi_i (Blue)
+y1.push(Math.exp(-Math.pow(i + separation/2, 2) * 5));
+// Mode psi_j (Purple)
+y2.push(Math.exp(-Math.pow(i - separation/2, 2) * 5));
+}
+
+data = [
+{
+x: x, y: y1, name: 'ψ_i', fill: 'tozeroy',
+line: {color: '#38bdf8', width: 2},
+fillcolor: 'rgba(56, 189, 248, 0.2)'
+},
+{
+x: x, y: y2, name: 'ψ_j', fill: 'tozeroy',
+line: {color: '#a78bfa', width: 2},
+fillcolor: 'rgba(167, 139, 250, 0.2)'
+}
+];
+
+layout.xaxis.range = [-4, 4];
+layout.xaxis.title.text = "Substrate Coordinate (x)";
+layout.yaxis.title.text = "Amplitude Density";
+
+// Dynamic Annotation to prove the math
+layout.annotations = [{
+x: 0, y: 0.9, xref: 'x', yref: 'y',
+text: o < 0.1 ? '<b>Orthogonal: ⟨ψi|ψj⟩ ≈ 0</b>' : 'Basis Overlap Active',
+showarrow: false,
+font: {color: o < 0.1 ? '#4ade80' : '#94a3b8', size: 12}
+}];
+
+
+
+} else if (currentTool === 3) {
+// 1. Get Simulation Parameters
+// Ensure these IDs match your sliders for Module 3 (e.g., time or energy)
+let t = parseFloat(document.getElementById('p_sl')?.value) || 0;
+let x = [], y_real = [], y_imag = [], y_prob = [];
+
+// Physical Constants for the Simulation
+const k = 5; // Momentum
+const omega = 2; // Energy frequency
+
+for (let i = -5; i <= 5; i += 0.05) {
+x.push(i);
+
+// Step 2 & 3: ψ = R * exp(iθ)
+// Amplitude R (Envelope)
+let R = Math.exp(-Math.pow(i - (t * 2 - 5), 2) * 2);
+
+// Phase θ = (kx - ωt)
+let theta = (k * i) - (omega * t * 10);
+
+// Real and Imaginary components (The complex plane rotation)
+let real = R * Math.cos(theta);
+let imag = R * Math.sin(theta);
+
+y_real.push(real);
+y_imag.push(imag);
+y_prob.push(R * R); // Probability Density |Ψ|²
+}
+
+data = [
+{
+x: x, y: y_real, name: 'Re(Ψ) - Substrate Phase',
+line: {color: '#38bdf8', width: 1.5, dash: 'dot'}
+},
+{
+x: x, y: y_prob, name: '|Ψ|² - Probability', fill: 'tozeroy',
+line: {color: '#f472b6', width: 3},
+fillcolor: 'rgba(244, 114, 182, 0.1)'
+}
+];
+
+layout.xaxis.range = [-5, 5];
+layout.yaxis.range = [-1.2, 1.2];
+layout.xaxis.title = {text: "Position (x)", font: {size: 10}};
+layout.yaxis.title = {text: "Amplitude / Probability", font: {size: 10}};
+
+
+
+} else if (currentTool === 4) {
+let t = parseFloat(document.getElementById('c_sl')?.value) || 0;
+let x = [], y_fluc = [], y_pure = [];
+
+for (let i = -5; i <= 5; i += 0.1) {
+x.push(i);
+let base = Math.exp(-Math.pow(i, 2));
+
+let noise = 0.22 * Math.sin(i * 15 + t * 5) * base;
+
+y_pure.push(base);
+y_fluc.push(base + noise);
+}
+
+data = [
+{
+x: x, y: y_pure, name: 'Unitary State',
+line: {color: 'rgba(244, 114, 182, 0.2)', dash: 'dash'}
+},
+{
+x: x, y: y_fluc, name: 'NCM Stochastic Coupling',
+line: {color: '#fbbf24', width: 2.5}
+}
+];
+
+layout.title = "AMPLITUDE DYNAMICS: dA_i ~ η(t)A_i";
+layout.xaxis.range = [-5, 5];
+layout.yaxis.range = [-0.2, 1.2];
+
+
+
+
+
+} else if (currentTool === 5) {
+let k_val = parseFloat(document.getElementById('a_sl')?.value) || 0.5;
+let x = [], y_born = [], y_ncm = [];
+
+for (let i = 0; i <= 1; i += 0.02) {
+x.push(i);
+let p_standard = i;
+
+// REFINED LOGIC: epsilon is now RELATIVE to |c|^2 (p_standard)
+// Magnitude scales with (1 - k_val)
+let epsilon_relative = 0.25 * Math.sin(i * Math.PI) * (1 - k_val);
+let p_ncm = p_standard + (epsilon_relative * p_standard);
+
+y_born.push(p_standard);
+y_ncm.push(p_ncm);
+}
+
+data = [
+{
+x: x, y: y_born,
+name: 'Standard QM (|c|²)',
+showlegend: true,
+line: {color: 'rgba(255,255,255,0.4)', dash: 'dash', width: 1.5}
+},
+{
+x: x, y: y_ncm,
+name: 'Synthesis Framework (ε)',
+showlegend: true,
+fill: 'tonexty',
+fillcolor: 'rgba(244, 114, 182, 0.15)',
+line: {color: '#f472b6', width: 3}
+}
+];
+
+layout.title = "EXPERIMENTAL SIGNATURE: RELATIVE ε(K,P) DIVERGENCE";
+layout.xaxis.title = "Standard Expectation (|c|²)";
+layout.yaxis.title = "Observed Frequency (P)";
+
+// --- LEGEND CONFIGURATION ---
+layout.showlegend = true;
+layout.legend = {
+x: 0,
+y: 1,
+font: { color: '#ffffff', size: 10 },
+bgcolor: 'rgba(0,0,0,0)'
+};
+
+// --- ANNOTATION CONFIGURATION ---
+layout.annotations = [{
+x: 0.5,
+y: 0.65, // Adjusting height to track the new relative curve
+xref: 'x',
+yref: 'y',
+text: 'ε-Violation Zone',
+showarrow: true,
+arrowhead: 2,
+ax: -40,
+ay: -40,
+font: {color: '#f472b6', size: 11}
+}];
+}
+
+
+Plotly.react('plot-area', data, layout, {responsive: true, displayModeBar: false});
+}
+
+function resetLab() {
+if (currentTool === 1) syncVal(100, 'n_sl');
+if (currentTool === 2) syncVal(0, 'o_sl');
+if (currentTool === 3) syncVal(1.0, 'p_sl');
+if (currentTool === 4) syncVal(0.5, 'c_sl');
+if (currentTool === 5) syncVal(0.05, 'a_sl');
+runLab();
+}
+</script>
+</body>
+</html>

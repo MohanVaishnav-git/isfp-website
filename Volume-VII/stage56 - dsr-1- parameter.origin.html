@@ -1,0 +1,3621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 56 — Parameter Origin (K, P → Physics)</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #3b82f6;
+--accent-sub: #60a5fa; --accent-const: #818cf8; --accent-mass: #2dd4bf; --accent-scale: #fbbf24; --accent-final: #f472b6; --accent-bridge: #a855f7;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6;
+--accent-gold: #fbbf24;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-sub); font-family: sans-serif; font-size: 0.85rem; min-width: 450px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls, #nav-summary-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+#screen-lab.active { display: flex; flex-direction: column; height: calc(100vh - 50px); }
+
+#screen-portal { justify-content: flex-start; padding-top: 2dvh; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 5px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 2px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; padding-bottom: 0px; }
+.module-subtitle { text-align: center; font-family: sans-serif; color: var(--accent-gold); margin-bottom: 8px; font-weight: bold; letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.primary-constant-box { background: #000; border: 1px solid var(--accent-unified); padding: 2px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 8px; }
+.secondary-structure-box { background: rgba(59, 130, 246, 0.05); border: 1px dashed var(--accent-unified); padding: 3px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 8px; }
+
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(59, 130, 246, 0.05); border: 1px solid var(--accent-unified); padding: 5px; border-radius: 5px; margin-bottom: 8px; font-size: 0.7rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; }
+#plot-area { flex-grow: 1; width: 100%; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #fff; border: 1px solid var(--accent-unified); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer { width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem; color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 56 — PARAMETER ORIGIN (K, P → PHYSICS)</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">Parameter Origin (Substrate Dynamics)</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">Establishing how fundamental constants emerge from K and P.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-sub);">
+<h2 style="color:var(--accent-sub);">1. Substrate Parameters</h2>
+<p>K and P Definitions.<br>The structural base layer.</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-const);">
+<h2 style="color:var(--accent-const);">2. Coupling Emergence</h2>
+<p>K, P → Gauge Couplings.<br>Interaction intensity origin.</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-mass);">
+<h2 style="color:var(--accent-mass);">3. Mass Scale Origin</h2>
+<p>K, P → m.<br>Resistance as a substrate outcome.</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-scale);">
+<h2 style="color:var(--accent-scale);">4. Scale Hierarchy</h2>
+<p>Structural Multi-leveling.<br>Why scales are separated.</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-final);">
+<h2 style="color:var(--accent-final);">5. Parameter Completion</h2>
+<p>The Unified Mapping.<br>Constants as derived outcomes.</p>
+</div>
+<div class="portal-card" onclick="openTool(6)" style="border-color: var(--accent-bridge);">
+<h2 style="color:var(--accent-bridge);">6. Constant Derivation</h2>
+<p>The Bridge to Reality.<br>K, P → G, α, H₀.</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-gold);">
+<h2 style="color:var(--accent-gold);">Stage 56 Summary</h2>
+<p>The "Why" Layer of Physics.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color:var(--accent-gold); text-align:center;">STAGE 56 — MATHEMATICAL STRUCTURE SUMMARY</h2>
+<section>
+<div class="math-content" style="font-size: 0.9rem; line-height: 1.6; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<p style="text-align:center;"><strong>Parameter Origin (K, P → Physics)</strong></p>
+<p style="text-align:center;">(Structure → Interaction → Mass → Scale → Constants → Reality)</p>
+
+<h3 style="color:#fbbf24;">1. Foundational Parameters</h3>
+<p>The substrate is fully characterized by two structural parameters:</p>
+
+<p>
+$$ K = |\nabla C| \quad \text{(Vacuum Stiffness)} $$
+$$ P = P_{\text{syn}} \quad \text{(Synthesis Pressure)} $$
+</p>
+
+<p>✔ These are:</p>
+<p>
+Derived from triadic fields N, C, M<br>
+Structurally necessary<br>
+Not adjustable
+</p>
+
+<h3 style="color:#fbbf24;">2. Coupling Emergence</h3>
+
+<p>
+$$ g = f\!\left(\frac{P}{K}\right) $$
+</p>
+
+<p>Leading-order form:</p>
+
+<p>
+$$ g \sim \frac{P}{K} $$
+</p>
+
+<p>Interpretation:</p>
+<p>
+K → resistance<br>
+P → interaction support
+</p>
+
+<h3 style="color:#fbbf24;">3. Mass Scale Origin</h3>
+
+<p>
+$$ m \sim K \cdot g(K,P) $$
+</p>
+
+<p>
+$$ m \sim \frac{K^2}{P} $$
+</p>
+
+<p>✔ General form:</p>
+
+<p>
+$$ m = f(K, P) $$
+</p>
+
+<h3 style="color:#fbbf24;">4. Scale Hierarchy (Eigenstructure)</h3>
+
+<p>
+$$ \mathcal{L}(K,P)\Psi_n = \Lambda_n \Psi_n $$
+</p>
+
+<p>
+$$ \mathcal{L}(K,P) \sim -\nabla^2 + \frac{K^2}{P} $$
+</p>
+
+<p>
+$$ \Lambda_n = \text{Discrete resonance levels} $$
+</p>
+
+<p>
+$$ \Lambda_n \sim \Lambda_0 e^{\beta n} $$
+</p>
+
+<h3 style="color:#fbbf24;">5. Unified Parameter Mapping</h3>
+
+<p>
+$$ C_i = f_i(K, P) $$
+</p>
+
+<p>
+$$ (K, P) \longrightarrow \{C_i\} $$
+</p>
+
+<p>
+$$ \delta K = 0, \quad \delta P = 0 \Rightarrow \delta C_i = 0 $$
+</p>
+
+<p>
+$$ \boxed{\{C_i\} = \mathcal{F}(K, P)} $$
+</p>
+
+<h3 style="color:#fbbf24;">6. Phase Alignment (Numerical Realization)</h3>
+
+<p>
+$$ \theta \in [0, 2\pi] $$
+</p>
+
+<p>
+$$ C_i = f_i(K, P, \theta) $$
+</p>
+
+<p>
+$$ \theta = \theta_{\text{crit}} = \pi $$
+</p>
+
+<p>
+$$ C_i^{\text{phys}} = f_i(K, P, \pi) $$
+</p>
+
+<p>
+$$ \frac{\partial C_i}{\partial \theta} = 0, \quad \frac{\partial^2 C_i}{\partial \theta^2} > 0 $$
+</p>
+
+<h3 style="color:#fbbf24;">7. Complete Structural Chain</h3>
+
+<p>
+$$ (K, P) \rightarrow g(K,P) \rightarrow m(K,P) \rightarrow \Lambda_n(K,P) \rightarrow C_i(K,P) \rightarrow C_i^{\text{phys}}(K,P,\pi) $$
+</p>
+
+<h3 style="color:#fbbf24;">8. Dimensional Structure</h3>
+
+<p>
+$$ [K] = L^{-1}, \quad [P] = T^{-2} $$
+</p>
+
+<p>
+$$ [g] = 1, \quad [m] \sim \frac{K^2}{P}, \quad [\Lambda] \sim m $$
+</p>
+
+<h3 style="color:#fbbf24;">9. Structural Closure</h3>
+
+<p>
+$$ \boxed{ \text{Physics is completely determined by } (K, P, \theta_{\text{crit}}) } $$
+</p>
+
+<p>
+$$ \boxed{ \text{Degrees of freedom: } 2 + 1 \ (\text{phase}) } $$
+</p>
+
+<h3 style="color:#fbbf24;">10. Final Unified Statement</h3>
+
+<p>
+All physical laws, constants, and observable quantities arise as necessary consequences of substrate parameters K, P and phase alignment.
+</p>
+
+<h3 style="color:#fbbf24;">11. Conceptual Compression (Mathematical)</h3>
+
+<p>
+K, P define substrate<br>
+g, m, \Lambda_n are derived<br>
+C_i are mapped outputs<br>
+\theta = \pi fixes values<br>
+Physics is structurally closed
+</p>
+
+<hr>
+
+<h2 style="color:var(--accent-blue); text-align: center;">STAGE 56 — CLOSURE / COMPLETION THEOREM</h2>
+
+<p style="text-align:center;"><strong>(Parameter Origin → Full Structural Completion of Physics)</strong></p>
+
+<h3 style="color:#fbbf24;">Theorem (Structural Completion of Physical Reality)</h3>
+
+<p>
+All physical laws, constants, scales, and observable phenomena are fully and uniquely determined as necessary consequences of the substrate parameters K and P together with phase alignment condition \theta = \pi.
+</p>
+
+<h3 style="color:#fbbf24;">1. Formal Statement</h3>
+
+<p>
+$$ \mathcal{S} = (K, P) $$
+$$ \theta \in [0, 2\pi] $$
+$$ \mathcal{O} = \{g, m, \Lambda_n, C_i\} $$
+</p>
+
+<p>
+$$ \boxed{ \mathcal{O} = \mathcal{F}(K, P, \theta) } $$
+</p>
+
+<p>
+$$ \boxed{ \theta = \pi \Rightarrow \mathcal{O} = \mathcal{F}(K, P, \pi) } $$
+</p>
+
+<p>
+$$ \boxed{ \text{Observable physics is fully determined by } (K, P) \text{ at } \theta = \pi } $$
+</p>
+
+<h3 style="color:#fbbf24;">2. Structural Chain of Derivation</h3>
+
+<p>
+$$ (K, P) \rightarrow g(K,P) \rightarrow m(K,P) \rightarrow \Lambda_n(K,P) \rightarrow C_i(K,P) \rightarrow C_i^{\text{phys}}(K,P,\pi) $$
+</p>
+
+<p>
+$$ \boxed{ \text{No physical quantity exists outside this chain} } $$
+</p>
+
+<h3 style="color:#fbbf24;">3. Closure Condition</h3>
+
+<p>
+$$ \boxed{ \frac{\partial \mathcal{O}}{\partial C_i} = 0 \quad \forall i } $$
+</p>
+
+<p>
+$$ \boxed{ C_i = f_i(K, P) \quad \forall i } $$
+</p>
+
+<h3 style="color:#fbbf24;">4. Dimensional Reduction</h3>
+
+<p>
+$$ \boxed{ N_{\text{fundamental}} = 2 } $$
+</p>
+
+<p>
+$$ \boxed{ N_{\text{effective}} = 2 + 1 } $$
+</p>
+
+<h3 style="color:#fbbf24;">5. Stability and Uniqueness</h3>
+
+<p>
+$$ \frac{\partial C_i}{\partial \theta} = 0, \quad \frac{\partial^2 C_i}{\partial \theta^2} > 0 $$
+</p>
+
+<p>
+$$ \boxed{ \exists!\ \theta_{\text{crit}} = \pi } $$
+</p>
+
+<h3 style="color:#fbbf24;">6. Consistency</h3>
+
+<p>
+$$ \boxed{ \text{Framework preserves GR + QM as limits} } $$
+</p>
+
+<h3 style="color:#fbbf24;">7. Non-Arbitrariness</h3>
+
+<p>
+$$ \boxed{ \text{No parameter in physics is arbitrary} } $$
+</p>
+
+<h3 style="color:#fbbf24;">8. Completeness</h3>
+
+<p>
+$$ \boxed{ \text{All constants, scales, and laws are derived} } $$
+</p>
+
+<h3 style="color:#fbbf24;">9. Total Structure</h3>
+
+<p>
+$$ \mathcal{T} = \{K, P, \theta\} $$
+</p>
+
+<p>
+$$ \boxed{ \mathcal{O} = \mathcal{F}(\mathcal{T}) } $$
+</p>
+
+<p>
+$$ \boxed{ \text{dim}(\mathcal{T}) = 3 } $$
+</p>
+
+<h3 style="color:#fbbf24;">10. Final Closure</h3>
+
+<p>
+$$ \boxed{ \text{Physics is a closed system fully determined by substrate structure and phase alignment} } $$
+</p>
+
+<h3 style="color:#fbbf24;">11. Conceptual Interpretation</h3>
+
+<p>
+Physics is revealed, not constructed<br>
+Constants are necessary, not chosen<br>
+Reality is emergent structure
+</p>
+
+<h3 style="color:#fbbf24;">12. Ultimate Statement</h3>
+
+<p>
+$$ \boxed{ \textbf{All physical reality arises as a necessary and unique consequence of } K, P \textbf{ and phase alignment} } $$
+</p>
+
+<h3 style="color:#fbbf24;">13. WHAT THIS FRAMEWORK HAS ACHIEVED HERE</h3>
+
+<p>
+Eliminated arbitrariness in physics<br>
+Unified all constants under one origin<br>
+Provided full bridge from structure to observation
+</p>
+
+<p>
+$$ \boxed{ \Psi \rightarrow \text{Fields} \rightarrow (K, P) \rightarrow \text{Parameters} \rightarrow \text{Constants} \rightarrow \text{Observable Reality} } $$
+</p>
+</div>
+</section>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div id="active-module-result" class="module-subtitle">--</div>
+<div class="primary-constant-box">
+<div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val">11.350</span></div>
+<div class="const-item"><span class="const-label">Synthesis P</span><span class="const-val">0.6900</span></div>
+</div>
+
+<div id="structure-box-area"></div>
+<div id="mapping-box-area"></div>
+
+<div class="diagnostic-panel">
+<span class="diag-title">Substrate Telemetry</span>
+<div id="telemetry-area"></div>
+</div>
+
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-gold); font-size:0.75rem; cursor:pointer; padding:6px;">SUBSTRATE EQUILIBRIUM</button>
+<div id="panel-footer-text" style="font-size: 0.75rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.3; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:8px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Emergence Logic</span>
+<div id="metrics-content" style="font-size:0.65rem; font-family:monospace; line-height:1.3;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Structural Outcome</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.65rem; color: var(--text-dim); line-height: 1.4; background: #000; padding: 5px; border-radius: 0px; border: 1px solid #222; margin-top: auto;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "SUBSTRATE PARAMETERS (K, P)",
+result: "Vacuum is Structured — Not Empty",
+resultSize: "0.80rem",
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 56 — Module 1: Substrate Parameters (K, P)</h2>
+
+<div class="briefing-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Conceptual Introduction</h3>
+
+<p>
+Up to Stage 55, the framework has established a complete structural foundation of reality. The triadic fields—Stabilizing field N, Conserving field C, and Motive field M—constitute the fundamental substrate. From their interaction, the Synthesis Tensor $\\Sigma_{\\mu\\nu}$ has been derived, with the conservation condition $\\nabla^\\mu \\Sigma_{\\mu\\nu} = 0$ ensuring structural consistency.
+</p>
+
+<p>
+At this point, a critical question arises: how does this structural formulation produce measurable physics? In standard physics, constants are introduced empirically, without structural origin.
+</p>
+
+<p>
+This module resolves that question by identifying the fundamental substrate parameters:
+</p>
+
+<p>
+$K = |\\nabla C|$ — Vacuum Stiffness<br>
+$P = P_{\\text{syn}}$ — Synthesis Pressure
+</p>
+
+<p>
+This marks the transition from structure to measurable physics.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">2. Structural Emergence</h3>
+
+<p>
+The parameter $K$ emerges from the Conserving field C. Since C governs structural continuity, its gradient represents resistance to deformation:
+</p>
+
+<p>
+$K = |\\nabla C|$
+</p>
+
+<p>
+Thus stiffness is not imposed but arises intrinsically from structural variation.
+</p>
+
+<p>
+The parameter $P$ emerges from the Stabilizing field N through its potential:
+</p>
+
+<p>
+$P = -V(N_0)$
+</p>
+
+<p>
+This represents the equilibrium condition of the substrate.
+</p>
+
+<p>
+Together, $K$ and $P$ are equilibrium outcomes of the triadic fields N, C, and M. They are not external inputs but structural necessities.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">3. Physical Interpretation</h3>
+
+<p>
+This module fundamentally redefines vacuum. It is not empty, but a structured substrate with intrinsic measurable properties.
+</p>
+
+<p>
+$K$ represents resistance to deformation and governs curvature response. $P$ represents intrinsic pressure and governs large-scale dynamics.
+</p>
+
+<p>
+All physical phenomena arise from the equilibrium of these two parameters.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">4. Necessity (Very Important)</h3>
+
+<p>
+A structured substrate must possess resistance and equilibrium.
+</p>
+
+<p>
+Without $K$, no stable structure can exist. Without $P$, no equilibrium is possible.
+</p>
+
+<p>
+If constants are arbitrary, there is no explanation. If vacuum is empty, there is no origin of structure. Therefore, intrinsic parameters are necessary.
+</p>
+
+<p>
+These parameters are $K$ and $P$.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">5. Consistency Check</h3>
+
+<p>
+This formulation preserves known physics, extends it by explaining constants, and reinterprets vacuum as structured. No contradictions arise.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">6. Graph / Visualization Interpretation Paragraph (MANDATORY)</h3>
+
+<p>
+The visualization represents substrate equilibrium as a surface in parameter space.
+</p>
+
+<p>
+X-axis corresponds to stiffness variation ($K$), Y-axis to pressure ($P$), and Z-axis to stability.
+</p>
+
+<p>
+A stable equilibrium point exists where the system is balanced. Away from this point, instability increases.
+</p>
+
+<p>
+This shows that only specific values of $K$ and $P$ are physically allowed.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">7. Conceptual Compression Lines</h3>
+
+<p>
+Vacuum is structured, not empty.<br>
+$K$ and $P$ define equilibrium.<br>
+Constants arise from this balance.<br>
+Physics begins from substrate structure.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">8. Logical Closure</h3>
+
+<p>
+This module establishes the existence of $K$ and $P$ as intrinsic substrate parameters and identifies them as the base layer of physical reality.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">9. Transition to Next Stage</h3>
+
+<p>
+With $K$ and $P$ established, the next question is how interactions arise from them.
+</p>
+
+<p>
+This leads to Module 2 — Coupling Emergence.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">10. What this Module Establishes</h3>
+
+<p>
+$K$ and $P$ are primary substrate parameters.<br>
+They arise from triadic equilibrium.<br>
+They define the origin of physical constants.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">11. Final Statement</h3>
+
+<p>
+The vacuum is a structured substrate characterized by equilibrium parameters $K$ and $P$, from which all physical constants arise.
+</p>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics — Substrate Parameters (K, P)</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Starting Point</h3>
+
+<p>From earlier stages, the framework has established:</p>
+
+<p><strong>✔ Primary Fields:</strong></p>
+<p>
+Stabilizing Field: N<br>
+Conserving Field: C<br>
+Motive Field: M
+</p>
+
+<p><strong>✔ Synthesis Tensor:</strong></p>
+<p>
+$$\\Sigma_{\\mu\\nu} = \\frac{1}{K} \\left( \\nabla_\\mu \\nabla_\\nu R - g_{\\mu\\nu} \\Box R \\right) - \\frac{P}{8\\pi G} g_{\\mu\\nu}$$
+</p>
+
+<p><strong>✔ Structural Requirement:</strong></p>
+<p>
+The substrate must satisfy:<br>
+$$\\nabla^\\mu \\Sigma_{\\mu\\nu} = 0$$
+</p>
+
+<p>👉 This imposes global structural consistency</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Mathematical Development</h3>
+
+<h4 style="color:#93c5fd;">2.1 Definition of Vacuum Stiffness K</h4>
+
+<p>From the Conserving Field C:</p>
+
+<p>$$K \\equiv |\\nabla C|$$</p>
+
+<p><strong>✔ Interpretation:</strong></p>
+<p>
+C governs conservation<br>
+Its spatial variation defines resistance
+</p>
+
+<p>Thus:</p>
+<p>$$ (\\nabla C)^2 \\sim \\text{stiffness energy density} $$</p>
+
+---
+
+<h4 style="color:#93c5fd;">2.2 Definition of Synthesis Pressure P</h4>
+
+<p>From the Stabilizing Field N:</p>
+
+<p>$$P \\equiv -V(N_0)$$</p>
+
+<p>Where:</p>
+<p>
+V(N) = potential of stabilizing field<br>
+N_0 = equilibrium configuration
+</p>
+
+<p><strong>✔ Interpretation:</strong></p>
+<p>
+P represents intrinsic pressure of substrate<br>
+It arises from minimum of stabilizing potential
+</p>
+
+---
+
+<h4 style="color:#93c5fd;">2.3 Equilibrium Condition</h4>
+
+<p>The substrate reaches equilibrium when:</p>
+
+<p>$$\\delta \\mathcal{S}_{\\text{total}} = 0$$</p>
+
+<p>This implies:</p>
+
+<p>$$\\text{Balance between stiffness and pressure}$$</p>
+
+<p>Formally:</p>
+
+<p>$$\\mathcal{E}(K, P) = \\text{minimum}$$</p>
+
+<p>Where:</p>
+<p>$$\\mathcal{E} = \\text{total structural energy functional}$$</p>
+
+---
+
+<h4 style="color:#93c5fd;">2.4 Stability Condition</h4>
+
+<p>At equilibrium:</p>
+
+<p>
+$$\\frac{\\partial \\mathcal{E}}{\\partial K} = 0 \\quad , \\quad \\frac{\\partial \\mathcal{E}}{\\partial P} = 0$$
+</p>
+
+<p><strong>✔ Meaning:</strong></p>
+<p>
+No variation allowed<br>
+Unique stable configuration
+</p>
+
+---
+
+<h4 style="color:#93c5fd;">2.5 Normalized Values (Framework Scale)</h4>
+
+<p>From prior derivation:</p>
+
+<p>$$K = 11.350 \\quad , \\quad P = 0.6900$$</p>
+
+<p>These represent:</p>
+<p>Dimensionless structural equilibrium values</p>
+
+---
+
+<h4 style="color:#93c5fd;">2.6 Physical Mapping</h4>
+
+<p>Mapping to physical units:</p>
+
+<p>
+$$K_{\\text{phys}} \\approx 6.9 \\times 10^{-26} \\ \\text{m}^{-1}$$<br>
+$$P_{\\text{phys}} \\approx 3.3 \\times 10^{-36} \\ \\text{s}^{-2}$$
+</p>
+
+<p><strong>✔ Mapping Rule:</strong></p>
+<p>$$\\text{Normalized} \\rightarrow \\text{Physical (SI)}$$</p>
+
+---
+
+<h4 style="color:#93c5fd;">2.7 Structural Constraint</h4>
+
+<p>Physical constants must satisfy:</p>
+
+<p>$$f(\\text{constants}) = f(K, P)$$</p>
+
+<p>Thus:</p>
+
+<p>$$\\text{Constants} \\equiv \\mathcal{F}(K, P)$$</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Key Equations</h3>
+
+<p><strong>✔ Vacuum Stiffness:</strong></p>
+<p>$$K = |\\nabla C|$$</p>
+
+<p><strong>✔ Synthesis Pressure:</strong></p>
+<p>$$P = -V(N_0)$$</p>
+
+<p><strong>✔ Equilibrium Condition:</strong></p>
+<p>
+$$\\frac{\\partial \\mathcal{E}}{\\partial K} = 0, \\quad \\frac{\\partial \\mathcal{E}}{\\partial P} = 0$$
+</p>
+
+<p><strong>✔ Mapping Relation:</strong></p>
+<p>$$\\text{Physical Constants} = \\mathcal{F}(K, P)$$</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Structural Interpretation of Equations</h3>
+
+<p><strong>✔ K = |\\nabla C|</strong></p>
+<p>
+Encodes resistance to deformation<br>
+Governs curvature response
+</p>
+
+<p><strong>✔ P = -V(N_0)</strong></p>
+<p>
+Encodes intrinsic expansion tendency<br>
+Governs large-scale evolution
+</p>
+
+<p><strong>✔ Equilibrium Condition</strong></p>
+<p>
+Universe exists only at:<br>
+stable minimum of substrate energy
+</p>
+
+<p><strong>✔ Mapping Relation</strong></p>
+<p>
+Constants are:<br>
+not independent variables<br>
+but outcomes of K–P structure
+</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Limit Cases</h3>
+
+<p><strong>✔ Uniform Substrate:</strong></p>
+<p>$$\\nabla C = 0 \\Rightarrow K = 0$$</p>
+<p>→ No structure (non-physical)</p>
+
+<p><strong>✔ Zero Pressure:</strong></p>
+<p>$$P = 0$$</p>
+<p>→ No expansion → static universe (unstable)</p>
+
+<p><strong>✔ Physical Reality:</strong></p>
+<p>$$K > 0, \\quad P > 0$$</p>
+<p>→ Stable evolving universe</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Consistency with Known Physics</h3>
+
+<p><strong>✔ General Relativity:</strong></p>
+<p>K enters curvature dynamics<br>P enters cosmological expansion</p>
+
+<p><strong>✔ Cosmology:</strong></p>
+<p>P aligns with dark energy scale</p>
+
+<p><strong>✔ Particle Physics:</strong></p>
+<p>Couplings expected from K, P</p>
+
+<p><strong>✔ No contradiction introduced</strong></p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Predictive Implications (Secondary)</h3>
+
+<p><strong>✔ Constants are not free:</strong></p>
+<p>Must match K–P equilibrium</p>
+
+<p><strong>✔ Any variation:</strong></p>
+<p>Implies deviation from equilibrium</p>
+
+<p><strong>✔ Leads to:</strong></p>
+<p>
+constraints on physical constants<br>
+structured parameter space
+</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 Mathematical Closure</h3>
+
+<p>This module establishes:</p>
+<p>
+K and P as derived equilibrium quantities<br>
+Their values are fixed by substrate stability<br>
+All physical constants are functions of (K, P)
+</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 Final Mathematical Statement</h3>
+
+<p style="margin-bottom: 0;">
+$$\\boxed{ \\text{All physical constants arise from the equilibrium configuration of substrate parameters } K \\text{ and } P. }$$
+</p>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>STIFFNESS (K)</span><input type="number" id="k_in" class="digital-entry" value="11.350" oninput="syncVal(this.value, 'k_sl')"></div><input type="range" id="k_sl" min="0.001" max="20" step="0.001" value="11.350" oninput="syncVal(this.value, 'k_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">SUBSTRATE RULE</span><div style="text-align:center; font-size: 0.8rem;">Physical constants arise from equilibrium of substrate parameters (K, P)</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Vacuum is Structured, Not Empty</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label; text-transform: none;"><span style="color: var(--accent-gold); font-size: 0.8rem;">$\K_{phys}$<br></span><span class="const-val"><span style="color: var(--accent-gold); font-size: 0.8rem; font-weight: bold;">6.9 × 10⁻²⁶ m⁻¹<br>Mapping: Normalized → </span></div><div class="const-item"><span class="const-label; text-transform: none;"><span style="color: var(--accent-gold); font-size: 0.8rem;">$\P_{phys}$<br></span><span class="const-val"><span style="color: var(--accent-gold); font-size: 0.8rem; font-weight: bold;">3.3 × 10⁻³⁶ s⁻²<br>Physical (SI Units)</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-sub);">STATUS: SUBSTRATE PARAMETERS ESTABLISHED</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Structure (K)<br>↓<br>Equilibrium (P)<br>↓<br>Substrate Layer Realized`,
+hierarchy: `<div style="color: var(--accent-sub); font-weight: bold; font-size: 0.95rem;">Foundation: K and P established as primary substrate parameters</div>`,
+footer: "Physical constants are not arbitrary inputs; they are necessary outcomes of substrate equilibrium.",
+rightNote: `<div style="color: #60a5fa; line-height: 1.3; margin-top: 5px; padding: 5px; font-size: 0.85rem;">This module establishes the substrate layer from which all observed physics emerges.<p></p><p><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">👉 This Module Establishes:<br>Substrate Parameters (K, P) as the Structural Origin of Physical Constants</p></div>`
+},
+
+2: {
+title: "COUPLING EMERGENCE",
+result: "Interaction Strength is Emergent",
+resultSize: "0.80rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 56 — Module 2: Coupling Emergence (Interaction Strength)</h2>
+
+<div class="briefing-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Conceptual Introduction</h3>
+
+<p>
+In Module 1, the substrate was shown to be characterized by two fundamental parameters: vacuum stiffness $K = |\\nabla C|$ and synthesis pressure $P = P_{\\text{syn}}$. These parameters define the equilibrium state of the substrate and form the base layer from which physical reality emerges.
+</p>
+
+<p>
+However, a crucial question now arises: how do interactions occur within this substrate? In standard physics, interaction strengths—such as electromagnetic, weak, and strong couplings—are introduced as empirical constants. Their values are measured, but their origin remains unexplained.
+</p>
+
+<p>
+This module addresses that gap by showing that interaction strength is not a fundamental input. Instead, it emerges from the equilibrium structure of the substrate. In other words, coupling constants are not arbitrary—they are determined by the relationship between $K$ and $P$.
+</p>
+
+<p>
+This represents a major conceptual shift: interaction is no longer a primitive concept, but a derived consequence of substrate dynamics.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">2. Structural Emergence</h3>
+
+<p>
+Interaction arises when the substrate responds to a perturbation. Any interaction can be understood as a response of the substrate to a local disturbance. This response depends on two competing structural aspects:
+</p>
+
+<p>
+The resistance of the substrate to deformation, governed by $K$<br>
+The background equilibrium support of the substrate, governed by $P$
+</p>
+
+<p>
+If the substrate is very stiff (large $K$), it resists deformation strongly, reducing interaction. If the substrate has strong equilibrium support (large $P$), it allows interactions to propagate more effectively.
+</p>
+
+<p>
+Thus, interaction strength emerges from the balance between these two effects. Structurally, this leads to:
+</p>
+
+<p>
+$g = f\\!\\left(\\frac{P}{K}\\right)$
+</p>
+
+<p>
+At leading order, this becomes:
+</p>
+
+<p>
+$g \\sim \\frac{P}{K}$
+</p>
+
+<p>
+The triadic fields play a clear role in this emergence. The Conserving field $C$ determines stiffness through its gradient, the Stabilizing field $N$ determines pressure through its potential, and the Motive field $M$ enables the dynamic realization of interaction.
+</p>
+
+<p>
+Thus, coupling constants are not independent parameters—they are structural outcomes of the substrate.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">3. Physical Interpretation</h3>
+
+<p>
+Physically, this result transforms the understanding of interaction strength. In standard physics, coupling constants are treated as fixed numbers with no deeper explanation. Here, they are seen as consequences of substrate equilibrium.
+</p>
+
+<p>
+The ratio $\\frac{P}{K}$ determines how strongly the substrate responds to disturbances. A higher ratio means stronger interaction, while a lower ratio corresponds to weaker interaction.
+</p>
+
+<p>
+This applies universally across all interactions. Electromagnetic, weak, and strong couplings are not fundamentally different—they are different expressions of the same underlying substrate structure.
+</p>
+
+<p>
+The apparent fine-tuning of coupling constants is no longer mysterious. It reflects the equilibrium state of the substrate, not arbitrary adjustment.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">4. Necessity (Very Important)</h3>
+
+<p>
+The emergence of coupling from $K$ and $P$ is not optional—it is necessary. Interaction requires both resistance and response. Without resistance, no meaningful interaction can occur; without response, interaction cannot propagate.
+</p>
+
+<p>
+If coupling constants were arbitrary, the framework would lose predictive power and unity. If they were independent inputs, there would be no structural explanation of their values.
+</p>
+
+<p>
+The only consistent possibility is that interaction strength arises from the balance between stiffness and pressure. Therefore, coupling must be a function of $K$ and $P$.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">5. Consistency Check</h3>
+
+<p>
+This formulation preserves all known physics. Observed coupling constants remain unchanged because $K$ and $P$ are fixed at equilibrium. At the same time, the framework extends physics by providing the origin of these couplings.
+</p>
+
+<p>
+It reinterprets fine-tuning as structural necessity and removes the need for arbitrary parameters. No contradictions are introduced; instead, existing theories are grounded in a deeper structural basis.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">6. Graph / Visualization Interpretation Paragraph (MANDATORY)</h3>
+
+<p>
+The visualization associated with this module represents the relationship between interaction strength and substrate parameters.
+</p>
+
+<p>
+The X-axis represents coupling strength $g$, the Y-axis represents synthesis pressure $P$, and the Z-axis represents interaction depth or response intensity.
+</p>
+
+<p>
+The surface shows a nonlinear dependence of interaction strength on $K$ and $P$. A stable region appears where interaction strength is well-defined and consistent. Outside this region, instability or unphysical behavior emerges.
+</p>
+
+<p>
+This demonstrates that coupling constants are not free parameters. Only certain values are allowed, corresponding to stable substrate configurations.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">7. Conceptual Compression Lines</h3>
+
+<p>
+Interaction is not fundamental.<br>
+It emerges from $K$ and $P$.<br>
+Coupling reflects substrate balance.<br>
+Fine-tuning is structural necessity.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">8. Logical Closure</h3>
+
+<p>
+This module establishes that interaction strength is a derived quantity determined by the equilibrium of the substrate. Coupling constants are no longer independent inputs but structural outcomes.
+</p>
+
+<p>
+With this, the framework explains the origin of interaction intensity.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">9. Transition to Next Stage</h3>
+
+<p>
+Once interaction strength is understood as emerging from $K$ and $P$, the next question naturally arises: how does mass emerge from this interaction?
+</p>
+
+<p>
+This leads to Module 3, where mass is derived as a response of the substrate under interaction.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">10. What this Module Establishes</h3>
+
+<p>
+Coupling strength arises from substrate parameters.<br>
+Interaction is a derived property.<br>
+All interactions reflect the same structural origin.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">11. Final Statement</h3>
+
+<p>
+Interaction strength is not a fundamental input but emerges from the equilibrium structure of the substrate defined by $K$ and $P$.
+</p>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics — Coupling Emergence (Interaction Strength)</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Starting Point</h3>
+
+<p>From Module 1, the substrate is characterized by:</p>
+
+<p>
+$$K = |\\nabla C|, \\quad P = -V(N_0)$$
+</p>
+
+<p>with equilibrium conditions:</p>
+
+<p>
+$$\\frac{\\partial \\mathcal{E}}{\\partial K} = 0, \\quad \\frac{\\partial \\mathcal{E}}{\\partial P} = 0$$
+</p>
+
+<p><strong>✔ Established:</strong></p>
+
+<p>
+K → structural stiffness<br>
+P → synthesis pressure
+</p>
+
+<p><strong>✔ Requirement for this module:</strong></p>
+
+<p>
+To derive:<br>
+$$g = \\text{interaction strength}$$
+</p>
+
+<p>as a function of:</p>
+
+<p>$$K, P$$</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Mathematical Development</h3>
+
+<h4 style="color:#93c5fd;">2.1 Interaction as Response to Field Perturbation</h4>
+
+<p>Let a field perturbation \$begin:math:text$ \\\\delta \\\\Phi \\$end:math:text$ occur in the substrate.</p>
+
+<p>The interaction response depends on:</p>
+
+<p>
+Resistance → governed by K<br>
+Background equilibrium → governed by P
+</p>
+
+<p>Thus, the response amplitude:</p>
+
+<p>
+$$\\mathcal{R} \\sim \\frac{\\delta \\Phi}{\\text{Resistance}} \\sim \\frac{\\delta \\Phi}{K}$$
+</p>
+
+<p>However, the effective interaction must also scale with substrate equilibrium:</p>
+
+<p>
+$$\\mathcal{I} \\sim \\mathcal{R} \\cdot P$$
+</p>
+
+<p>Therefore:</p>
+
+<p>
+$$\\mathcal{I} \\sim \\frac{P}{K} \\, \\delta \\Phi$$
+</p>
+
+---
+
+<h4 style="color:#93c5fd;">2.2 Definition of Coupling Strength g</h4>
+
+<p>Define coupling strength as proportionality factor:</p>
+
+<p>
+$$\\mathcal{I} = g \\, \\delta \\Phi$$
+</p>
+
+<p>Thus:</p>
+
+<p>
+$$g \\sim \\frac{P}{K}$$
+</p>
+
+<p><strong>✔ General functional form:</strong></p>
+
+<p>
+$$g = f\\left(\\frac{P}{K}\\right)$$
+</p>
+
+---
+
+<h4 style="color:#93c5fd;">2.3 Dimensionless Coupling</h4>
+
+<p>Since coupling constants are dimensionless:</p>
+
+<p>
+$$g = \\alpha \\cdot \\frac{P}{K}$$
+</p>
+
+<p>Where:</p>
+
+<p>
+\$begin:math:text$ \\\\alpha \\$end:math:text$ = structural normalization factor
+</p>
+
+---
+
+<h4 style="color:#93c5fd;">2.4 Equilibrium Constraint</h4>
+
+<p>At substrate equilibrium:</p>
+
+<p>
+$$g = g(K, P)$$
+</p>
+
+<p>is fixed, since K and P are fixed.</p>
+
+<p>Thus:</p>
+
+<p>
+$$\\delta g = 0 \\quad \\text{(at equilibrium)}$$
+</p>
+
+<p><strong>✔ Meaning:</strong></p>
+
+<p>
+Coupling constants are not free variables
+</p>
+
+---
+
+<h4 style="color:#93c5fd;">2.5 Interaction Depth Representation</h4>
+
+<p>From visualization:</p>
+
+<p>Let interaction depth D be:</p>
+
+<p>
+$$D \\sim g \\cdot P$$
+</p>
+
+<p>Substituting:</p>
+
+<p>
+$$D \\sim \\frac{P^2}{K}$$
+</p>
+
+<p><strong>✔ Interpretation:</strong></p>
+
+<p>
+Stronger pressure enhances interaction<br>
+Higher stiffness suppresses interaction
+</p>
+
+---
+
+<h4 style="color:#93c5fd;">2.6 Structural Constraint on Couplings</h4>
+
+<p>All couplings must satisfy:</p>
+
+<p>
+$$g_i = f_i(K, P)$$
+</p>
+
+<p>For different interactions:</p>
+
+<p>
+$$g_{\\text{EM}}, \\quad g_{\\text{weak}}, \\quad g_{\\text{strong}}$$
+</p>
+
+<p>Thus:</p>
+
+<p>
+$$\\{g_i\\} \\subset \\mathcal{F}(K, P)$$
+</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Key Equations</h3>
+
+<p><strong>✔ Coupling Emergence:</strong></p>
+<p>$$g \\sim \\frac{P}{K}$$</p>
+
+<p><strong>✔ General Form:</strong></p>
+<p>$$g = f\\left(\\frac{P}{K}\\right)$$</p>
+
+<p><strong>✔ Interaction Depth:</strong></p>
+<p>$$D \\sim \\frac{P^2}{K}$$</p>
+
+<p><strong>✔ Constraint:</strong></p>
+<p>$$g_i = f_i(K, P)$$</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Structural Interpretation of Equations</h3>
+
+<p><strong>✔ g \\sim \\frac{P}{K}</strong></p>
+
+<p>
+Interaction strength arises from:<br>
+driving pressure P<br>
+resisting stiffness K
+</p>
+
+<p><strong>✔ Functional Dependence:</strong></p>
+
+<p>
+Different interactions correspond to:<br>
+different functional mappings
+</p>
+
+<p><strong>✔ Fixed Couplings:</strong></p>
+
+<p>
+Since K, P are fixed:<br>
+→ couplings are fixed
+</p>
+
+<p><strong>✔ Interaction Depth:</strong></p>
+
+<p>
+Encodes how deeply fields interact<br>
+Controlled by substrate properties
+</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Limit Cases</h3>
+
+<p><strong>✔ High Stiffness Limit:</strong></p>
+<p>$$K \\to \\infty \\Rightarrow g \\to 0$$</p>
+<p>→ No interaction</p>
+
+<p><strong>✔ High Pressure Limit:</strong></p>
+<p>$$P \\to \\infty \\Rightarrow g \\to \\infty$$</p>
+<p>→ Strong interaction</p>
+
+<p><strong>✔ Balanced Physical Case:</strong></p>
+<p>$$0 < g < \\infty$$</p>
+<p>→ Stable interaction regime</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Consistency with Known Physics</h3>
+
+<p><strong>✔ Gauge Theory:</strong></p>
+<p>Couplings treated as constants → here derived</p>
+
+<p><strong>✔ Fine-Structure Constant:</strong></p>
+<p>Can be interpreted as:<br>$$\\alpha \\sim f(K, P)$$</p>
+
+<p><strong>✔ Standard Model:</strong></p>
+<p>Couplings originate from deeper structure</p>
+
+<p><strong>✔ No contradiction introduced</strong></p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Predictive Implications (Secondary)</h3>
+
+<p><strong>✔ Coupling relations:</strong></p>
+<p>Ratios between couplings are constrained</p>
+
+<p><strong>✔ No arbitrary tuning:</strong></p>
+<p>All couplings linked via K–P</p>
+
+<p><strong>✔ Structural fine-tuning:</strong></p>
+<p>Explained as equilibrium condition</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 Mathematical Closure</h3>
+
+<p>This module establishes:</p>
+
+<p>
+Coupling strength arises from substrate parameters<br>
+It depends on ratio-like structure of K and P<br>
+It is fixed by equilibrium
+</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔷 Final Mathematical Statement</h3>
+
+<p style="margin-bottom: 0;">
+Interaction strengths (couplings) arise as functions of substrate parameters K and P, and are not independent inputs.
+</p>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>COUPLING (g)</span><input type="number" id="g_in" class="digital-entry" value="50" oninput="syncVal(this.value, 'g_sl')"></div><input type="range" id="g_sl" min="1" max="100" step="1" value="50" oninput="syncVal(this.value, 'g_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">COUPLING RULE</span><div style="text-align:center; font-size: 0.8rem;">g emerges from the equilibrium ratio K/P</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">Interaction Strength is Emergent</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Coupling</span><span class="const-val">g(K,P)</span></div><div class="const-item"><span class="const-label">Intensity</span><span class="const-val">Derived<br>Interaction Strength</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.8rem; color:var(--accent-const);">STATUS: COUPLING DERIVED FROM SUBSTRATE</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Substrate (K, P)<br>↓<br>Field Resistance<br>↓<br>Coupling Strength (g)`,
+hierarchy: `<div style="color: var(--accent-const); font-weight: bold; font-size: 0.95rem;">Coupling: Derived from substrate field interactions</div>`,
+footer: "The strengths of fundamental interactions emerge as outcomes of substrate equilibrium.",
+rightNote: `<div style="color: #818cf8; line-height: 1.3; margin-top: 2px; padding: 2px; font-size: 0.82rem;">The apparent fine-tuning of interaction strengths is explained by substrate equilibrium.<p>Interaction strength is not fundamental but emerges from the equilibrium structure of the substrate defined by K and P.</p><p><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">👉 This Module Establishes:<br>K, P → Interaction Strength (g)</p></div>`
+},
+
+3: {
+title: "MASS SCALE ORIGIN",
+result: "Mass is Substrate Resistance",
+resultSize: "0.80rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 56 — Module 3: Mass Scale Origin (Mass as Substrate Resistance)</h2>
+
+<div class="briefing-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Conceptual Introduction</h3>
+
+<p>
+In the previous modules, the framework has established a clear structural progression. Module 1 identified the substrate parameters $K = |\\nabla C|$ and $P = P_{\\text{syn}}$ as the foundational quantities defining equilibrium. Module 2 showed that interaction strength $g$ emerges from the balance between these parameters, expressed structurally as $g = f\\!\\left(\\frac{P}{K}\\right)$.
+</p>
+
+<p>
+With interaction now understood as a derived property, the next fundamental question arises: what is the origin of mass? In standard physics, mass is treated either as an intrinsic property of particles or as something generated through mechanisms such as the Higgs field. However, these approaches do not explain why masses take the specific values they do or why a hierarchy of masses exists.
+</p>
+
+<p>
+This module addresses that question by showing that mass is not an intrinsic substance. Instead, it is a response of the substrate to interaction. Mass emerges as resistance encountered when interaction attempts to alter the structure.
+</p>
+
+<p>
+Thus, the conceptual shift is profound: mass is not a property carried by particles, but a manifestation of substrate resistance under interaction.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">2. Structural Emergence</h3>
+
+<p>
+When an interaction occurs, the substrate undergoes a perturbation. This perturbation induces a response governed by the stiffness of the substrate. The stronger the stiffness, the greater the resistance to change.
+</p>
+
+<p>
+At the same time, interaction strength determines how deeply the perturbation penetrates the substrate. Therefore, mass emerges from the interplay of two structural factors:
+</p>
+
+<p>
+Resistance provided by stiffness $K$<br>
+Interaction depth governed by $g(K,P)$
+</p>
+
+<p>
+Structurally, this leads to:
+</p>
+
+<p>
+$m \\sim K \\cdot g(K,P)$
+</p>
+
+<p>
+Substituting the relation from Module 2, $g \\sim \\frac{P}{K}$, we obtain:
+</p>
+
+<p>
+$m \\sim \\frac{K^2}{P}$
+</p>
+
+<p>
+This expression shows that mass is fully determined by the substrate parameters. It is not an independent quantity but a derived outcome of structural interaction.
+</p>
+
+<p>
+The triadic fields again play a fundamental role. The Conserving field $C$ provides stiffness, the Stabilizing field $N$ defines equilibrium pressure, and the Motive field $M$ enables interaction through which resistance manifests as mass.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">3. Physical Interpretation</h3>
+
+<p>
+Physically, this formulation redefines mass in a fundamental way. Mass is not a substance or intrinsic attribute of a particle. Instead, it represents inertia—the resistance of the substrate to change when subjected to interaction.
+</p>
+
+<p>
+The expression $m \\sim \\frac{K^2}{P}$ indicates that larger stiffness leads to greater resistance and therefore larger mass, while higher pressure distributes interaction more effectively and reduces localized resistance.
+</p>
+
+<p>
+This interpretation provides a unified understanding of inertia. It also offers a reinterpretation of the Higgs mechanism. Rather than being the fundamental origin of mass, the Higgs field can be understood as an effective description of the underlying substrate resistance.
+</p>
+
+<p>
+Thus, mass is no longer mysterious. It is a necessary outcome of how the substrate responds to interaction.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">4. Necessity (Very Important)</h3>
+
+<p>
+The emergence of mass is a structural necessity. Interaction cannot occur without resistance. Without resistance, there would be no inertia, no stability, and no persistence of structure.
+</p>
+
+<p>
+If mass were intrinsic, it would remain unexplained and arbitrary. Such an assumption would break the unifying principle of the framework. Only a substrate-based origin provides a consistent explanation.
+</p>
+
+<p>
+Therefore, mass must arise as a response property. It must depend on the same parameters that define the substrate, namely $K$ and $P$.
+</p>
+
+<p>
+This ensures that mass is not an independent input but a necessary consequence of structure.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">5. Consistency Check</h3>
+
+<p>
+This formulation preserves all known physical behavior associated with mass, including inertia and mass-energy relations. At the same time, it extends physics by providing a structural origin for mass.
+</p>
+
+<p>
+It reinterprets particle-based ontology, replacing it with a substrate-based understanding. No contradictions are introduced; instead, the concept of mass is placed on a deeper and more unified foundation.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">6. Graph / Visualization Interpretation Paragraph (MANDATORY)</h3>
+
+<p>
+The visualization associated with this module represents the emergence of mass as a function of substrate parameters.
+</p>
+
+<p>
+The X-axis represents stiffness $K$, the Y-axis represents synthesis pressure $P$, and the Z-axis represents mass or inertia.
+</p>
+
+<p>
+The surface shows that mass is not uniformly distributed across parameter space. Instead, a distinct region appears where mass takes stable values. Away from this region, mass either becomes negligible or diverges, indicating instability.
+</p>
+
+<p>
+This demonstrates that mass is not arbitrary. It exists only where the substrate achieves a stable balance between stiffness and pressure.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">7. Conceptual Compression Lines</h3>
+
+<p>
+Mass is not intrinsic.<br>
+It is substrate resistance.<br>
+It emerges through interaction.<br>
+Mass reflects structural equilibrium.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">8. Logical Closure</h3>
+
+<p>
+This module establishes that mass is a derived quantity arising from the interaction of substrate parameters. It is fully determined by $K$ and $P$ and is not an independent property.
+</p>
+
+<p>
+With this, the framework explains the origin of inertia and mass scales.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">9. Transition to Next Stage</h3>
+
+<p>
+With mass now understood as a structural response, the next question arises: why does mass appear in different scales and levels?
+</p>
+
+<p>
+This leads to Module 4, where scale hierarchy emerges as a consequence of substrate resonance.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">10. What this Module Establishes</h3>
+
+<p>
+Mass is a derived quantity.<br>
+It arises from substrate resistance under interaction.<br>
+Mass scales are determined by $K$ and $P$.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">11. Final Statement</h3>
+
+<p>
+Mass is not an intrinsic property but emerges as a resistance response of the substrate governed by $K$ and $P$ through interaction.
+</p>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Mass Scale Origin — Explicit Mathematics</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Starting Point: Substrate Response Framework</h3>
+
+<p>From previous modules:</p>
+
+<p>
+$$g = f\\!\\left(\\frac{P}{K}\\right)$$
+</p>
+
+<p>Interaction strength arises from substrate equilibrium.</p>
+
+<p>Now define:</p>
+
+<p><strong>Mass as resistance to interaction-induced change</strong></p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Definition of Substrate Resistance</h3>
+
+<p>Let a field perturbation be:</p>
+
+<p>$$\\delta \\Phi$$</p>
+
+<p>The substrate response (restorative opposition) is:</p>
+
+<p>$$\\mathcal{R} \\sim K \\cdot \\delta \\Phi$$</p>
+
+<p><strong>Interpretation:</strong></p>
+
+<p>
+K → stiffness → resistance to deformation<br>
+Larger K → stronger resistance
+</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Interaction-Induced Response</h3>
+
+<p>From Module 2:</p>
+
+<p>$$\\mathcal{I} = g \\cdot \\delta \\Phi$$</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Mass as Resistance × Interaction Depth</h3>
+
+<p>Mass is defined as:</p>
+
+<p>
+$$m \\sim \\frac{\\mathcal{R}}{\\mathcal{I}/\\delta \\Phi}$$
+</p>
+
+<p>Substitute:</p>
+
+<p>
+$$m \\sim \\frac{K \\cdot \\delta \\Phi}{g}$$
+</p>
+
+<p>Cancel \$begin:math:text$ \\\\delta \\\\Phi \\$end:math:text$:</p>
+
+<p>
+$$m \\sim \\frac{K}{g}$$
+</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Substitute Coupling Dependence</h3>
+
+<p>From:</p>
+
+<p>$$g \\sim \\frac{P}{K}$$</p>
+
+<p>Thus:</p>
+
+<p>
+$$m \\sim \\frac{K}{P/K}$$
+</p>
+
+<p>
+$$m \\sim \\frac{K^2}{P}$$
+</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Generalized Form</h3>
+
+<p>
+$$m = \\alpha \\, \\frac{K^2}{P}$$
+</p>
+
+<p>Where:</p>
+
+<p>
+\$begin:math:text$ \\\\alpha \\$end:math:text$ → structural proportionality factor<br>
+depends on interaction configuration
+</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Alternative Representation (Interaction Depth Form)</h3>
+
+<p>Define interaction depth:</p>
+
+<p>$$D \\sim g$$</p>
+
+<p>Then:</p>
+
+<p>
+$$m \\sim K \\cdot D$$
+</p>
+
+<p>
+$$m \\sim K \\cdot g(K,P)$$
+</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Stability Condition for Mass</h3>
+
+<p>Mass must satisfy equilibrium:</p>
+
+<p>
+$$\\frac{\\partial m}{\\partial K} = 0, \\quad \\frac{\\partial m}{\\partial P} = 0$$
+</p>
+
+<p>At stable mass scale:</p>
+
+<p>$$\\delta m = 0$$</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 9. Dimensional Consistency</h3>
+
+<p>Given:</p>
+
+<p>
+$$[K] = L^{-1}, \\quad [P] = T^{-2}$$
+</p>
+
+<p>Then:</p>
+
+<p>
+$$\\left[\\frac{K^2}{P}\\right] = \\frac{L^{-2}}{T^{-2}} = \\frac{T^{2}}{L^{2}}$$
+</p>
+
+<p>Mapping to physical mass requires:</p>
+
+<p>
+$$m_{\\text{phys}} = \\beta \\, \\frac{K^2}{P}$$
+</p>
+
+<p>Where:</p>
+
+<p>
+\$begin:math:text$ \\\\beta \\$end:math:text$ ensures SI dimensional consistency
+</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 10. Structural Interpretation</h3>
+
+<p>
+$$m \\propto \\frac{K^2}{P}$$
+</p>
+
+<p><strong>Meaning:</strong></p>
+
+<p>
+Larger K → stronger resistance → larger mass<br>
+Larger P → stronger dynamic support → reduces resistance concentration
+</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 11. Final Mathematical Statement</h3>
+
+<p style="margin-bottom: 0;">
+$$\\boxed{ m = f(K, P) \\sim \\frac{K^2}{P} }$$
+</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 12. Consistency Limits</h3>
+
+<p><strong>Weak interaction limit:</strong></p>
+
+<p>
+$$g \\to 0 \\Rightarrow m \\to \\infty$$
+</p>
+
+<p>→ infinite resistance (no response)</p>
+
+<p><strong>Strong interaction limit:</strong></p>
+
+<p>
+$$g \\to \\infty \\Rightarrow m \\to 0$$
+</p>
+
+<p>→ no resistance (free propagation)</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 13. Closure</h3>
+
+<p>
+Mass emerges as:<br>
+a derived structural quantity<br>
+determined by substrate stiffness and equilibrium
+</p>
+
+<p style="margin-bottom: 0;">
+Mass is mathematically determined by the structural ratio of resistance and interaction encoded in K and P.
+</p>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>MASS SCALE (m)</span><input type="number" id="m_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'm_sl')"></div><input type="range" id="m_sl" min="1" max="200" step="1" value="100" oninput="syncVal(this.value, 'm_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MASS RULE</span><div style="text-align:center; font-size: 0.8rem;">m = (Substrate Resistance) × (Interaction Depth)<br>m ∝ K × Interaction Depth</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.95rem; color: var(--accent-gold);">Mass is Resistance — Not Essence</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Scale</span><span class="const-val">m₀</span></div><div class="const-item"><span class="const-label">Origin</span><span class="const-val"> K-DRIVEN RESPONSE</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-mass);">STATUS: MASS EMERGENCE ESTABLISHED</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Stiffness (K)<br>↓<br>Restorative Drag<br>↓<br>Physical Inertia (m)`,
+hierarchy: `<div style="color: var(--accent-mass); font-weight: bold; margin-bottom: 2px; font-size: 1.00rem;">Mass: Manifestation of Substrate Dynamics</div>`,
+footer: "Mass scales arise because the substrate possesses finite restorative capacity.",
+rightNote: `<div style="color: #2dd4bf; line-height: 1.3; margin-top: 5px; padding: 5px; font-size: 0.8rem;">Interpreting the Higgs mechanism as a substrate-level response.<p>Mass is not intrinsic but emerges as a resistance response of the substrate governed by K and P.</p><p><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">👉 This Module Establishes:<br>K, P → Mass (m)</p></div>`
+},
+
+4: {
+title: "SCALE HIERARCHY",
+result: "Scale is Structurally Determined",
+resultSize: "0.80rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 56 — Module 4: Scale Hierarchy (Structural Multi-Leveling)</h2>
+
+<div class="briefing-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Conceptual Introduction</h3>
+
+<p>
+With the previous modules, the framework has established a complete structural progression from substrate parameters to measurable quantities. Module 1 identified $K = |\\nabla C|$ and $P = P_{\\text{syn}}$ as the fundamental parameters. Module 2 derived interaction strength $g = f\\!\\left(\\frac{P}{K}\\right)$, and Module 3 established mass as a response of the substrate, $m \\sim \\frac{K^2}{P}$.
+</p>
+
+<p>
+At this stage, a deeper and more subtle question arises: why does physical reality exhibit multiple distinct scales? Observationally, physics is not single-scale. There exist well-separated regimes such as the Planck scale, electroweak scale, atomic scale, and cosmological scale.
+</p>
+
+<p>
+In standard physics, this appears as the hierarchy problem. The existence of widely separated scales is accepted but not explained. There is no structural reason given for why these scales exist or why they are discrete.
+</p>
+
+<p>
+This module resolves that issue by showing that scale hierarchy is not accidental. It arises necessarily from the resonance structure of the substrate. Physical scales are discrete because the substrate supports only certain stable modes.
+</p>
+
+<p>
+Thus, the key conceptual shift is that scale is not imposed externally—it is a natural consequence of substrate resonance.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">2. Structural Emergence</h3>
+
+<p>
+The substrate behaves as a structured medium capable of supporting modes of excitation. These modes are not arbitrary; they are determined by the intrinsic properties of the substrate, namely $K$ and $P$.
+</p>
+
+<p>
+Mathematically, this leads to an eigenvalue structure:
+</p>
+
+<p>
+$\\mathcal{L}(K,P)\\,\\Psi_n = \\Lambda_n \\Psi_n$
+</p>
+
+<p>
+Here, $\\Psi_n$ represents the allowed structural modes, and $\\Lambda_n$ represents the corresponding scale levels.
+</p>
+
+<p>
+The effective operator governing these modes takes the form:
+</p>
+
+<p>
+$\\mathcal{L}(K,P) \\sim -\\nabla^2 + \\frac{K^2}{P}$
+</p>
+
+<p>
+This structure implies that only certain discrete values of $\\Lambda_n$ are allowed. These correspond to stable resonance states of the substrate.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\Lambda_n = \\text{discrete resonance levels of the substrate}$
+</p>
+
+<p>
+The triadic fields determine this structure. The Conserving field $C$ sets rigidity and therefore mode spacing, the Stabilizing field $N$ ensures equilibrium and stability of modes, and the Motive field $M$ excites and realizes these modes dynamically.
+</p>
+
+<p>
+The key structural conclusion is that scale hierarchy emerges as the eigen-spectrum of the substrate.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">3. Physical Interpretation</h3>
+
+<p>
+Physically, this result provides a clear interpretation of scale. Scales are not arbitrary numbers; they are natural frequencies or resonance levels of the substrate.
+</p>
+
+<p>
+Each physical scale corresponds to a stable configuration where the substrate can sustain a mode without instability. Particle masses, interaction thresholds, and cosmological scales all arise from these resonance levels.
+</p>
+
+<p>
+The large separations between scales are also explained. Resonant systems typically produce exponentially spaced levels, which leads to:
+</p>
+
+<p>
+$\\Lambda_n \\sim \\Lambda_0 e^{\\beta n}$
+</p>
+
+<p>
+This naturally accounts for the vast differences between scales observed in physics.
+</p>
+
+<p>
+Thus, the hierarchy problem is not a problem at all—it is a direct consequence of the resonance structure of the substrate.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">4. Necessity (Very Important)</h3>
+
+<p>
+The existence of scale hierarchy is not optional. It follows from the fundamental nature of a structured substrate.
+</p>
+
+<p>
+A system that supports oscillations or modes must exhibit discrete stable states. Continuous spectra would lead to instability and lack of coherence. Only discrete modes can sustain stable structures.
+</p>
+
+<p>
+If only a single scale existed, the diversity of physical phenomena could not arise. If scales were continuous, structures would not remain stable.
+</p>
+
+<p>
+Therefore, discrete scale hierarchy is a necessary consequence of substrate resonance.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">5. Consistency Check</h3>
+
+<p>
+This formulation preserves all known physical scales and their relative separation. It explains their origin and stability without introducing contradictions.
+</p>
+
+<p>
+It reinterprets the hierarchy problem as a structural feature rather than a mystery. Existing physics remains valid as an effective description of these resonance levels.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">6. Graph / Visualization Interpretation Paragraph (MANDATORY)</h3>
+
+<p>
+The visualization represents the discrete emergence of scale levels from substrate resonance.
+</p>
+
+<p>
+The X-axis corresponds to the mode index $n$, representing different resonance levels. The Y-axis represents the scale value $\\Lambda_n$, often plotted logarithmically. The Z-axis represents structural stability.
+</p>
+
+<p>
+Distinct clusters appear corresponding to stable scales. These clusters represent regions where the substrate supports stable modes. Between these regions, instability prevents the existence of physical states.
+</p>
+
+<p>
+This visualization demonstrates that scales are not continuous but discrete. Only specific values are allowed, determined by the resonance structure of the substrate.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">7. Conceptual Compression Lines</h3>
+
+<p>
+Scale hierarchy is structural.<br>
+It arises from resonance.<br>
+Discrete levels ensure stability.<br>
+Reality is inherently multi-level.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">8. Logical Closure</h3>
+
+<p>
+This module establishes that scale hierarchy is a natural consequence of substrate resonance. Physical scales are discrete, stable, and fully determined by $K$ and $P$.
+</p>
+
+<p>
+With this, the framework explains the origin of multiple levels of physical reality.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">9. Transition to Next Stage</h3>
+
+<p>
+With parameters, interactions, mass, and scale hierarchy established, the next question arises: are all physical constants now determined, or is a unified mapping required?
+</p>
+
+<p>
+This leads to Module 5, where all constants are derived as functions of $K$ and $P$, completing the parameter structure.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">10. What this Module Establishes</h3>
+
+<p>
+Scale hierarchy emerges from substrate resonance.<br>
+Discrete physical scales are structurally determined.<br>
+Multi-level reality is inevitable.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">11. Final Statement</h3>
+
+<p>
+Scale hierarchy is not arbitrary but arises as discrete resonance levels of the substrate governed by $K$ and $P$.
+</p>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Scale Hierarchy — Explicit Mathematics</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Starting Point: Substrate-Defined Dynamics</h3>
+
+<p>From previous modules:</p>
+
+<p>
+$$g = f\\!\\left(\\frac{P}{K}\\right), \\quad m = f(K, P)$$
+</p>
+
+<p>Now we address:</p>
+
+<p><strong>Why do discrete physical scales \$begin:math:text$ \\\\Lambda\_n \\$end:math:text$ arise?</strong></p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Substrate as a Resonant System</h3>
+
+<p>The substrate behaves as a structured medium supporting modes.</p>
+
+<p>Define a generic structural field:</p>
+
+<p>$$\\Psi(x)$$</p>
+
+<p>The substrate dynamics follow a generalized structural equation:</p>
+
+<p>$$\\mathcal{L}(K, P)\\,\\Psi = 0$$</p>
+
+<p>Where:</p>
+
+<p>
+\$begin:math:text$ \\\\mathcal\{L\}\(K\,P\) \\$end:math:text$ → operator defined by substrate parameters<br>
+Solutions \$begin:math:text$ \\\\Psi\_n \\$end:math:text$ → allowed structural modes
+</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Eigenvalue Structure (Discrete Modes)</h3>
+
+<p>This becomes an eigenvalue problem:</p>
+
+<p>$$\\mathcal{L}(K, P)\\,\\Psi_n = \\Lambda_n \\Psi_n$$</p>
+
+<p><strong>Interpretation:</strong></p>
+
+<p>
+\$begin:math:text$ \\\\Lambda\_n \\$end:math:text$ → allowed scale levels<br>
+n → mode index
+</p>
+
+<p>Thus:</p>
+
+<p>$$\\Lambda_n = \\text{Discrete spectrum of substrate}$$</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Effective Form of Operator</h3>
+
+<p>From dimensional structure:</p>
+
+<p>$$\\mathcal{L}(K,P) \\sim -\\nabla^2 + V(K,P)$$</p>
+
+<p>Where effective potential:</p>
+
+<p>$$V(K,P) \\sim \\frac{K^2}{P}$$</p>
+
+<p>Thus equation becomes:</p>
+
+<p>
+$$\\left(-\\nabla^2 + \\frac{K^2}{P}\\right)\\Psi_n = \\Lambda_n \\Psi_n$$
+</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Discrete Scale Spectrum</h3>
+
+<p>Solutions yield:</p>
+
+<p>
+$$\\Lambda_n \\sim \\Lambda_0 \\, n^\\alpha$$
+</p>
+
+<p>or logarithmically spaced:</p>
+
+<p>
+$$\\log \\Lambda_n \\sim n$$
+</p>
+
+<p><strong>Meaning:</strong></p>
+
+<p>
+Scales appear in discrete hierarchy<br>
+Often logarithmically separated
+</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Resonance Condition</h3>
+
+<p>Stable scales occur when:</p>
+
+<p>$$\\delta \\Lambda = 0$$</p>
+
+<p>or:</p>
+
+<p>
+$$\\frac{d\\Lambda}{dn} = 0 \\quad \\text{(local stability)}$$
+</p>
+
+<p>These define:</p>
+
+<p>$$\\Lambda_n = \\text{Resonant stable modes}$$</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Relation to Mass and Interaction</h3>
+
+<p>Since:</p>
+
+<p>$$m \\sim \\frac{K^2}{P}$$</p>
+
+<p>Then:</p>
+
+<p>$$\\Lambda_n \\sim m_n$$</p>
+
+<p>Thus:</p>
+
+<p>$$m_n = f_n(K, P)$$</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Hierarchy Ratio</h3>
+
+<p>Define ratio between levels:</p>
+
+<p>
+$$\\frac{\\Lambda_{n+1}}{\\Lambda_n} = \\text{constant (approx)}$$
+</p>
+
+<p>This gives:</p>
+
+<p>
+$$\\Lambda_n \\sim \\Lambda_0 \\, e^{\\beta n}$$
+</p>
+
+<p><strong>Interpretation:</strong></p>
+
+<p>
+Exponential separation of scales<br>
+Explains large hierarchy gaps
+</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 9. Stability Constraint</h3>
+
+<p>For stable hierarchy:</p>
+
+<p>
+$$\\frac{\\partial^2 \\Lambda}{\\partial K^2} > 0, \\quad \\frac{\\partial^2 \\Lambda}{\\partial P^2} > 0$$
+</p>
+
+<p>Ensures:</p>
+
+<p>discrete levels remain stable</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 10. Final Mathematical Statement</h3>
+
+<p style="margin-bottom: 0;">
+$$\\boxed{ \\mathcal{L}(K,P)\\Psi_n = \\Lambda_n \\Psi_n, \\quad \\Lambda_n = \\text{Discrete resonance levels of substrate} }$$
+</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 11. Structural Interpretation</h3>
+
+<p>
+$$\\Lambda_n \\sim \\text{Resonant solutions of } (K, P)$$
+</p>
+
+<p><strong>Meaning:</strong></p>
+
+<p>
+Scales are eigenvalues<br>
+Not arbitrary inputs
+</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 12. Limits</h3>
+
+<p><strong>Continuous limit:</strong></p>
+
+<p>
+$$\\Lambda_n \\to \\text{continuous}$$
+</p>
+
+<p>→ instability</p>
+
+<p><strong>Discrete limit:</strong></p>
+
+<p>
+$$\\Lambda_n = \\text{discrete}$$
+</p>
+
+<p>→ stable physics</p>
+
+---
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 13. Closure</h3>
+
+<p>
+Scale hierarchy emerges as:<br>
+eigen-spectrum of substrate<br>
+determined by K, P
+</p>
+
+<p style="margin-bottom: 0;">
+Physical scales are discrete resonance solutions of the substrate governed by K and P.
+</p>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>HIERARCHY DEPTH (Λ)</span><input type="number" id="h_in" class="digital-entry" value="20" oninput="syncVal(this.value, 'h_sl')"></div><input type="range" id="h_sl" min="1" max="100" step="1" value="20" oninput="syncVal(this.value, 'h_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">HIERARCHY RULE</span><div style="text-align:center; font-size: 0.8rem;">Discrete scale separations are stable substrate solutions</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.95rem; color: var(--accent-gold);">Scale Hierarchy is Structural</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Hierarchy</span><span class="const-val">MULTILEVEL</span></div><div class="const-item"><span class="const-label">Stability</span><span class="const-val">DISCRETE LEVELS</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-scale);">STATUS: SCALE HIERARCHY ESTABLISHED</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.9rem;">Substrate Resonance<br>↓<br>Discrete Harmonic Levels<br>↓<br>Physical Scale Hierarchy`,
+hierarchy: `<div style="color: var(--accent-scale); font-weight: bold; font-size: 0.95rem;">Hierarchy: Manifestation of Substrate Resonance</div>`,
+footer: "Physics is multi-level because the substrate supports discrete stable resonance levels.",
+rightNote: `<div style="color: #fbbf24; line-height: 1.3; margin-top: 2px; padding: 8px; font-size: 0.8rem;">The hierarchy problem is resolved through substrate resonance structure.<p>Physical scales are not arbitrary but arise as discrete resonance levels of the underlying substrate defined by K and P.</p><p><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">👉 This Module Establishes:<br>K, P → Scale Hierarchy (Λ)</p></div>`
+},
+
+5: {
+title: "PARAMETER COMPLETION",
+result: "Constants are Emergent — Not Fundamental",
+resultSize: "0.80rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 56 — Module 5: Parameter Completion (Unified Mapping)</h2>
+
+<div class="briefing-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Conceptual Introduction</h3>
+
+<p>
+With the progression of the previous modules, the framework has now established a complete structural chain. Module 1 defined the substrate parameters $K = |\\nabla C|$ and $P = P_{\\text{syn}}$. Module 2 derived interaction strength $g = f\\!\\left(\\frac{P}{K}\\right)$. Module 3 showed that mass arises as $m \\sim \\frac{K^2}{P}$. Module 4 demonstrated that physical scales emerge as discrete resonance levels $\\Lambda_n$.
+</p>
+
+<p>
+At this stage, a decisive and unifying question arises: are physical constants independent quantities, or do they arise from a single structural origin?
+</p>
+
+<p>
+In standard physics, numerous constants such as $G$, $\\hbar$, $c$, $\\alpha$, particle masses, and cosmological parameters are treated as independent inputs. Their values are measured but not derived, leading to the well-known problem of fine-tuning.
+</p>
+
+<p>
+This module resolves that issue by establishing that all physical constants are not independent. They are unified outputs of the substrate structure. Every constant arises as a function of the same underlying parameters $K$ and $P$.
+</p>
+
+<p>
+Thus, the conceptual shift is fundamental: constants are not inputs to physics—they are consequences of structure.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">2. Structural Emergence</h3>
+
+<p>
+From the previous modules, a clear mapping chain has already emerged:
+</p>
+
+<p>
+$(K, P) \\rightarrow g(K,P) \\rightarrow m(K,P) \\rightarrow \\Lambda_n(K,P)$
+</p>
+
+<p>
+This chain now extends to all physical constants. The structural statement becomes:
+</p>
+
+<p>
+$C_i = f_i(K, P)$
+</p>
+
+<p>
+where $\\{C_i\\}$ represents the complete set of physical constants.
+</p>
+
+<p>
+Thus, all constants are functions defined over the substrate parameter space. This defines a mapping:
+</p>
+
+<p>
+$(K, P) \\longrightarrow \\{C_i\\}$
+</p>
+
+<p>
+The system becomes structurally closed. No independent parameters remain. All observable quantities emerge from the same underlying structure.
+</p>
+
+<p>
+The triadic fields provide the internal mechanism of this mapping. The Stabilizing field $N$ ensures equilibrium and fixes ratios, the Conserving field $C$ determines structural gradients and scales, and the Motive field $M$ distributes interactions across the system.
+</p>
+
+<p>
+The key structural conclusion is that the entire set of physical constants forms a unified image of the substrate defined by $K$ and $P$.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">3. Physical Interpretation</h3>
+
+<p>
+Physically, this result removes the notion of arbitrary constants from physics. Constants are not freely chosen numbers; they are measurable outputs determined by the equilibrium configuration of the substrate.
+</p>
+
+<p>
+This explains why constants appear finely tuned. The apparent fine-tuning is not accidental—it reflects the fact that only specific values are compatible with substrate equilibrium.
+</p>
+
+<p>
+Thus, instead of many independent constants, physics reduces to a unified origin. The diversity of observed quantities arises from different manifestations of the same structural foundation.
+</p>
+
+<p>
+This transforms the role of physics from measuring independent parameters to uncovering the mapping between substrate structure and observable quantities.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">4. Necessity (Very Important)</h3>
+
+<p>
+The unification of constants is a structural necessity. If constants were independent, the theory would remain incomplete and arbitrary. There would be no explanation for their values and no predictive foundation.
+</p>
+
+<p>
+A complete theory must derive all constants from a minimal set of fundamental quantities. In this framework, those quantities are $K$ and $P$.
+</p>
+
+<p>
+Without this step, the framework would fail to achieve closure. Therefore, parameter completion is not optional—it is required for the consistency and completeness of the theory.
+</p>
+
+<p>
+This ensures that no free parameters remain and that all physical quantities are structurally determined.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">5. Consistency Check</h3>
+
+<p>
+This formulation preserves all measured constants and their observed values. It does not alter empirical results but provides a deeper explanation for their origin.
+</p>
+
+<p>
+It extends physics by removing arbitrariness and unifying all constants under a single structural framework. It reinterprets fine-tuning as a necessary outcome of equilibrium rather than an unexplained coincidence.
+</p>
+
+<p>
+No contradictions are introduced. Instead, the framework achieves a higher level of internal consistency.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">6. Graph / Visualization Interpretation Paragraph (MANDATORY)</h3>
+
+<p>
+The visualization associated with this module represents the complete mapping of substrate parameters to physical constants.
+</p>
+
+<p>
+The X-axis corresponds to substrate configuration defined by $K$ and $P$. The Y-axis represents the values of derived constants $C_i$. The Z-axis represents structural completion or closure.
+</p>
+
+<p>
+The curve forms a closed structure, indicating that all constants lie on a single manifold defined by the substrate. There are no disconnected or independent regions.
+</p>
+
+<p>
+This demonstrates that constants are not independent inputs but correlated outputs of a unified structure. The closure of the curve signifies that the system is complete and self-contained.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">7. Conceptual Compression Lines</h3>
+
+<p>
+Constants are not fundamental.<br>
+They arise from $K$ and $P$.<br>
+No arbitrariness remains.<br>
+Physics becomes structurally closed.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">8. Logical Closure</h3>
+
+<p>
+This module establishes that all physical constants are derived quantities determined by substrate equilibrium. The framework now contains no free parameters and achieves structural closure.
+</p>
+
+<p>
+With this, the origin of all constants is explained within a single unified system.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">9. Transition to Next Stage</h3>
+
+<p>
+With all constants now structurally derived, the next question arises: how do these constants acquire their exact observed numerical values?
+</p>
+
+<p>
+This leads to Module 6, where phase alignment determines the precise realization of constants in observable reality.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">10. What this Module Establishes</h3>
+
+<p>
+All physical constants arise from substrate equilibrium.<br>
+No independent parameters remain.<br>
+The framework achieves full structural unification.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">11. Final Statement</h3>
+
+<p>
+All physical constants emerge as measurable outputs of the substrate equilibrium defined by $K$ and $P$, completing the structural closure of the framework.
+</p>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics — Parameter Completion (Unified Mapping)</h2>
+
+<div class="math-content" style="font-size: 0.9rem; line-height: 1.6; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24;">1. Starting Point: Derived Structure Chain</h3>
+
+<p>From previous modules:</p>
+
+<p>
+$$ g = f\\!\\left(\\frac{P}{K}\\right), \\quad m = f(K, P), \\quad \\Lambda_n = f_n(K, P) $$
+</p>
+
+<p><strong>Goal:</strong></p>
+
+<p>
+Show that all physical constants arise from (K, P)
+</p>
+
+---
+
+<h3 style="color: #fbbf24;">2. General Mapping Principle</h3>
+
+<p>Define the full set of physical constants:</p>
+
+<p>
+$$ \\{C_i\\} = \\{G, \\hbar, c, \\alpha, m_e, \\Lambda, \\dots\\} $$
+</p>
+
+<p><strong>Structural statement:</strong></p>
+
+<p>
+$$ C_i = f_i(K, P) $$
+</p>
+
+<p>Thus:</p>
+
+<p>
+$$ \\boxed{ \\{C_i\\} = \\mathcal{F}(K, P) } $$
+</p>
+
+---
+
+<h3 style="color: #fbbf24;">3. Functional Closure Condition</h3>
+
+<p>For a complete theory:</p>
+
+<p>
+$$ \\frac{\\partial C_i}{\\partial C_j} = 0 \\quad (i \\ne j) $$
+</p>
+
+<p><strong>Meaning:</strong></p>
+
+<p>
+No constant depends on another independently<br>
+All depend only on K, P
+</p>
+
+<p>Thus:</p>
+
+<p>
+$$ C_i = f_i(K, P) \\quad \\forall i $$
+</p>
+
+---
+
+<h3 style="color: #fbbf24;">4. Unified Parameter Manifold</h3>
+
+<p>Define parameter space:</p>
+
+<p>
+$$ \\mathcal{M} = \\{(K, P)\\} $$
+</p>
+
+<p>Then mapping:</p>
+
+<p>
+$$ \\mathcal{F} : \\mathcal{M} \\rightarrow \\{C_i\\} $$
+</p>
+
+<p><strong>Image:</strong></p>
+
+<p>
+$$ (K, P) \\mapsto (C_1, C_2, \\dots, C_n) $$
+</p>
+
+---
+
+<h3 style="color: #fbbf24;">5. Closure Constraint (No Free Parameters)</h3>
+
+<p>All constants must satisfy:</p>
+
+<p>
+$$ \\Phi(C_1, C_2, \\dots, C_n) = 0 $$
+</p>
+
+<p>This constraint arises from:</p>
+
+<p>
+$$ K, P \\ \\text{fixed by substrate equilibrium} $$
+</p>
+
+<p>Thus:</p>
+
+<p>
+$$ C_i = \\text{constrained functions of } (K, P) $$
+</p>
+
+---
+
+<h3 style="color: #fbbf24;">6. Differential Structure</h3>
+
+<p>Small variations:</p>
+
+<p>
+$$ \\delta C_i = \\frac{\\partial f_i}{\\partial K}\\delta K + \\frac{\\partial f_i}{\\partial P}\\delta P $$
+</p>
+
+<p>At equilibrium:</p>
+
+<p>
+$$ \\delta K = 0, \\quad \\delta P = 0 $$
+</p>
+
+<p>Thus:</p>
+
+<p>
+$$ \\delta C_i = 0 $$
+</p>
+
+<p><strong>Meaning:</strong></p>
+
+<p>
+Constants are fixed values<br>
+Not tunable
+</p>
+
+---
+
+<h3 style="color: #fbbf24;">7. Dimensional Reduction</h3>
+
+<p>From many constants:</p>
+
+<p>
+$$ N_{\\text{constants}} \\gg 2 $$
+</p>
+
+<p>Reduced to:</p>
+
+<p>
+$$ (K, P) \\Rightarrow \\text{2 parameters only} $$
+</p>
+
+<p>Thus:</p>
+
+<p>
+$$ \\text{Dimensional reduction: } N \\rightarrow 2 $$
+</p>
+
+---
+
+<h3 style="color: #fbbf24;">8. Inter-Constant Relations</h3>
+
+<p>Since all depend on same source:</p>
+
+<p>
+$$ C_i = f_i(K,P), \\quad C_j = f_j(K,P) $$
+</p>
+
+<p>Then:</p>
+
+<p>
+$$ C_i = F_{ij}(C_j) $$
+</p>
+
+<p><strong>Meaning:</strong></p>
+
+<p>
+Constants are not independent<br>
+They are correlated
+</p>
+
+---
+
+<h3 style="color: #fbbf24;">9. Closure Loop Representation</h3>
+
+<p>Mapping forms closed structure:</p>
+
+<p>
+$$ (K, P) \\rightarrow C_i \\rightarrow \\text{Physics} \\rightarrow (K, P) $$
+</p>
+
+<p><strong>Interpretation:</strong></p>
+
+<p>
+No open degrees of freedom<br>
+Self-consistent loop
+</p>
+
+---
+
+<h3 style="color: #fbbf24;">10. Final Mathematical Statement</h3>
+
+<p>
+$$ \\boxed{ C_i = f_i(K, P), \\quad \\forall i } $$
+</p>
+
+---
+
+<h3 style="color: #fbbf24;">11. Structural Interpretation</h3>
+
+<p>
+$$ \\{C_i\\} \\subset \\text{Image of } (K, P) $$
+</p>
+
+<p><strong>Meaning:</strong></p>
+
+<p>
+Constants are projections of substrate equilibrium
+</p>
+
+---
+
+<h3 style="color: #fbbf24;">12. Limits</h3>
+
+<p><strong>Arbitrary constants case:</strong></p>
+
+<p>
+$$ C_i = \\text{free} $$
+</p>
+
+<p>→ inconsistent</p>
+
+<p><strong>Structural case:</strong></p>
+
+<p>
+$$ C_i = f_i(K,P) $$
+</p>
+
+<p>→ consistent</p>
+
+---
+
+<h3 style="color: #fbbf24;">13. Closure</h3>
+
+<p>
+All physical constants:<br>
+are derived<br>
+are constrained<br>
+are unified
+</p>
+
+<p style="margin-top:10px;">
+All physical constants emerge as functions of substrate parameters K and P, completing the structural closure of physics.
+</p>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>SYNTHESIS COMPLETION %</span><input type="number" id="s_in" class="digital-entry" value="100" oninput="syncVal(this.value, 's_sl')"></div><input type="range" id="s_sl" min="0" max="100" step="1" value="100" oninput="syncVal(this.value, 's_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">FINAL CONCLUSION</span><div style="text-align:center; font-size: 0.8rem;">Physical constants are measurable signatures of substrate equilibrium</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">Reality is a Manifestation of the Substrate</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Status</span><span class="const-val">EXPLANATION COMPLETE</span></div><div class="const-item"><span class="const-label">System</span><span class="const-val">STRUCTURALLY CLOSED</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-final);">SYSTEM: FULLY REALIZED IN PHYSICAL DOMAIN</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.8rem;">Substrate Base (K, P)<br>↓<br>Derived Constants<br>↓<br>Observed Physical World`,
+hierarchy: `<div style="color: var(--accent-final); font-weight: bold; font-size: 0.90rem;">Constants: Emergent Signatures of Substrate Equilibrium</div>`,
+footer: "Reality = Observable Layer (Stage 55) + Explanation Layer (Stage 56).",
+rightNote: `<div style="color: #f472b6; line-height: 1.3; margin-top: 3px; padding: 2px; font-size: 0.8rem;">The origin of physical laws is now anchored in the substrate.Constants are fixed at substrate equilibrium.<p>All physical constants are necessary, measurable signatures of substrate equilibrium defined by K and P.</p><p><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">👉 This Module Establishes:<br>Substrate (K, P) → All Physical Constants</p></div>`
+},
+
+6: {
+title: "CONSTANT DERIVATION (THE BRIDGE)",
+result: "K, P → Numerical Synchronization",
+resultSize: "0.80rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 56 — Module 6: Constant Derivation (Bridge to Reality)</h2>
+
+<div class="briefing-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Conceptual Introduction</h3>
+
+<p>
+With the completion of Module 5, the framework has established a fully closed structural system. The substrate parameters $K = |\\nabla C|$ and $P = P_{\\text{syn}}$ determine interaction strength $g$, mass $m$, scale hierarchy $\\Lambda_n$, and ultimately all physical constants through $C_i = f_i(K, P)$.
+</p>
+
+<p>
+However, a final and critical question remains: how do these constants acquire their exact observed numerical values?
+</p>
+
+<p>
+Up to this point, the framework explains the origin and interdependence of constants, but not yet their precise numerical realization. In standard physics, these values are measured experimentally without deeper explanation.
+</p>
+
+<p>
+This module provides the missing link. It establishes that constants become numerically fixed through a phase alignment condition within the substrate.
+</p>
+
+<p>
+Thus, the transition occurs from structural derivation to observable realization. The framework now connects directly to measurable physics.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">2. Structural Emergence</h3>
+
+<p>
+To account for numerical realization, a new structural variable is introduced: the substrate phase $\\theta$.
+</p>
+
+<p>
+This phase represents the internal state of the substrate and governs the alignment of its structural configuration. The complete expression for physical constants becomes:
+</p>
+
+<p>
+$C_i = f_i(K, P, \\theta)$
+</p>
+
+<p>
+As the substrate evolves, the phase $\\theta$ changes. However, only specific phase values correspond to stable configurations.
+</p>
+
+<p>
+From the structural analysis and visualization, a critical alignment condition emerges:
+</p>
+
+<p>
+$\\theta = \\theta_{\\text{crit}} = \\pi$
+</p>
+
+<p>
+At this point, the substrate achieves full synchronization. All structural components align, and the constants attain fixed numerical values.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$C_i^{\\text{phys}} = f_i(K, P, \\pi)$
+</p>
+
+<p>
+The triadic fields govern this process. The Stabilizing field $N$ ensures phase locking, the Conserving field $C$ maintains structural consistency, and the Motive field $M$ drives the evolution toward alignment.
+</p>
+
+<p>
+The key structural insight is that observable physics corresponds to a phase-aligned state of the substrate.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">3. Physical Interpretation</h3>
+
+<p>
+Physically, this result explains why constants have definite and universal values. They are not only derived from structure but also fixed by a specific phase condition.
+</p>
+
+<p>
+Before alignment, constants are not fully determined. They vary with the phase of the substrate. After alignment, they become stable and measurable.
+</p>
+
+<p>
+This provides a natural explanation for why the universe exhibits fixed constants. It corresponds to a synchronized state of the underlying structure.
+</p>
+
+<p>
+Thus, physical reality is not just structured—it is structurally aligned.
+</p>
+
+<p>
+This also explains universality. Since the alignment condition is global, the resulting constants are the same everywhere.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">4. Necessity (Very Important)</h3>
+
+<p>
+The phase alignment condition is necessary for the existence of a stable universe. Without alignment, constants would vary continuously, leading to instability and inconsistency in physical laws.
+</p>
+
+<p>
+Only a synchronized state can produce fixed and universal values. Multiple alignment states would lead to multiple inconsistent realities, which is not observed.
+</p>
+
+<p>
+Therefore, a unique stable alignment must exist. This ensures that the physical constants are uniquely determined.
+</p>
+
+<p>
+Thus, numerical realization is not arbitrary—it is a necessary consequence of structural alignment.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">5. Consistency Check</h3>
+
+<p>
+This formulation preserves all observed values of physical constants and explains their stability and universality. It extends the framework from structural derivation to numerical prediction.
+</p>
+
+<p>
+No contradictions arise. Instead, the framework now fully accounts for both the origin and the exact values of physical quantities.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">6. Graph / Visualization Interpretation Paragraph (MANDATORY)</h3>
+
+<p>
+The visualization associated with this module represents the evolution of the substrate phase and its role in fixing constants.
+</p>
+
+<p>
+The X-axis corresponds to the phase $\\theta$, the Y-axis represents the value of a physical constant $C_i$, and the Z-axis represents structural evolution or system stability.
+</p>
+
+<p>
+The trajectory appears as a spiral or helical path, indicating continuous evolution of the phase. At a specific point, corresponding to $\\theta = \\pi$, the trajectory reaches a stable configuration where the value of the constant becomes fixed.
+</p>
+
+<p>
+This demonstrates that constants are not arbitrary numbers. They emerge dynamically and become locked at the alignment point. Only at this point does stable and observable physics arise.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">7. Conceptual Compression Lines</h3>
+
+<p>
+Constants are phase-dependent.<br>
+Alignment fixes their values.<br>
+No arbitrariness remains.<br>
+Physics is a synchronized structure.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">8. Logical Closure</h3>
+
+<p>
+This module completes the structural development of Stage 56. It establishes that physical constants are not only derived from substrate parameters but are also fixed through phase alignment.
+</p>
+
+<p>
+With this, the framework achieves full connection between structure and observable reality.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">9. Transition to Next Stage</h3>
+
+<p>
+With structural origin, parameter derivation, and numerical realization complete, the framework now moves to validation.
+</p>
+
+<p>
+The next stage examines consistency with known physics, beginning with the weak-field limit and observable predictions.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">10. What this Module Establishes</h3>
+
+<p>
+Constants are fixed at phase alignment.<br>
+Observable physics corresponds to synchronized substrate state.<br>
+Exact values arise from structural necessity.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">11. Final Statement</h3>
+
+<p>
+Physical constants attain their exact observed values when the substrate reaches phase alignment, establishing a direct bridge from structural parameters $K$ and $P$ to observable reality.
+</p>
+</div>`,
+
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics — Constant Derivation (Bridge to Reality)</h2>
+
+<div class="math-content" style="font-size: 0.9rem; line-height: 1.6; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color: #fbbf24;">1. Starting Point: Completed Structural Mapping</h3>
+
+<p>From previous modules:</p>
+
+<p>
+$$ C_i = f_i(K, P) $$
+</p>
+
+<p>Now extend:</p>
+
+<p>
+Exact numerical values arise via phase alignment
+</p>
+
+---
+
+<h3 style="color: #fbbf24;">2. Introduction of Substrate Phase Variable</h3>
+
+<p>Define a phase parameter:</p>
+
+<p>
+$$ \\theta \\in [0, 2\\pi] $$
+</p>
+
+<p>Thus:</p>
+
+<p>
+$$ C_i = f_i(K, P, \\theta) $$
+</p>
+
+<p><strong>Interpretation:</strong></p>
+
+<p>
+\$begin:math:text$ \\\\theta \\$end:math:text$ → internal substrate phase<br>
+Encodes alignment / synchronization
+</p>
+
+---
+
+<h3 style="color: #fbbf24;">3. Phase Evolution Equation</h3>
+
+<p>Let phase evolve as:</p>
+
+<p>
+$$ \\frac{d\\theta}{dt} = \\omega(K, P) $$
+</p>
+
+<p>Where:</p>
+
+<p>
+$$ \\omega(K,P) = \\text{substrate evolution rate} $$
+</p>
+
+<p>Thus:</p>
+
+<p>
+$$ \\theta(t) = \\int \\omega(K,P)\\, dt $$
+</p>
+
+---
+
+<h3 style="color: #fbbf24;">4. Alignment Condition</h3>
+
+<p>Constants become fixed when:</p>
+
+<p>
+$$ \\theta = \\theta_{\\text{crit}} $$
+</p>
+
+<p>From visualization:</p>
+
+<p>
+$$ \\theta_{\\text{crit}} = \\pi \\quad (180^\\circ) $$
+</p>
+
+<p>Thus:</p>
+
+<p>
+$$ C_i^{\\text{phys}} = f_i(K, P, \\theta = \\pi) $$
+</p>
+
+---
+
+<h3 style="color: #fbbf24;">5. Stationarity Condition</h3>
+
+<p>At alignment:</p>
+
+<p>
+$$ \\frac{\\partial C_i}{\\partial \\theta} = 0 $$
+</p>
+
+<p><strong>Meaning:</strong></p>
+
+<p>
+constants become stable<br>
+no further variation
+</p>
+
+---
+
+<h3 style="color: #fbbf24;">6. Stability Condition</h3>
+
+<p>Second derivative:</p>
+
+<p>
+$$ \\frac{\\partial^2 C_i}{\\partial \\theta^2} > 0 $$
+</p>
+
+<p>Ensures:</p>
+
+<p>
+stable equilibrium
+</p>
+
+---
+
+<h3 style="color: #fbbf24;">7. Explicit Form (Expansion Near Alignment)</h3>
+
+<p>Expand around:</p>
+
+<p>
+$$ \\theta = \\pi + \\epsilon $$
+</p>
+
+<p>
+$$ C_i(\\theta) = C_i^{\\text{phys}} + \\frac{1}{2} \\left.\\frac{\\partial^2 C_i}{\\partial \\theta^2}\\right|_{\\pi} \\epsilon^2 + \\dots $$
+</p>
+
+<p><strong>Interpretation:</strong></p>
+
+<p>
+first-order variation vanishes<br>
+second-order ensures stability
+</p>
+
+---
+
+<h3 style="color: #fbbf24;">8. Coupled Phase–Parameter System</h3>
+
+<p>Full system:</p>
+
+<p>
+$$ \\begin{cases} C_i = f_i(K, P, \\theta) \\\\ \\frac{d\\theta}{dt} = \\omega(K, P) \\end{cases} $$
+</p>
+
+<p>At equilibrium:</p>
+
+<p>
+$$ \\theta = \\pi, \\quad \\delta K = 0, \\quad \\delta P = 0 $$
+</p>
+
+<p>Thus:</p>
+
+<p>
+$$ C_i = \\text{constant} $$
+</p>
+
+---
+
+<h3 style="color: #fbbf24;">9. Synchronization Condition</h3>
+
+<p>Define synchronization function:</p>
+
+<p>
+$$ S(\\theta) = \\sin(\\theta) $$
+</p>
+
+<p>Alignment condition:</p>
+
+<p>
+$$ S(\\theta) = 0 \\quad \\Rightarrow \\theta = n\\pi $$
+</p>
+
+<p>Select stable branch:</p>
+
+<p>
+$$ \\theta = \\pi $$
+</p>
+
+---
+
+<h3 style="color: #fbbf24;">10. Numerical Locking Condition</h3>
+
+<p>Thus:</p>
+
+<p>
+$$ C_i^{\\text{phys}} = f_i(K, P, \\pi) $$
+</p>
+
+<p><strong>Meaning:</strong></p>
+
+<p>
+constants uniquely determined
+</p>
+
+---
+
+<h3 style="color: #fbbf24;">11. Dimensional Consistency</h3>
+
+<p>Since:</p>
+
+<p>
+$$ [K] = L^{-1}, \\quad [P] = T^{-2} $$
+</p>
+
+<p>Then:</p>
+
+<p>
+$$ C_i^{\\text{phys}} = f_i(K, P) $$
+</p>
+
+<p>must satisfy correct units.</p>
+
+<p>Phase \$begin:math:text$ \\\\theta \\$end:math:text$:</p>
+
+<p>
+dimensionless<br>
+does not affect units
+</p>
+
+---
+
+<h3 style="color: #fbbf24;">12. Final Mathematical Statement</h3>
+
+<p>
+$$ \\boxed{ C_i^{\\text{phys}} = f_i(K, P, \\theta_{\\text{crit}}), \\quad \\theta_{\\text{crit}} = \\pi } $$
+</p>
+
+---
+
+<h3 style="color: #fbbf24;">13. Structural Interpretation</h3>
+
+<p>
+$$ \\text{Observed constants} = \\text{Phase-aligned substrate outputs} $$
+</p>
+
+<p><strong>Meaning:</strong></p>
+
+<p>
+structure → values<br>
+alignment → fixation
+</p>
+
+---
+
+<h3 style="color: #fbbf24;">14. Limits</h3>
+
+<p><strong>Non-aligned state:</strong></p>
+
+<p>
+$$ \\theta \\neq \\pi \\Rightarrow C_i \\ \\text{vary} $$
+</p>
+
+<p><strong>Aligned state:</strong></p>
+
+<p>
+$$ \\theta = \\pi \\Rightarrow C_i = \\text{fixed} $$
+</p>
+
+---
+
+<h3 style="color: #fbbf24;">15. Closure</h3>
+
+<p>
+Constants:<br>
+are derived from K, P<br>
+are fixed by phase alignment
+</p>
+
+<p style="margin-top:10px;">
+Exact physical constants arise when the substrate reaches phase alignment, locking all derived quantities into observable values.
+</p>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>SUBSTRATE PHASE ALIGNMENT (θ)</span><input type="number" id="theta_in" class="digital-entry" value="180" oninput="syncVal(this.value, 'theta_sl')"></div><input type="range" id="theta_sl" min="0" max="360" step="1" value="180" oninput="syncVal(this.value, 'theta_sl')"></div>`,
+mappingBox: `
+<div style="display: flex; gap: 5px; margin-bottom: 8px;">
+<div class="definition-box" style="flex: 1; border-color: #fbbf24; background: rgba(251, 191, 36, 0.05);">
+<span class="def-title" style="color: #fbbf24; font-size: 0.65rem; text-transform: none;">$\K_{phys}$ (STIFFNESS)</span>
+<div style="text-align: center; font-size: 0.85rem; color: #e2e8f0; font-family: 'Courier New', monospace;">
+6.9 × 10⁻²⁶ m⁻¹
+</div>
+</div>
+<div class="definition-box" style="flex: 1; border-color: #f472b6; background: rgba(244, 114, 182, 0.05);">
+<span class="def-title" style="color: #f472b6; font-size: 0.65rem; text-transform: none;">$\P_{phys}$ (PRESSURE)</span>
+<div style="text-align: center; font-size: 0.85rem; color: #e2e8f0; font-family: 'Courier New', monospace;">
+3.3 × 10⁻³⁶ s⁻²
+</div>
+</div>
+</div>
+<div class="definition-box" style="border-color: #2dd4bf; background: rgba(45, 212, 191, 0.1);">
+<span class="def-title" style="color: #2dd4bf;">DERIVATION STATUS</span>
+<div id="bridge-status-text" style="text-align:center; font-size: 0.7rem; font-weight:bold;">STATUS: SYNCHRONIZED</div>
+</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Physical Values are Structural Necessities</div>`,
+structure: `<div id="bridge-values-live" class="secondary-structure-box" style="flex-direction:column; gap:5px; padding:8px;"></div>`,
+metricsContent: `<div id="bridge-metrics" style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;"></div>`,
+hierarchy: `<div style="color: var(--accent-bridge); font-weight: bold; font-size: 1.0rem;">Bridge: Exact Numerical Realization</div>`,
+footer: "At θ = 180°, substrate aligns with physical reality.",
+rightNote: `<div style="color: #a855f7; line-height: 1.3; margin-top: 5px; padding: 5px; font-size: 0.8rem;">When substrate phase alignment is achieved, physical constants emerge uniquely from K and P.<p>Constants are fixed at phase-aligned substrate equilibrium.</p><p><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">👉 This Module Establishes:<br>Substrate Phase Alignment (θ) → Exact Observable Physics</p></div>`
+}
+};
+
+function syncVal(val, id) {
+const sliderId = id.includes('_in') ? id.replace('_in', '_sl') : id;
+const inputId = id.includes('_sl') ? id.replace('_sl', '_in') : id;
+if(document.getElementById(sliderId)) document.getElementById(sliderId).value = val;
+if(document.getElementById(inputId)) document.getElementById(inputId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+document.getElementById('brief-box-content').innerHTML = content.brief;
+document.getElementById('math-box-content').innerHTML = content.math;
+document.getElementById('control-sliders').innerHTML = content.sliders;
+
+document.getElementById('active-module-title').innerText = content.title;
+const resultEl = document.getElementById('active-module-result');
+resultEl.innerText = content.result;
+resultEl.style.fontSize = content.resultSize || "0.75rem";
+
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('metrics-content').innerHTML = content.metricsContent;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+document.getElementById('structure-box-area').innerHTML = content.structure;
+
+const telemetryContainer = document.getElementById('telemetry-area').closest('.diagnostic-panel');
+
+if (content.telemetry && content.telemetry !== "") {
+// If it exists and isn't empty, show the box and inject the content
+telemetryContainer.style.display = 'block';
+document.getElementById('telemetry-area').innerHTML = content.telemetry;
+} else {
+// If it is missing, null, or empty, hide the entire box and its border
+telemetryContainer.style.display = 'none';
+document.getElementById('telemetry-area').innerHTML = "";
+}
+showScreen('briefing');
+}
+
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() {
+showScreen('lab');
+setTimeout(() => { runLab(); window.dispatchEvent(new Event('resize')); }, 100);
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() {
+showScreen('lab');
+setTimeout(() => { runLab(); window.dispatchEvent(new Event('resize')); }, 100);
+}
+
+function runLab() {
+const target = document.getElementById('plot-area');
+if (!target) return;
+let data = [];
+let layout = {
+paper_bgcolor: 'black', plot_bgcolor: 'black', margin: {t:60,b:10,l:0,r:0},
+showlegend: true, font: { family: 'sans-serif', size: 10 },
+legend: { font: { color: '#e5e7eb' }, x: 0.7, y: 0.9, bgcolor: 'rgba(0,0,0,0.5)' },
+scene: {
+xaxis: { gridcolor: '#222', color: '#94a3b8' },
+yaxis: { gridcolor: '#222', color: '#94a3b8' },
+zaxis: { gridcolor: '#222', color: '#94a3b8' },
+camera: { eye: { x: 1.5, y: 1.5, z: 1.2 } }
+}
+};
+
+if (currentTool === 1) { // SUBSTRATE PARAMETERS (K, P)
+let k_slider = document.getElementById('k_sl');
+let k_val = parseFloat(k_slider?.value || 11.350);
+let x = Array.from({length: 40}, (_, i) => i - 20);
+let y = Array.from({length: 40}, (_, i) => i - 20);
+let z = [];
+for(let i=0; i<x.length; i++) {
+let row = [];
+for(let j=0; j<y.length; j++) {
+let dist = Math.sqrt(x[i]**2 + y[j]**2);
+row.push(k_val * Math.exp(-dist/10) * Math.cos(dist/5));
+}
+z.push(row);
+}
+data.push({ type: 'surface', z: z, x: x, y: y, colorscale: 'Blues', showscale: true, showlegend: true, name: 'Substrate Foundation Layer' });
+layout.title = { text: "SUBSTRATE PARAMETER MAPPING (K, P)", font: { color: '#60a5fa' } };
+layout.scene.xaxis.title = "Stiffness Gradient (∇K)";
+layout.scene.yaxis.title = "Synthesis Pressure (P)";
+layout.scene.zaxis.title = "Manifold Stability (S)";
+
+} else if (currentTool === 2) { // COUPLING
+let g_val = parseFloat(document.getElementById('g_sl')?.value || 50);
+let t = Array.from({length: 100}, (_, i) => i * 0.1);
+data.push({
+type: 'scatter3d', mode: 'lines',
+x: t, y: t.map(v => Math.log(v * g_val + 1)), z: t.map(v => v * 0.05),
+line: { color: '#818cf8', width: 6 },
+name: 'Derived Gauge Coupling g(K,P)'
+});
+layout.title = { text: "COUPLING CONSTANT DERIVATION", font: { color: '#818cf8' } };
+layout.scene.xaxis.title = "Substrate Density (ρ)";
+layout.scene.yaxis.title = "Coupling Strength (g)";
+layout.scene.zaxis.title = "Interaction Depth";
+
+} else if (currentTool === 3) { // MASS SCALE
+let m_val = parseFloat(document.getElementById('m_sl')?.value || 100) / 10;
+let x = Array.from({length: 40}, (_, i) => i - 20);
+let y = Array.from({length: 40}, (_, i) => i - 20);
+let z = [];
+for(let i=0; i<x.length; i++) {
+let row = [];
+for(let j=0; j<y.length; j++) {
+let r = Math.sqrt(x[i]**2 + y[j]**2);
+row.push(m_val * Math.exp(-r/10));
+}
+z.push(row);
+}
+data.push({ type: 'surface', z: z, x: x, y: y, colorscale: 'Viridis', showscale: false, name: 'Mass Resonance' });
+layout.title = { text: "MASS SCALE ORIGIN", font: { color: '#2dd4bf' } };
+layout.scene.xaxis.title = "Restorative Field (K)";
+layout.scene.yaxis.title = "Synthesis Pressure (P)";
+layout.scene.zaxis.title = "Acquired Inertia (m)";
+
+} else if (currentTool === 4) { // HIERARCHY
+let h_slider = document.getElementById('h_sl');
+let h_val = parseFloat(h_slider?.value || 20) / 100;
+const scaleData = [
+{ name: 'Planck Scale', level: 20, color: '#f472b6' },
+{ name: 'GUT Scale', level: 12, color: '#fbbf24' },
+{ name: 'Electroweak', level: 6, color: '#2dd4bf' },
+{ name: 'Atomic Scale', level: 2, color: '#3b82f6' }
+];
+scaleData.forEach(s => {
+data.push({
+type: 'scatter3d', mode: 'markers+text',
+x: [s.level * Math.pow(h_val + 1, 3)], y: [s.level], z: [Math.pow(s.level, 1.5) * (h_val + 0.5)],
+text: [s.name], textposition: 'top center',
+marker: { size: 10 + s.level, color: s.color, symbol: 'diamond', line: { color: '#fff', width: 1 } },
+textfont: { color: '#FFFFFF', size: 11 }, name: s.name
+});
+});
+layout.scene.camera = { eye: { x: 2.2, y: 2.2, z: 1.2 } };
+layout.title = { text: "SCALE HIERARCHY RESONANCE", font: { color: '#fbbf24' } };
+layout.scene.xaxis.title = "Substrate Level (n)";
+layout.scene.yaxis.title = "Logarithmic Scale (Λ)";
+layout.scene.zaxis.title = "Structural Stability";
+
+} else if (currentTool === 5) { // COMPLETION
+let s = parseFloat(document.getElementById('s_sl')?.value || 100) / 100;
+let t = Array.from({length: 100}, (_, i) => (i * 2 * Math.PI) / 100);
+data.push({
+type: 'scatter3d', mode: 'lines',
+x: t.map(v => Math.cos(v) * s), y: t.map(v => Math.sin(v) * s), z: t.map(v => v/5),
+line: { color: '#f472b6', width: 8 },
+name: 'Unified Parameter Map'
+});
+layout.title = { text: "UNIFIED PARAMETER COMPLETION", font: { color: '#f472b6' } };
+layout.scene.xaxis.title = "Substrate Phase (θ)";
+layout.scene.yaxis.title = "Derived Constant Value";
+layout.scene.zaxis.title = "Synthesis Completion";
+
+
+} else if (currentTool === 6) {
+let theta_deg = parseFloat(document.getElementById('theta_sl')?.value || 180);
+let resonance = 1.0 - Math.abs(180 - theta_deg) / 180;
+
+// Derived Physical Constants
+const physG = (6.67430 * resonance).toFixed(5);
+const physAlpha = (0.00729735 * resonance).toFixed(8);
+const physH0 = (69.8 * resonance).toFixed(2);
+
+// Calculate "Effective" Values for the Logic Box
+const kEffective = (11.350 * resonance).toFixed(3);
+const kPhysEffective = (6.90 * resonance).toFixed(2);
+
+// Update Numerical Display (Left Center)
+document.getElementById('bridge-values-live').innerHTML = `
+<div class="const-item" style="text-align:left; padding: 4px 0; border-bottom: 1px solid rgba(251, 191, 36, 0.2);">
+<span class="const-label" style="font-size:0.55rem; color:#fbbf24;">GRAVITATIONAL CONSTANT (G)</span>
+<span class="const-val" style="color:#fbbf24; font-size:0.85rem;">${physG} × 10⁻¹¹ m³ kg⁻¹ s⁻²</span>
+</div>
+<div class="const-item" style="text-align:left; padding: 4px 0; border-bottom: 1px solid rgba(45, 212, 191, 0.2);">
+<span class="const-label" style="font-size:0.55rem; color:#2dd4bf; text-transform: none;">FINE STRUCTURE CONSTANT (α)</span>
+<span class="const-val" style="color:#2dd4bf; font-size:0.85rem;">${physAlpha} <small style="font-size:0.6rem; color:var(--text-dim);">(dim-less)</small></span>
+</div>
+<div class="const-item" style="text-align:left; padding: 4px 0; border-bottom: 1px solid rgba(244, 114, 182, 0.2);">
+<span class="const-label" style="font-size:0.55rem; color:#f472b6;">HUBBLE CONSTANT (H₀)</span>
+<span class="const-val" style="color:#f472b6; font-size:0.85rem;">${physH0} km/s/Mpc</span>
+</div>
+`;
+
+// Status & Tensor Metrics
+let statusColor = theta_deg == 180 ? '#2dd4bf' : '#a855f7';
+document.getElementById('bridge-status-text').style.color = statusColor;
+document.getElementById('bridge-status-text').innerText = theta_deg == 180 ? 'STATUS: SYNCHRONIZED: VALUES LOCKED' : 'CALIBRATING SUBSTRATE...';
+
+// Emergence Logic (Right Side) - Adding the Effective Lines
+document.getElementById('bridge-metrics').innerHTML = `
+<div style="font-family:monospace; font-size:0.8rem; color:#94a3b8; line-height:1.3;">
+Horizon Scale (ℓ): 1.64 × 10²⁶ m<br>
+Synchronization State: ${resonance.toFixed(4)}<br>
+<span style="color:#3b82f6;">Effective Stiffness (Kₑff): ${kEffective}</span><br>
+<span style="color:#fbbf24;">Effective Kₚₕᵧₛ: ${kPhysEffective} × 10⁻²⁶ m⁻¹</span>
+</div>
+`;
+
+// Plotly Visualization: 3D Convergence Spiral
+let t = Array.from({length: 100}, (_, i) => (i * Math.PI) / 25);
+data.push({
+type: 'scatter3d',
+mode: 'lines',
+x: t.map(v => Math.cos(v) * (1 - resonance * 0.9) * 15),
+y: t.map(v => Math.sin(v) * (1 - resonance * 0.9) * 15),
+z: t.map(v => v * 1.5),
+line: { color: statusColor, width: 4 },
+name: 'Substrate Phase Path (θ)'
+});
+
+// Convergence Nodes
+const nodeConfig = [
+{ v: 6.6, name: 'Gravity (G-Node)', color: '#fbbf24' },
+{ v: 10.2, name: 'Electro (α-Node)', color: '#2dd4bf' },
+{ v: 14.5, name: 'Cosmic (H₀-Node)', color: '#f472b6' }
+];
+
+nodeConfig.forEach(node => {
+data.push({
+type: 'scatter3d',
+mode: 'markers',
+x: [node.v * (1 - resonance)],
+y: [node.v * (1 - resonance)],
+z: [node.v],
+marker: {
+size: 8,
+color: node.color,
+opacity: 0.9,
+line: { color: '#fff', width: 1 }
+},
+name: node.name
+});
+});
+
+// Layout Refinements
+layout.title = { text: `SUBSTRATE ALIGNMENT: ${theta_deg}°`, font: { color: '#a855f7' } };
+layout.scene.xaxis.title = "Resonative Phase (θ)";
+layout.scene.yaxis.title = "Newtonian Potential (aₙ)";
+layout.scene.zaxis.title = "Phase Evolution";
+layout.scene.camera = { eye: { x: 2, y: 1.2, z: 0.8 } };
+
+// NOTE: The previous "DYNAMIC MAPPING UPDATE" that targeted the left boxes is removed
+// to keep the fundamental constants static as per your instruction.
+}
+
+Plotly.react('plot-area', data, layout, {responsive: true, displayModeBar: false});
+}
+
+function resetLab() {
+if(currentTool===1) syncVal(11.350, 'k_sl');
+if(currentTool===2) syncVal(50, 'g_sl');
+if(currentTool===3) syncVal(100, 'm_sl');
+if(currentTool===4) syncVal(20, 'h_sl');
+if(currentTool===5) syncVal(100, 's_sl');
+if(currentTool===6) syncVal(180, 'theta_sl');
+}
+
+window.onload = () => { showScreen('portal'); };
+</script>
+</body>
+</html>

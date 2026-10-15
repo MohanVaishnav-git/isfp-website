@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 47 — Domain of Particles (Excitations)</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #6366f1;
+--accent-excitation: #38bdf8; --accent-mode: #818cf8; --accent-quantum: #c084fc; --accent-identity: #fb7185; --accent-reality: #4ade80;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6; --accent-gold: #fbbf24;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-unified); font-family: sans-serif; font-size: 0.85rem; min-width: 450px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls, #nav-summary-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+#screen-lab.active { display: flex; flex-direction: column; height: calc(100vh - 50px); }
+
+#screen-portal { justify-content: flex-start; padding-top: 4dvh; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 50px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 2px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); padding-bottom: 0px; }
+.module-subtitle { text-align: center; font-family: sans-serif; color: var(--accent-gold); margin-bottom: 2px; font-weight: bold; letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.primary-constant-box { background: #000; border: 1px solid var(--accent-unified); padding: 6px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 8px; }
+.secondary-structure-box { background: rgba(99, 102, 241, 0.05); border: 1px dashed var(--accent-unified); padding: 6px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 12px; }
+
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(99, 102, 241, 0.05); border: 1px solid var(--accent-unified); padding: 5px; border-radius: 5px; margin-bottom: 8px; font-size: 0.7rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; }
+#plot-area { flex-grow: 1; width: 100%; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #fff; border: 1px solid var(--accent-unified); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer { width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem; color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 47 — DOMAIN OF PARTICLES (QUANTIZED EXCITATIONS)</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">The Emergence of Particles</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">From continuous fields to discrete quantized manifestations.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-excitation);">
+<h2 style="color:var(--accent-excitation);">1. Field Excitations</h2>
+<p>Local Disturbances: $\boxed{ \phi(x,t) = A e^{i(kx-\omega t)} }$<br>Continuous classical excitation mode</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-mode);">
+<h2 style="color:var(--accent-mode);">2. Mode Structure</h2>
+<p>Frequency Spectrum: $\boxed{ \omega_k = \sqrt{k^2 + m^2} }$<br>Continuous spectrum of field modes</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-quantum);">
+<h2 style="color:var(--accent-quantum);">3. Quantization</h2>
+<p>Discrete Units: $\boxed{ E_n = (n + \frac{1}{2})\hbar\omega }$</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-identity);">
+<h2 style="color:var(--accent-identity);">4. Particle Identity</h2>
+<p>Quantum Numbers: $\boxed{ | m, s, q, \dots \rangle }$</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-reality);">
+<h2 style="color:var(--accent-reality);">5. Particle Reality</h2>
+<p>Observable State: $\boxed{ E^2 = p^2 + m^2 }$</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-unified);">
+<h2 style="color:var(--accent-unified);">6. Stage 47 Summary</h2>
+<p>Particles as Quantized Modes.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 47 — Mathematical Structure</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<p style="text-align: center; color: #38bdf8; font-weight: bold;">Particles as Quantized On-Shell Field Excitations</p>
+
+<h3 style="color: #38bdf8; margin-bottom: 10px;">🔷 1. FIELD FOUNDATION</h3>
+<p>A relativistic field \phi(x) satisfies: $$(\Box + m^2)\,\phi(x) = 0$$ with plane-wave solutions: $$\phi(x) \sim e^{-ip \cdot x}, \quad p^2 = m^2$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 2. MODE DECOMPOSITION</h3>
+<p>The field admits a Fourier expansion: $$\phi(x,t) = \int \frac{d^3 k}{(2\pi)^3} \frac{1}{\sqrt{2\omega_k}} \left( a_{\mathbf{k}} e^{-ik\cdot x} + a_{\mathbf{k}}^\dagger e^{ik\cdot x} \right)$$ $$\omega_k = \sqrt{\mathbf{k}^2 + m^2}$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 3. QUANTIZATION</h3>
+<p>Operators satisfy: $$[a_{\mathbf{k}}, a_{\mathbf{k}'}^\dagger] = (2\pi)^3 \delta^3(\mathbf{k}-\mathbf{k}')$$ Hamiltonian: $$H = \int \frac{d^3 k}{(2\pi)^3} \, \omega_k \left(a_{\mathbf{k}}^\dagger a_{\mathbf{k}} + \tfrac{1}{2}\right)$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 4. PARTICLE STATES</h3>
+<p>Vacuum: $$a_{\mathbf{k}} |0\rangle = 0$$ Single-particle state: $$|1_{\mathbf{k}}\rangle = a_{\mathbf{k}}^\dagger |0\rangle$$ General: $$|n_{\mathbf{k}}\rangle = \frac{(a_{\mathbf{k}}^\dagger)^n}{\sqrt{n!}} |0\rangle$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 5. ENERGY SPECTRUM</h3>
+<p>$$E_{n_{\mathbf{k}}} = \left(n_{\mathbf{k}} + \tfrac{1}{2}\right)\omega_k$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 6. IDENTITY FROM SYMMETRY</h3>
+<p>Field transforms under group G: $$\phi \rightarrow U(g)\phi$$ Generators T^a define charges: $$Q^a |\psi\rangle = q^a |\psi\rangle$$ Spin: $$\mathbf{J}^2 |\psi\rangle = s(s+1)|\psi\rangle$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 7. PARTICLE IDENTITY</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">$$\boxed{ \text{Particle} = (m,\; s,\; \{q^a\},\; R) }$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 8. ON-SHELL CONDITION</h3>
+<p>$$p^2 = m^2 \quad\Longleftrightarrow\quad E^2 = p^2 + m^2$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 9. PROPAGATOR CRITERION</h3>
+<p>$$\Delta(p) = \frac{1}{p^2 - m^2 + i\epsilon}$$ $$p^2 = m^2 \;\Rightarrow\; \text{pole (physical particle)}$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 10. REALITY SELECTION</h3>
+<p>$$p^2 = m^2 \;\Rightarrow\; \text{on-shell (observable)}$$ $$p^2 \neq m^2 \;\Rightarrow\; \text{off-shell (virtual)}$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 🔶 COMPLETION THEOREM (STAGE 47)</h3>
+<p style="text-align: center; color: #f472b6;">$$\boxed{ \text{A particle is a quantized, on-shell excitation of a field mode,} }$$</p>
+<p style="text-align: center; color: #f472b6;">$$\boxed{ \text{whose identity is determined by symmetry representations of the field.} }$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 11. FULL STRUCTURAL CHAIN</h3>
+<p style="text-align: center; font-weight: bold;">$$\boxed{ \text{Field} \;\Rightarrow\; \text{Modes} \;\Rightarrow\; \text{Quantization} \;\Rightarrow\; \text{Identity} \;\Rightarrow\; \text{On-Shell Reality} }$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 12. FINAL ONE-LINE STATEMENT</h3>
+<p style="margin-bottom: 0; text-align: center;">$$\boxed{ \text{Particles are on-shell quanta of fields with symmetry-defined identity.} }$$</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Mathematical Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Structural Identity:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\hat{\Phi} \rightarrow |n, q, m, s\rangle_{on-shell}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Stage 47 mathematically unifies the field-to-particle transition by defining physical reality as the intersection of quantization, symmetry representation, and the on-shell invariant.</p>
+</div>
+</div>
+
+</section>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div id="active-module-result" class="module-subtitle">--</div>
+<div class="primary-constant-box">
+<div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val">11.350</span></div>
+<div class="const-item"><span class="const-label">Synthesis P</span><span class="const-val">0.6900</span></div>
+</div>
+
+<div id="structure-box-area"></div>
+
+<div id="mapping-box-area"></div>
+
+<div class="diagnostic-panel">
+<span class="diag-title">Quantization Telemetry</span>
+<div id="telemetry-area"></div>
+</div>
+
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-unified); font-size:0.75rem; cursor:pointer; padding:6px;">RESET EXCITATION</button>
+<div id="panel-footer-text" style="font-size: 0.75rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.3; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:8px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Excitation Logic</span>
+<div id="metrics-content" style="font-size:0.65rem; font-family:monospace; line-height:1.3;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Discrete Realization</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.65rem; color: var(--text-dim); line-height: 1.4; background: #000; padding: 5px; border-radius: 0px; border: 1px solid #222; margin-top: auto;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "FIELD EXCITATIONS",
+result: "Particles arise as excitations of fields",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Field Excitations</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. CONCEPTUAL FOUNDATION</h3>
+<p>Modern physics describes reality not in terms of isolated particles, but in terms of continuous fields that extend throughout space. A particle is not a fundamental object placed into space. Instead, it is a localized excitation of an underlying field. This represents a fundamental shift: <strong>Classical view &rarr; particles are primary</strong>; <strong>Field-theoretic view &rarr; fields are primary, particles are derived</strong>.</p>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">$$\\text{Particle} \\equiv \\text{Excited state of a field}$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. CONTINUOUS FIELD AND VACUUM STATE</h3>
+<p>In its lowest energy configuration, a field exists in a vacuum state, with no localized disturbances. When energy is introduced: the field departs from equilibrium, a disturbance is created, and this disturbance propagates through the field. At this stage: the excitation is continuous, energy is not yet quantized, and the system behaves like a wave-like structure.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. LOCALIZED EXCITATIONS</h3>
+<p>A particle begins as a localized disturbance in the field $\\phi(x,t)$. This disturbance can be expressed as a superposition of modes: $$\\phi(x,t) = \\int A(k) e^{i(kx - \\omega t)} \\, dk$$ which forms a wave packet. Key characteristics include spatial localization, finite spread, propagation through the field, and energy transport. Thus, what appears as a particle is a structured, localized excitation, not a point object.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. PHYSICAL INTERPRETATION</h3>
+<p>At this stage of description: the field is continuously excited, there is no discrete particle number yet, and the excitation is classical in form, quantum in potential. This is the pre-quantization stage of particle formation.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. GRAPH INTERPRETATION (MANDATORY)</h3>
+<p>The visualization shows a localized field excitation over spatial coordinates. <strong>Axes:</strong> Horizontal plane &rarr; spatial dimensions x, y; Vertical axis &rarr; field amplitude $\\phi$. <strong>What is shown:</strong> The flat region represents the vacuum field, the localized dip (or peak) represents an excitation, and the smooth surface indicates continuity of the field. <strong>Key insights:</strong> The excitation is localized but extended, not point-like; the field exists everywhere — the excitation is a modification of the field, not a separate entity; the smooth curvature shows that the excitation is continuous (not quantized); the finite spread indicates wave-like behavior; and the excitation propagates without breaking field continuity.</p>
+<p style="text-align: center; font-style: italic; color: #f472b6;">$$\\text{Particle-like behavior} \\;\\rightarrow\\; \\text{localized field disturbance}$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. STRUCTURAL ROLE IN STAGE 47</h3>
+<p>This module establishes the first step in particle emergence: $$\\text{Field} \\;\\rightarrow\\; \\text{Excitation}$$ Subsequent modules will complete the transition: Module 2 &rarr; quantization (discreteness), Module 3 &rarr; mode structure, Module 4 &rarr; physical realization (on-shell condition), and Module 5 &rarr; particle spectrum.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. FINAL INSIGHT</h3>
+<p>A particle is not an independent object inserted into reality. It is a state of the field itself.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. ONE-LINE CLOSURE</h3>
+<p>Particles arise as localized excitations of continuous fields.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">FINAL INSIGHT</h3>
+<p style="margin-bottom: 0;">Symmetry is not structure—it is the condition before structure.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 1 Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Fundamental Identity:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\text{Particle} \\equiv \\text{Excited state of a field}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The vacuum transitions from a state of rest to a localized disturbance, representing the first departure from the void toward manifestation.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Math: Field Excitations</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. CLASSICAL FIELD DEFINITION</h3>
+<p>A scalar field is defined as: $$\\phi = \\phi(x,t)$$ which assigns a value to every point in space-time.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. FIELD DYNAMICS (WAVE EQUATION)</h3>
+<p>The field evolution is governed by: $$\\Box \\phi + m^2 \\phi = 0$$ where: $$\\Box = \\partial_t^2 - \\nabla^2$$. This is the Klein–Gordon equation (classical form).</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. PLANE WAVE SOLUTIONS</h3>
+<p>The general solution consists of modes: $$\\phi(x,t) = A e^{i(kx - \\omega t)}$$ with dispersion relation: $$\\omega^2 = k^2 + m^2$$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. SUPERPOSITION &rarr; WAVE PACKET (LOCALIZED EXCITATION)</h3>
+<p>A localized excitation is formed by superposition: $$\\phi(x,t) = \\int A(k)\\, e^{i(kx - \\omega t)} \\, dk$$ This represents: <strong>a localized wave packet</strong>.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. ENERGY OF FIELD EXCITATION</h3>
+<p>The energy density of the field is: $$\\mathcal{E} = \\frac{1}{2} \\left[ (\\partial_t \\phi)^2 + (\\nabla \\phi)^2 + m^2 \\phi^2 \\right]$$ Total energy: $$E = \\int \\mathcal{E} \\, d^3x$$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. CONTINUOUS ENERGY SPECTRUM</h3>
+<p>At this stage: $$E = \\omega = \\sqrt{k^2 + m^2}$$ Energy is continuous, since k is continuous.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. INTERPRETATION (LINKED TO MODULE)</h3>
+<p style="text-align: center; font-style: italic; color: #f472b6;">$$\\text{Localized excitation} \\;\\Rightarrow\\; \\text{wave packet solution of field equation}$$</p>
+<p><strong>Particle (emerging)</strong> &approx; $$\\phi(x,t)$$ localized disturbance.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. KEY STRUCTURAL POINT</h3>
+<p>No quantization yet: $$E \\in \\mathbb{R}$$. Discreteness appears only in Module 2.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">FINAL LINE (FOR CONSISTENCY)</h3>
+<p style="margin-bottom: 0; text-align: center; font-weight: bold; color: #f472b6;">$$\\text{Particle} \\equiv \\text{localized solution of field equation}$$</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Mathematical Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Klein-Gordon Operator:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\left( \\Box + m^2 \\right) \\phi = 0$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The wave packet represents the first mathematical step from a vacuum field to a localized structural entity.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>AMPLITUDE (A)</span><input type="number" id="a_in" class="digital-entry" value="1.0" oninput="syncVal(this.value, 'a_sl')"></div><input type="range" id="a_sl" min="0.1" max="2" step="0.1" value="1.0" oninput="syncVal(this.value, 'a_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">LOCAL DISTURBANCE</span><div style="text-align:center; font-size: 0.9rem;">Localized propagating excitation in field $\\phi$<p>Energy:→ Continuous (Not Quantized)</p></div>`,
+lawBox: `<div class="definition-box"><span class="def-title">CORE INSIGHT</span><div style="text-align:center; font-size: 0.8rem;">Particles originate as localized excitations of a continuous field.</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">State</span><span class="const-val">CONTINUOUS</span></div><div class="const-item"><span class="const-label">Entity</span><span class="const-val">CONTINUOUS WAVE PACKET</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-excitation);">FIELD COHERENCE: 100%</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.95rem;">Field Excitation<br>↓<br>Propagation<br>↓<br>Continuous Energy Mode`,
+hierarchy: `<div style="color: var(--accent-excitation); font-weight: bold; font-size: 0.95rem;">Field State: Continuously Excited</div>`,
+footer: "The field is no longer in the vacuum state. It carries energy through motion.",
+rightNote: `<div style="color: #818cf8; line-height: 1.4; font-size: 0.95rem;">Before quantization, excitations possess a continuous energy spectrum.<p>$\\omega_k = \\sqrt{k^2 + m^2}$<br>Excitation frequency determined by field mass (Stage 46)</p>`
+},
+
+2: {
+title: "MODE STRUCTURE (SPECTRUM)",
+result: "Quantization defines discrete particle states",
+resultSize: "0.75rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Mode Structure (Spectrum)</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<p style="text-align: center; color: #38bdf8; font-weight: bold;">Quantization defines discrete particle states</p>
+
+<h3 style="color: #38bdf8; margin-bottom: 10px;">🔷 CONCEPTUAL FOUNDATION</h3>
+<p>A localized field excitation (Module 1) is not a single entity but a superposition of fundamental modes. Each field configuration can be decomposed into: $$\\text{Field} \\;\\rightarrow\\; \\text{Sum of modes}$$. These modes are characterized by: Wavevector k, Frequency $\\omega$, and Energy $E = \\omega$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 FOURIER MODE DECOMPOSITION</h3>
+<p>Any field $\\phi(x,t)$ can be expressed as: $$\\phi(x,t) = \\int A(k)\\, e^{i(kx - \\omega t)} \\, dk$$. This represents: <strong>a continuous spectrum of modes</strong>. Each value of k corresponds to a distinct excitation mode.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 CONTINUOUS SPECTRUM</h3>
+<p>At this stage: k takes continuous values, and Energy is therefore continuous: $$\\omega(k) = \\sqrt{k^2 + m^2}$$. Thus: $E \\in \\mathbb{R}$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 PHYSICAL MEANING OF MODES</h3>
+<p>Each mode represents: A possible excitation pattern of the field, a propagating structure, and a stable dynamical solution. However: <strong>These are not yet particles</strong>. They are: <strong>building blocks of particle states</strong>.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 TRANSITION IN UNDERSTANDING</h3>
+<p>We move from: Module 1 &rarr; localized wave packet, to: Module 2 &rarr; decomposition into fundamental modes: $$\\text{Wave Packet} \\;\\Rightarrow\\; \\text{Sum of modes}$$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 GRAPH INTERPRETATION (MANDATORY)</h3>
+<p>The central visualization shows field mode structure in continuous k-space. <strong>Axes interpretation:</strong> One axis &rarr; propagation direction (linked to k); Other axes &rarr; field components (real/imaginary or amplitude space). <strong>What the curves represent:</strong> Each curve corresponds to a single mode; The family of curves represents different values of k. <strong>Key insights:</strong> The excitation is not single-valued — it spans multiple modes; Each mode has a distinct frequency and energy; The spectrum is continuous (no gaps); Modes propagate smoothly &rarr; stability of field dynamics; The structure exists in mode space (k-space), not just position space. <strong>Interpretation:</strong> $$\\text{Field excitation} \\;\\rightarrow\\; \\text{continuous spectrum of modes}$$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 IMPORTANT CLARIFICATION</h3>
+<p>At this stage: No quantization yet, No discrete particle number, No operators. <strong>Only: continuous mode structure</strong>.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 STRUCTURAL ROLE IN STAGE 47</h3>
+<p>This module establishes: $$\\text{Excitation} \\;\\rightarrow\\; \\text{Mode decomposition}$$. Next module will introduce: $$\\text{Modes} \\;\\rightarrow\\; \\text{Quantized states}$$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 CONCEPTUAL BRIDGE</h3>
+<p>This is the exact transition point: From wave description &rarr; To particle description (next step).</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 FINAL INSIGHT</h3>
+<p>A particle is not a single wave— <strong>It is a quantized excitation of a specific field mode</strong>.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 ONE-LINE CLOSURE</h3>
+<p style="margin-bottom: 0;">Field excitations decompose into a continuous spectrum of modes.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 2 Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Spectrum State:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\phi(k) = \\mathcal{F}\\{\\phi(x)\\}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The localized excitation is resolved into its constituent frequency modes, providing the necessary spectral building blocks for future quantization into discrete states.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Math: Mode Structure (Continuous Spectrum)</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">🔷 1. FIELD AS SUPERPOSITION OF MODES</h3>
+<p>The field is expressed as a Fourier decomposition:</p>
+<p style="text-align: center; color: #f472b6;">$$\\phi(x,t) = \\int \\frac{d^3 k}{(2\\pi)^3} \\, A(\\mathbf{k}) \\, e^{i(\\mathbf{k}\\cdot \\mathbf{x} - \\omega t)}$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 2. DISPERSION RELATION</h3>
+<p>Each mode satisfies: $$\\omega^2 = k^2 + m^2$$. Thus: $$\\omega(\\mathbf{k}) = \\sqrt{\\mathbf{k}^2 + m^2}$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 3. ENERGY–MOMENTUM RELATION</h3>
+<p>For each mode: $$E = \\omega, \\quad \\mathbf{p} = \\mathbf{k}$$. Hence: $$E^2 = p^2 + m^2$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 4. CONTINUOUS SPECTRUM</h3>
+<p>Since $\\mathbf{k} \\in \\mathbb{R}^3$, we have $E(\\mathbf{k}) \\in \\mathbb{R}$. <strong>👉 Energy spectrum is continuous</strong></p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 5. MODE AMPLITUDE DISTRIBUTION</h3>
+<p>The function $A(\\mathbf{k})$ determines the contribution of each mode and the shape of the excitation.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 6. LOCALIZED WAVE PACKET (RECONNECTION TO MODULE 1)</h3>
+<p>A localized excitation arises from: $$A(\\mathbf{k}) = e^{-(\\mathbf{k} - \\mathbf{k}_0)^2 / \\sigma^2}$$ leading to: $$\\phi(x,t) = \\int d^3k \\, A(\\mathbf{k}) e^{i(\\mathbf{k}\\cdot \\mathbf{x} - \\omega t)}$$. <strong>👉 Superposition of modes &rarr; localization</strong></p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 7. ENERGY OF MODE DISTRIBUTION</h3>
+<p>Total energy: $$E = \\int d^3k \\, |A(\\mathbf{k})|^2 \\, \\omega(\\mathbf{k})$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 8. KEY STRUCTURAL STATEMENT</h3>
+<p style="text-align: center; font-style: italic; color: #f472b6;">$$\\text{Field excitation} \\;\\Rightarrow\\; \\text{continuous distribution over modes}$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 9. PRE-QUANTIZATION CONDITION</h3>
+<p>No discreteness: Modes are labeled continuously by $\\mathbf{k}$, and there are <strong>no integer occupation numbers</strong>.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 FINAL LINE</h3>
+<p style="margin-bottom: 0; text-align: center; font-weight: bold; color: #f472b6;">$$\\text{Particle (emerging)} \\equiv \\text{mode structure of field (continuous)}$$</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Mathematical Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Spectral Density:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\rho(E) = \\frac{d^3k}{dE}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The excitation is resolved into a continuous manifold of frequencies, where identity is defined by a specific distribution in k-space rather than a singular point.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>WAVEVECTOR (k)</span><input type="number" id="k_in" class="digital-entry" value="1.0" oninput="syncVal(this.value, 'k_sl')"></div><input type="range" id="k_sl" min="0.5" max="5" step="0.5" value="1.0" oninput="syncVal(this.value, 'k_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">SPECTRAL MODES</span><div style="text-align:center; font-size: 0.9rem;">$\\omega_k = \\sqrt{k^2 + m^2}$<br>Each k defines an allowed excitation mode</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">CORE INSIGHT</span><div style="text-align:center; font-size: 0.8rem;">Each particle will corresponds to a quantized excitation of a field mode.</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Spectrum</span><span class="const-val">FOURIER DECOMPOSITION</span></div><div class="const-item"><span class="const-label">Entity</span><span class="const-val">CONTINUOUS k-MODES</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-mode);">MODE STABILITY: PROPAGATING</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem; line-height: 1.2;">Mode Decomposition<br>↓<br>Continuous k-Spectrum<br>↓<br>Energy–Momentum Relation`,
+hierarchy: `<div style="color: var(--accent-mode); font-weight: bold; font-size: 0.85rem; margin-bottom: 0;">Mode: Continuously labeled by k<p>At this stage, the spectrum is continuous — quantization is introduced in the next module</p></div>`,
+footer: "We move from 'waves' to 'modes'. The structure of the particle is beginning to emerge.",
+rightNote: `<div style="color: #818cf8; line-height: 1.2; font-size: 0.85rem;">The mode structure organizes field excitations into a continuous momentum spectrum.<p>$E_k = \\omega_k = \\sqrt{k^2 + m^2}$<br>Energy of each mode determined by field mass (Stage 46)</p>`
+},
+
+3: {
+title: "QUANTIZATION",
+result: "Field modes determine particle identity",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Quantization — Discrete Energy Spectrum</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<p style="text-align: center; color: #38bdf8; font-weight: bold;">Field modes determine particle identity</p>
+
+<h3 style="color: #38bdf8; margin-bottom: 10px;">🔷 CONCEPTUAL FOUNDATION</h3>
+<p>In Module 2, the field was decomposed into continuous modes labeled by k. Now the key shift occurs: <strong>👉 Each mode is no longer continuously excited</strong> and <strong>👉 It can only exist in discrete energy states</strong>.</p>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">$$\\text{Mode} \\;\\Rightarrow\\; \\text{Quantized excitation}$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 CORE PRINCIPLE</h3>
+<p>Each field mode behaves like a harmonic oscillator. Thus its energy becomes: $E_n = \\left(n + \\tfrac{1}{2}\\right)\\hbar \\omega$ with $n = 0,1,2,\\dots$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 MEANING OF QUANTIZATION</h3>
+<p>Energy is not continuous anymore; only discrete levels are allowed, and transition occurs in finite steps. The jump: $n = 0 \\rightarrow 1$ represents: <strong>👉 creation of one particle</strong>.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 PARTICLE DEFINITION (FIRST EXACT STATEMENT)</h3>
+<p>A particle is: <strong>$$\\boxed{\\text{One quantum of excitation of a field mode}}$$</strong></p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 ROLE OF PLANCK CONSTANT</h3>
+<p>$\\hbar \\neq 0 \\;\\Rightarrow\\; \\text{discreteness}$. It sets the scale of quantum jumps and converts continuous oscillation &rarr; discrete energy ladder.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 OCCUPATION NUMBER</h3>
+<p>Each mode carries: $n = 0,1,2,\\dots$. Meaning: n=0 &rarr; vacuum (no particle); n=1 &rarr; one particle; n=2 &rarr; two particles (same mode).</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 STRUCTURAL TRANSITION</h3>
+<p>We now have: $$\\text{Continuous spectrum} \\;\\Rightarrow\\; \\text{Discrete quanta}$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 GRAPH INTERPRETATION</h3>
+<p>The central visualization shows a quantized energy ladder. <strong>Axes:</strong> Vertical &rarr; Energy E; Horizontal plane &rarr; mode configuration / spatial degrees; Discrete layers &rarr; allowed energy levels. <strong>Key elements in graph:</strong></p>
+<ul>
+<li><strong>1. Discrete Levels:</strong> Horizontal planes represent $E_n = (n + \\tfrac{1}{2})\\hbar\\omega$. No states exist in between.</li>
+<li><strong>2. Highlighted Quantum (yellow marker):</strong> Represents n = 1, the <strong>👉 single particle state</strong>.</li>
+<li><strong>3. Level Transitions:</strong> Movement between levels $n \\rightarrow n+1$ corresponds to absorption / emission and particle creation / annihilation.</li>
+<li><strong>4. Zero-Point Energy:</strong> Even at n = 0, we have $E_0 = \\tfrac{1}{2}\\hbar\\omega$. <strong>👉 Vacuum is not empty.</strong></li>
+</ul>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 PHYSICAL INTERPRETATION</h3>
+<p>This module establishes: <strong>👉 Reality is granular at the field level</strong>. There is no continuous excitation energy, only discrete quanta.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 STRUCTURAL ROLE IN STAGE 47</h3>
+<p>This is the decisive step: $$\\text{Field} \\;\\rightarrow\\; \\text{Modes} \\;\\rightarrow\\; \\text{Quanta}$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 BRIDGE FORWARD</h3>
+<p>Next modules will show: how these quanta acquire identity (Module 4) and how they become observable particles (Module 5).</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 FINAL INSIGHT</h3>
+<p>A particle is not a point object— <strong>👉 It is a quantized state of a field mode</strong>.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 ONE-LINE CLOSURE</h3>
+<p style="margin-bottom: 0;">Field excitations become particles when their energy is quantized.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 3 Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Quantization Condition:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\hat{H} = \\sum_k \\hbar \\omega_k \\left( \\hat{a}_k^\\dagger \\hat{a}_k + \\frac{1}{2} \\right)$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The continuous field resolved in Module 2 is now restricted into discrete energy packets, establishing the fundamental granularity of physical existence.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Math: Quantization of Field Modes</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">🔷 1. CLASSICAL MODE DECOMPOSITION (FROM MODULE 2)</h3>
+<p>$$\\phi(x,t) = \\int \\frac{d^3 k}{(2\\pi)^3} \\, A(\\mathbf{k}) \\, e^{i(\\mathbf{k}\\cdot \\mathbf{x} - \\omega_k t)}$$ with: $$\\omega_k = \\sqrt{\\mathbf{k}^2 + m^2}$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 2. PROMOTION TO OPERATORS</h3>
+<p>Quantization replaces amplitudes by operators: $$A(\\mathbf{k}) \\;\\rightarrow\\; a_{\\mathbf{k}}, \\quad A^*(\\mathbf{k}) \\;\\rightarrow\\; a_{\\mathbf{k}}^\\dagger$$ Thus: $$\\phi(x,t) = \\int \\frac{d^3 k}{(2\\pi)^3} \\frac{1}{\\sqrt{2\\omega_k}} \\left( a_{\\mathbf{k}} e^{i(\\mathbf{k}\\cdot x - \\omega_k t)} + a_{\\mathbf{k}}^\\dagger e^{-i(\\mathbf{k}\\cdot x - \\omega_k t)} \\right)$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 3. COMMUTATION RELATIONS</h3>
+<p>$$[a_{\\mathbf{k}}, a_{\\mathbf{k}'}^\\dagger] = (2\\pi)^3 \\delta^3(\\mathbf{k} - \\mathbf{k}')$$ $$[a_{\\mathbf{k}}, a_{\\mathbf{k}'}] = 0 \\quad,\\quad [a_{\\mathbf{k}}^\\dagger, a_{\\mathbf{k}'}^\\dagger] = 0$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 4. HAMILTONIAN (ENERGY OPERATOR)</h3>
+<p>$$H = \\int \\frac{d^3 k}{(2\\pi)^3} \\, \\omega_k \\left(a_{\\mathbf{k}}^\\dagger a_{\\mathbf{k}} + \\tfrac{1}{2}\\right)$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 5. NUMBER OPERATOR</h3>
+<p>$$N_{\\mathbf{k}} = a_{\\mathbf{k}}^\\dagger a_{\\mathbf{k}}$$ Eigenvalues: $$N_{\\mathbf{k}} |n_{\\mathbf{k}}\\rangle = n_{\\mathbf{k}} |n_{\\mathbf{k}}\\rangle \\quad,\\quad n_{\\mathbf{k}} = 0,1,2,\\dots$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 6. ENERGY SPECTRUM PER MODE</h3>
+<p>$$E_{n_{\\mathbf{k}}} = \\left(n_{\\mathbf{k}} + \\tfrac{1}{2}\\right)\\omega_k$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 7. VACUUM STATE</h3>
+<p>$$a_{\\mathbf{k}} |0\\rangle = 0$$ $$E_0 = \\int \\frac{d^3 k}{(2\\pi)^3} \\tfrac{1}{2}\\omega_k$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 8. PARTICLE CREATION</h3>
+<p>$$|1_{\\mathbf{k}}\\rangle = a_{\\mathbf{k}}^\\dagger |0\\rangle$$ $$N_{\\mathbf{k}} |1_{\\mathbf{k}}\\rangle = 1 \\cdot |1_{\\mathbf{k}}\\rangle$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 9. GENERAL MULTI-PARTICLE STATE</h3>
+<p>$$|n_{\\mathbf{k}}\\rangle = \\frac{(a_{\\mathbf{k}}^\\dagger)^n}{\\sqrt{n!}} |0\\rangle$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 10. KEY STRUCTURAL STATEMENT</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">$$\\text{Particle} \\equiv a_{\\mathbf{k}}^\\dagger |0\\rangle$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 FINAL LINE</h3>
+<p style="margin-bottom: 0; text-align: center; font-style: italic;">$$\\text{Field modes} \\;\\Rightarrow\\; \\text{quantized operators} \\;\\Rightarrow\\; \\text{particles as quanta}$$</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Mathematical Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Operator Mapping:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\hat{\\phi} = \\sum (\\text{Creation} + \\text{Annihilation})$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The continuous amplitudes are replaced by discrete ladder operators, transforming the wave function into a multi-body occupation space.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>OCCUPATION NUMBER (n)</span><input type="number" id="n_in" class="digital-entry" value="1" oninput="syncVal(this.value, 'n_sl')"></div><input type="range" id="n_sl" min="0" max="5" step="1" value="1" oninput="syncVal(this.value, 'n_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">DISCRETE ENERGY LEVELS</span><div style="text-align:center; font-size: 0.9rem;">$E_n = \\left(n + \\tfrac{1}{2}\\right)\\hbar \\omega$</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">CORE INSIGHT</span><div style="text-align:center; font-size: 0.9rem;">A particle is a single quantum of a field mode excitation.</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Step</span><span class="const-val">QUANTUM</span></div><div class="const-item"><span class="const-label">Entity</span><span class="const-val">DISCRETE EXCITATION</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.95rem; color:var(--accent-quantum);">PLANCK CONSTANT: ACTIVE ($\\hbar$)</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.95rem;">Field Mode<br>↓<br>Creation / Annihilation Operators<br>↓<br>Quantized Energy Levels`,
+hierarchy: `<div style="color: var(--accent-quantum); font-weight: bold; font-size: 0.95rem;">State: Quantized (Discrete Spectrum)</div>`,
+footer: "The transition n=0 $\\rightarrow$ 1 corresponds to the creation of one particle.",
+rightNote: `<div style="color: #c084fc; line-height: 1.4; font-size: 0.95rem;">Field excitations occur in discrete quanta.`
+},
+
+4: {
+title: "PARTICLE IDENTITY",
+result: "On-shell excitations correspond to physical particles",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Particle Identity — Field-Defined Signatures</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<p style="text-align: center; color: #38bdf8; font-weight: bold;">On-shell excitations correspond to physical particles</p>
+
+<h3 style="color: #38bdf8; margin-bottom: 10px;">🔷 CONCEPTUAL FOUNDATION</h3>
+<p>In Module 3, we obtained: $$\\text{Particles} = \\text{quantized excitations of field modes}$$. But this is not yet complete. <strong>👉 We must now answer:</strong> What distinguishes one particle from another?</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 CORE PRINCIPLE</h3>
+<p>A particle is defined not only by its existence (quantum), but by its: <strong>$$\\boxed{\\text{Symmetry-defined quantum numbers}}$$</strong></p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 IDENTITY STRUCTURE</h3>
+<p>Each particle carries a signature: Mass m, Charge q, Spin s, and Gauge quantum numbers (e.g., isospin, color, etc.).</p>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">$$\\text{Particle Identity} \\;\\equiv\\; (m,\\; q,\\; s,\\; \\text{gauge charges})$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 ORIGIN OF IDENTITY</h3>
+<p>These properties arise from: <strong>👉 Underlying field symmetries</strong></p>
+<p style="text-align: center; font-style: italic;">$$\\text{Field Symmetry} \\;\\Rightarrow\\; \\text{Representation} \\;\\Rightarrow\\; \\text{Conserved Quantities} \\;\\Rightarrow\\; \\text{Particle Identity}$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 SYMMETRY REPRESENTATION</h3>
+<p>Each field transforms under a symmetry group: U(1) &rarr; electric charge; SU(2) &rarr; weak isospin; SU(3) &rarr; color charge. <strong>👉 A particle corresponds to a specific representation of these groups.</strong></p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 STABILITY OF IDENTITY</h3>
+<p>The UI correctly states: <strong>👉 Symmetry representation: fixed</strong>. Meaning: Identity does not change continuously; it is structurally locked.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 DIFFERENT FIELDS &rarr; DIFFERENT PARTICLES</h3>
+<p>Each field defines a particle species: Electron field &rarr; electron; Quark field &rarr; quarks; Gauge field &rarr; bosons. $$\\text{Field} \\;\\Rightarrow\\; \\text{Particle species}$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 GRAPH INTERPRETATION</h3>
+<p>The central visualization shows particle identity space. <strong>Axes interpretation:</strong> One axis &rarr; spin / intrinsic structure; One axis &rarr; interaction strength (coupling); One axis &rarr; sector/group identity. <strong>Elements in the graph:</strong></p>
+<ul>
+<li><strong>1. Distinct clusters (Lepton / Quark / Boson sectors):</strong> Each cluster = different field type; Represents different symmetry representations.</li>
+<li><strong>2. Points within clusters:</strong> Individual particles within a species; Same field &rarr; different states.</li>
+<li><strong>3. Separation between clusters:</strong> Indicates structural distinction; Not continuous transition.</li>
+</ul>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">👉 Interpretation: Identity is discrete and symmetry-defined</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 KEY INSIGHT</h3>
+<p>Particles are not arbitrary objects— <strong>👉 They are allowed realizations of symmetry structure</strong>.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 STRUCTURAL ROLE IN STAGE 47</h3>
+<p>Now we have: $$\\text{Field} \\;\\Rightarrow\\; \\text{Modes} \\;\\Rightarrow\\; \\text{Quanta} \\;\\Rightarrow\\; \\text{Identity}$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 BRIDGE FORWARD</h3>
+<p>Next module will establish: <strong>👉 When these identities become physically observable particles</strong> (using on-shell condition).</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 FINAL INSIGHT</h3>
+<p>Identity is not accidental— <strong>👉 It is imposed by symmetry structure of the field</strong>.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 ONE-LINE CLOSURE</h3>
+<p style="margin-bottom: 0;">Fields define particle species; quanta define individual particles.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 4 Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Symmetry Signature:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\mathcal{Q} |\\psi\\rangle = q |\\psi\\rangle$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Identity is the locking of a quantum excitation into a specific mathematical representation of the field's underlying symmetry groups.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Math: Particle Identity from Symmetry Structure</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">🔷 1. FIELDS AND SYMMETRY GROUPS</h3>
+<p>Each field $\\phi$ transforms under a symmetry group G: $$\\phi \\;\\rightarrow\\; U(g)\\,\\phi, \\quad g \\in G$$ where: $U(g) = \\text{representation of } G$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 2. GENERATOR STRUCTURE</h3>
+<p>For continuous symmetries: $$U(g) = e^{i \\alpha^a T^a}$$ $T^a \\rightarrow$ generators of the group; $\\alpha^a \\rightarrow$ transformation parameters.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 3. CONSERVED CHARGES (NOETHER)</h3>
+<p>Each generator gives a conserved quantity: $$Q^a = \\int d^3x \\, J^{0a}(x)$$ with: $$\\partial_\\mu J^{\\mu a} = 0$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 4. CHARGE ACTING ON STATES</h3>
+<p>$$Q^a | \\psi \\rangle = q^a | \\psi \\rangle$$ <strong>👉 Eigenvalues $q^a$ define particle charges</strong>.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 5. REPRESENTATION LABELS</h3>
+<p>A particle state belongs to a representation R of G: $$|\\psi\\rangle \\in R$$ Examples: <strong>U(1):</strong> charge q; <strong>SU(2):</strong> isospin I; <strong>SU(3):</strong> color representation.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 6. CASIMIR OPERATORS (INVARIANT LABELS)</h3>
+<p>Group invariants define identity: $$C_2 = T^a T^a$$ $$C_2 |\\psi\\rangle = c_R |\\psi\\rangle$$ <strong>👉 $c_R$ labels the representation uniquely</strong>.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 7. SPIN FROM LORENTZ SYMMETRY</h3>
+<p>Under Lorentz group: $$\\psi \\;\\rightarrow\\; S(\\Lambda)\\,\\psi$$ Spin defined via: $$\\mathbf{J}^2 | \\psi \\rangle = s(s+1) | \\psi \\rangle$$ $$J_z | \\psi \\rangle = m_s | \\psi \\rangle$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 8. MASS FROM FIELD EQUATION</h3>
+<p>Mass arises from dispersion: $$E^2 = p^2 + m^2$$ Thus: $m = \\text{invariant mass of excitation}$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 9. COMPLETE IDENTITY OF A PARTICLE</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ \\text{Particle Identity} = (m,\\; s,\\; \\{q^a\\},\\; R) }$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 10. FIELD &rarr; PARTICLE SPECIES MAPPING</h3>
+<p>Each field defines a representation: $$\\phi_R \\;\\Rightarrow\\; \\text{particle species labeled by } R$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 11. MULTI-FIELD STRUCTURE</h3>
+<p>For multiple symmetries: $$G = U(1) \\times SU(2) \\times SU(3)$$ Particle labeled by: $(q,\\; I,\\; C)$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 12. KEY STRUCTURAL STATEMENT</h3>
+<p style="text-align: center; font-style: italic;">$$\\text{Identity} \\;\\equiv\\; \\text{eigenvalues of symmetry generators}$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 FINAL LINE</h3>
+<p style="margin-bottom: 0; text-align: center; font-weight: bold; color: #f472b6;">$$\\text{Fields} \\;\\Rightarrow\\; \\text{Representations} \\;\\Rightarrow\\; \\text{Quantum Numbers} \\;\\Rightarrow\\; \\text{Particle Identity}$$</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Mathematical Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Identity Vector:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\vec{I} = (m, s, q_i)$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Particle identity is mathematically finalized as a fixed set of eigenvalues, mapping the abstract field excitation to a specific entry in the universal particle spectrum.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>FIELD REPRESENTATION (SYMMETRY GROUP)</span><input type="number" id="t_in" class="digital-entry" value="1" oninput="syncVal(this.value, 't_sl')"></div><input type="range" id="t_sl" min="1" max="3" step="1" value="1" oninput="syncVal(this.value, 't_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">IDENTITY SPECS</span><div style="text-align:center; font-size: 0.9rem;">Mass, Charge, Spin, Gauge Quantum Numbers</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">CORE INSIGHT</span><div style="text-align:center; font-size: 0.9rem;">Fields define particle species; quanta define individual particles.</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Signature</span><span class="const-val">STABLE</span></div><div class="const-item"><span class="const-label">Entity</span><span class="const-val">PARTICLE SPECIES</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.95rem; color:var(--accent-identity);">SYMMETRY REPRESENTATION : FIXED</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Field Symmetry<br>↓<br>Symmetry Representation<br>↓<br>Conserved Quantum Numbers<br>↓<br>Particle Identity`,
+hierarchy: `<div style="color: var(--accent-identity); font-weight: bold; font-size:0.95rem;">Identity: Particle Species Defined</div>`,
+footer: "Different fields give rise to different particle species.",
+rightNote: `<div style="color: #fb7185; line-height: 1.4; font-size: 0.95rem;">Identity is structural, not accidental.`
+},
+
+5: {
+title: "PARTICLE REALITY",
+result: "Particle spectrum emerges from field structure",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing : Particle Reality — On-Shell Condition</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<p style="text-align: center; color: #38bdf8; font-weight: bold;">Particle spectrum emerges from field structure</p>
+
+<h3 style="color: #38bdf8; margin-bottom: 10px;">🔷 CONCEPTUAL FOUNDATION</h3>
+<p>From previous modules: $$\\text{Field} \\;\\Rightarrow\\; \\text{Modes} \\;\\Rightarrow\\; \\text{Quanta} \\;\\Rightarrow\\; \\text{Identity}$$ But one final question remains: <strong>👉 Which of these are physically observable?</strong></p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 CORE PRINCIPLE</h3>
+<p>A particle is physically real only if it satisfies: <strong>$$\\boxed{E^2 = p^2 + m^2}$$</strong> <strong>👉 This is the on-shell condition</strong></p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 MEANING OF ON-SHELL</h3>
+<p>“Shell” = energy–momentum relation surface. “On-shell” = lies exactly on this surface. $$\\text{On-shell} \\;\\Rightarrow\\; \\text{physically realizable state}$$ $$\\text{Off-shell} \\;\\Rightarrow\\; \\text{virtual / transient state}$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 PHYSICAL INTERPRETATION</h3>
+<p>Only on-shell excitations propagate stably, carry definite energy and momentum, and can be detected. <strong>👉 Therefore: $$\\boxed{\\text{Observable particle} = \\text{on-shell excitation of a field}}$$</strong></p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 STABILITY CONDITION</h3>
+<p>On-shell ensures: no decay due to inconsistency and coherent propagation. $$\\text{Stability} \\;\\Leftrightarrow\\; \\text{on-shell condition satisfied}$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 GRAPH INTERPRETATION</h3>
+<p>The central visualization shows energy–momentum structure. <strong>Axes:</strong> Vertical &rarr; total energy E; Horizontal &rarr; momentum p; Depth &rarr; rest mass m. <strong>Key elements:</strong></p>
+<ul>
+<li><strong>1. Mass Shell (circular boundary):</strong> Represents $E^2 = p^2 + m^2$. This is the allowed surface of reality.</li>
+<li><strong>2. Highlighted point (particle state):</strong> Lies exactly on the shell. <strong>👉 Meaning:</strong> physically valid particle; observable.</li>
+<li><strong>3. Interior region (off-shell):</strong> Points inside do not satisfy the relation. <strong>👉 Represent:</strong> virtual states; intermediate processes.</li>
+</ul>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">Interpretation: $$\\text{Reality} \\;\\Rightarrow\\; \\text{selection of on-shell states}$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 STRUCTURAL ROLE IN STAGE 47</h3>
+<p>Now the chain is complete: $$\\text{Field} \\rightarrow \\text{Mode} \\rightarrow \\text{Quantum} \\rightarrow \\text{Identity} \\rightarrow \\text{Reality}$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 KEY INSIGHT</h3>
+<p>Not every mathematical excitation is real— <strong>👉 Reality is a constraint-selected subset</strong>.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 FINAL INSIGHT</h3>
+<p>A particle is: <strong>👉 a stable, on-shell, quantized excitation of a field</strong>.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 ONE-LINE CLOSURE</h3>
+<p>On-shell state = physical particle</p>
+<p style="margin-top: 10px; font-style: italic; color: #f472b6; text-align: center;">(✔ Yes — your idea fits perfectly as a separate highlighted line)</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 5 Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Reality Constraint:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$P^2 = m^2$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The final stabilization of the field excitation, where only those states aligning with the mass-energy invariant emerge as observable physical particles.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Math: On-Shell Condition and Physical Particle Reality</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">🔷 1. RELATIVISTIC DISPERSION RELATION</h3>
+<p>For any excitation: $$E^2 = p^2 + m^2$$ or in covariant form: $$p^\\mu p_\\mu = m^2$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 2. ON-SHELL CONDITION</h3>
+<p style="text-align: center; color: #f472b6;">$$\\boxed{p^2 = m^2}$$</p>
+<p>where: $$p^2 = E^2 - \\mathbf{p}^2$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 3. FIELD EQUATION (KLEIN–GORDON)</h3>
+<p>$$(\\Box + m^2)\\,\\phi(x) = 0$$ Plane-wave solution: $$\\phi(x) \\sim e^{-ip\\cdot x}$$ gives: $$p^2 = m^2$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 4. ENERGY OF PHYSICAL MODES</h3>
+<p>$$E = \\sqrt{\\mathbf{p}^2 + m^2}$$ <strong>👉 Only these modes propagate as real particles</strong></p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 5. PROPAGATOR STRUCTURE</h3>
+<p>$$\\Delta(p) = \\frac{1}{p^2 - m^2 + i\\epsilon}$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 6. PHYSICAL PARTICLE = POLE OF PROPAGATOR</h3>
+<p>$$p^2 = m^2 \\;\\Rightarrow\\; \\text{pole}$$ <strong>👉 Observable particle corresponds to: $$\\boxed{\\text{Pole of propagator}}$$</strong></p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 7. OFF-SHELL VS ON-SHELL</h3>
+<p>$$p^2 \\neq m^2 \\;\\Rightarrow\\; \\text{off-shell (virtual)}$$ $$p^2 = m^2 \\;\\Rightarrow\\; \\text{on-shell (real)}$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 8. QUANTUM STATE CONDITION</h3>
+<p>$$H |p\\rangle = E |p\\rangle$$ with: $$E^2 = p^2 + m^2$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 9. LORENTZ INVARIANCE</h3>
+<p>Mass defined as invariant: $$m^2 = p^\\mu p_\\mu$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 10. STABILITY CRITERION</h3>
+<p><strong>Stable particle</strong> &Rightarrow; real on-shell solution.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 11. OBSERVABLE STATES</h3>
+<p>$$\\langle p | p \\rangle \\neq 0 \\quad \\text{only for on-shell states}$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 12. KEY STRUCTURAL STATEMENT</h3>
+<p style="text-align: center; font-style: italic; color: #f472b6;">$$\\text{Physical reality} \\;\\equiv\\; \\text{on-shell sector of field theory}$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 FINAL LINE</h3>
+<p style="margin-bottom: 0; text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ \\text{On-shell state} \\;=\\; \\text{physical particle} }$$</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Mathematical Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Final Constraint:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\delta(p^2 - m^2)$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The mathematical field is constrained to its on-shell solutions, locking the abstract quantum numbers into a stable, observable reality.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>MOMENTUM (p)</span><input type="number" id="p_in" class="digital-entry" value="1.0" oninput="syncVal(this.value, 'p_sl')"></div><input type="range" id="p_sl" min="0" max="10" step="0.5" value="1.0" oninput="syncVal(this.value, 'p_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">RELATIVISTIC STATE</span><div style="text-align:center; font-size: 0.9rem;">ON-SHELL CONDITION: $E^2 = p^2 + m^2$</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">CORE INSIGHT</span><div style="text-align:center; font-size: 0.8rem;">Physical reality consists of observable, on-shell particle excitations.</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Realization</span><span class="const-val">REALIZED</span></div><div class="const-item"><span class="const-label">Entity</span><span class="const-val">PARTICLE</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-reality);">OBSERVABLE STATE: ON-SHELL</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.95rem;">On-shell Condition<br>↓<br>Stable Propagation<br>↓<br>Observability`,
+hierarchy: `<div style="color: var(--accent-reality); font-weight: bold;">Reality: Observable Particle State</div>`,
+footer: `<div style="color: #4ade80; line-height: 1.4; font-size: 0.95rem;">The excitation is now a stable, observable particle.`,
+rightNote: `<div style="color: #4ade80; line-height: 1.4; font-size: 0.85rem;">A particle is the stable, observable manifestation of a field.`
+}
+};
+
+function syncVal(val, id) {
+const sliderId = id.includes('_in') ? id.replace('_in', '_sl') : id;
+const inputId = id.includes('_sl') ? id.replace('_sl', '_in') : id;
+if(document.getElementById(sliderId)) document.getElementById(sliderId).value = val;
+if(document.getElementById(inputId)) document.getElementById(inputId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+document.getElementById('brief-box-content').innerHTML = content.brief;
+document.getElementById('math-box-content').innerHTML = content.math;
+document.getElementById('control-sliders').innerHTML = content.sliders;
+
+// Dynamic Header update
+document.getElementById('active-module-title').innerText = content.title;
+const resultEl = document.getElementById('active-module-result');
+resultEl.innerText = content.result;
+resultEl.style.fontSize = content.resultSize || "0.65rem";
+
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('metrics-content').innerHTML = content.metricsContent;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+
+// NEW DYNAMIC INJECTIONS
+document.getElementById('structure-box-area').innerHTML = content.structure;
+document.getElementById('telemetry-area').innerHTML = content.telemetry;
+
+showScreen('briefing');
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() {
+showScreen('lab');
+setTimeout(() => { runLab(); window.dispatchEvent(new Event('resize')); }, 100);
+}
+
+function runLab() {
+const target = document.getElementById('plot-area');
+if (!target) return;
+let data = [];
+let layout = {
+paper_bgcolor: 'black', plot_bgcolor: 'black', margin: {t:60,b:10,l:0,r:0},
+showlegend: true,
+font: { family: 'sans-serif', size: 10 },
+legend: { font: { color: '#94a3b8' }, x: 0.8, y: 0.9 },
+scene: {
+xaxis: { title: 'Spatial X', visible: true, gridcolor: '#222', color: '#38bdf8' },
+yaxis: { title: 'Spatial Y', visible: true, gridcolor: '#222', color: '#38bdf8' },
+zaxis: { title: 'Amplitude Φ', visible: true, gridcolor: '#222', color: '#c084fc' },
+camera: { eye: { x: 1.5, y: 1.5, z: 1.2 } },
+aspectmode: 'cube'
+}
+};
+
+if (currentTool === 1) { // EXCITATIONS
+let a = parseFloat(document.getElementById('a_sl')?.value || 1.0);
+let x_v = [], y_v = [], z_v = [];
+
+for (let x = -5; x <= 5; x += 0.25) {
+for (let y = -5; y <= 5; y += 0.25) {
+let r = Math.sqrt(x * x + y * y);
+x_v.push(x);
+y_v.push(y);
+// Dynamic growth: 'a' physically scales the Z values
+z_v.push(a * Math.exp(-r * 0.5) * Math.cos(r - 2.0));
+}
+}
+
+data.push({
+type: 'mesh3d',
+x: x_v,
+y: y_v,
+z: z_v,
+intensity: z_v,
+colorscale: 'Blues',
+opacity: 0.8,
+name: 'Localized Field Excitation',
+showlegend: true
+});
+
+layout.title = {
+text: "LOCALIZED FIELD EXCITATION",
+font: { color: '#38bdf8', size: 16, weight: 'bold' }
+};
+
+layout.scene = {
+xaxis: {
+title: { text: 'Space Coordinate (x)', font: { color: '#ffffff', size: 10 } },
+gridcolor: 'rgba(255, 255, 255, 0.2)',
+tickfont: { color: '#ffffff', size: 9 }
+},
+yaxis: {
+title: { text: 'Space Coordinate (y)', font: { color: '#ffffff', size: 10 } },
+gridcolor: 'rgba(255, 255, 255, 0.2)',
+tickfont: { color: '#ffffff', size: 9 }
+},
+zaxis: {
+title: { text: 'Field Amplitude (Φ)', font: { color: '#f472b6', size: 11 } },
+gridcolor: 'rgba(255, 255, 255, 0.4)',
+tickfont: { color: '#f472b6', size: 10 },
+range: [-2.5, 2.5],
+autorange: false
+},
+camera: {
+eye: { x: 1.5, y: 1.5, z: 1.2 }
+}
+};
+
+layout.showlegend = true;
+layout.legend = {
+x: 0.05, // Moved to the far left
+y: 0.9,
+xanchor: 'left',
+font: { color: '#ffffff', size: 10 },
+bgcolor: 'rgba(15, 23, 42, 0.7)',
+bordercolor: '#38bdf8',
+borderwidth: 1
+};
+
+
+} else if (currentTool === 2) { // MODES
+let k = parseFloat(document.getElementById('k_sl')?.value || 1.0);
+let x_vals = [], y_vals = [], z_vals = [];
+
+for (let t = 0; t < 20; t += 0.1) {
+x_vals.push(t - 10);
+y_vals.push(Math.sin(t * k));
+z_vals.push(Math.cos(t * k));
+}
+
+data.push({
+type: 'scatter3d',
+mode: 'lines',
+x: x_vals,
+y: y_vals,
+z: z_vals,
+line: { color: '#818cf8', width: 6 },
+name: `Continuous k-Spectrum`
+});
+
+layout.title = {
+text: "FIELD MODE SPECTRUM (CONTINUOUS)",
+font: { color: '#818cf8', size: 16, weight: 'bold' }
+};
+
+layout.scene = {
+xaxis: {
+title: { text: 'Propagation Coordinate (x)', font: { color: '#ffffff', size: 10 } },
+gridcolor: 'rgba(255, 255, 255, 0.4)', // Brightened grid
+tickfont: { color: '#ffffff', size: 9 }
+},
+yaxis: {
+title: { text: 'Field Real Component (Re)', font: { color: '#ffffff', size: 10 } },
+gridcolor: 'rgba(255, 255, 255, 0.4)', // Brightened grid
+tickfont: { color: '#ffffff', size: 9 }
+},
+zaxis: {
+title: { text: 'Field Imaginary Component (Im)', font: { color: '#818cf8', size: 11 } },
+gridcolor: 'rgba(255, 255, 255, 0.5)', // Brightest grid for depth
+tickfont: { color: '#818cf8', size: 10 }
+},
+camera: {
+eye: { x: 1.8, y: 1.2, z: 1.2 }
+}
+};
+
+layout.showlegend = true;
+layout.legend = {
+x: 0.05,
+y: 0.9,
+xanchor: 'left',
+font: { color: '#ffffff', size: 10 },
+bgcolor: 'rgba(15, 23, 42, 0.7)',
+bordercolor: '#818cf8',
+borderwidth: 1
+};
+
+
+} else if (currentTool === 3) { // QUANTIZATION
+let n = parseInt(document.getElementById('n_sl')?.value || 1);
+
+// Drawing the energy rungs
+for (let i = 0; i <= 5; i++) {
+data.push({
+type: 'scatter3d',
+mode: 'lines',
+x: [-2, 2],
+y: [i, i],
+z: [0, 0],
+line: {
+color: i === n ? '#c084fc' : 'rgba(255, 255, 255, 0.1)', // Inactive levels now visible
+width: i === n ? 10 : 2
+},
+name: i === n ? `Active State (n=${n})` : `Level ${i}`
+});
+}
+
+if (n > 0) {
+data.push({
+type: 'scatter3d',
+mode: 'markers',
+x: [0],
+y: [n],
+z: [0],
+marker: { size: 15, color: '#facc15', symbol: 'diamond' },
+name: 'Particle Quantum'
+});
+}
+
+layout.title = {
+text: "QUANTIZED ENERGY SPECTRUM",
+font: { color: '#c084fc', size: 16, weight: 'bold' }
+};
+
+layout.scene = {
+xaxis: {
+title: { text: 'Spatial Extent (x)', font: { color: '#ffffff', size: 10 } },
+gridcolor: 'rgba(255, 255, 255, 0.4)', // Bright grid
+tickfont: { color: '#ffffff', size: 9 }
+},
+yaxis: {
+title: { text: 'Energy Level (n)', font: { color: '#c084fc', size: 11 } },
+gridcolor: 'rgba(255, 255, 255, 0.5)', // Brighter grid for vertical scale
+tickfont: { color: '#c084fc', size: 10 }
+},
+zaxis: {
+title: { text: 'Phase Amplitude (Ψ)', font: { color: '#ffffff', size: 10 } },
+gridcolor: 'rgba(255, 255, 255, 0.4)',
+tickfont: { color: '#ffffff', size: 9 },
+range: [-1, 1]
+},
+camera: {
+eye: { x: 2.0, y: 1.0, z: 0.5 } // Angled to show "shelves" of energy
+}
+};
+
+layout.showlegend = true;
+layout.legend = {
+x: 0.05,
+y: 0.9,
+xanchor: 'left',
+font: { color: '#ffffff', size: 10 },
+bgcolor: 'rgba(15, 23, 42, 0.7)',
+bordercolor: '#c084fc',
+borderwidth: 1
+};
+
+
+} else if (currentTool === 4) { // IDENTITY
+let type = parseInt(document.getElementById('t_sl')?.value || 1);
+let colors = ['#38bdf8', '#fb7185', '#4ade80'];
+let shapes = ['circle', 'diamond', 'square'];
+let names = ['Lepton Sector', 'Quark Sector', 'Gauge Boson Sector'];
+for(let i=0; i<3; i++) {
+data.push({
+type: 'scatter3d', mode: 'markers+lines', x: [i*2 - 2, i*2 - 2], y: [0, 2], z: [0, 0],
+marker: { size: i+1 === type ? 20 : 8, color: colors[i], symbol: shapes[i] },
+line: { color: colors[i], width: i+1 === type ? 5 : 1 },
+name: names[i]
+});
+}
+layout.title = { text: "FIELD-DEFINED PARTICLE IDENTITIES", font: { color: '#fb7185' } };
+layout.scene = {
+xaxis: { title: 'Sector ID (S)', visible: true, gridcolor: '#222', color: '#38bdf8' },
+yaxis: { title: 'Interaction Intensity (I)', visible: true, gridcolor: '#222', color: '#38bdf8' },
+zaxis: { title: 'Spin / Phase (s)', visible: true, gridcolor: '#222', color: '#c084fc' },
+camera: { eye: { x: 1.5, y: 1.5, z: 1.2 } },
+aspectmode: 'cube'
+};
+
+
+} else if (currentTool === 5) { // REALITY
+let p = parseFloat(document.getElementById('p_sl')?.value || 1.0);
+let m = 2.0;
+let e = Math.sqrt(p*p + m*m);
+data.push({
+type: 'scatter3d', mode: 'lines+markers', x: [0, p], y: [0, m], z: [0, e],
+line: { color: '#4ade80', width: 8 },
+marker: { size: 10, color: '#fff' },
+name: 'Total Energy E = √(p² + m²)'
+});
+let mx=[], my=[], me=[];
+for(let a=0; a<Math.PI*2; a+=0.1) {
+let tx = Math.cos(a)*3; let ty = Math.sin(a)*3;
+mx.push(tx); my.push(ty); me.push(Math.sqrt(tx*tx + ty*ty + m*m));
+}
+data.push({ type: 'scatter3d', mode: 'lines', x: mx, y: my, z: me, line: { color: '#eee', dash: 'dot' }, name: 'Mass Shell: E² = p² + m²' });
+layout.title = { text: "ON-SHELL PARTICLE REALITY", font: { color: '#4ade80' } };
+layout.scene = {
+xaxis: { title: 'Momentum (p)', visible: true, gridcolor: '#222', color: '#38bdf8' },
+yaxis: { title: 'Rest Mass (m)', visible: true, gridcolor: '#222', color: '#38bdf8' },
+zaxis: { title: 'Total Energy (E)', visible: true, gridcolor: '#222', color: '#c084fc' },
+camera: { eye: { x: 1.5, y: 1.5, z: 1.2 } },
+aspectmode: 'cube'
+};
+}
+
+
+Plotly.react('plot-area', data, layout, {responsive: true, displayModeBar: false});
+}
+
+function resetLab() {
+if(currentTool===1) syncVal(1.0, 'a_sl');
+if(currentTool===2) syncVal(1.0, 'k_sl');
+if(currentTool===3) syncVal(1, 'n_sl');
+if(currentTool===4) syncVal(1, 't_sl');
+if(currentTool===5) syncVal(1.0, 'p_sl');
+}
+
+window.onload = () => { showScreen('portal'); };
+</script>
+</body>
+</html>

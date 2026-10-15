@@ -1,0 +1,3693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 60 — Final Synthesis</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #3b82f6;
+--accent-recap: #94a3b8; --accent-onto: #60a5fa; --accent-unify: #c084fc; --accent-emerg: #f87171; --accent-final: #2dd4bf;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6;
+--accent-gold: #fbbf24;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-gold); font-family: sans-serif; font-size: 0.85rem; min-width: 450px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls, #nav-summary-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+#screen-lab.active { display: flex; flex-direction: column; height: calc(100vh - 50px); }
+
+#screen-portal { justify-content: flex-start; padding-top: 6dvh; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 60px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 2px; font-weight: bold; letter-spacing: 0.5px; padding-bottom: 0px; }
+.module-subtitle { text-align: center; font-family: sans-serif; color: var(--accent-gold); margin-bottom: 12px; font-weight: bold; letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.primary-constant-box { background: #000; border: 1px solid var(--accent-unified); padding: 2px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 8px; }
+.secondary-structure-box { background: rgba(59, 130, 246, 0.05); border: 1px dashed var(--accent-unified); padding: 3px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 12px; }
+
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(59, 130, 246, 0.05); border: 1px solid var(--accent-unified); padding: 5px; border-radius: 5px; margin-bottom: 8px; font-size: 0.7rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; }
+#plot-area { flex-grow: 1; width: 100%; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #fff; border: 1px solid var(--accent-unified); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer { width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem; color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 60 — FINAL SYNTHESIS</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">Final Synthesis</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">Unification of physics as a structured manifestation of substrate dynamics.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-recap);">
+<h2 style="color:var(--accent-recap);">1. Framework Recap</h2>
+<p>Complete chain overview.<br>Layered continuous structure.</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-onto);">
+<h2 style="color:var(--accent-onto);">2. Layered Ontology</h2>
+<p>Hierarchical mapping.<br>Fundamental vs. Emergent.</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-unify);">
+<h2 style="color:var(--accent-unify);">3. Theory Unification</h2>
+<p>QM, GR, and SM integration.<br>Substrate as the origin.</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-emerg);">
+<h2 style="color:var(--accent-emerg);">4. Emergence of Reality</h2>
+<p>Layered transformations.<br>Substrate to Observables.</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-final);">
+<h2 style="color:var(--accent-final);">5. Final Unified Statement</h2>
+<p>Self-consistent closure.<br>Complete structural mapping.</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-unified);">
+<h2 style="color:var(--accent-unified);">6. Stage 60 Summary</h2>
+<p>The Ultimate Physical Realization.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color:var(--accent-unified); text-align:center;">Stage 60 — Mathematical Structure Summary and Closure Theorem</h2>
+<section>
+<h3 style="color:#fbbf24;">1. Fundamental Substrate</h3>
+
+<p>
+\[
+K = |\nabla C|, \quad P = P_{\text{syn}}
+\]
+</p>
+
+<p>
+\[
+\mathcal{L}_0 = \{K, P\}
+\]
+</p>
+
+<h3 style="color:#fbbf24;">2. Layered Ontological Mapping</h3>
+
+<p>
+\[
+\mathcal{L}_0 \rightarrow \mathcal{L}_1 \rightarrow \mathcal{L}_2 \rightarrow \mathcal{L}_3 \rightarrow \mathcal{L}_4
+\]
+</p>
+
+<p>
+\[
+\mathcal{L}_{n+1} = \mathcal{F}_n(\mathcal{L}_n)
+\]
+</p>
+
+<h3 style="color:#fbbf24;">3. Emergence Cascade</h3>
+
+<p>
+\[
+(K, P) \rightarrow C_i \rightarrow (A_\mu, F_{\mu\nu}) \rightarrow (m, g, \Psi) \rightarrow g_{\mu\nu} \rightarrow \mathcal{O}_{\text{obs}}
+\]
+</p>
+
+<h3 style="color:#fbbf24;">4. Unified Functional Dependence</h3>
+
+<p>
+\[
+\mathcal{O}_{\text{obs}} = \mathcal{F}(K, P)
+\]
+</p>
+
+<h3 style="color:#fbbf24;">5. Theory Unification Condition</h3>
+
+<p>
+\[
+\mathcal{L}_{QM}, \mathcal{L}_{GR}, \mathcal{L}_{SM} \subseteq \mathcal{F}(K, P)
+\]
+</p>
+
+<p>
+\[
+\bigcup \text{(All Theories)} = \mathcal{F}(K, P)
+\]
+</p>
+
+<h3 style="color:#fbbf24;">6. Closure Condition</h3>
+
+<p>
+\[
+\forall \mathcal{O}, \quad \exists \, \mathcal{F} : \mathcal{O} = \mathcal{F}(K, P)
+\]
+</p>
+
+<h3 style="color:#fbbf24;">7. Reduction Principle</h3>
+
+<p>
+\[
+\forall \mathcal{L}_n, \quad \exists \, \mathcal{F}_n : \mathcal{L}_n = \mathcal{F}_n(K, P)
+\]
+</p>
+
+<p>
+\[
+\bigcup_n \mathcal{L}_n = \mathcal{F}(K, P)
+\]
+</p>
+
+<h3 style="color:#fbbf24;">8. Directionality Constraint</h3>
+
+<p>
+\[
+\mathcal{L}_0 \Rightarrow \mathcal{L}_n
+\]
+</p>
+
+<p>
+\[
+\frac{\partial \mathcal{L}_0}{\partial \mathcal{L}_n} = 0
+\]
+</p>
+
+<h3 style="color:#fbbf24;">9. Continuity Condition</h3>
+
+<p>
+\[
+\mathcal{F} \in C^{\infty}
+\]
+</p>
+
+<p>
+\[
+\lim_{\Delta K \to 0} \Delta \mathcal{O} = 0, \quad \lim_{\Delta P \to 0} \Delta \mathcal{O} = 0
+\]
+</p>
+
+<h3 style="color:#fbbf24;">10. Final Unified Expression</h3>
+
+<p>
+\[
+\text{Reality} = \mathcal{F}(K, P)
+\]
+</p>
+
+</div>
+
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 60 — Closure / Completion Theorem</h2>
+
+<div class="math-content" style="font-size: 0.95rem; line-height: 1.75; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Statement of the Theorem</h3>
+
+<p>
+<strong>Closure Theorem (Stage 60):</strong>
+All physical reality is a complete, self-consistent, and continuous manifestation of substrate parameters \(K\) and \(P\), such that every observable quantity, structure, and physical law is derivable as a function of \((K, P)\), with no independent entities, parameters, or external inputs.
+</p>
+
+<p>
+Formally:
+</p>
+
+<p>
+\[
+\forall \mathcal{O}, \quad \exists \, \mathcal{F} : \mathcal{O} = \mathcal{F}(K, P)
+\]
+</p>
+
+<h3 style="color:#fbbf24;">2. Completeness Condition</h3>
+
+<p>
+A physical theory is complete if and only if all observables are derivable from its fundamental variables.
+</p>
+
+<p>
+Here:
+</p>
+
+<p>
+\[
+\mathcal{L}_0 = \{K, P\}
+\]
+</p>
+
+<p>
+and for all layers:
+</p>
+
+<p>
+\[
+\forall \mathcal{L}_n, \quad \exists \, \mathcal{F}_n : \mathcal{L}_n = \mathcal{F}_n(K, P)
+\]
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+\[
+\bigcup_n \mathcal{L}_n = \mathcal{F}(K, P)
+\]
+</p>
+
+<p>
+No physical quantity lies outside this mapping.
+</p>
+
+<h3 style="color:#fbbf24;">3. Closure Condition</h3>
+
+<p>
+Closure requires that the mapping from substrate to observables is total and exhaustive:
+</p>
+
+<p>
+\[
+(K, P) \rightarrow \mathcal{O}_{\text{obs}}
+\]
+</p>
+
+<p>
+with no residual degrees of freedom.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+\[
+\frac{\partial \mathcal{O}}{\partial X} = 0 \quad \forall X \notin \{K, P\}
+\]
+</p>
+
+<h3 style="color:#fbbf24;">4. Self-Consistency Condition</h3>
+
+<p>
+All layers must be mutually consistent:
+</p>
+
+<p>
+\[
+\mathcal{F}_n(K, P) \Rightarrow \mathcal{F}_{n+1}(K, P)
+\]
+</p>
+
+<p>
+with no contradictions across layers.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+\[
+\mathcal{F}_n \subseteq \mathcal{F}_{n+1}
+\]
+</p>
+
+<h3 style="color:#fbbf24;">5. Directionality (Causality) Condition</h3>
+
+<p>
+Causation flows strictly from substrate to higher layers:
+</p>
+
+<p>
+\[
+\mathcal{L}_0 \Rightarrow \mathcal{L}_n
+\]
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+\[
+\frac{\partial \mathcal{L}_0}{\partial \mathcal{L}_n} = 0
+\]
+</p>
+
+<p>
+No upward causation exists.
+</p>
+
+<h3 style="color:#fbbf24;">6. Continuity Condition</h3>
+
+<p>
+All mappings are smooth:
+</p>
+
+<p>
+\[
+\mathcal{F} \in C^{\infty}
+\]
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+\[
+\lim_{\Delta K \to 0} \Delta \mathcal{O} = 0, \quad \lim_{\Delta P \to 0} \Delta \mathcal{O} = 0
+\]
+</p>
+
+<p>
+Ensuring continuous emergence of reality.
+</p>
+
+<h3 style="color:#fbbf24;">7. Unification Condition</h3>
+
+<p>
+All physical theories are embedded within the same structure:
+</p>
+
+<p>
+\[
+\mathcal{L}_{QM}, \mathcal{L}_{GR}, \mathcal{L}_{SM} \subseteq \mathcal{F}(K, P)
+\]
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+\[
+\bigcup \text{(All Theories)} = \mathcal{F}(K, P)
+\]
+</p>
+
+<h3 style="color:#fbbf24;">8. Minimal Ontology Condition</h3>
+
+<p>
+Only substrate variables are fundamental:
+</p>
+
+<p>
+\[
+\text{Fundamental Set} = \{K, P\}
+\]
+</p>
+
+<p>
+All other entities are emergent:
+</p>
+
+<p>
+\[
+\text{Emergent} = \mathcal{F}(K, P)
+\]
+</p>
+
+<h3 style="color:#fbbf24;">9. Final Closure Expression</h3>
+
+<p>
+The complete physical reality is given by:
+</p>
+
+<p>
+\[
+\text{Reality} = \mathcal{F}(K, P)
+\]
+</p>
+
+<p>
+This represents total structural closure.
+</p>
+
+<h3 style="color:#fbbf24;">10. Interpretation</h3>
+
+<p>
+The theorem establishes that:
+</p>
+
+<ul>
+<li>All physical phenomena arise from a single substrate</li>
+<li>No independent or unexplained entities remain</li>
+<li>All theories are unified within one structure</li>
+<li>Reality is continuous, layered, and self-consistent</li>
+</ul>
+
+<p>
+Thus, physics is fully closed both structurally and conceptually.
+</p>
+
+<h3 style="color:#fbbf24;">11. Final Theorem Statement</h3>
+
+<p>
+All physical reality is a complete, continuous, and self-consistent manifestation of substrate parameters (K, P), and no physical quantity exists outside $\mathcal{F}(K, P)$.
+</p>
+
+</div>
+
+</section>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div id="active-module-result" class="module-subtitle">--</div>
+<div class="primary-constant-box">
+<div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val">11.350</span></div>
+<div class="const-item"><span class="const-label">Synthesis P</span><span class="const-val">0.6900</span></div>
+</div>
+
+<div id="structure-box-area"></div>
+<div id="mapping-box-area"></div>
+
+<div class="diagnostic-panel">
+<span class="diag-title">Synthesis Telemetry</span>
+<div id="telemetry-area"></div>
+</div>
+
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-unified); font-size:0.75rem; cursor:pointer; padding:6px;">RECALIBRATE UNIFICATION</button>
+<div id="panel-footer-text" style="font-size: 0.85rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.3; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:8px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Synthesis Logic</span>
+<div id="metrics-content" style="font-size:0.65rem; font-family:monospace; line-height:1.3;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Structural Chain</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.65rem; color: var(--text-dim); line-height: 1.3; background: #000; padding: 5px; border-radius: 0px; border: 1px solid #222; margin-bottom: 0px; margin-top: auto;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "RECAP OF COMPLETE FRAMEWORK",
+result: "Coherent Layered Structure",
+resultSize: "0.90rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 60 — Module 1: Recap of Complete Framework (Coherent Layered Structure)</h2>
+
+<div class="briefing-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Conceptual Introduction</h3>
+
+<p>
+With the completion of Stages 1 through 59, this framework has systematically constructed a unified description of physical reality, beginning from fundamental triadic fields and culminating in cosmological phenomena. All physical quantities—interaction, mass, geometry, energy density, and large-scale structure—have been derived as necessary consequences of substrate parameters $K = |\\nabla C|$ and $P = P_{\\text{syn}}$.
+</p>
+
+<p>
+At this stage, a fundamental requirement arises:
+</p>
+
+<p>
+<strong>To establish a coherent global view of the entire framework as a single continuous structure.</strong>
+</p>
+
+<p>
+The purpose of this module is therefore not to introduce new elements, but to synthesize all prior developments into a unified structural narrative.
+</p>
+
+<p>
+This marks the transition from progressive derivation to total integration:
+</p>
+
+<p>
+$\\text{Sequential Development} \\;\\longrightarrow\\; \\text{Unified Structural Whole}$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">2. Structural Position of the Framework</h3>
+
+<p>
+The framework is constructed as a layered progression, where each stage emerges necessarily from the previous one. This progression follows a strict structural hierarchy:
+</p>
+
+<ul>
+<li>Triadic Fields $(N, C, M)$ as foundational reality</li>
+<li>Emergence of substrate parameters $(K, P)$</li>
+<li>Derivation of interaction and mass scales</li>
+<li>Formation of geometry and spacetime structure</li>
+<li>Extension to cosmological dynamics</li>
+<li>Resolution of dark sector phenomena</li>
+</ul>
+
+<p>
+Each layer is not independent but structurally dependent on the preceding layer.
+</p>
+
+<p>
+Thus, the framework forms a continuous chain:
+</p>
+
+<p>
+$\\text{Fields} \\;\\longrightarrow\\; (K, P) \\;\\longrightarrow\\; \\text{Physics} \\;\\longrightarrow\\; \\text{Cosmology}$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">3. Limitation of Fragmented Descriptions</h3>
+
+<p>
+In standard physics, different domains are treated as separate theories:
+</p>
+
+<ul>
+<li>Quantum mechanics for microscopic phenomena</li>
+<li>Gauge theory for interactions</li>
+<li>General relativity for gravity</li>
+<li>Cosmology for large-scale structure</li>
+</ul>
+
+<p>
+These descriptions are mathematically successful but remain fragmented. There is no single structural origin that unifies all domains.
+</p>
+
+<p>
+This leads to a fundamental limitation:
+</p>
+
+<p>
+$\\text{Multiple Theories} \\neq \\text{Unified Physical Origin}$
+</p>
+
+<p>
+The absence of a unifying substrate results in conceptual discontinuity across scales.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">4. Structural Insight from the Complete Chain</h3>
+
+<p>
+The synthesis framework resolves this fragmentation by establishing that all domains arise from the same underlying substrate structure.
+</p>
+
+<p>
+From previous stages:
+</p>
+
+<p>
+$g = f\\!\\left(\\frac{P}{K}\\right), \\quad m = f(K, P), \\quad \\rho = \\frac{K^2}{P}, \\quad H^2 \\sim P$
+</p>
+
+<p>
+Thus, interaction, mass, energy density, and cosmological expansion are unified under $(K, P)$.
+</p>
+
+<p>
+This implies:
+</p>
+
+<p>
+$\\text{All Physics} \\;\\sim\\; \\mathcal{F}(K, P)$
+</p>
+
+<p>
+The framework therefore provides a single generative source for all physical phenomena.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">5. Physical Interpretation</h3>
+
+<p>
+From the substrate perspective, reality is not composed of separate domains but is a continuous structured manifestation of a single underlying medium.
+</p>
+
+<p>
+Each observed phenomenon corresponds to a different level of structural expression:
+</p>
+
+<ul>
+<li>Quantum behavior reflects local substrate dynamics</li>
+<li>Interactions reflect symmetry expressions of substrate response</li>
+<li>Geometry reflects large-scale substrate configuration</li>
+<li>Cosmology reflects global substrate evolution</li>
+</ul>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Reality} = \\text{Layered Manifestation of Substrate Structure}$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">6. Necessity of Structural Continuity (Very Important)</h3>
+
+<p>
+A fundamental principle emerges:
+</p>
+
+<p>
+<strong>Physical reality must be structurally continuous across all scales.</strong>
+</p>
+
+<p>
+Without continuity:
+</p>
+
+<ul>
+<li>Different domains remain disconnected</li>
+<li>Constants appear arbitrary</li>
+<li>Transitions between scales remain unexplained</li>
+</ul>
+
+<p>
+The substrate framework ensures continuity by deriving all phenomena from the same parameters $(K, P)$.
+</p>
+
+<p>
+Thus, continuity is not an assumption but a structural necessity.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">7. Consistency Check</h3>
+
+<p>
+The unified structure preserves all successful predictions of existing theories:
+</p>
+
+<ul>
+<li>Quantum mechanics remains valid at microscopic scales</li>
+<li>Gauge theory remains valid as an effective interaction description</li>
+<li>General relativity remains valid as emergent geometry</li>
+<li>Cosmological observations remain fully reproduced</li>
+</ul>
+
+<p>
+Thus, the framework does not replace existing physics but integrates it into a deeper structure.
+</p>
+
+<p>
+Consistency is therefore maintained at all levels.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">8. Graph / Visualization Interpretation Paragraph (MANDATORY)</h3>
+
+<p>
+The visualization presents a rising curve representing structural integration across stages, with the horizontal axis denoting the stage sequence from foundational fields to cosmological completion, and the vertical axis representing structural integration intensity.
+</p>
+
+<p>
+Each point along the curve corresponds to a stage where a new layer of physical reality is derived and integrated into the overall framework.
+</p>
+
+<p>
+The smooth continuity of the curve indicates that each stage emerges naturally from the previous one without discontinuity.
+</p>
+
+<p>
+The upward trend signifies increasing structural completeness, culminating in a unified closure at Stage 60.
+</p>
+
+<p>
+This visualization encodes the essential insight:
+</p>
+
+<p>
+$\\text{Progressive Derivation} \\Rightarrow \\text{Coherent Unified Structure}$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">9. Conceptual Compression Lines</h3>
+
+<p>
+Physics is a continuous structure, not fragmented domains.<br>
+All phenomena arise from $(K, P)$.<br>
+Each stage is a necessary extension of the previous.<br>
+The universe is a unified structural manifestation.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">10. Logical Closure</h3>
+
+<p>
+This module establishes that the entire framework forms a single coherent structure. The progression from foundational fields to cosmological phenomena is continuous and unified.
+</p>
+
+<p>
+All previously derived results are now integrated into a complete structural chain.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">11. Transition to Next Module</h3>
+
+<p>
+Having established the unified structure of the framework, the next step is to examine its ontological organization—distinguishing between fundamental and emergent layers.
+</p>
+
+<p>
+This leads to Module 2, where the layered ontology of reality is formally established.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">12. Final Statement</h3>
+
+<p>
+The entire physical universe is a coherent, continuous manifestation of substrate dynamics governed by $K$ and $P$, forming a unified structural whole.
+</p>
+
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 60 — Module 1: Explicit Mathematics — Recap of Complete Framework</h2>
+
+<div class="math-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Starting Point: Fundamental Substrate Fields</h3>
+
+<p>
+The complete framework originates from the triadic field structure:
+</p>
+
+<p>
+$(N, C, M)$
+</p>
+
+<p>
+These fields generate the substrate parameters:
+</p>
+
+<p>
+$K = |\\nabla C|, \\quad P = P_{\\text{syn}}$
+</p>
+
+<p>
+All physical quantities must ultimately be expressed in terms of $(K, P)$.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">2. Structural Chain of Derivation</h3>
+
+<p>
+From previous stages, the full structural mapping is:
+</p>
+
+<p>
+$(N, C, M) \\;\\longrightarrow\\; (K, P) \\;\\longrightarrow\\; \\mathcal{O}_{\\text{phys}}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\mathcal{O}_{\\text{phys}} = \\mathcal{F}(K, P)$
+</p>
+
+<p>
+This establishes a single functional dependence for all observables.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">3. Absence of Independent Parameters</h3>
+
+<p>
+Standard formulations introduce independent quantities:
+</p>
+
+<ul>
+<li>$g$ (coupling constants)</li>
+<li>$m$ (mass parameters)</li>
+<li>$\\Lambda$ (cosmological constant)</li>
+<li>$\\rho_{\\text{DM}}$ (dark matter density)</li>
+</ul>
+
+<p>
+In the substrate formulation:
+</p>
+
+<p>
+$g = f\\!\\left(\\frac{P}{K}\\right), \\quad m = f(K, P), \\quad \\Lambda = P, \\quad \\rho = \\frac{K^2}{P}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\frac{\\partial \\mathcal{O}}{\\partial g} = 0, \\quad \\frac{\\partial \\mathcal{O}}{\\partial m} = 0, \\quad \\frac{\\partial \\mathcal{O}}{\\partial \\Lambda} = 0$
+</p>
+
+<p>
+All parameters are derived, not independent.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">4. Unified Interaction Structure</h3>
+
+<p>
+Interaction strength:
+</p>
+
+<p>
+$g = f\\!\\left(\\frac{P}{K}\\right)$
+</p>
+
+<p>
+Gauge fields:
+</p>
+
+<p>
+$A_\\mu = \\mathcal{A}_\\mu(K, P)$
+</p>
+
+<p>
+Field strength:
+</p>
+
+<p>
+$F_{\\mu\\nu} = \\mathcal{F}_{\\mu\\nu}(K, P)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Interaction} \\Rightarrow \\text{Function of } (K, P)$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">5. Unified Mass and Energy Structure</h3>
+
+<p>
+Mass:
+</p>
+
+<p>
+$m = f(K, P)$
+</p>
+
+<p>
+Energy density:
+</p>
+
+<p>
+$\\rho = \\frac{K^2}{P}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Matter Content} \\Rightarrow \\text{Function of } (K, P)$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">6. Unified Geometric Structure</h3>
+
+<p>
+Metric:
+</p>
+
+<p>
+$g_{\\mu\\nu} = \\mathcal{G}_{\\mu\\nu}(K, P)$
+</p>
+
+<p>
+Curvature:
+</p>
+
+<p>
+$G_{\\mu\\nu} = \\mathcal{R}_{\\mu\\nu}(K, P)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Geometry} \\Rightarrow \\text{Function of } (K, P)$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">7. Unified Cosmological Structure</h3>
+
+<p>
+Friedmann equation:
+</p>
+
+<p>
+$H^2 = \\frac{8\\pi G}{3} \\frac{K^2}{P} + \\frac{P}{3}$
+</p>
+
+<p>
+Acceleration:
+</p>
+
+<p>
+$\\frac{\\ddot{a}}{a} = P - \\frac{4\\pi G}{3} \\frac{K^2}{P}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Cosmology} \\Rightarrow \\text{Function of } (K, P)$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">8. Unified Observable Mapping</h3>
+
+<p>
+All observables satisfy:
+</p>
+
+<p>
+$\\mathcal{O} = \\mathcal{F}(K, P)$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\forall \\mathcal{O}, \\quad \\exists \\; (K, P)$
+</p>
+
+<p>
+No observable lies outside substrate dependence.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">9. Limit Case: Fragmented Theories</h3>
+
+<p>
+If $(K, P)$ are ignored:
+</p>
+
+<p>
+$\\mathcal{O} = \\mathcal{G}(g, m, \\Lambda, \\rho_{\\text{DM}})$
+</p>
+
+<p>
+This leads to:
+</p>
+
+<ul>
+<li>Independent constants</li>
+<li>Unrelated domains</li>
+<li>Phenomenological insertions</li>
+</ul>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Fragmented Physics} \\Rightarrow \\text{Lack of Structural Origin}$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">10. Structural Conclusion</h3>
+
+<p>
+The complete framework satisfies:
+</p>
+
+<p>
+$\\mathcal{O}_{\\text{universe}} = \\mathcal{F}(K, P)$
+</p>
+
+<p>
+All physical laws, constants, and observables emerge from substrate parameters.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Complete Physics} = \\text{Unified Function of } (K, P)$
+</p>
+
+<p>
+This establishes the mathematical closure of the framework as a single coherent structure.
+</p>
+
+</div>`,
+
+
+sliders: `<div class="control-item"><div class="label-group"><span>FRAMEWORK INTEGRATION</span><input type="number" id="f_in" class="digital-entry" value="60" oninput="syncVal(this.value, 'f_sl')"></div><input type="range" id="f_sl" min="0" max="100" step="1" value="60" oninput="syncVal(this.value, 'f_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.8rem;">Stage 1-59 &rarr; Coherent Unification</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Physics is a layered, continuous structure</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Scope</span><span class="const-val">COMPLETE</span></div><div class="const-item"><span class="const-label">Nature</span><span class="const-val">COHERENT</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-recap);">MODE: RECAPITULATING ALL STAGES</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Quantum Basics<br>↓<br>Interaction Symmetry<br>↓<br>Substrate Closure`,
+hierarchy: `<div style="color: var(--accent-recap); font-weight: bold; font-size: 0.95rem;">Full Structural Chain Realized</div>`,
+footer: "Physics is complete as a structured, continuous journey.",
+rightNote: `<div style="color: #94a3b8; line-height: 1.3; margin: 5px; font-size: 0.77rem;">Establishing the global narrative of the framework.<p><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">👉 This Module Establishes:<br>The unified chain overview from foundational K, P to cosmological observables.</p></div>`
+},
+
+2: {
+title: "LAYERED ONTOLOGY OF REALITY",
+result: "Fundamental vs. Emergent",
+resultSize: "0.80rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 60 — Module 2: Layered Ontology of Reality (Fundamental vs Emergent)</h2>
+
+<div class="briefing-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Conceptual Introduction</h3>
+
+<p>
+With Module 1, the framework established that physical reality is a coherent and continuous structure arising entirely from substrate dynamics governed by $K$ and $P$.
+</p>
+
+<p>
+However, coherence alone does not fully describe the organization of reality. A deeper question naturally arises:
+</p>
+
+<p>
+<strong>How is this unified structure internally organized?</strong>
+</p>
+
+<p>
+Although all phenomena arise from the same substrate, they do not appear at the same level of manifestation. Observable reality exhibits clear distinctions between fundamental quantities and derived phenomena.
+</p>
+
+<p>
+This module establishes that physical reality is not only unified but also hierarchically structured. It introduces the concept of a layered ontology, distinguishing between fundamental and emergent levels of existence.
+</p>
+
+<p>
+Thus, the structural transition is:
+</p>
+
+<p>
+$\\text{Unified Structure} \\;\\longrightarrow\\; \\text{Layered Ontology}$
+</p>
+
+<h3 style="color:#fbbf24;">2. Definition of Ontological Layers</h3>
+
+<p>
+An ontological layer is defined as a level of physical description characterized by a distinct degree of emergence from the substrate.
+</p>
+
+<p>
+The hierarchy can be expressed as:
+</p>
+
+<p>
+$\\text{Substrate} \\;\\longrightarrow\\; \\text{Field Potentials} \\;\\longrightarrow\\; \\text{Observable Reality}$
+</p>
+
+<p>
+Each successive layer represents a transformation of the underlying structure into more complex and measurable forms.
+</p>
+
+<p>
+Importantly, higher layers do not exist independently. They are fully determined by the lower layers.
+</p>
+
+<h3 style="color:#fbbf24;">3. Fundamental Layer: Substrate</h3>
+
+<p>
+The fundamental layer consists of the substrate defined by:
+</p>
+
+<p>
+$K = |\\nabla C|, \\quad P = P_{\\text{syn}}$
+</p>
+
+<p>
+This layer represents the true physical origin of all phenomena. It is not directly observable but determines all observable quantities.
+</p>
+
+<p>
+At this level:
+</p>
+
+<ul>
+<li>There are no particles or forces</li>
+<li>Only structural properties exist</li>
+<li>All dynamics arise from field interactions $(N, C, M)$</li>
+</ul>
+
+<p>
+Thus, the substrate is ontologically fundamental.
+</p>
+
+<h3 style="color:#fbbf24;">4. Intermediate Layer: Field Potentials</h3>
+
+<p>
+The next layer consists of effective field descriptions, including gauge fields and interaction potentials.
+</p>
+
+<p>
+These are expressed as:
+</p>
+
+<p>
+$A_\\mu = \\mathcal{A}_\\mu(K, P), \\quad F_{\\mu\\nu} = \\mathcal{F}_{\\mu\\nu}(K, P)$
+</p>
+
+<p>
+At this level, physical behavior is described in terms of fields, symmetries, and interactions.
+</p>
+
+<p>
+However, these fields are not fundamental. They are effective representations of substrate dynamics.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Fields} = \\text{Emergent descriptions of substrate structure}$
+</p>
+
+<h3 style="color:#fbbf24;">5. Emergent Layer: Observable Reality</h3>
+
+<p>
+The highest layer consists of directly measurable phenomena:
+</p>
+
+<ul>
+<li>Particles and masses</li>
+<li>Forces and interactions</li>
+<li>Macroscopic structures and cosmology</li>
+</ul>
+
+<p>
+These are governed by relations such as:
+</p>
+
+<p>
+$m = f(K, P), \\quad g = f\\!\\left(\\frac{P}{K}\\right), \\quad \\rho = \\frac{K^2}{P}$
+</p>
+
+<p>
+At this level, physical laws appear as empirical regularities.
+</p>
+
+<p>
+However, these laws are not fundamental—they are manifestations of deeper structure.
+</p>
+
+<h3 style="color:#fbbf24;">6. Fundamental vs Emergent Distinction</h3>
+
+<p>
+A precise distinction can now be established:
+</p>
+
+<p>
+$\\text{Fundamental} \\equiv \\text{Independent structural origin}$
+</p>
+
+<p>
+$\\text{Emergent} \\equiv \\text{Derived from underlying structure}$
+</p>
+
+<p>
+Thus:
+</p>
+
+<ul>
+<li>$K, P$ are fundamental</li>
+<li>$A_\\mu, F_{\\mu\\nu}$ are emergent (intermediate)</li>
+<li>$m, g, \\rho$ are emergent (observable)</li>
+</ul>
+
+<p>
+This resolves a major conceptual ambiguity in physics: what is truly fundamental and what is derived.
+</p>
+
+<h3 style="color:#fbbf24;">7. Direction of Causation</h3>
+
+<p>
+The ontological hierarchy imposes a strict direction of causation:
+</p>
+
+<p>
+$\\text{Substrate} \\;\\Rightarrow\\; \\text{Fields} \\;\\Rightarrow\\; \\text{Observables}$
+</p>
+
+<p>
+There is no reverse dependence:
+</p>
+
+<p>
+$\\text{Observables} \\not\\Rightarrow \\text{Substrate}$
+</p>
+
+<p>
+Thus, higher layers cannot define or modify lower layers; they can only reflect them.
+</p>
+
+<h3 style="color:#fbbf24;">8. Necessity of Layered Structure</h3>
+
+<p>
+A layered ontology is not optional—it is structurally necessary.
+</p>
+
+<p>
+If all quantities were treated as equally fundamental:
+</p>
+
+<ul>
+<li>Physical constants would remain unexplained</li>
+<li>Different theories would remain disconnected</li>
+<li>No unified derivation would exist</li>
+</ul>
+
+<p>
+The hierarchy ensures that complexity emerges from simplicity.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$\\text{Complexity} \\;\\text{is emergent, simplicity is fundamental}$
+</p>
+
+<h3 style="color:#fbbf24;">9. Graph / Visualization Interpretation Paragraph (MANDATORY)</h3>
+
+<p>
+The visualization presents a three-dimensional surface representing the emergence of physical reality from the substrate.
+</p>
+
+<p>
+The horizontal axes correspond to the fundamental substrate parameters and intermediate structural layers, while the vertical axis represents the degree of emergence or observable complexity.
+</p>
+
+<p>
+The central region of the surface represents the fundamental layer, where structure is simplest and most stable. As one moves outward and upward, the surface rises, indicating increasing complexity and emergence.
+</p>
+
+<p>
+The smooth continuity of the surface demonstrates that there are no discontinuities between layers. Each level transitions gradually into the next, reflecting a continuous structural transformation.
+</p>
+
+<p>
+Thus, the graph encodes:
+</p>
+
+<p>
+$\\text{Substrate} \\;\\Rightarrow\\; \\text{Layered Emergence} \\;\\Rightarrow\\; \\text{Observable Reality}$
+</p>
+
+<h3 style="color:#fbbf24;">10. Conceptual Compression Lines</h3>
+
+<p>
+Reality is hierarchically structured.<br>
+The substrate is fundamental.<br>
+Fields are intermediate representations.<br>
+Observables are emergent manifestations.<br>
+Complexity arises from simplicity.
+</p>
+
+<h3 style="color:#fbbf24;">11. Logical Closure</h3>
+
+<p>
+This module establishes the ontological structure of reality. It shows that physical existence is organized into a hierarchy of layers, all grounded in the substrate defined by $K$ and $P$.
+</p>
+
+<p>
+The distinction between fundamental and emergent is thus clearly defined and structurally justified.
+</p>
+
+<h3 style="color:#fbbf24;">12. Transition to Next Module</h3>
+
+<p>
+Having established the layered ontology of reality, the next step is to integrate all domains of physics within this hierarchy.
+</p>
+
+<p>
+This leads to Module 3, where quantum mechanics, gauge theory, and general relativity are unified within the substrate framework.
+</p>
+
+<h3 style="color:#fbbf24;">13. Final Statement</h3>
+
+<p>
+Physical reality is a layered hierarchy in which all observable phenomena emerge from a fundamental substrate governed by $K$ and $P$, establishing a precise distinction between fundamental structure and emergent manifestation.
+</p>
+
+</div>`,
+
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 60 — Module 2: Explicit Mathematics — Layered Ontology of Reality</h2>
+
+<div class="math-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Fundamental Definition of Ontological Layers</h3>
+
+<p>
+Define a hierarchy of physical description levels:
+</p>
+
+<p>
+$$
+\\mathcal{L}_0 \\rightarrow \\mathcal{L}_1 \\rightarrow \\mathcal{L}_2
+$$
+</p>
+
+<p>
+where:
+</p>
+
+<ul>
+<li>$\\mathcal{L}_0$: Substrate layer</li>
+<li>$\\mathcal{L}_1$: Field (intermediate) layer</li>
+<li>$\\mathcal{L}_2$: Observable layer</li>
+</ul>
+
+<p>
+Each layer is a functional transformation of the preceding one.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\mathcal{L}_{n+1} = \\mathcal{T}_n(\\mathcal{L}_n)
+$$
+</p>
+
+<h3 style="color:#fbbf24;">2. Substrate Layer (Fundamental Variables)</h3>
+
+<p>
+At the fundamental level:
+</p>
+
+<p>
+$$
+K = |\\nabla C|, \\quad P = P_{\\text{syn}}
+$$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\mathcal{L}_0 = \\{K(x), P(x)\\}
+$$
+</p>
+
+<p>
+These variables are independent and define the structural state of the system.
+</p>
+
+<p>
+No higher-level quantities determine them:
+</p>
+
+<p>
+$$
+\\frac{\\partial K}{\\partial \\mathcal{L}_1} = 0, \\quad \\frac{\\partial P}{\\partial \\mathcal{L}_1} = 0
+$$
+</p>
+
+<h3 style="color:#fbbf24;">3. Mapping to Field Layer</h3>
+
+<p>
+The intermediate layer consists of effective fields:
+</p>
+
+<p>
+$$
+A_\\mu = \\mathcal{A}_\\mu(K, P), \\quad F_{\\mu\\nu} = \\mathcal{F}_{\\mu\\nu}(K, P)
+$$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\mathcal{L}_1 = \\mathcal{T}_0(\\mathcal{L}_0)
+$$
+</p>
+
+<p>
+with transformation:
+</p>
+
+<p>
+$$
+\\mathcal{T}_0: (K, P) \\rightarrow (A_\\mu, F_{\\mu\\nu})
+$$
+</p>
+
+<p>
+Hence:
+</p>
+
+<p>
+$$
+\\frac{\\partial A_\\mu}{\\partial K} \\neq 0, \\quad \\frac{\\partial A_\\mu}{\\partial P} \\neq 0
+$$
+</p>
+
+<h3 style="color:#fbbf24;">4. Mapping to Observable Layer</h3>
+
+<p>
+Observable quantities are derived as:
+</p>
+
+<p>
+$$
+m = f(K, P), \\quad g = f\\!\\left(\\frac{P}{K}\\right), \\quad \\rho = \\frac{K^2}{P}
+$$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\mathcal{L}_2 = \\mathcal{T}_1(\\mathcal{L}_1) = \\mathcal{T}_1(\\mathcal{T}_0(\\mathcal{L}_0))
+$$
+</p>
+
+<p>
+Hence:
+</p>
+
+<p>
+$$
+\\mathcal{L}_2 = \\mathcal{F}(K, P)
+$$
+</p>
+
+<h3 style="color:#fbbf24;">5. Composite Mapping Structure</h3>
+
+<p>
+The full mapping is:
+</p>
+
+<p>
+$$
+(K, P) \\xrightarrow{\\mathcal{T}_0} (A_\\mu, F_{\\mu\\nu}) \\xrightarrow{\\mathcal{T}_1} (m, g, \\rho, \\dots)
+$$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\mathcal{O} = \\mathcal{F}(K, P)
+$$
+</p>
+
+<p>
+All observables depend solely on substrate parameters.
+</p>
+
+<h3 style="color:#fbbf24;">6. Fundamental vs Emergent Condition</h3>
+
+<p>
+Define:
+</p>
+
+<p>
+$$
+\\text{Fundamental} \\iff \\frac{\\partial \\mathcal{L}_0}{\\partial \\mathcal{L}_n} = 0 \\quad \\forall n > 0
+$$
+</p>
+
+<p>
+$$
+\\text{Emergent} \\iff \\exists \\, \\mathcal{F}: \\mathcal{L}_n = \\mathcal{F}(\\mathcal{L}_0)
+$$
+</p>
+
+<p>
+Thus:
+</p>
+
+<ul>
+<li>$(K, P)$: Fundamental</li>
+<li>$(A_\\mu, F_{\\mu\\nu})$: Emergent</li>
+<li>$(m, g, \\rho)$: Emergent</li>
+</ul>
+
+<h3 style="color:#fbbf24;">7. Directionality Constraint</h3>
+
+<p>
+Causation is strictly hierarchical:
+</p>
+
+<p>
+$$
+\\mathcal{L}_0 \\Rightarrow \\mathcal{L}_1 \\Rightarrow \\mathcal{L}_2
+$$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\frac{\\partial \\mathcal{L}_1}{\\partial \\mathcal{L}_2} = 0, \\quad \\frac{\\partial \\mathcal{L}_0}{\\partial \\mathcal{L}_2} = 0
+$$
+</p>
+
+<p>
+No upward causation exists.
+</p>
+
+<h3 style="color:#fbbf24;">8. Continuity Condition Across Layers</h3>
+
+<p>
+The mapping must be continuous:
+</p>
+
+<p>
+$$
+\\mathcal{T}_n \\in C^\\infty
+$$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\lim_{\\Delta K \\to 0} \\Delta \\mathcal{L}_n = 0, \\quad \\lim_{\\Delta P \\to 0} \\Delta \\mathcal{L}_n = 0
+$$
+</p>
+
+<p>
+Ensuring no discontinuities in emergence.
+</p>
+
+<h3 style="color:#fbbf24;">9. Layer Reduction Principle</h3>
+
+<p>
+All higher layers reduce to substrate:
+</p>
+
+<p>
+$$
+\\forall \\mathcal{L}_n, \\quad \\exists \\, \\mathcal{F}_n : \\mathcal{L}_n = \\mathcal{F}_n(K, P)
+$$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\bigcup_{n} \\mathcal{L}_n \\equiv \\mathcal{F}(K, P)
+$$
+</p>
+
+<h3 style="color:#fbbf24;">10. Structural Conclusion</h3>
+
+<p>
+Physical reality forms a hierarchical mapping from substrate parameters $(K, P)$ to all observable quantities.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\text{Reality} = \\mathcal{F}(K, P)
+$$
+</p>
+
+<p>
+with strict ontological hierarchy and no independent higher-level entities.
+</p>
+
+</div>`,
+
+
+sliders: `<div class="control-item"><div class="label-group"><span>ONTOLOGY DEPTH</span><input type="number" id="o_in" class="digital-entry" value="50" oninput="syncVal(this.value, 'o_sl')"></div><input type="range" id="o_sl" min="0" max="100" step="1" value="50" oninput="syncVal(this.value, 'o_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.8rem;">Substrate &rarr; Hierarchical Layers</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Complexity is emergent; simplicity is fundamental</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Hierarchy</span><span class="const-val">LAYERED</span></div><div class="const-item"><span class="const-label">Origin</span><span class="const-val">SUBSTRATE</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-onto);">MODE: MAPPING HIERARCHICAL ONTOLOGY</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Substrate (K, P)<br>↓<br>Field Potentials<br>↓<br>Observable Reality`,
+hierarchy: `<div style="color: var(--accent-onto); font-weight: bold; font-size: 0.95rem;">Distinction: Fundamental vs Emergent</div>`,
+footer: "Reality is a layered hierarchy of emergent substrate properties.",
+rightNote: `<div style="color: #60a5fa; line-height: 1.3; margin: 5px; font-size: 0.77rem;">Defining the ontological layers of existence.<p><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">👉 This Module Establishes:<br>The hierarchical layers from substrate to fields to measurable interactions.</p></div>`
+},
+
+3: {
+title: "UNIFICATION OF QM, GR, AND SM",
+result: "Structural Integration",
+resultSize: "0.80rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 60 — Module 3: Theory Unification (QM, GR, and SM as Layered Manifestations)</h2>
+
+<div class="briefing-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Conceptual Introduction</h3>
+
+<p>
+With Module 2, the framework established that physical reality is organized as a layered ontology, where all observable phenomena emerge from the substrate defined by $K$ and $P$.
+</p>
+
+<p>
+A crucial implication now follows:
+</p>
+
+<p>
+<strong>If reality is layered, then existing physical theories must correspond to different layers of the same structure.</strong>
+</p>
+
+<p>
+Modern physics is built upon three major theoretical pillars:
+</p>
+
+<ul>
+<li>Quantum Mechanics (QM)</li>
+<li>General Relativity (GR)</li>
+<li>Standard Model (SM)</li>
+</ul>
+
+<p>
+These theories are individually successful but appear conceptually incompatible when treated as fundamental and independent.
+</p>
+
+<p>
+This module establishes that the incompatibility is not physical but ontological. These theories operate at different layers of emergence and therefore must be unified structurally, not merged artificially.
+</p>
+
+<p>
+Thus, the transition is:
+</p>
+
+<p>
+$$
+\\text{Separate Theories} \\;\\longrightarrow\\; \\text{Layered Structural Unification}
+$$
+</p>
+
+<h3 style="color:#fbbf24;">2. Position of Quantum Mechanics</h3>
+
+<p>
+Quantum Mechanics describes the behavior of systems at the level of wave functions and probability amplitudes.
+</p>
+
+<p>
+The central object is:
+</p>
+
+<p>
+$$
+\\Psi(x,t)
+$$
+</p>
+
+<p>
+which evolves according to:
+</p>
+
+<p>
+$$
+i\\hbar \\frac{\\partial \\Psi}{\\partial t} = \\hat{H} \\Psi
+$$
+</p>
+
+<p>
+Within this framework, the wave function represents a probabilistic description of physical states.
+</p>
+
+<p>
+In the substrate framework, this corresponds to an emergent representation of underlying structural fluctuations governed by $(K, P)$.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\Psi \\sim \\text{Effective representation of substrate state}
+$$
+</p>
+
+<h3 style="color:#fbbf24;">3. Position of the Standard Model</h3>
+
+<p>
+The Standard Model describes interactions through gauge fields and symmetry groups:
+</p>
+
+<p>
+$$
+G = U(1) \\times SU(2) \\times SU(3)
+$$
+</p>
+
+<p>
+with dynamics governed by:
+</p>
+
+<p>
+$$
+D_\\mu = \\partial_\\mu + i g A_\\mu
+$$
+</p>
+
+<p>
+and field strength:
+</p>
+
+<p>
+$$
+F_{\\mu\\nu} = \\partial_\\mu A_\\nu - \\partial_\\nu A_\\mu + [A_\\mu, A_\\nu]
+$$
+</p>
+
+<p>
+This theory operates at the level of interaction fields, corresponding to the intermediate ontological layer.
+</p>
+
+<p>
+Within the substrate framework:
+</p>
+
+<p>
+$$
+A_\\mu = \\mathcal{A}_\\mu(K, P), \\quad F_{\\mu\\nu} = \\mathcal{F}_{\\mu\\nu}(K, P)
+$$
+</p>
+
+<p>
+Thus, gauge fields are emergent descriptions of substrate interactions.
+</p>
+
+<h3 style="color:#fbbf24;">4. Position of General Relativity</h3>
+
+<p>
+General Relativity describes spacetime geometry through the metric tensor:
+</p>
+
+<p>
+$$
+g_{\\mu\\nu}
+$$
+</p>
+
+<p>
+with dynamics given by:
+</p>
+
+<p>
+$$
+G_{\\mu\\nu} = 8\\pi G T_{\\mu\\nu}
+$$
+</p>
+
+<p>
+In this framework, gravity is interpreted as curvature of spacetime.
+</p>
+
+<p>
+Within the substrate formulation:
+</p>
+
+<p>
+$$
+g_{\\mu\\nu} = \\mathcal{G}_{\\mu\\nu}(K, P)
+$$
+</p>
+
+<p>
+Thus, geometry is not fundamental but an emergent manifestation of substrate configuration.
+</p>
+
+<h3 style="color:#fbbf24;">5. Unified Structural Mapping</h3>
+
+<p>
+The three theories can now be placed within the layered ontology:
+</p>
+
+<p>
+$$
+(K, P) \\;\\longrightarrow\\; (A_\\mu, F_{\\mu\\nu}) \\;\\longrightarrow\\; (\\Psi, m, g, g_{\\mu\\nu})
+$$
+</p>
+
+<p>
+Thus:
+</p>
+
+<ul>
+<li>Substrate $(K, P)$: Fundamental layer</li>
+<li>Gauge fields $(A_\\mu, F_{\\mu\\nu})$: Intermediate layer (SM)</li>
+<li>Wave function and observables $(\\Psi, m, g)$: Emergent layer (QM)</li>
+<li>Geometry $(g_{\\mu\\nu})$: Emergent large-scale structure (GR)</li>
+</ul>
+
+<p>
+All theories are therefore unified as different manifestations of the same substrate.
+</p>
+
+<h3 style="color:#fbbf24;">6. Resolution of Theoretical Conflict</h3>
+
+<p>
+The apparent incompatibility between QM and GR arises because both are treated as fundamental.
+</p>
+
+<p>
+However, within this framework:
+</p>
+
+<p>
+$$
+\\text{QM} \\neq \\text{GR at same level}
+$$
+</p>
+
+<p>
+Instead:
+</p>
+
+<p>
+$$
+\\text{QM, GR, SM} \\subset \\text{Emergent Layers of Substrate}
+$$
+</p>
+
+<p>
+Thus, there is no conflict. Each theory describes a different aspect of the same structure.
+</p>
+
+<h3 style="color:#fbbf24;">7. Necessity of Structural Unification</h3>
+
+<p>
+A complete theory must unify all domains under a common origin:
+</p>
+
+<p>
+$$
+\\mathcal{O} = \\mathcal{F}(K, P)
+$$
+</p>
+
+<p>
+Since QM, GR, and SM all depend on derived quantities, they must be unified at the level of $(K, P)$.
+</p>
+
+<p>
+Thus, unification is not optional but structurally necessary.
+</p>
+
+<h3 style="color:#fbbf24;">8. Graph / Visualization Interpretation Paragraph (MANDATORY)</h3>
+
+<p>
+The visualization presents a unified mapping curve in a three-dimensional space, where each axis represents a different domain: quantum state, geometric curvature, and interaction structure.
+</p>
+
+<p>
+The curve traces a continuous trajectory through these domains, demonstrating that they are not separate but interconnected aspects of a single structure.
+</p>
+
+<p>
+The smoothness of the curve indicates continuity across domains, while its curvature represents transformation between different physical descriptions.
+</p>
+
+<p>
+This visualization encodes the key insight:
+</p>
+
+<p>
+$$
+\\text{QM} \\rightarrow \\text{SM} \\rightarrow \\text{GR} \\Rightarrow \\text{Unified Substrate Origin}
+$$
+</p>
+
+<h3 style="color:#fbbf24;">9. Conceptual Compression Lines</h3>
+
+<p>
+All theories describe the same structure.<br>
+Differences arise from levels of emergence.<br>
+QM, GR, and SM are not independent.<br>
+They are unified through $(K, P)$.
+</p>
+
+<h3 style="color:#fbbf24;">10. Logical Closure</h3>
+
+<p>
+This module establishes that the major theories of physics are not competing frameworks but complementary layers of a single underlying structure.
+</p>
+
+<p>
+Their unification is achieved by identifying their common origin in substrate dynamics.
+</p>
+
+<h3 style="color:#fbbf24;">11. Transition to Next Module</h3>
+
+<p>
+Having unified the theoretical frameworks, the next step is to describe how observable reality emerges as a complete and continuous transformation from substrate to measurement.
+</p>
+
+<p>
+This leads to Module 4, where the emergence of physical reality is fully articulated.
+</p>
+
+<h3 style="color:#fbbf24;">12. Final Statement</h3>
+
+<p>
+Quantum Mechanics, General Relativity, and the Standard Model are unified as layered manifestations of a single substrate governed by $K$ and $P$, resolving their apparent incompatibility through ontological structure.
+</p>
+
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 60 — Module 3: Explicit Mathematics — Unification of QM, GR, and SM</h2>
+
+<div class="math-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Substrate Foundation</h3>
+
+<p>
+All physical structure originates from substrate parameters:
+</p>
+
+<p>
+$$
+K = |\\nabla C|, \\quad P = P_{\\text{syn}}
+$$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\mathcal{L}_0 = \\{K, P\\}
+$$
+</p>
+
+<h3 style="color:#fbbf24;">2. Emergence of Field Layer (Standard Model)</h3>
+
+<p>
+Gauge fields arise as functions of substrate parameters:
+</p>
+
+<p>
+$$
+A_\\mu = \\mathcal{A}_\\mu(K, P), \\quad F_{\\mu\\nu} = \\mathcal{F}_{\\mu\\nu}(K, P)
+$$
+</p>
+
+<p>
+Standard Model structure:
+</p>
+
+<p>
+$$
+G = U(1) \\times SU(2) \\times SU(3)
+$$
+</p>
+
+<p>
+Covariant derivative:
+</p>
+
+<p>
+$$
+D_\\mu = \\partial_\\mu + i g A_\\mu
+$$
+</p>
+
+<p>
+Coupling emerges from substrate:
+</p>
+
+<p>
+$$
+g = f\\!\\left(\\frac{P}{K}\\right)
+$$
+</p>
+
+<h3 style="color:#fbbf24;">3. Emergence of Quantum Layer (QM)</h3>
+
+<p>
+Wave function:
+</p>
+
+<p>
+$$
+\\Psi(x,t) = \\Psi(K, P)
+$$
+</p>
+
+<p>
+Evolution equation:
+</p>
+
+<p>
+$$
+i\\hbar \\frac{\\partial \\Psi}{\\partial t} = \\hat{H}(K, P) \\Psi
+$$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\Psi = \\mathcal{Q}(K, P)
+$$
+</p>
+
+<h3 style="color:#fbbf24;">4. Emergence of Geometry (GR)</h3>
+
+<p>
+Metric arises from substrate:
+</p>
+
+<p>
+$$
+g_{\\mu\\nu} = \\mathcal{G}_{\\mu\\nu}(K, P)
+$$
+</p>
+
+<p>
+Einstein equation:
+</p>
+
+<p>
+$$
+G_{\\mu\\nu} = 8\\pi G T_{\\mu\\nu}
+$$
+</p>
+
+<p>
+becomes:
+</p>
+
+<p>
+$$
+G_{\\mu\\nu} = \\mathcal{H}_{\\mu\\nu}(K, P)
+$$
+</p>
+
+<h3 style="color:#fbbf24;">5. Unified Mapping Structure</h3>
+
+<p>
+All theories derive from substrate:
+</p>
+
+<p>
+$$
+(K, P) \\rightarrow (A_\\mu, F_{\\mu\\nu}) \\rightarrow (\\Psi, g_{\\mu\\nu}, m, g)
+$$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\mathcal{O} = \\mathcal{F}(K, P)
+$$
+</p>
+
+<h3 style="color:#fbbf24;">6. Layer Identification</h3>
+
+<p>
+Standard Model:
+</p>
+
+<p>
+$$
+\\mathcal{L}_{SM} = \\{A_\\mu, F_{\\mu\\nu}\\}
+$$
+</p>
+
+<p>
+Quantum Mechanics:
+</p>
+
+<p>
+$$
+\\mathcal{L}_{QM} = \\{\\Psi, \\hat{H}\\}
+$$
+</p>
+
+<p>
+General Relativity:
+</p>
+
+<p>
+$$
+\\mathcal{L}_{GR} = \\{g_{\\mu\\nu}, G_{\\mu\\nu}\\}
+$$
+</p>
+
+<h3 style="color:#fbbf24;">7. Non-Conflict Condition</h3>
+
+<p>
+Theories do not conflict if:
+</p>
+
+<p>
+$$
+\\mathcal{L}_{QM}, \\mathcal{L}_{GR}, \\mathcal{L}_{SM} \\subset \\mathcal{F}(K, P)
+$$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\text{Conflict} \\Rightarrow \\text{Incorrect ontological placement}
+$$
+</p>
+
+<h3 style="color:#fbbf24;">8. Unified Functional Representation</h3>
+
+<p>
+All physical quantities:
+</p>
+
+<p>
+$$
+\\{\\Psi, A_\\mu, F_{\\mu\\nu}, g_{\\mu\\nu}, m, g\\} = \\mathcal{F}(K, P)
+$$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\text{Physics} = \\mathcal{F}(K, P)
+$$
+</p>
+
+<h3 style="color:#fbbf24;">9. Structural Necessity Condition</h3>
+
+<p>
+A complete theory must satisfy:
+</p>
+
+<p>
+$$
+\\forall \\mathcal{O}, \\quad \\exists \\, \\mathcal{F} : \\mathcal{O} = \\mathcal{F}(K, P)
+$$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\text{Unification} \\Rightarrow \\text{Common substrate origin}
+$$
+</p>
+
+<h3 style="color:#fbbf24;">10. Structural Conclusion</h3>
+
+<p>
+Quantum Mechanics, General Relativity, and the Standard Model are unified as emergent layers of a single substrate.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\text{Unified Physics} = \\mathcal{F}(K, P)
+$$
+</p>
+
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>UNIFICATION COUPLING</span><input type="number" id="u_in" class="digital-entry" value="80" oninput="syncVal(this.value, 'u_sl')"></div><input type="range" id="u_sl" min="0" max="100" step="1" value="80" oninput="syncVal(this.value, 'u_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.8rem;">QM + GR + SM &rarr; Substrate Origin</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">All theories describe different parts of the same whole</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Theory</span><span class="const-val">INTEGRATED</span></div><div class="const-item"><span class="const-label">Gaps</span><span class="const-val">ZERO</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-unify);">MODE: INTEGRATING QUANTUM & COSMIC SCALES</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Wave Function (\Psi)<br>↓<br>Geometric Distortion (g)<br>↓<br>Structural Unification`,
+hierarchy: `<div style="color: var(--accent-unify); font-weight: bold; font-size: 0.95rem;">Unification: Substrate as Common Root</div>`,
+footer: "The substrate resolves the conflict between the micro and macro scales.",
+rightNote: `<div style="color: #c084fc; line-height: 1.3; margin: 5px; font-size: 0.77rem;">Synthesizing major physical theories into one model.<p><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">👉 This Module Establishes:<br>QM, GR, and SM are different layers of the same unified substrate dynamics.</p></div>`
+},
+
+4: {
+title: "EMERGENCE OF PHYSICAL REALITY",
+result: "Layered Transformations",
+resultSize: "0.80rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 60 — Module 4: Emergence of Physical Reality (From Substrate to Observable)</h2>
+
+<div class="briefing-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Conceptual Introduction</h3>
+
+<p>
+With Module 3, the framework achieved structural unification of Quantum Mechanics, General Relativity, and the Standard Model by placing them within a layered ontology rooted in substrate parameters $(K, P)$.
+</p>
+
+<p>
+A natural and essential question now arises:
+</p>
+
+<p>
+<strong>How does observable physical reality emerge from the substrate?</strong>
+</p>
+
+<p>
+While previous modules established the existence of layers and their theoretical correspondence, this module establishes the dynamic process through which reality manifests.
+</p>
+
+<p>
+Thus, the focus shifts from structure to process:
+</p>
+
+<p>
+$$
+\\text{Substrate Structure} \\;\\longrightarrow\\; \\text{Emergent Physical Reality}
+$$
+</p>
+
+<h3 style="color:#fbbf24;">2. Definition of Emergence Cascade</h3>
+
+<p>
+Physical reality is not static but arises through a sequence of transformations originating from the substrate.
+</p>
+
+<p>
+Define the emergence cascade as:
+</p>
+
+<p>
+$$
+(K, P) \\rightarrow C_i \\rightarrow (A_\\mu, F_{\\mu\\nu}) \\rightarrow (m, g, \\Psi) \\rightarrow \\mathcal{O}_{\\text{obs}}
+$$
+</p>
+
+<p>
+where:
+</p>
+
+<ul>
+<li>$(K, P)$: Fundamental substrate parameters</li>
+<li>$C_i$: Derived structural constants</li>
+<li>$(A_\\mu, F_{\\mu\\nu})$: Interaction fields</li>
+<li>$(m, g, \\Psi)$: Observable quantum quantities</li>
+<li>$\\mathcal{O}_{\\text{obs}}$: Measurable physical reality</li>
+</ul>
+
+<p>
+Thus, reality emerges as a continuous transformation chain.
+</p>
+
+<h3 style="color:#fbbf24;">3. From Substrate to Constants</h3>
+
+<p>
+The first stage of emergence produces physical constants:
+</p>
+
+<p>
+$$
+C_i = f_i(K, P)
+$$
+</p>
+
+<p>
+These constants determine scales, interaction strengths, and structural relations in physics.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\text{Substrate} \\rightarrow \\text{Constants}
+$$
+</p>
+
+<h3 style="color:#fbbf24;">4. From Constants to Interaction Fields</h3>
+
+<p>
+Using the derived constants, interaction fields emerge:
+</p>
+
+<p>
+$$
+A_\\mu = \\mathcal{A}_\\mu(K, P), \\quad F_{\\mu\\nu} = \\mathcal{F}_{\\mu\\nu}(K, P)
+$$
+</p>
+
+<p>
+These fields encode how interactions propagate and couple across the system.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\text{Constants} \\rightarrow \\text{Interaction Structure}
+$$
+</p>
+
+<h3 style="color:#fbbf24;">5. From Interaction to Observable Quantities</h3>
+
+<p>
+Observable quantities arise from interaction dynamics:
+</p>
+
+<p>
+$$
+m = f(K, P), \\quad g = f\\!\\left(\\frac{P}{K}\\right), \\quad \\Psi = \\mathcal{Q}(K, P)
+$$
+</p>
+
+<p>
+These quantities define measurable properties such as mass, coupling, and quantum states.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\text{Interaction Structure} \\rightarrow \\text{Observable Quantities}
+$$
+</p>
+
+<h3 style="color:#fbbf24;">6. Emergence of Measurable Reality</h3>
+
+<p>
+Finally, measurable reality is obtained as:
+</p>
+
+<p>
+$$
+\\mathcal{O}_{\\text{obs}} = \\mathcal{F}(K, P)
+$$
+</p>
+
+<p>
+All experimental observations—particle behavior, gravitational effects, and cosmological phenomena—are manifestations of this final stage.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\text{Substrate} \\Rightarrow \\text{Reality}
+$$
+</p>
+
+<h3 style="color:#fbbf24;">7. Process Nature of Reality</h3>
+
+<p>
+A key insight follows:
+</p>
+
+<p>
+<strong>Reality is not a static entity but a dynamic process of emergence.</strong>
+</p>
+
+<p>
+At every level, observable quantities depend on continuous transformations of substrate parameters.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\text{Reality} = \\text{Ongoing Transformation}(K, P)
+$$
+</p>
+
+<h3 style="color:#fbbf24;">8. Graph / Visualization Interpretation Paragraph (MANDATORY)</h3>
+
+<p>
+The visualization presents a three-dimensional emergence surface where the base plane represents substrate parameters $(K, P)$, and the vertical axis represents measurable reality.
+</p>
+
+<p>
+The surface rises smoothly from the base, forming a peak that indicates the accumulation of emergent effects as transformations progress.
+</p>
+
+<p>
+The gradient of the surface represents the rate of emergence, with steeper regions corresponding to stronger manifestation of observable quantities.
+</p>
+
+<p>
+The continuity of the surface demonstrates that there are no discrete jumps; reality emerges smoothly from substrate dynamics.
+</p>
+
+<p>
+Thus, the graph encodes:
+</p>
+
+<p>
+$$
+(K, P) \\rightarrow \\mathcal{O}_{\\text{obs}}
+$$
+</p>
+
+<h3 style="color:#fbbf24;">9. Conceptual Compression Lines</h3>
+
+<p>
+Reality emerges through a continuous chain.<br>
+No independent observable layer exists.<br>
+Constants, interactions, and observables are linked.<br>
+All arise from $(K, P)$.
+</p>
+
+<h3 style="color:#fbbf24;">10. Logical Closure</h3>
+
+<p>
+This module establishes that physical reality is the final stage of a structured emergence cascade originating from substrate dynamics.
+</p>
+
+<p>
+All observable phenomena are unified as manifestations of a continuous transformation process.
+</p>
+
+<h3 style="color:#fbbf24;">11. Transition to Next Module</h3>
+
+<p>
+Having established the full emergence of physical reality, the next step is to formulate the final unified statement that encapsulates the entire framework as a complete and self-consistent system.
+</p>
+
+<p>
+This leads to Module 5, where the ultimate structural closure is formally stated.
+</p>
+
+<h3 style="color:#fbbf24;">12. Final Statement</h3>
+
+<p>
+Physical reality is a continuous emergent process originating from substrate parameters $(K, P)$, progressing through constants and interactions, and culminating in measurable observable phenomena.
+</p>
+
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 60 — Module 4: Explicit Mathematics — Emergence of Physical Reality</h2>
+
+<div class="math-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Substrate Definition</h3>
+
+<p>
+Fundamental variables:
+</p>
+
+<p>
+$$
+K = |\\nabla C|, \\quad P = P_{\\text{syn}}
+$$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\mathcal{L}_0 = \\{K(x), P(x)\\}
+$$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">2. Emergence of Structural Constants</h3>
+
+<p>
+Physical constants arise as functions of substrate:
+</p>
+
+<p>
+$$
+C_i = f_i(K, P)
+$$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\mathcal{L}_1 = \\{C_i\\} = \\mathcal{F}_1(K, P)
+$$
+</p>
+
+<p>
+Differential dependence:
+</p>
+
+<p>
+$$
+\\frac{\\partial C_i}{\\partial K} \\neq 0, \\quad \\frac{\\partial C_i}{\\partial P} \\neq 0
+$$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">3. Emergence of Interaction Fields</h3>
+
+<p>
+Gauge fields:
+</p>
+
+<p>
+$$
+A_\\mu = \\mathcal{A}_\\mu(K, P), \\quad F_{\\mu\\nu} = \\mathcal{F}_{\\mu\\nu}(K, P)
+$$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\mathcal{L}_2 = \\mathcal{F}_2(\\mathcal{L}_1) = \\mathcal{F}_2(K, P)
+$$
+</p>
+
+<p>
+Coupling:
+</p>
+
+<p>
+$$
+g = f\\!\\left(\\frac{P}{K}\\right)
+$$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">4. Emergence of Quantum and Mass Structure</h3>
+
+<p>
+Observable quantities:
+</p>
+
+<p>
+$$
+m = f(K, P), \\quad \\Psi = \\mathcal{Q}(K, P)
+$$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\mathcal{L}_3 = \\{m, g, \\Psi\\} = \\mathcal{F}_3(K, P)
+$$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">5. Emergence of Geometric Structure</h3>
+
+<p>
+Metric tensor:
+</p>
+
+<p>
+$$
+g_{\\mu\\nu} = \\mathcal{G}_{\\mu\\nu}(K, P)
+$$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\mathcal{L}_4 = \\{g_{\\mu\\nu}\\} = \\mathcal{F}_4(K, P)
+$$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">6. Observable Reality Mapping</h3>
+
+<p>
+All observables:
+</p>
+
+<p>
+$$
+\\mathcal{O}_{\\text{obs}} = \\mathcal{F}(K, P)
+$$
+</p>
+
+<p>
+Composite chain:
+</p>
+
+<p>
+$$
+(K, P) \\rightarrow C_i \\rightarrow (A_\\mu, F_{\\mu\\nu}) \\rightarrow (m, g, \\Psi) \\rightarrow g_{\\mu\\nu} \\rightarrow \\mathcal{O}_{\\text{obs}}
+$$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">7. Directionality Condition</h3>
+
+<p>
+Strict hierarchy:
+</p>
+
+<p>
+$$
+\\mathcal{L}_0 \\Rightarrow \\mathcal{L}_1 \\Rightarrow \\mathcal{L}_2 \\Rightarrow \\mathcal{L}_3 \\Rightarrow \\mathcal{L}_4
+$$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\frac{\\partial \\mathcal{L}_n}{\\partial \\mathcal{L}_m} = 0 \\quad \text{for } m > n
+$$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">8. Continuity Condition</h3>
+
+<p>
+Smooth emergence:
+</p>
+
+<p>
+$$
+\\mathcal{F}_n \\in C^{\\infty}
+$$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\lim_{\\Delta K \\to 0} \\Delta \\mathcal{L}_n = 0, \\quad \\lim_{\\Delta P \\to 0} \\Delta \\mathcal{L}_n = 0
+$$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">9. Reduction Principle</h3>
+
+<p>
+All layers reduce to substrate:
+</p>
+
+<p>
+$$
+\\forall \\mathcal{L}_n, \\quad \\exists \\, \\mathcal{F}_n : \\mathcal{L}_n = \\mathcal{F}_n(K, P)
+$$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\bigcup_n \\mathcal{L}_n = \\mathcal{F}(K, P)
+$$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">10. Structural Conclusion</h3>
+
+<p>
+Physical reality is a continuous transformation of substrate parameters $(K, P)$ across hierarchical layers.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\text{Reality} = \\mathcal{F}(K, P)
+$$
+</p>
+
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>EMERGENCE FLOW</span><input type="number" id="e_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'e_sl')"></div><input type="range" id="e_sl" min="0" max="100" step="1" value="100" oninput="syncVal(this.value, 'e_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.8rem;">Substrate Flow &rarr; Observable Matter</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Reality is a process, not a static entity</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Process</span><span class="const-val">EMERGENT</span></div><div class="const-item"><span class="const-label">Reality</span><span class="const-val">MANIFEST</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-emerg);">MODE: TRACING SUBSTRATE-TO-OBSERVABLE FLOW</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Stiffness/Pressure (K, P)<br>↓<br>Physical Constants<br>↓<br>Observable Reality (N)`,
+hierarchy: `<div style="color: var(--accent-emerg); font-weight: bold; font-size: 0.95rem;">Chain: Constants to Interactions to N</div>`,
+footer: "What we see is the final stage of a multi-layered substrate process.",
+rightNote: `<div style="color: #f87171; line-height: 1.3; margin: 5px; font-size: 0.77rem;">Mapping the process of physical manifestation.<p><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">👉 This Module Establishes:<br>Reality emerges through a chain of transformations from fundamental (K,P) to measurable observables.</p></div>`
+},
+
+5: {
+title: "FINAL UNIFIED STATEMENT",
+result: "Self-Consistent Closure",
+resultSize: "0.80rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 60 — Module 5: Final Unified Statement (Self-Consistent Structural Closure)</h2>
+
+<div class="briefing-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Conceptual Introduction</h3>
+
+<p>
+With the completion of Modules 1–4, this framework has achieved:
+</p>
+
+<ul>
+<li>A complete structural recap of all stages</li>
+<li>A layered ontology of reality</li>
+<li>Unification of QM, GR, and SM</li>
+<li>A continuous emergence pathway from substrate to observable reality</li>
+</ul>
+
+<p>
+The final step now is to establish the ultimate conclusion:
+</p>
+
+<p>
+<strong>What is the complete and self-consistent statement of physical reality?</strong>
+</p>
+
+<p>
+This module provides the definitive closure of the entire framework.
+</p>
+
+<p>
+Thus, the transition is:
+</p>
+
+<p>
+$$
+\\text{Structured Framework} \\;\\longrightarrow\\; \\text{Final Unified Statement}
+$$
+</p>
+
+<h3 style="color:#fbbf24;">2. Total Structural Mapping</h3>
+
+<p>
+From all previous modules, the complete mapping is:
+</p>
+
+<p>
+$$
+(K, P) \\rightarrow C_i \\rightarrow (A_\\mu, F_{\\mu\\nu}) \\rightarrow (m, g, \\Psi) \\rightarrow g_{\\mu\\nu} \\rightarrow \\mathcal{O}_{\\text{obs}}
+$$
+</p>
+
+<p>
+This mapping represents the full structural chain of physical reality.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\text{Reality} = \\mathcal{F}(K, P)
+$$
+</p>
+
+<h3 style="color:#fbbf24;">3. Closure Condition</h3>
+
+<p>
+A complete physical theory must satisfy:
+</p>
+
+<p>
+$$
+\\forall \\mathcal{O}, \\quad \\exists \\, \\mathcal{F} : \\mathcal{O} = \\mathcal{F}(K, P)
+$$
+</p>
+
+<p>
+This condition is now fully achieved.
+</p>
+
+<p>
+There are no remaining independent variables or unexplained parameters.
+</p>
+
+<h3 style="color:#fbbf24;">4. Self-Consistency Requirement</h3>
+
+<p>
+The framework must be internally consistent across all levels:
+</p>
+
+<p>
+$$
+\\mathcal{F}_n(K, P) \\Rightarrow \\mathcal{F}_{n+1}(K, P)
+$$
+</p>
+
+<p>
+with no contradictions between layers.
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\text{All layers are mutually consistent manifestations of the same substrate}
+$$
+</p>
+
+<h3 style="color:#fbbf24;">5. Elimination of Redundant Entities</h3>
+
+<p>
+All previously independent theoretical entities are now reinterpreted:
+</p>
+
+<ul>
+<li>Gauge fields: emergent interaction representations</li>
+<li>Wave function: emergent state description</li>
+<li>Spacetime geometry: emergent structural configuration</li>
+<li>Dark sector: substrate effect</li>
+</ul>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\text{No independent fundamental entities beyond } (K, P)
+$$
+</p>
+
+<h3 style="color:#fbbf24;">6. Absolute Unification Condition</h3>
+
+<p>
+Unification is achieved if:
+</p>
+
+<p>
+$$
+\\bigcup \\text{(All Theories)} \\equiv \\mathcal{F}(K, P)
+$$
+</p>
+
+<p>
+This condition is satisfied, establishing complete unification.
+</p>
+
+<h3 style="color:#fbbf24;">7. Nature of Physical Reality</h3>
+
+<p>
+A final interpretation emerges:
+</p>
+
+<p>
+<strong>Reality is a structured, layered, and continuous manifestation of substrate dynamics.</strong>
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\text{Reality} = \\text{Structured Emergence}(K, P)
+$$
+</p>
+
+<h3 style="color:#fbbf24;">8. Graph / Visualization Interpretation Paragraph (MANDATORY)</h3>
+
+<p>
+The visualization presents a fully developed structural surface, where the axes represent substrate parameters and transformation pathways, and the surface represents unified physical reality.
+</p>
+
+<p>
+The multi-peaked structure reflects the richness of emergent phenomena, while the continuity of the surface indicates that all such phenomena arise from a single underlying substrate.
+</p>
+
+<p>
+The absence of discontinuities or separations demonstrates complete integration across all layers.
+</p>
+
+<p>
+Thus, the visualization encodes:
+</p>
+
+<p>
+$$
+\\text{Unified Reality} \\Rightarrow \\mathcal{F}(K, P)
+$$
+</p>
+
+<h3 style="color:#fbbf24;">9. Conceptual Compression Lines</h3>
+
+<p>
+All physics arises from $(K, P)$.<br>
+No independent entities exist.<br>
+Reality is layered and continuous.<br>
+Unification is complete.
+</p>
+
+<h3 style="color:#fbbf24;">10. Logical Closure</h3>
+
+<p>
+This module establishes the final and complete closure of the framework.
+</p>
+
+<p>
+All physical phenomena, across all scales and theories, are unified as manifestations of substrate dynamics.
+</p>
+
+<h3 style="color:#fbbf24;">11. Transition to Summary</h3>
+
+<p>
+Having established the final unified statement, the next step is to present a complete summary of Stage 60, consolidating all modules into a coherent final overview.
+</p>
+
+<h3 style="color:#fbbf24;">12. Final Statement</h3>
+
+<p>
+All physical reality is a self-consistent, structured, and continuous manifestation of a unified substrate governed by $K$ and $P$, achieving complete and absolute theoretical unification.
+</p>
+
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Stage 60 — Module 5: Explicit Mathematics — Final Unified Statement</h2>
+
+<div class="math-content" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+
+<h3 style="color:#fbbf24;">1. Fundamental Substrate Definition</h3>
+
+<p>
+The complete physical system is defined by:
+</p>
+
+<p>
+$$
+K = |\\nabla C|, \\quad P = P_{\\text{syn}}
+$$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\mathcal{L}_0 = \\{K(x), P(x)\\}
+$$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">2. Total Structural Mapping</h3>
+
+<p>
+All physical quantities emerge through a unified mapping:
+</p>
+
+<p>
+$$
+(K, P) \\rightarrow C_i \\rightarrow (A_\\mu, F_{\\mu\\nu}) \\rightarrow (m, g, \\Psi) \\rightarrow g_{\\mu\\nu} \\rightarrow \\mathcal{O}_{\\text{obs}}
+$$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\mathcal{O}_{\\text{obs}} = \\mathcal{F}(K, P)
+$$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">3. Closure Condition</h3>
+
+<p>
+Completeness requires:
+</p>
+
+<p>
+$$
+\\forall \\mathcal{O}, \\quad \\exists \\, \\mathcal{F} : \\mathcal{O} = \\mathcal{F}(K, P)
+$$
+</p>
+
+<p>
+No observable lies outside this mapping.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">4. Self-Consistency Constraint</h3>
+
+<p>
+All transformation layers must satisfy:
+</p>
+
+<p>
+$$
+\\mathcal{F}_n(K, P) \\Rightarrow \\mathcal{F}_{n+1}(K, P)
+$$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\mathcal{F}_n \\subseteq \\mathcal{F}_{n+1}
+$$
+</p>
+
+<p>
+Ensuring no contradiction across layers.
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">5. Reduction Principle</h3>
+
+<p>
+All layers reduce to substrate:
+</p>
+
+<p>
+$$
+\\forall \\mathcal{L}_n, \\quad \\exists \\, \\mathcal{F}_n : \\mathcal{L}_n = \\mathcal{F}_n(K, P)
+$$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\bigcup_n \\mathcal{L}_n = \\mathcal{F}(K, P)
+$$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">6. Elimination of Independent Variables</h3>
+
+<p>
+There exist no independent physical variables:
+</p>
+
+<p>
+$$
+\\frac{\\partial \\mathcal{O}}{\\partial X} = 0 \\quad \\forall X \\notin \\{K, P\\}
+$$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\text{All physical dependence is on } (K, P)
+$$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">7. Unification Condition</h3>
+
+<p>
+All theories satisfy:
+</p>
+
+<p>
+$$
+\\mathcal{L}_{QM}, \\mathcal{L}_{GR}, \\mathcal{L}_{SM} \\subseteq \\mathcal{F}(K, P)
+$$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\bigcup \\text{(All Theories)} = \\mathcal{F}(K, P)
+$$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">8. Directionality Constraint</h3>
+
+<p>
+Causation flows from substrate:
+</p>
+
+<p>
+$$
+\\mathcal{L}_0 \\Rightarrow \\mathcal{L}_n
+$$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\frac{\\partial \\mathcal{L}_0}{\\partial \\mathcal{L}_n} = 0
+$$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">9. Continuity Condition</h3>
+
+<p>
+All mappings are smooth:
+</p>
+
+<p>
+$$
+\\mathcal{F} \\in C^{\\infty}
+$$
+</p>
+
+<p>
+Thus:
+</p>
+
+<p>
+$$
+\\lim_{\\Delta K \\to 0} \\Delta \\mathcal{O} = 0, \\quad \\lim_{\\Delta P \\to 0} \\Delta \\mathcal{O} = 0
+$$
+</p>
+
+---
+
+<h3 style="color:#fbbf24;">10. Final Unified Equation</h3>
+
+<p>
+The complete physical reality is expressed as:
+</p>
+
+<p>
+$$
+\\text{Reality} = \\mathcal{F}(K, P)
+$$
+</p>
+
+<p>
+This represents absolute structural closure.
+</p>
+
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>UNIFIED CLOSURE</span><input type="number" id="c_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'c_sl')"></div><input type="range" id="c_sl" min="0" max="100" step="1" value="100" oninput="syncVal(this.value, 'c_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.8rem;">All Layers &rarr; Resolved Unified Reality</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Reality is structured, layered, and complete</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Status</span><span class="const-val">UNIFIED</span></div><div class="const-item"><span class="const-label">Closure</span><span class="const-val">ABSOLUTE</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-final);">SYSTEM: FULL CONCEPTUAL CLOSURE ACHIEVED</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Unified Physics<br>↓<br>Self-Consistent Whole<br>↓<br>Final Synthesis`,
+hierarchy: `<div style="color: var(--accent-final); font-weight: bold; font-size: 0.95rem;">Absolute Unification Achieved</div>`,
+footer: "Reality is the structured manifestation of substrate dynamics.",
+rightNote: `<div style="color: #2dd4bf; line-height: 1.3; margin: 5px; font-size: 0.77rem;">The definitive conclusion of the Synthesis Framework.<p><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">👉 This Module Establishes:<br>All physical phenomena arise from a unified structured substrate governed by symmetry.</p></div>`
+}
+};
+
+function syncVal(val, id) {
+const sliderId = id.includes('_in') ? id.replace('_in', '_sl') : id;
+const inputId = id.includes('_sl') ? id.replace('_sl', '_in') : id;
+if(document.getElementById(sliderId)) document.getElementById(sliderId).value = val;
+if(document.getElementById(inputId)) document.getElementById(inputId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+document.getElementById('brief-box-content').innerHTML = content.brief;
+document.getElementById('math-box-content').innerHTML = content.math;
+document.getElementById('control-sliders').innerHTML = content.sliders;
+
+document.getElementById('active-module-title').innerText = content.title;
+const resultEl = document.getElementById('active-module-result');
+resultEl.innerText = content.result;
+resultEl.style.fontSize = content.resultSize || "0.75rem";
+
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('metrics-content').innerHTML = content.metricsContent;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+document.getElementById('structure-box-area').innerHTML = content.structure;
+document.getElementById('telemetry-area').innerHTML = content.telemetry;
+showScreen('briefing');
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() {
+showScreen('lab');
+setTimeout(() => { runLab(); window.dispatchEvent(new Event('resize')); }, 100);
+}
+
+function runLab() {
+const target = document.getElementById('plot-area');
+if (!target) return;
+let data = [];
+let layout = {
+paper_bgcolor: 'black', plot_bgcolor: 'black', margin: {t:60,b:10,l:0,r:0},
+showlegend: false, font: { family: 'sans-serif', size: 10 },
+scene: {
+xaxis: { gridcolor: '#222', color: '#94a3b8', title: 'Basis Dimension' },
+yaxis: { gridcolor: '#222', color: '#94a3b8', title: 'Phase Dimension' },
+zaxis: { gridcolor: '#222', color: '#94a3b8', title: 'Manifest Intensity' }
+}
+};
+
+if (currentTool === 1) { // FRAMEWORK RECAP
+let f = parseFloat(document.getElementById('f_sl')?.value || 60) / 100;
+let x = Array.from({length: 61}, (_, i) => i);
+
+// 1. Target Closure (The ideal limit of the Framework)
+let yTarget = x.map(xi => 1.0);
+data.push({
+x: x, y: yTarget,
+mode: 'lines',
+line: { color: '#eee', width: 1, dash: 'dot' },
+name: 'Unified Closure'
+});
+
+// 2. Integration Area (Shaded progress of the Synthesis)
+let yCurrent = x.map(xi => (xi / 60) * f * (1 + 0.1 * Math.sin(xi / 3)));
+data.push({
+x: x, y: yCurrent,
+fill: 'tozeroy',
+fillcolor: 'rgba(148, 163, 184, 0.15)', // Light Recap grey
+mode: 'none',
+name: 'Structural Coherence',
+hoverinfo: 'skip'
+});
+
+// 3. Framework Flow (Primary active line)
+data.push({
+x: x, y: yCurrent,
+mode: 'lines+markers',
+line: { color: '#94a3b8', width: 3 },
+marker: {
+size: x.map(xi => xi % 10 === 0 ? 8 : 0), // Highlight decade stages (10, 20, etc.)
+color: '#fbbf24'
+},
+name: 'Integration Path'
+});
+
+layout.xaxis = {
+title: "Stage Sequence (1-60)",
+color: "#eee",
+gridcolor: "#222",
+tickvals: [1, 15, 30, 45, 60]
+};
+layout.yaxis = {
+title: "Structural Integration Intensity",
+color: "#eee",
+gridcolor: "#222",
+range: [0, 1.1]
+};
+layout.showlegend = true;
+layout.legend = {
+font: { color: '#eee', size: 9 },
+x: 0.02, y: 0.98,
+xanchor: 'left', yanchor: 'top',
+bgcolor: 'rgba(0,0,0,0.5)'
+};
+layout.title = {
+text: "FULL FRAMEWORK FLOW & COHERENCE",
+font: { color: '#94a3b8', size: 14 }
+};
+
+
+} else if (currentTool === 2) { // LAYERED ONTOLOGY
+let o = parseFloat(document.getElementById('o_sl')?.value || 50) / 100;
+let x = Array.from({length: 40}, (_, i) => i - 20);
+let y = Array.from({length: 40}, (_, i) => i - 20);
+let z = x.map(xi => y.map(yi => {
+let r = Math.sqrt(xi*xi + yi*yi) + 1;
+return o * (Math.cos(r/2) / (r/4 + 1));
+}));
+
+data.push({
+type: 'surface',
+z: z,
+colorscale: 'Blues',
+showscale: false,
+showlegend: true, // Enabled as requested
+name: 'Ontological Layers'
+});
+
+layout.scene.zaxis.range = [-1, 1];
+layout.showlegend = true;
+layout.legend = {
+font: { color: '#eee', size: 10 },
+x: 0, y: 1,
+xanchor: 'left', yanchor: 'top',
+bgcolor: 'rgba(0,0,0,0)'
+};
+
+layout.title = {
+text: "LAYERED STRUCTURE CHART",
+font: { color: '#60a5fa' }
+};
+
+layout.scene.xaxis.title = "Fundamental Layer";
+layout.scene.yaxis.title = "Interaction Layer";
+layout.scene.zaxis.title = "Emergent Reality";
+
+
+} else if (currentTool === 3) { // THEORY UNIFICATION
+let u = parseFloat(document.getElementById('u_sl')?.value || 80) / 100;
+let t = Array.from({length: 100}, (_, i) => i / 10);
+let x = t.map(ti => u * ti * Math.cos(ti));
+let y = t.map(ti => u * ti * Math.sin(ti));
+let z = t.map(ti => ti);
+
+data.push({
+type: 'scatter3d',
+x: x, y: y, z: z,
+mode: 'lines',
+line: { color: '#c084fc', width: 6 },
+showlegend: true, // Enabled as requested
+name: 'Unified Mapping'
+});
+
+layout.showlegend = true;
+layout.legend = {
+font: { color: '#eee', size: 10 },
+x: 0, y: 1,
+xanchor: 'left', yanchor: 'top',
+bgcolor: 'rgba(0,0,0,0)'
+};
+
+layout.title = {
+text: "UNIFIED MAPPING DIAGRAM (QM/GR/SM)",
+font: { color: '#c084fc' }
+};
+
+layout.scene.xaxis.title = "Quantum State (Ψ)";
+layout.scene.yaxis.title = "Geometric Tension (g)";
+layout.scene.zaxis.title = "Interaction Symmetry";
+
+// Maintain a consistent view for the unification spiral
+layout.scene.camera = {
+eye: { x: 1.5, y: 1.5, z: 1.2 }
+};
+
+
+} else if (currentTool === 4) { // EMERGENCE CASCADE
+let e = parseFloat(document.getElementById('e_sl')?.value || 100) / 100;
+let x = Array.from({length: 40}, (_, i) => i - 20);
+let y = Array.from({length: 40}, (_, i) => i - 20);
+
+// Generating the Gaussian emergence peak centered on the origin
+let z = x.map(xi => y.map(yi => (Math.exp(-(xi*xi + yi*yi) / 80) * e * 1.5)));
+
+data.push({
+type: 'surface',
+z: z,
+colorscale: 'Reds',
+showscale: false,
+showlegend: true,
+name: 'Emergence Intensity'
+});
+
+// Locking the Z-axis range to prevent jumping during slider movement
+layout.scene.zaxis.range = [0, 1.5];
+layout.showlegend = true;
+layout.legend = {
+font: { color: '#eee', size: 10 },
+x: 0, y: 1,
+xanchor: 'left', yanchor: 'top',
+bgcolor: 'rgba(0,0,0,0)'
+};
+
+layout.title = {
+text: "THE EMERGENCE CASCADE (Substrate to Observable)",
+font: { color: '#f87171' }
+};
+
+layout.scene.xaxis.title = "Substrate (K, P)";
+layout.scene.yaxis.title = "Physical Constants";
+layout.scene.zaxis.title = "Measurable Reality (N)";
+
+} else if (currentTool === 5) { // FINAL UNIFICATION
+let u = parseFloat(document.getElementById('c_sl')?.value || 100) / 100;
+let x = Array.from({length: 40}, (_, i) => i - 20);
+let y = Array.from({length: 40}, (_, i) => i - 20);
+
+// Complex interference pattern representing the final structural map
+let z = x.map(xi => y.map(yi => u * (Math.cos(xi/4) * Math.sin(yi/4)) * (Math.sin(xi*yi/40))));
+
+data.push({
+type: 'surface',
+z: z,
+colorscale: 'Viridis',
+showscale: false,
+showlegend: true,
+name: 'Unified Reality'
+});
+
+// Stabilizing the amplitude range to ensure smooth interaction
+layout.scene.zaxis.range = [-1.5, 1.5];
+layout.showlegend = true;
+layout.legend = {
+font: { color: '#eee', size: 10 },
+x: 0, y: 1,
+xanchor: 'left', yanchor: 'top',
+bgcolor: 'rgba(0,0,0,0)'
+};
+
+layout.title = {
+text: "THE COMPLETED STRUCTURAL MAP",
+font: { color: '#2dd4bf' }
+};
+
+layout.scene.xaxis.title = "Symmetry Axis (S)";
+layout.scene.yaxis.title = "Manifestation Axis (M)";
+layout.scene.zaxis.title = "Unified Substrate Amplitude";
+}
+
+Plotly.react('plot-area', data, layout, {responsive: true, displayModeBar: false});
+}
+
+function resetLab() {
+if(currentTool===1) syncVal(60, 'f_sl');
+if(currentTool===2) syncVal(50, 'o_sl');
+if(currentTool===3) syncVal(80, 'u_sl');
+if(currentTool===4) syncVal(100, 'e_sl');
+if(currentTool===5) syncVal(100, 'c_sl');
+}
+
+window.onload = () => { showScreen('portal'); };
+</script>
+</body>
+</html>

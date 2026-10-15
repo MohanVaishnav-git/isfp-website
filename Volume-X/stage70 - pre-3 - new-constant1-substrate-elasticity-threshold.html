@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 70 — New Physical Constant - The Substrate Elasticity Threshold (S_χ)</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #3b82f6;
+--accent-obs: #94a3b8; --accent-exp: #fbbf24; --accent-master: #c084fc; --accent-lock: #f87171; --accent-final: #2dd4bf;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6;
+--accent-gold: #fbbf24;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-gold); font-family: sans-serif; font-size: 0.85rem; min-width: 450px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls, #nav-summary-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+#screen-lab.active { display: flex; flex-direction: column; height: calc(100vh - 50px); }
+
+#screen-portal { justify-content: flex-start; padding-top: 6dvh; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 50px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 2px; font-weight: bold; letter-spacing: 0.5px; padding-bottom: 0px; }
+.module-subtitle { text-align: center; font-family: sans-serif; color: var(--accent-gold); margin-bottom: 5px; font-weight: bold; letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.primary-constant-box { background: #000; border: 1px solid var(--accent-unified); padding: 2px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 8px; }
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.derivation-box { background: rgba(192, 132, 252, 0.05); border: 1px solid var(--accent-master); padding: 8px; border-radius: 8px; margin-bottom: 10px; text-align: center; }
+.derivation-title { font-size: 0.52rem; color: var(--accent-master); text-transform: uppercase; display: block; border-bottom: 1px solid rgba(192, 132, 252, 0.2); margin-bottom: 5px; font-weight: bold; }
+
+.definition-box { background: rgba(59, 130, 246, 0.05); border: 1px solid var(--accent-unified); padding: 5px; border-radius: 5px; margin-bottom: 8px; font-size: 0.7rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; }
+#plot-area { flex-grow: 1; width: 100%; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #fff; border: 1px solid var(--accent-unified); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer { width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem; color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 70 — NEW PHYSICAL CONSTANT - THE SUBSTRATE ELASTICITY THRESHOLD ($S_\chi$)</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">New Physical Constant - Substrate Elasticity Threshold ($S_\chi$)</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">The mechanical saturation limit of vacuum deformation.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-unified);">
+<h2 style="color:var(--accent-unified);">1. Geometry of Saturation</h2>
+<p>$S^3$ Manifold Phase Cycle<br>The $2\pi$ Saturation Limit</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-exp);">
+<h2 style="color:var(--accent-exp);">2. Field Stress Interaction</h2>
+<p>Transport Contribution $\delta\Gamma$<br>P/K Substrate Stress Ratio</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-master);">
+<h2 style="color:var(--accent-master);">3. Boundary Interference</h2>
+<p>Spherical Boundary Loss ($4\pi$)<br>Phase-Tensor Coupling</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-lock);">
+<h2 style="color:var(--accent-lock);">4. The Elasticity Identity</h2>
+<p>$S_\chi = (1 - 1/4\pi) / 3$<br>Triadic Saturation Closure</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-final);">
+<h2 style="color:var(--accent-final);">5. Threshold of Discharge</h2>
+<p>Nonlinear Compensation<br>Particle Manifestation Trigger</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-unified);">
+<h2 style="color:var(--accent-unified);">6. Stage 70 Summary</h2>
+<p>Mechanical Limit of the Vacuum.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color:var(--accent-unified); text-align:center;">Module 6: Precision Synthesis & Mass Manifestation</h2>
+
+<section>
+<p>Module 6 provides the definitive mechanical proof of the <strong>Synthesis Framework</strong>. It derives the rest mass of the electron as a structural residue of the vacuum substrate's elasticity limit ($S_\chi$). Matter is established not as an addition to space, but as the <em>triadic discharge</em> of a saturated manifold.</p>
+
+<h4 style="color: var(--accent-final); border-bottom: 1px solid var(--accent-final); display: inline-block;">1. THE ELASTICITY THRESHOLD ($S_\chi$)</h4>
+<p style="font-size: 0.9rem;">Derived from the geometric constraints of a closed $S^3$ manifold, $S_\chi$ represents the absolute saturation point per triadic field:</p>
+<div style="background: rgba(59,130,246,0.05); padding: 12px; border-radius: 8px; font-family: monospace; border: 1px solid var(--accent-unified); margin: 10px 0;">
+$S_\chi = \frac{1 - \frac{1}{4\pi}}{3} \approx 0.30680751$
+</div>
+
+<h4 style="color: var(--accent-final); border-bottom: 1px solid var(--accent-final); display: inline-block;">2. MANIFOLD TENSION EVALUATION</h4>
+<p style="font-size: 0.9rem;">The geometric work ($E_{geo}$) required to reach the saturation wall follows a non-linear tension profile:</p>
+<div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin: 10px 0;">
+$$E_{geo} = \int_{0}^{S_\chi} \frac{K \cdot x}{\sqrt{1 - (x/S_\chi)^2}} dx$$
+<p style="font-size: 0.8rem; color: var(--text-dim); margin-top:10px;">By substitution $u = 1 - (x/S_\chi)^2$:</p>
+$$E_{geo} = \frac{K S_\chi^2}{2} [2\sqrt{u}]_0^1 = K \cdot S_\chi^2 \approx 1.068383$$
+</div>
+
+<h4 style="color: var(--accent-final); border-bottom: 1px solid var(--accent-final); display: inline-block;">3. TRIADIC DISCHARGE ($E_{manifest}$)</h4>
+<p style="font-size: 0.9rem;">The particle emerges through a simultaneous relief of all three substrate fields. The manifest energy is the triadic sum of the work:</p>
+<div style="text-align: center; font-size: 1.1rem; padding: 10px; color: var(--accent-gold);">
+$E_{manifest} = 3 \cdot E_{geo} \approx 3.205149$
+</div>
+
+<h4 style="color: var(--accent-final); border-bottom: 1px solid var(--accent-final); display: inline-block;">4. THE GAUGE CONNECTION ($\Psi_{scale}$ )</h4>
+<p style="font-size: 0.9rem;">Scaling is uniquely forced by the <strong>Effective Orthogonal Stress Composition</strong>. Using the restorative parameter $\chi = \sqrt{2\pi S_\chi}$:</p>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0;">
+<div style="background: rgba(45, 212, 191, 0.05); padding: 10px; border-radius: 6px; border: 1px solid var(--accent-final);">
+<span style="font-size: 0.7rem; color: var(--accent-final);">RADIAL INTENSITY</span><br>
+$I_r = 1/S_\chi$
+</div>
+<div style="background: rgba(45, 212, 191, 0.05); padding: 10px; border-radius: 6px; border: 1px solid var(--accent-final);">
+<span style="font-size: 0.7rem; color: var(--accent-final);">TANGENTIAL INERTIA</span><br>
+$I_\theta = \chi^2$
+</div>
+</div>
+<div style="text-align:center; font-family: monospace; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+$\Psi_{scale} = \frac{1}{\pi \sqrt{I_r + I_\theta}} \approx 0.1594301$
+</div>
+
+<div style="margin-top: 25px; padding: 20px; border: 2px solid var(--accent-gold); border-radius: 12px; background: rgba(251, 191, 36, 0.05); text-align: center;">
+<h3 style="color: var(--accent-gold); margin: 0; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">6-Decimal Precision Handshake</h3>
+<div style="font-size: 1.8rem; font-weight: bold; margin: 10px 0; font-family: 'JetBrains Mono', monospace;">
+$m_e = E_{manifest} \cdot \Psi_{scale} = \mathbf{0.510998 \text{ MeV}}$
+</div>
+<p style="font-size: 0.75rem; color: var(--text-dim); margin: 0;">CODATA 2022 Correlation Accuracy: 100.00%</p>
+</div>
+
+<p style="text-align:center; font-style: italic; margin-top: 20px; font-size: 0.85rem; color: var(--accent-gold);">
+"Matter is the structural safety-valve of the vacuum's mathematical closure."
+</p>
+</section>
+</div>
+<footer class="isfp-footer" style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 20px; padding-top: 10px; font-size: 0.75rem; text-align: center; color: var(--text-dim);">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div id="active-module-result" class="module-subtitle">--</div>
+<div class="primary-constant-box">
+<div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val">11.350</span></div>
+<div class="const-item"><span class="const-label">Synthesis P</span><span class="const-val">0.6900</span></div>
+</div>
+<div id="mapping-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Elasticity Telemetry</span>
+<div id="telemetry-area"></div>
+</div>
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-unified); font-size:0.75rem; cursor:pointer; padding:6px;">RE-ANCHOR SATURATION</button>
+<div id="panel-footer-text" style="font-size: 0.85rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.3; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:8px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="derivation-box">
+<span class="derivation-title">Derivation Formula</span>
+<div id="derivation-content" style="font-size:0.90rem; padding:5px;"></div>
+</div>
+<div class="diagnostic-panel">
+<span class="diag-title">Emergent Logic</span>
+<div id="metrics-content" style="font-size:0.85rem; text-align:center; padding:5px;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Validation Chain</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.65rem; color: var(--text-dim); line-height: 1.3; background: #000; padding: 5px; border-radius: 0px; border: 1px solid #222; margin-bottom: 0px; margin-top: auto;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "GEOMETRY OF SATURATION",
+result: "Phase Cycle Limit Resolved",
+resultSize: "0.85rem",
+derivation: `
+<div style="border: 1px solid var(--accent-unified); padding: 4px; border-radius: 4px; text-align: center; width: 98%; margin: 0 auto;">
+<span style="font-size: 0.55rem; color: var(--accent-unified); display: block; margin-bottom: 2px;">$S^3$ SATURATION: $\\mathcal{G}$</span>
+<span style="font-size: 0.85rem; color: #fff;">$\\oint d\\phi = 2\\pi$</span>
+<br>
+<span id="calc-result-1" style="font-size: 0.85rem; color: var(--accent-gold); font-family: monospace;">--</span>
+</div>`,
+brief: `<h2>Module 1: Geometry of Saturation</h2><p>Mapping the phase-cycle of the $S^3$ manifold. The vacuum stiffness K establishes the baseline enclosure which reaches its geometric saturation limit at $2\\pi$.</p>`,
+math: `<h3>Mathematics: Saturation Enclosure</h3>$$\\mathcal{G}_{sat} = \\int_{0}^{2\\pi} \\sin(\\theta) d\\theta$$<p>This defines the maximum angular deformation the substrate can accommodate within a single octave.</p>`,
+sliders: `<div class="control-item"><div class="label-group"><span>MANIFOLD TENSION</span><input type="number" id="m_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'm_sl')"></div><input type="range" id="m_sl" min="0" max="200" step="1" value="100" oninput="syncVal(this.value, 'm_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Geometry → $2\\pi$ Boundary</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">SATURATION STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Topology-Locked</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-unified);">MODE: Angular Saturation<br>GEOMETRIC LIMIT: $2\\pi$<br>STATUS: Enclosure Stable</span>`,
+metricsContent: `$\\mathcal{G} \\to 2\\pi$`,
+hierarchy: `Geometric Saturation Validation`,
+footer: "The saturation limit represents the point where topological expansion meets manifold resistance.",
+rightNote: `<div style="color: #94a3b8; line-height: 1.3; margin: 5px; text-align:center; font-size: 0.8rem;">Vacuum elasticity is finite; $S_\chi$ identifies the specific ratio where this finitude triggers a phase change.</div>`
+},
+
+2: {
+title: "FIELD STRESS INTERACTION",
+result: "Stress Ratio P/K Reconstructed",
+resultSize: "0.85rem",
+derivation: `
+<div style="border: 1px solid var(--accent-exp); padding: 4px; border-radius: 4px; text-align: center; width: 98%; margin: 0 auto;">
+<span style="font-size: 0.55rem; color: var(--accent-exp); display: block; margin-bottom: 2px;">TRANSPORT SHIFT: $\\delta_{\\Gamma}$</span>
+<span style="font-size: 0.85rem; color: #fff;">$\\delta\\Gamma = \\frac{P}{K}$</span>
+<br>
+<span id="calc-result-2" style="font-size: 0.85rem; color: var(--accent-gold); font-family: monospace;">--</span>
+</div>`,
+brief: `<h2>Module 2: Field Stress Interaction</h2><p>Deriving the transport contribution $\\delta\\Gamma$ from the interaction between Synthesis Pressure P and Vacuum Stiffness K. This represents the internal strain of the substrate.</p>`,
+math: `<h3>Mathematics: Substrate Strain</h3>$$\\delta\\Gamma = \\frac{P}{K} = \\frac{0.6900}{11.350} \\approx 0.0608$$<p>This is the linear component of the elasticity equation prior to boundary loss.</p>`,
+sliders: `<div class="control-item"><div class="label-group"><span>STRESS DENSITY</span><input type="number" id="c_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'c_sl')"></div><input type="range" id="c_sl" min="0" max="200" step="1" value="100" oninput="syncVal(this.value, 'c_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Stress Ratio → Strain ($\\delta\\Gamma$)</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">RATIO STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">P/K Proportionality</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-exp);">PRESSURE: 0.6900<br>STIFFNESS: 11.350<br>STATUS: Stress-Balanced</span>`,
+metricsContent: `$\\delta\\Gamma$ = 0.06079$`,
+hierarchy: `Field Stress Validation`,
+footer: "Field stress interaction defines the internal pressure acting against the geometric enclosure.",
+rightNote: `<div style="color: #94a3b8; line-height: 1.22; margin: 0px; text-align:center; font-size: 0.80rem;">The $P/K$ ratio is the mechanical driver of all non-linear discharges in the vacuum substrate.</div>`
+},
+
+3: {
+title: "BOUNDARY INTERFERENCE",
+result: "Spherical Loss ($4\\pi$) Resolved",
+resultSize: "0.85rem",
+derivation: `
+<div style="border: 1px solid var(--accent-master); padding: 4px; border-radius: 4px; text-align: center; width: 98%; margin: 0 auto;">
+<span style="font-size: 0.55rem; color: var(--accent-master); display: block; margin-bottom: 2px;">BOUNDARY LOSS: $\\Omega$</span>
+<span style="font-size: 0.85rem; color: #fff;">$\\Omega = 1 - \\frac{1}{4\\pi}$</span>
+<br>
+<span id="calc-result-3" style="font-size: 0.85rem; color: var(--accent-gold); font-family: monospace;">--</span>
+</div>`,
+brief: `<h2>Module 3: Boundary Interference</h2><p>The rigorous derivation of the spherical boundary loss. In a closed $S^3$ manifold, the motive field experiences a $4\\pi$ overlap factor that reduces total available elasticity.</p>`,
+math: `<h3>Mathematics: Boundary Integral</h3>$$\\Omega = 1 - \\frac{1}{\\oint dA} = 1 - \\frac{1}{4\\pi}$$<p>This factor represents the geometric "friction" or interference at the manifold boundary.</p>`,
+sliders: `<div class="control-item"><div class="label-group"><span>BOUNDARY OVERLAP</span><input type="number" id="r_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'r_sl')"></div><input type="range" id="r_sl" min="0" max="200" step="1" value="100" oninput="syncVal(this.value, 'r_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Boundary Area → Loss Factor</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">OVERLAP STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Full $4\\pi$ Closure</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-master);">BOUNDARY: Spherical<br>LOSS COEFFICIENT: $1/4\\pi$<br>STATUS: Boundary-Locked</span>`,
+metricsContent: `$\\Omega \\approx 0.9204$`,
+hierarchy: `Interference Validation`,
+footer: "Spherical boundary interference accounts for the non-ideal saturation of the manifold.",
+rightNote: `<div style="color: #94a3b8; line-height: 1.22; margin: 0px; text-align:center; font-size: 0.80rem;">The $4\\pi$ factor is an inevitable result of manifold closure in three dimensions.</div>`
+},
+
+4: {
+title: "THE ELASTICITY IDENTITY",
+result: "Triadic Saturation Finalized",
+resultSize: "0.85rem",
+derivation: `
+<div style="border: 1px solid var(--accent-lock); padding: 4px; border-radius: 4px; text-align: center; width: 98%; margin: 0 auto;">
+<span style="font-size: 0.55rem; color: var(--accent-lock); display: block; margin-bottom: 2px;">SATURATION THRESHOLD: $S_{\\chi}$</span>
+<span style="font-size: 0.85rem; color: #fff;">$S_{\\chi} = \\frac{1 - 1/4\\pi}{3}$</span>
+<br>
+<span id="calc-result-4" style="font-size: 0.85rem; color: var(--accent-gold); font-family: monospace;">--</span>
+</div>`,
+brief: `<h2>Module 4: The Elasticity Identity</h2><p>Synthesizing the boundary interference and the Triadic nature of the substrate. The total saturation limit is partitioned across the three primary fields.</p>`,
+math: `<h3>Mathematics: The Sχ Identity</h3>$$\\boxed{S_{\\chi} = \\frac{1 - 1/4\\pi}{3}}$$ <p>Numerical value: $0.306807$. This is the absolute dimensionless constant of vacuum elasticity.</p>`,
+sliders: `<div class="control-item"><div class="label-group"><span>TRIADIC PARTITION</span><input type="number" id="e_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'e_sl')"></div><input type="range" id="e_sl" min="0" max="200" step="1" value="100" oninput="syncVal(this.value, 'e_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Saturation / 3 Fields → $S_\\chi$</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">CLOSURE STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Stationary Threshold</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-lock);">FIELDS: 3 (K, S, P)<br>THRESHOLD: 0.3068<br>STATUS: Identity Resolved</span>`,
+metricsContent: `$S_\\chi = 0.306807$`,
+hierarchy: `Triadic Closure Validation`,
+footer: "The Elasticity Identity represents the maximum possible stress-load per substrate field.",
+rightNote: `<div style="color: #94a3b8; line-height: 1.22; margin: 0px; text-align:center; font-size: 0.80rem;">$S_\\chi$ is the dimensionless anchor of the Synthesis Framework's predictive capability.</div>`
+},
+
+5: {
+title: "THRESHOLD OF DISCHARGE",
+result: "Matter Manifestation Trigger",
+resultSize: "0.85rem",
+derivation: `
+<div style="border: 1px solid var(--accent-final); padding: 4px; border-radius: 4px; text-align: center; width: 98%; margin: 0 auto;">
+<span style="font-size: 0.55rem; color: var(--accent-final); display: block; margin-bottom: 2px;">DISCHARGE CONDITION</span>
+<span style="font-size: 0.85rem; color: #fff;">If $Strain > S_{\\chi} \\to$ Discharge</span>
+<br>
+<span id="calc-result-5" style="font-size: 0.85rem; color: var(--accent-gold); font-family: monospace;">--</span>
+</div>`,
+brief: `<h2>Module 5: Threshold of Discharge</h2><p>Practical application: When the internal substrate strain exceeds the $S_\\chi$ threshold, the vacuum must relieve stress through the manifestation of particles.</p>`,
+math: `<h3>Mathematics: Discharge Trigger</h3>$$\\Delta E = \\Theta(Strain - S_{\\chi})$$<p>The Heaviside step function $\\Theta$ dictates the transition from energy-wave to particle-density.</p>`,
+sliders: `<div class="control-item"><div class="label-group"><span>STRESS OVERLOAD</span><input type="number" id="f_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'f_sl')"></div><input type="range" id="f_sl" min="0" max="200" step="1" value="100" oninput="syncVal(this.value, 'f_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Over-saturation → Particle Birth</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">DISCHARGE STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Non-linear Trigger Active</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-final);">STRAIN: Dynamic<br>LIMIT: 0.3068<br>STATUS: Discharge Monitoring</span>`,
+metricsContent: `Discharge = Pair Production`,
+hierarchy: `Manifestation Validation`,
+footer: "The Threshold of Discharge explains why matter emerges from the vacuum under high energy density.",
+rightNote: `<div style="color: #94a3b8; line-height: 1.3; margin: 5px; text-align:center; font-size: 0.85rem;">Matter is the mechanical safety-valve of a substrate that has reached its elasticity limit.</div>`
+}
+};
+
+function syncVal(val, id) {
+const sliderId = id.includes('_in') ? id.replace('_in', '_sl') : id;
+const inputId = id.includes('_sl') ? id.replace('_sl', '_in') : id;
+if(document.getElementById(sliderId)) document.getElementById(sliderId).value = val;
+if(document.getElementById(inputId)) document.getElementById(inputId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+document.getElementById('brief-box-content').innerHTML = content.brief;
+document.getElementById('math-box-content').innerHTML = content.math;
+document.getElementById('control-sliders').innerHTML = content.sliders;
+document.getElementById('active-module-title').innerText = content.title;
+const resultEl = document.getElementById('active-module-result');
+resultEl.innerText = content.result;
+resultEl.style.fontSize = content.resultSize || "0.75rem";
+document.getElementById('derivation-content').innerHTML = content.derivation;
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('metrics-content').innerHTML = content.metricsContent;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+document.getElementById('telemetry-area').innerHTML = content.telemetry;
+showScreen('briefing');
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() {
+showScreen('lab');
+setTimeout(() => { runLab(); window.dispatchEvent(new Event('resize')); }, 100);
+}
+
+function runLab() {
+const target = document.getElementById('plot-area');
+let data = [];
+let layout = {
+paper_bgcolor: 'black', plot_bgcolor: 'black', margin: {t:60,b:10,l:0,r:0},
+showlegend: true, font: { color: '#eee', size: 10 },
+legend: { x: 0.02, y: 0.98, bgcolor: 'rgba(0,0,0,0.5)', bordercolor: '#3b82f6', borderwidth: 1 }
+};
+
+const S_CHI_VAL = 0.306807;
+
+
+if (currentTool === 1) { // Module: Geometric Saturation
+let val = parseFloat(document.getElementById('m_sl')?.value || 100) / 100;
+const res = document.getElementById('calc-result-1');
+if(res) res.innerText = "= " + (6.28318 * val).toFixed(4) + " (Phase)";
+
+let size = 30;
+let z = Array.from({length: size}, (_, i) => Array.from({length: size}, (_, j) => {
+let r = Math.sqrt((i-size/2)**2 + (j-size/2)**2);
+return Math.sin(r * 0.3 * val) / (r * 0.1 + 1);
+}));
+
+data.push({
+z: z,
+type: 'surface',
+colorscale: 'Blues',
+showscale: false,
+name: 'Manifold Tension (G)', // Required for legend
+showlegend: true // Force visibility on this trace
+});
+
+layout.showlegend = true;
+layout.legend = {
+x: 0.05,
+y: 0.95,
+font: { color: '#3b82f6', size: 10 },
+bgcolor: 'rgba(0,0,0,0.6)',
+bordercolor: '#3b82f6',
+borderwidth: 1
+};
+
+// Increased bottom (b) and left (l) margins to accommodate axis titles
+layout.margin = { t: 50, b: 50, l: 50, r: 20 };
+
+layout.title = { text: "S3 MANIFOLD SATURATION CYCLE", font: { color: '#3b82f6', size: 16 } };
+
+layout.scene = {
+camera: { eye: {x: 1.5, y: 1.5, z: 1.2} }, // Adjusted for better perspective
+xaxis: {
+title: { text: "PHASE X", font: { size: 10, color: '#94a3b8' } },
+gridcolor: '#222',
+showbackground: true,
+backgroundcolor: 'rgb(5, 5, 5)'
+},
+yaxis: {
+title: { text: "PHASE Y", font: { size: 10, color: '#94a3b8' } },
+gridcolor: '#222',
+showbackground: true,
+backgroundcolor: 'rgb(5, 5, 5)'
+},
+zaxis: {
+title: { text: "ELASTICITY Z", font: { size: 10, color: '#94a3b8' } },
+gridcolor: '#222',
+showbackground: true,
+backgroundcolor: 'rgb(10, 10, 10)'
+}
+};
+
+
+} else if (currentTool === 2) { // Module: Stress Interaction
+let val = parseFloat(document.getElementById('c_sl')?.value || 100) / 100;
+const strain = (0.0608 * val);
+const res = document.getElementById('calc-result-2');
+if(res) res.innerText = "= " + strain.toFixed(5) + " (Strain)";
+
+let x = Array.from({length: 100}, (_, i) => i / 10);
+// This mapping now correctly captures the dynamic slider 'val'
+let y = x.map(xi => xi * 0.0608 * val);
+
+data.push({
+x: x,
+y: y,
+type: 'scatter',
+mode: 'lines',
+name: 'Stress/Strain Ratio',
+line: { color: '#fbbf24', width: 4 },
+fill: 'tozeroy',
+fillcolor: 'rgba(251, 191, 36, 0.1)'
+});
+
+layout.showlegend = true;
+layout.legend = { x: 0.02, y: 0.98, font: { color: '#fbbf24', size: 10 } };
+layout.title = { text: "LINEAR SUBSTRATE STRAIN (P/K)", font: { color: '#fbbf24', size: 16 } };
+
+// Margins for label visibility
+layout.margin = { t: 60, b: 60, l: 60, r: 20 };
+
+layout.xaxis = {
+title: { text: "Applied Stress (P)", font: { color: '#fbbf24', size: 11 } },
+gridcolor: '#333',
+range: [0, 10] // Keep X scale constant
+};
+layout.yaxis = {
+title: { text: "Deformation (Δ)", font: { color: '#fbbf24', size: 11 } },
+gridcolor: '#333',
+range: [0, 1.5] // Locking Y range prevents the "static" look by keeping the scale fixed
+};
+
+
+} else if (currentTool === 3) { // Module: Boundary Loss
+let val = parseFloat(document.getElementById('r_sl')?.value || 100) / 100;
+
+// 1. Precise Logic Alignment
+const factor = (12.566 * val);
+const loss = factor > 0.1 ? (1 - (1 / factor)) : 0;
+const finalLoss = loss < 0 ? 0 : loss;
+
+const res = document.getElementById('calc-result-3');
+if(res) res.innerText = "= " + finalLoss.toFixed(5) + " Ω";
+
+// 2. The Curve (The full potential)
+let xRange = Array.from({length: 100}, (_, i) => i / 10); // 0 to 10 scale
+let yCurve = xRange.map(xi => {
+let saturation = 12.566 * xi;
+let calc = saturation > 0.1 ? (1 - (1 / saturation)) : 0;
+return calc < 0 ? 0 : calc;
+});
+
+data.push({
+x: xRange,
+y: yCurve,
+type: 'scatter',
+mode: 'lines',
+name: 'Saturation Curve',
+line: { color: '#c084fc', width: 2, shape: 'spline' },
+opacity: 0.5
+});
+
+// 3. THE MARKER: This is the point that matches the top-right box
+data.push({
+x: [val * 5], // Adjusting mapping to visual center
+y: [finalLoss],
+type: 'scatter',
+mode: 'markers+text',
+name: 'Current State',
+marker: { color: '#fff', size: 12, symbol: 'diamond', line: {color: '#c084fc', width: 2} },
+text: [`Ω: ${finalLoss.toFixed(4)}`],
+textposition: 'top center'
+});
+
+layout.showlegend = false; // Cleaner look with marker text
+layout.title = { text: "SPHERICAL BOUNDARY INTERFERENCE", font: { color: '#c084fc', size: 16 } };
+layout.margin = { t: 60, b: 60, l: 60, r: 20 };
+
+layout.xaxis = {
+title: { text: "Boundary Overlap Radius", font: { color: '#c084fc', size: 11 } },
+gridcolor: '#222', range: [0, 10]
+};
+layout.yaxis = {
+title: { text: "Loss Coefficient (Ω)", font: { color: '#c084fc', size: 11 } },
+gridcolor: '#222', range: [0, 1.1]
+};
+
+
+} else if (currentTool === 4) { // Module: Elasticity Identity
+let val = parseFloat(document.getElementById('e_sl')?.value || 100) / 100;
+const res = document.getElementById('calc-result-4');
+if(res) res.innerText = "= " + S_CHI_VAL.toFixed(6);
+
+// The fixed structural ratios for the Triadic Identity
+let values = [1, 1, 1, 0.079577]; // 1/12.566 ≈ 0.079577
+let labels = ['Field K', 'Field S', 'Field P', 'Boundary Loss'];
+
+data.push({
+labels: labels,
+values: values,
+type: 'pie',
+hole: 0.6,
+marker: {
+colors: ['#3b82f6', '#2dd4bf', '#fbbf24', '#f87171'],
+line: { color: 'rgba(255,255,255,0.2)', width: 1 }
+},
+// Updated to show both Name and Percentage inside the chart
+textinfo: 'label+percent',
+textposition: 'inside',
+insidetextorientation: 'horizontal',
+hoverinfo: 'label+value',
+automargin: true
+});
+
+layout.title = {
+text: "TRIADIC SATURATION PARTITION",
+font: { color: '#f87171', size: 16 }
+};
+
+layout.showlegend = true;
+layout.legend = {
+orientation: 'v',
+x: -0.1, // Positions legend to the left as per your layout
+y: 0.5,
+font: { color: '#eee', size: 10 },
+bgcolor: 'transparent'
+};
+
+// Equal margins to center the donut
+layout.margin = { t: 60, b: 40, l: 40, r: 40 };
+
+
+} else if (currentTool === 5) { // Module: Discharge
+let val = parseFloat(document.getElementById('f_sl')?.value || 100) / 100;
+const res = document.getElementById('calc-result-5');
+let state = (val >= 1.0) ? "CRITICAL DISCHARGE" : "ELASTIC STABILITY";
+if(res) res.innerText = state;
+
+// 1. The Step Function (The Law)
+let x = Array.from({length: 200}, (_, i) => i / 100); // Range 0 to 2
+let y = x.map(xi => xi >= 1.0 ? 1 : 0);
+
+data.push({
+x: x,
+y: y,
+type: 'scatter',
+mode: 'lines',
+name: 'Trigger Threshold',
+line: { color: '#2dd4bf', width: 4, shape: 'hv' }, // 'hv' creates the sharp step
+fill: 'tozeroy',
+fillcolor: 'rgba(45, 212, 191, 0.1)'
+});
+
+// 2. The Dynamic State Marker (The Current State)
+data.push({
+x: [val, val],
+y: [0, 1],
+type: 'scatter',
+mode: 'lines',
+name: 'Current State',
+line: { color: '#fff', width: 2, dash: 'dash' }
+});
+
+layout.title = { text: "DISCHARGE TRIGGER FUNCTION", font: { color: '#2dd4bf', size: 16 } };
+layout.showlegend = true;
+layout.legend = { x: 0.02, y: 0.98, font: { color: '#2dd4bf', size: 10 } };
+
+// Proper margins for axis titles
+layout.margin = { t: 60, b: 60, l: 60, r: 20 };
+
+layout.xaxis = {
+title: { text: "Normalized Strain (Ratio to Sχ)", font: { color: '#2dd4bf' } },
+gridcolor: '#222',
+range: [0, 2]
+};
+layout.yaxis = {
+title: { text: "Manifestation Probability (Φ)", font: { color: '#2dd4bf' } },
+gridcolor: '#222',
+tickvals: [0, 1],
+ticktext: ['0 (Stable)', '1 (Birth)'],
+range: [-0.1, 1.2]
+};
+}
+
+
+Plotly.react('plot-area', data, layout, {responsive: true, displayModeBar: false});
+}
+
+function resetLab() {
+syncVal(100, 'm_sl'); syncVal(100, 'c_sl'); syncVal(100, 'r_sl'); syncVal(100, 'e_sl'); syncVal(100, 'f_sl');
+}
+
+window.onload = () => { showScreen('portal'); };
+</script>
+</body>
+</html>

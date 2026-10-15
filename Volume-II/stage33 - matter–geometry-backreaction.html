@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 33 — Matter–Geometry Backreaction</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #f59e0b;
+--accent-back: #fbbf24; --accent-mass: #f97316; --accent-fluc: #fb7185; --accent-drift: #38bdf8; --accent-equil: #10b981;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100dvh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-unified); font-family: sans-serif; font-size: 0.85rem; min-width: 350px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+
+#screen-portal { justify-content: flex-start; padding-top: 8dvh; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 70px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); height: 90%; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0px auto; grid-template-columns: 320px 1fr 320px; gap: 10px; height: calc(100% - 40px); padding-top: 0px; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.constant-display-box {
+background: #111; border: 1px solid var(--accent-unified); padding: 6px; border-radius: 8px;
+display: flex; justify-content: space-around; margin-bottom: 10px;
+}
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(245, 158, 11, 0.05); border: 1px solid var(--accent-unified); padding: 8px; border-radius: 8px; margin-bottom: 8px; font-size: 0.6rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; height: 100%; position: relative; overflow: hidden; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #000; border: 1px solid #f59e0b; padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer {
+width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem;
+color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 33 — MATTER–GEOMETRY BACKREACTION</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">Backreaction & Feedback Lab</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">The Two-Way Coupling of Quantum Energy and Substrate Geometry.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-back);">
+<h2 style="color:var(--accent-back);">1. Energy Backreaction</h2>
+<p>Quantum Energy as a Source of Substrate Stress.</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-mass);">
+<h2 style="color:var(--accent-mass);">2. Quantum Mass Emergence</h2>
+<p>Curvature wells from Localized Resonance.</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-fluc);">
+<h2 style="color:var(--accent-fluc);">3. Vacuum Fluctuation Gravity</h2>
+<p>Stochastic Metric Ripples from Vacuum Noise.</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-drift);">
+<h2 style="color:var(--accent-drift);">4. Wavepacket Gravitational Drift</h2>
+<p>Quantum Motion along Self-Consistent Geodesics.</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-equil);">
+<h2 style="color:var(--accent-equil);">5. Quantum–Gravity Equilibrium</h2>
+<p>Stable Matter–Geometry Feedback Loops.</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-unified); background: linear-gradient(135deg, #0f1115 0%, #1a150a 100%);">
+<h2 style="color:var(--accent-unified);">6. Mathematical Structure</h2>
+<p>Summary of Backreaction & Feedback Mechanics.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer" style="padding: 10px 0;">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer" style="padding: 10px 0;">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color:var(--accent-unified); text-align:center;">Summary: Mathematical Structure of Stage 33</h2>
+
+<h3>Purpose of the Mathematical Summary</h3>
+<p>Stage 33 introduced the dynamical interaction between wave energy and the geometry of the vacuum substrate. Earlier stages of the framework established that spacetime geometry emerges from the structural parameters vacuum stiffness $K$ and synthesis pressure $P$, and that quantum wavefields appear as oscillatory modes of the substrate medium. Stage 33 extends this structure by demonstrating that energy carried by these wavefields can influence the geometry of the substrate itself. The purpose of this mathematical summary is to present the governing relations that describe this feedback interaction between wave energy and geometric curvature.</p>
+
+<h3>Fundamental Energy–Geometry Relation</h3>
+<p>The central concept of Stage 33 is that energy stored in wavefields modifies the geometry of the substrate medium. This interaction may be represented through the general relation</p>
+<p>$$G_{\mu\nu} \propto T_{\mu\nu}$$</p>
+<p>where:</p>
+<ul>
+<li>$G_{\mu\nu}$ represents the curvature of the geometric structure and</li>
+<li>$T_{\mu\nu}$ represents the energy–momentum distribution of the wavefields.</li>
+</ul>
+<p>Within the framework this relation expresses the principle that the energy of oscillatory modes produces stress within the substrate, and the substrate responds by adjusting its geometry.</p>
+
+<h3>Wave Energy Density</h3>
+<p>The energy carried by a wavefield propagating through the substrate can be expressed as</p>
+<p>$$\rho_{\text{wave}} = \frac{1}{2} \left[(\partial_t \psi)^2 + c^2(\nabla \psi)^2 \right]$$</p>
+<p>where:</p>
+<ul>
+<li>$\psi$ represents the amplitude of the oscillatory field,</li>
+<li>$\partial_t \psi$ represents the time variation of the field, and</li>
+<li>$\nabla \psi$ represents the spatial gradient of the field.</li>
+</ul>
+<p>This expression describes how the oscillatory motion of the field stores energy within the substrate.</p>
+
+<h3>Localized Energy and Effective Mass</h3>
+<p>When oscillatory waves become spatially localized they produce a concentrated energy density within a region of the substrate. The total energy contained in the localized configuration may be written as</p>
+<p>$$E = \int \rho_{\text{wave}} dV$$</p>
+<p>where $dV$ represents the volume element of the localized region.</p>
+<p>The equivalent mass associated with this localized energy is</p>
+<p>$$m_{\text{eff}} = \frac{E}{c^2}$$</p>
+<p>This relation expresses how localized wave energy behaves as an effective mass within the framework.</p>
+
+<h3>Geometry Response to Energy Density</h3>
+<p>The deformation of the substrate geometry produced by energy density may be represented by the gravitational potential relation</p>
+<p>$$\nabla^2 \Phi = 4\pi G \rho_{\text{wave}}$$</p>
+<p>where:</p>
+<ul>
+<li>$\Phi$ represents the potential generated by the energy distribution.</li>
+</ul>
+<p>This relation describes how energy density generates curvature in the surrounding geometry.</p>
+
+<h3>Metric Perturbation</h3>
+<p>When energy density varies within the substrate the geometry of the medium may be expressed as a perturbation of an equilibrium metric</p>
+<p>$$g_{\mu\nu} = g_{\mu\nu}^{(0)} + h_{\mu\nu}$$</p>
+<p>where:</p>
+<ul>
+<li>$g_{\mu\nu}^{(0)}$ represents the equilibrium geometry of the substrate and</li>
+<li>$h_{\mu\nu}$ represents the perturbation produced by localized energy fluctuations.</li>
+</ul>
+<p>This relation describes the geometric response of the substrate to energy variations.</p>
+
+<h3>Propagation of Wave Packets in Curved Geometry</h3>
+<p>When wave packets move through the curved substrate geometry their trajectories follow geodesic paths determined by the metric of the medium</p>
+<p>$$\frac{d^2 x^\mu}{ds^2} + \Gamma^\mu_{\alpha\beta} \frac{dx^\alpha}{ds}\frac{dx^\beta}{ds} = 0$$</p>
+<p>where:</p>
+<ul>
+<li>$x^\mu$ represents spacetime coordinates and</li>
+<li>$\Gamma^\mu_{\alpha\beta}$ represents the connection coefficients derived from the substrate geometry.</li>
+</ul>
+<p>This equation describes how wave packets propagate through curved geometry.</p>
+
+<h3>Energy–Geometry Feedback Loop</h3>
+<p>The combined relations presented above describe a dynamical feedback system in which wave energy and geometry interact. This interaction may be summarized conceptually as:</p>
+<p><strong>Wave Energy $\rightarrow$ Substrate Stress $\rightarrow$ Geometry Curvature</strong></p>
+<p>and</p>
+<p><strong>Geometry Curvature $\rightarrow$ Guided Wave Propagation</strong></p>
+<p>Together these relations form the feedback structure:</p>
+<p><strong>Wave Energy $\leftrightarrow$ Geometry Curvature</strong></p>
+<p>which represents the dynamical coupling between matter and geometry.</p>
+
+<h3>Role of Framework Parameters</h3>
+<p>The response of the substrate medium is regulated by the structural parameters of the framework.</p>
+<p><strong>Vacuum stiffness $K$</strong> determines the resistance of the substrate to deformation. Larger stiffness reduces the curvature produced by a given energy density.</p>
+<p><strong>Synthesis pressure $P$</strong> stabilizes the substrate and distributes stress throughout the medium.</p>
+<p>Together these parameters determine the mechanical behavior of the substrate when energy is present within the system.</p>
+
+<h3>Conceptual Interpretation</h3>
+<p>The mathematical relations summarized in this section describe how energy contained in wavefields interacts with the geometry of the vacuum substrate. Localized energy generates stress within the medium, the substrate responds by deforming its geometry, and the resulting geometry guides the propagation of energy through the system. The framework therefore describes matter and geometry as two aspects of a single dynamical structure governed by the properties of the substrate.</p>
+
+<div class="summary-section" style="margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+
+<h3 style="color: var(--accent-color); text-transform: uppercase; letter-spacing: 2px;">Fundamental Resonance Identity</h3>
+
+<p>
+The values <strong>K = 11.350</strong> and <strong>P = 0.6900</strong> are not empirical measurements.
+They are the <em>structural equilibrium parameters</em> of the vacuum substrate derived from the interaction of the three vacuum fields (Stabilizing, Conserving, and Motive).
+These parameters correspond to the <strong>zero-point resonance configuration</strong> where the substrate achieves dynamic balance.
+</p>
+
+<div class="math-box" style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 8px; margin: 20px 0;">
+
+<p style="text-align: center; font-size: 1.1em;">
+The Resonance Identity ($R$):
+$$
+R(K,P) = \frac{K}{K_0}\cdot\frac{P_0}{P} \approx 1
+$$
+</p>
+
+<p style="text-align:center; font-size:0.9em; opacity:0.8;">
+where $K_0 = 11.350$ and $P_0 = 0.6900$ represent the structural equilibrium values of the substrate.
+</p>
+
+</div>
+
+<div class="logic-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 0.9em;">
+
+<div class="logic-item">
+<h4 style="color: #00d4ff; margin-bottom: 5px;">Why K = 11.350?</h4>
+<p>
+This value corresponds to the structural stiffness required for stable curvature formation.
+If $K$ were lower, gravitational binding would be insufficient to maintain coherent structures.
+If $K$ were significantly larger, curvature responses would become unstable and produce excessive geometric rigidity.
+</p>
+</div>
+
+<div class="logic-item">
+<h4 style="color: #00d4ff; margin-bottom: 5px;">Why P = 0.6900?</h4>
+<p>
+The synthesis pressure represents the equilibrium background pressure generated by the stabilizing field.
+At $P = 0.6900$ the substrate maintains global expansion equilibrium while still allowing localized curvature formation.
+This balance permits both cosmic expansion and gravitational structure formation to coexist.
+</p>
+</div>
+
+</div>
+
+<p style="margin-top: 20px; font-style: italic; opacity: 0.8;">
+<strong>Conclusion:</strong>
+When $R = 1$ the interaction between the Stabilizing, Conserving, and Motive fields produces a balanced substrate state.
+Small deviations from this condition alter the curvature response of the vacuum and shift the stability of large-scale cosmic structures.
+</p>
+
+</div>
+
+<hr>
+
+<h2 style="color:var(--accent-unified); text-align:center;">Master Equation of the Feedback System</h2>
+
+<h3>Purpose of the Master Equation</h3>
+<p>Stage 33 introduced the dynamical interaction between wave energy and the geometry of the vacuum substrate. Earlier stages of the framework established that spacetime geometry emerges from the structural parameters vacuum stiffness $K$ and synthesis pressure $P$, and that oscillatory wavefields propagate through this substrate as coherent quantum excitations. Stage 33 extends this structure by demonstrating that energy carried by these wavefields can influence the geometry of the substrate itself. The purpose of the master equation is to summarize this interaction in a single mathematical relation describing the feedback between wave energy and substrate geometry.</p>
+
+<h3>Substrate Geometry Relation</h3>
+<p>According to this framework the geometry of spacetime emerges from the structural properties of the vacuum substrate and the energy distribution contained within it. This relationship may be expressed as</p>
+<p>$$g_{\mu\nu} = f(K, P, \rho_{\text{wave}})$$</p>
+<p>where:</p>
+<ul>
+<li>$g_{\mu\nu}$ represents the metric geometry of the substrate,</li>
+<li>$K$ represents vacuum stiffness,</li>
+<li>$P$ represents synthesis pressure, and</li>
+<li>$\rho_{\text{wave}}$ represents the energy density of oscillatory wavefields.</li>
+</ul>
+<p>This relation expresses the principle that geometry is determined by both the structural properties of the substrate and the energy contained in its oscillatory modes.</p>
+
+<h3>Wavefield Dynamics</h3>
+<p>The evolution of the oscillatory field within the substrate may be represented by a relativistic wave equation</p>
+<p>$$(\Box + m^2)\Psi = 0$$</p>
+<p>where:</p>
+<ul>
+<li>$\Psi$ represents the oscillatory field and</li>
+<li>$\Box$ represents the wave operator defined by the substrate geometry.</li>
+</ul>
+<p>This equation describes how quantum wavefields propagate within the curved geometry produced by the substrate.</p>
+
+<h3>Energy–Geometry Coupling</h3>
+<p>The energy density of the wavefield produces stress within the substrate, leading to geometric deformation. This interaction may be expressed through the relation</p>
+<p>$$G_{\mu\nu} = \kappa \, T_{\mu\nu}(\Psi)$$</p>
+<p>where:</p>
+<ul>
+<li>$G_{\mu\nu}$ represents the geometric curvature of the substrate and</li>
+<li>$T_{\mu\nu}(\Psi)$ represents the stress–energy distribution generated by the wavefield.</li>
+</ul>
+<p>This equation describes how energy contained in oscillatory modes influences the geometry of the substrate.</p>
+
+<h3>Master Feedback Equation</h3>
+<p>Combining the wave dynamics with the geometry response yields the master relation describing the feedback system</p>
+<p>$$G_{\mu\nu}(K,P) = \kappa \, T_{\mu\nu}(\Psi)$$</p>
+<p>together with the wave propagation equation</p>
+<p>$$(\Box_g + m^2)\Psi = 0$$</p>
+<p>where $\Box_g$ represents the wave operator defined by the metric $g_{\mu\nu}$.</p>
+<p>These equations describe a self-consistent system in which wavefields evolve within a geometry generated by their own energy distribution.</p>
+
+<h3>Equilibrium Condition</h3>
+<p>A stable configuration arises when the energy distribution of the wavefield and the curvature of the substrate geometry remain mutually consistent. This equilibrium condition may be written conceptually as:</p>
+<p><strong>Wave Energy $\leftrightarrow$ Geometry Curvature</strong></p>
+<p>indicating that the energy stored in the wavefield generates the geometry that in turn stabilizes the wave configuration.</p>
+
+<h3>Role of Framework Parameters</h3>
+<p><strong>Vacuum stiffness $K$</strong> determines the mechanical resistance of the substrate to deformation produced by energy concentration. Larger stiffness reduces the curvature produced by a given energy density.</p>
+<p><strong>Synthesis pressure $P$</strong> stabilizes the substrate and regulates the redistribution of stress throughout the medium.</p>
+<p>Together these parameters determine how energy contained in wavefields modifies the geometry of the substrate.</p>
+
+<h3>Conceptual Interpretation</h3>
+<p>The master equation expresses the central idea of Stage 33: matter and geometry form a coupled dynamical system within the vacuum substrate. Wavefields carry energy through the medium, this energy produces geometric curvature, and the resulting geometry guides the propagation of the wavefields. Matter therefore appears as a stable configuration of energy and curvature within the substrate. </p>
+</div>
+
+</div>
+<footer class="isfp-footer" style="padding: 10px 0;">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div class="constant-display-box">
+<div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val">11.350</span></div>
+<div class="const-item"><span class="const-label">Pressure P</span><span class="const-val">0.6900</span></div>
+</div>
+<div id="mapping-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Feedback Telemetry</span>
+<span id="epoch-label" style="font-family:monospace; font-size:0.85rem; color:var(--accent-unified);">BACKREACTION ACTIVE</span>
+</div>
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:8px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:6px;">RESET PARAMETERS</button>
+<div id="panel-footer-text" style="font-size: 0.75rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.4; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:8px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.62rem; text-transform:uppercase; cursor:pointer; padding:6px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area" style="width:100%; height:100%;"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Coupling Logic</span>
+<div id="metrics-content" style="font-size:0.75rem; font-family:monospace; line-height:1.7;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Unified Hierarchy</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.75rem; color: var(--text-dim); line-height: 1.4; background: #000; padding: 10px; border-radius: 8px; border: 1px solid #222; margin-top: auto;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "Energy Backreaction",
+brief: `
+<div class="math-process">
+<h2 style="color:var(--accent-back); text-align:center;">Detailed Briefing: Energy Backreaction</h2>
+
+<h3 style="color:var(--accent-back);">Purpose of the Module</h3>
+<p>Stage 33 Module 1 introduces the concept of energy backreaction on the substrate geometry. Earlier stages of the simulator established the structural hierarchy of the framework. Stage 31 demonstrated how spacetime geometry emerges from the substrate parameters vacuum stiffness $K$ and synthesis pressure $P$. Stage 32 introduced the appearance of coherent quantum wavefields as oscillatory modes of the substrate medium. In those stages the causal direction primarily flowed from the substrate toward geometry and quantum dynamics.</p>
+<p>Module 1 of Stage 33 introduces the reverse interaction. Once quantum waves exist within the substrate they carry energy. According to this framework the presence of energy within the substrate generates local stress within the medium. This stress alters the geometric configuration of the substrate grid, producing a deformation of the local geometry. The purpose of this module is therefore to illustrate how energy contained in wavefields can influence the geometry of the substrate itself.</p>
+
+<h3 style="color:var(--accent-back);">Concept</h3>
+<p>In classical field theory energy stored in a field can produce physical effects on the medium through which the field propagates. In gravitational physics the energy–momentum distribution determines the curvature of spacetime. According to this framework the underlying mechanism of this relationship is the mechanical response of the vacuum substrate. When a wavefield propagates through the substrate it carries energy density. This energy produces a localized stress within the substrate medium. The substrate then responds to this stress by adjusting its geometric configuration. The module therefore demonstrates the basic mechanism:</p>
+<div style="background:rgba(251, 191, 36, 0.1); border-left: 3px solid var(--accent-back); padding: 10px; margin: 15px 0; text-align:center; font-weight:bold;">
+Wave Energy<br>→ Substrate Stress<br>→ Geometry Deformation
+</div>
+<p>This process represents the backreaction of matter on geometry.</p>
+
+<h3 style="color:var(--accent-back);">Substrate Parameters</h3>
+<p>The module displays the two structural parameters of the framework:</p>
+<ul>
+<li><strong>Vacuum Stiffness:</strong> $K = 11.350$</li>
+<li><strong>Synthesis Pressure:</strong> $P = 0.6900$</li>
+</ul>
+<p>Vacuum stiffness represents the resistance of the substrate to spatial deformation. A larger stiffness means the substrate resists curvature more strongly. Synthesis pressure represents the internal stabilizing tension of the substrate that maintains equilibrium across the vacuum structure.</p>
+<p>When energy is introduced into the substrate in the form of a wavefield, the response of the medium depends on the values of these parameters. Regions with higher stiffness resist deformation more strongly, while synthesis pressure regulates how the substrate redistributes stress.</p>
+
+<h3 style="color:var(--accent-back);">Wave Energy as the Source of Backreaction</h3>
+<p>The simulator introduces a control parameter representing the wave energy density present in the substrate. This quantity corresponds to the local concentration of oscillatory energy carried by the quantum wave. As the energy density increases the stress applied to the substrate also increases. The substrate grid displayed in the visualization responds by gradually deforming. The curvature of the grid therefore represents the geometric effect of the energy distribution within the medium.</p>
+
+<h3 style="color:var(--accent-back);">Visualization</h3>
+<p>The central visualization shows a substrate surface represented by a grid structure. The grid corresponds to the geometric structure of spacetime emerging from the substrate fields. At low wave energy the grid remains nearly flat, indicating that the geometry is approximately uniform. As the energy parameter increases the central region of the grid begins to bend downward. This bending represents the formation of curvature generated by the localized energy distribution.</p>
+<p>The deformation pattern therefore visually represents the concept that energy within the substrate modifies the geometry of the medium.</p>
+
+<h3 style="color:var(--accent-back);">Emergence Hierarchy</h3>
+<div style="background:rgba(251, 191, 36, 0.05); border: 1px solid var(--accent-back); border-radius:10px; padding: 15px; text-align:center; margin: 20px 0;">
+<strong>Wave Energy</strong><br>↓<br><strong>Substrate Stress</strong><br>↓<br><strong>Geometry Shift</strong>
+</div>
+<p>This hierarchy describes the physical process being simulated. The oscillatory energy of the wave generates a stress within the substrate. This stress modifies the geometry of the substrate grid, producing a local curvature.</p>
+
+<h3 style="color:var(--accent-back);">Conceptual Interpretation</h3>
+<p>According to this framework gravitational curvature arises from the mechanical response of the vacuum substrate to energy stored in fields. Instead of interpreting gravity purely as geometric curvature without physical substance, the framework interprets curvature as the deformation of an underlying medium characterized by stiffness and pressure. When energy is present within the medium the substrate responds by adjusting its geometry.</p>
+<p>Module 1 therefore illustrates the fundamental interaction between matter and geometry. Energy contained in wavefields alters the structure of the substrate, and the resulting geometry subsequently influences the motion of waves and particles.</p>
+
+<h3 style="color:var(--accent-back);">Scientific Significance</h3>
+<p>This module represents the first explicit demonstration of matter–geometry feedback within the simulator architecture. Earlier stages illustrated the emergence of geometry and quantum waves independently. Module 1 introduces the coupling between these two domains. The energy contained in quantum wavefields becomes a source of geometric deformation of the substrate. This establishes the basic dynamical loop that underlies gravitational physics.</p>
+<p>By representing this process visually, the simulator provides an intuitive representation of how energy distributions influence the geometry of the underlying substrate medium.</p>
+</div>
+`,
+math: `
+<div class="math-process">
+<h2 style="color:var(--accent-back); text-align:center;">Explicit Mathematics: Energy Backreaction</h2>
+
+<h3 style="color:var(--accent-back);">Governing Relation</h3>
+<p>The basic mathematical idea illustrated in this module is that energy density modifies the geometric response of the substrate. This relationship can be represented conceptually as:</p>
+<p style="text-align:center; font-size:1.1rem;">
+$$\\Delta g_{\\mu\\nu} \\propto \\rho_{\\text{wave}}$$
+</p>
+<p>where $\\rho_{\\text{wave}}$ represents the energy density carried by the wavefield.</p>
+
+<h3 style="color:var(--accent-back);">Substrate Stress Relation</h3>
+<p>According to this framework the energy density of the wave produces a stress in the substrate medium. This stress can be represented as:</p>
+<p style="text-align:center; font-size:1.1rem;">
+$$\\sigma_s = K \\cdot \\epsilon$$
+</p>
+<p>where:</p>
+<ul>
+<li>$\\sigma_s$ — substrate stress</li>
+<li>$K$ — vacuum stiffness</li>
+<li>$\\epsilon$ — deformation strain of the substrate</li>
+</ul>
+<p>This relation expresses the mechanical response of the substrate medium.</p>
+
+<h3 style="color:var(--accent-back);">Energy Density of the Wave</h3>
+<p>The energy density of the oscillatory wavefield can be represented as:</p>
+<p style="text-align:center; font-size:1.1rem;">
+$$\\rho_{\\text{wave}} = \\frac{1}{2} \\left[(\\partial_t \\psi)^2 + c^2(\\nabla \\psi)^2 \\right]$$
+</p>
+<p>where:</p>
+<ul>
+<li>$\\psi$ — wave amplitude</li>
+<li>$\\partial_t \\psi$ — temporal variation of the wave</li>
+<li>$\\nabla \\psi$ — spatial gradient of the wave</li>
+</ul>
+<p>This expression describes how oscillatory motion of the wave carries energy through the substrate.</p>
+
+<h3 style="color:var(--accent-back);">Geometry Response</h3>
+<p>The resulting geometric response of the substrate can be expressed as:</p>
+<p style="text-align:center; font-size:1.1rem;">
+$$\\nabla^2 \\Phi = 4\\pi G \\rho_{\\text{wave}}$$
+</p>
+<p>where $\\Phi$ represents the gravitational potential generated by the energy density.</p>
+<p>This relation illustrates how energy stored in the wavefield produces curvature in the geometry of the substrate.</p>
+
+<h3 style="color:var(--accent-back);">Role of Framework Parameters</h3>
+<p>The two structural parameters of the framework influence this interaction:</p>
+<p><strong>Vacuum stiffness $K$</strong> regulates the resistance of the substrate to deformation. Larger stiffness reduces the curvature produced by a given energy density.</p>
+<p><strong>Synthesis pressure $P$</strong> maintains global equilibrium of the substrate and determines how stress is redistributed across the medium.</p>
+<p>Together these parameters determine how strongly wave energy modifies the geometry of the substrate.</p>
+
+<h3 style="color:var(--accent-back);">Mathematical Interpretation</h3>
+<p>The mathematical structure illustrated by the module can therefore be summarized as:</p>
+<div style="background:rgba(251, 191, 36, 0.05); border: 1px solid var(--accent-back); border-radius:10px; padding: 15px; text-align:center; margin: 20px 0; font-weight:bold;">
+$$\\text{Wave Energy} \\rightarrow \\text{Substrate Stress} \\rightarrow \\text{Geometry Deformation}$$
+</div>
+<p>This relation represents the backreaction of matter on geometry within the substrate framework.</p>
+</div>
+`,
+sliders: `<div class="control-item"><div class="label-group"><span>Coupling Strength</span><input type="number" id="back_input" class="digital-entry" value="0.0" oninput="syncVal(this.value, 'back_slider')"></div><input type="range" id="back_slider" min="0" max="1" step="0.01" value="0" oninput="syncVal(this.value, 'back_input')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Mechanism</span><div style="text-align:center; font-size: 1.00rem; color:var(--accent-back);">SUBSTRATE STRESS</div></div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Backreaction</span><div style="text-align:center; font-size: 1.00rem;">$\\delta g \\propto |\\Psi|^2$</div></div>`,
+hierarchy: "Wave Energy<br>↓<br>Substrate Stress<br>↓<br>Geometry Shift",
+footer: "High energy density leads to local substrate deformation.",
+rightNote: "<b>Feedback:</b> Increase coupling to see the grid deform under wave peaks."
+},
+2: {
+title: "Quantum Mass Emergence",
+brief: `
+<div class="math-process">
+<h2 style="color:var(--accent-mass); text-align:center;">Detailed Briefing: Quantum Mass Emergence</h2>
+
+<h3 style="color:var(--accent-mass);">Purpose of the Module</h3>
+<p>Stage 33 Module 2 explores how localized energy within the substrate can manifest as an effective mass. Earlier modules established that geometry emerges from the substrate parameters vacuum stiffness $K$ and synthesis pressure $P$, and that quantum waves propagate as oscillatory modes of the substrate medium. Module 1 of Stage 33 introduced the concept that wave energy can influence substrate geometry through backreaction. Module 2 advances this idea further by examining how stable localized oscillatory structures may produce persistent curvature of the substrate. The purpose of this module is therefore to illustrate how a localized concentration of oscillatory energy can behave as a massive object within the substrate framework.</p>
+
+<h3 style="color:var(--accent-mass);">Concept</h3>
+<p>In classical physics mass is often treated as an intrinsic property of matter. In field theory, however, particles are understood as localized excitations of underlying fields. According to this framework the vacuum substrate supports oscillatory wave modes that can become spatially localized. When such oscillations form a stable standing configuration, the energy of the oscillation remains concentrated within a confined region. This localized energy generates stress within the substrate and produces a deformation of the surrounding geometry. The module therefore demonstrates the mechanism by which localized wave energy can create a curvature structure that behaves as an effective mass.</p>
+
+<h3 style="color:var(--accent-mass);">Substrate Parameters</h3>
+<p>The simulator displays the structural parameters of the substrate:</p>
+<ul>
+<li><strong>Vacuum Stiffness:</strong> $K = 11.350$</li>
+<li><strong>Synthesis Pressure:</strong> $P = 0.6900$</li>
+</ul>
+<p>Vacuum stiffness determines how strongly the substrate resists deformation when energy is concentrated in a localized region. A higher stiffness implies that stronger energy localization is required to produce curvature. Synthesis pressure represents the stabilizing tension that maintains equilibrium across the substrate medium. Together these parameters determine how localized oscillatory energy modifies the geometry of the substrate.</p>
+
+<h3 style="color:var(--accent-mass);">Localized Resonance</h3>
+<p>The visualization shows a standing wave packet confined to a localized region of the substrate grid. Unlike freely propagating waves, which distribute energy across space, a standing resonance concentrates energy near a central point. This localization produces a region of increased substrate stress. The surrounding grid deforms slightly inward, illustrating how localized energy produces curvature in the substrate geometry. The visual representation therefore shows how the spatial confinement of wave energy generates an effective gravitational influence.</p>
+
+<h3 style="color:var(--accent-mass);">Emergence Hierarchy</h3>
+<div style="background:rgba(249, 115, 22, 0.05); border: 1px solid var(--accent-mass); border-radius:10px; padding: 15px; text-align:center; margin: 20px 0;">
+<strong>Standing Mode</strong><br>↓<br><strong>Local Energy Density</strong><br>↓<br><strong>Effective Mass</strong>
+</div>
+<p>A standing wave mode concentrates oscillatory energy within a specific region of the substrate. This energy produces a local density within the medium. The substrate responds to this energy density by deforming its geometry, producing curvature that behaves as an effective mass.</p>
+
+<h3 style="color:var(--accent-mass);">Conceptual Interpretation</h3>
+<p>According to this framework mass is not treated as a fundamental property inserted into the theory independently. Instead mass arises from the presence of localized energy within the substrate medium. When oscillatory wave modes become confined into stable resonance patterns, the energy stored in those oscillations produces a deformation of the substrate geometry. This deformation persists as long as the oscillatory mode remains stable. The effective mass associated with a particle therefore corresponds to the energy of a stable resonance of the substrate field.</p>
+
+<h3 style="color:var(--accent-mass);">Visualization Explanation</h3>
+<p>The central visualization displays a localized oscillation pattern on the substrate grid. The horizontal axis represents spatial position, while the vertical displacement of the grid represents the deformation of the substrate geometry. The peak of the oscillation corresponds to the region of maximum energy density. As the resonance amplitude increases the central region of the grid bends slightly inward, representing the curvature generated by the localized energy distribution.</p>
+
+<h3 style="color:var(--accent-mass);">Scientific Significance</h3>
+<p>This module illustrates how particle mass may be interpreted as a manifestation of energy localization within the vacuum substrate. Instead of introducing mass as an independent fundamental quantity, the framework interprets mass as a consequence of stable oscillatory configurations of the underlying fields. This interpretation aligns with the broader field-theoretic perspective in which particles correspond to localized excitations of a deeper field structure. By representing this mechanism visually, the simulator provides an intuitive picture of how localized wave energy can produce the gravitational influence normally attributed to mass.</p>
+</div>
+`,
+math: `
+<div class="math-process">
+<h2 style="color:var(--accent-mass); text-align:center;">Explicit Mathematics: Quantum Mass Emergence</h2>
+
+<h3 style="color:var(--accent-mass);">Governing Relation</h3>
+<p>The basic mathematical relation connecting energy and mass is:</p>
+<p style="text-align:center; font-size:1.1rem;">
+$$E = mc^2$$
+</p>
+<p>This relation states that mass corresponds to a form of energy stored within a physical system.</p>
+
+<h3 style="color:var(--accent-mass);">Energy of the Standing Wave</h3>
+<p>The energy of a localized standing wave in the substrate can be written as:</p>
+<p style="text-align:center; font-size:1.1rem;">
+$$E = \\int \\rho_{\\text{wave}} \\, dV$$
+</p>
+<p>where:</p>
+<ul>
+<li>$\\rho_{\\text{wave}}$ — energy density of the oscillatory field</li>
+<li>$dV$ — volume element of the localized region</li>
+</ul>
+<p>This integral represents the total energy contained in the localized resonance.</p>
+
+<h3 style="color:var(--accent-mass);">Wave Energy Density</h3>
+<p>The energy density of the oscillatory field may be expressed as:</p>
+<p style="text-align:center; font-size:1.1rem;">
+$$\\rho_{\\text{wave}} = \\frac{1}{2} \\left[(\\partial_t \\psi)^2 + c^2(\\nabla \\psi)^2 \\right]$$
+</p>
+<p>where:</p>
+<ul>
+<li>$\\psi$ — amplitude of the oscillatory wavefield</li>
+<li>$\\partial_t \\psi$ — temporal variation of the field</li>
+<li>$\\nabla \\psi$ — spatial gradient of the field</li>
+</ul>
+<p>This expression describes the distribution of energy carried by the wave.</p>
+
+<h3 style="color:var(--accent-mass);">Effective Mass Relation</h3>
+<p>The effective mass generated by the localized energy is therefore:</p>
+<p style="text-align:center; font-size:1.1rem;">
+$$m_{\\text{eff}} = \\frac{E}{c^2}$$
+</p>
+<p>This relation shows how the energy stored in the standing wave corresponds to an equivalent mass.</p>
+
+<h3 style="color:var(--accent-mass);">Geometry Response</h3>
+<p>The curvature generated by this energy density can be expressed through the relation:</p>
+<p style="text-align:center; font-size:1.1rem;">
+$$\\nabla^2 \\Phi = 4\\pi G \\rho_{\\text{wave}}$$
+</p>
+<p>where:</p>
+<ul>
+<li>$\\Phi$ — gravitational potential generated by the energy distribution</li>
+<li>$G$ — gravitational constant</li>
+</ul>
+<p>This equation describes how localized energy density produces curvature in the surrounding geometry.</p>
+
+<h3 style="color:var(--accent-mass);">Role of Framework Parameters</h3>
+<p>The response of the substrate depends on the structural parameters of the framework:</p>
+<p><strong>Vacuum stiffness $K$</strong> regulates how strongly the substrate resists deformation. Larger values of $K$ reduce the curvature produced by a given energy density.</p>
+<p><strong>Synthesis pressure $P$</strong> stabilizes the substrate and regulates the redistribution of stress throughout the medium.</p>
+<p>Together these parameters determine how localized oscillatory energy produces curvature within the substrate geometry.</p>
+</div>
+`,
+sliders: `<div class="control-item"><div class="label-group"><span>Resonance Energy</span><input type="number" id="mass_input" class="digital-entry" value="0.5" oninput="syncVal(this.value, 'mass_slider')"></div><input type="range" id="mass_slider" min="0.1" max="2" step="0.01" value="0.5" oninput="syncVal(this.value, 'mass_input')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">State</span><div style="text-align:center; font-size: 1.00rem; color:var(--accent-mass);">MASSIVE RESONANCE</div></div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Effective Mass</span><div style="text-align:center; font-size: 1.00rem;">$M_{eff} = \\int \\rho_{sub} dV$</div></div>`,
+hierarchy: "Standing Mode<br>↓<br>Local Energy Density<br>↓<br>Effective Mass",
+footer: "The particle resonance creates its own gravitational well.",
+rightNote: "<b>Observation:</b> Note how the substrate grid pulls inward toward the resonance center."
+},
+3: {
+title: "Vacuum Fluctuation Gravity",
+brief: `
+<div class="math-process">
+<h2 style="color:var(--accent-fluc); text-align:center;">Detailed Briefing: Vacuum Fluctuation Geometry</h2>
+
+<h3 style="color:var(--accent-fluc);">Purpose of the Module</h3>
+<p>Stage 33 Module 3 investigates how microscopic fluctuations in the energy of the vacuum substrate can produce small geometric perturbations in the surrounding spacetime structure. Earlier modules demonstrated that coherent quantum waves can generate stress within the substrate and that localized standing modes may manifest as effective mass. Module 3 extends this idea to the microscopic level by examining what occurs when the energy of the substrate fluctuates randomly rather than remaining in a stable coherent configuration. The purpose of this module is therefore to illustrate how fluctuations in the substrate energy distribution can lead to small variations in the geometry of the medium.</p>
+
+<h3 style="color:var(--accent-fluc);">Concept</h3>
+<p>In quantum theory the vacuum is not perfectly static but contains fluctuating energy modes arising from the dynamical behavior of underlying fields. According to this framework the vacuum substrate is a structured medium characterized by stiffness $K$ and synthesis pressure $P$. Even in the absence of large coherent waves, small fluctuations in the oscillatory state of the substrate may occur. These fluctuations generate localized variations in the energy density of the medium. When the substrate experiences such variations it responds by slightly adjusting its geometry. The module therefore demonstrates the mechanism:</p>
+<div style="background:rgba(251, 113, 133, 0.1); border-left: 3px solid var(--accent-fluc); padding: 10px; margin: 15px 0; text-align:center; font-weight:bold;">
+Vacuum Fluctuation<br>→ Energy Variation<br>→ Metric Perturbation
+</div>
+<p>This process represents the interaction between microscopic vacuum dynamics and the geometry of the substrate.</p>
+
+<h3 style="color:var(--accent-fluc);">Substrate Parameters</h3>
+<p>The simulator displays the structural constants of the substrate:</p>
+<ul>
+<li><strong>Vacuum Stiffness:</strong> $K = 11.350$</li>
+<li><strong>Synthesis Pressure:</strong> $P = 0.6900$</li>
+</ul>
+<p>Vacuum stiffness determines how strongly the substrate resists deformation when energy fluctuations occur. Larger stiffness values produce smaller geometric distortions for the same energy fluctuation. Synthesis pressure maintains the global equilibrium of the substrate and redistributes local stress generated by fluctuations across the surrounding region.</p>
+
+<h3 style="color:var(--accent-fluc);">Vacuum Noise</h3>
+<p>The module introduces a parameter representing the intensity of vacuum noise. This quantity describes the amplitude of random oscillations occurring within the substrate field. As the noise level increases the energy density within the substrate becomes more irregular. These irregularities generate small stress variations in the medium. The substrate responds by producing slight distortions of the grid structure shown in the visualization.</p>
+
+<h3 style="color:var(--accent-fluc);">Visualization</h3>
+<p>The central visualization displays the substrate grid representing the geometric structure of the medium. When the vacuum noise parameter is small the grid remains nearly flat with only minor irregularities. As the noise amplitude increases small ripples appear across the grid surface. These ripples represent localized perturbations in the geometry of the substrate produced by energy fluctuations. The visualization therefore illustrates how microscopic vacuum dynamics can generate small geometric distortions even in the absence of large coherent wave structures.</p>
+
+<h3 style="color:var(--accent-fluc);">Emergence Hierarchy</h3>
+<div style="background:rgba(251, 113, 133, 0.05); border: 1px solid var(--accent-fluc); border-radius:10px; padding: 15px; text-align:center; margin: 20px 0;">
+<strong>Vacuum Noise</strong><br>↓<br><strong>Energy Variations</strong><br>↓<br><strong>Metric Ripples</strong>
+</div>
+<p>Random fluctuations in the oscillatory state of the substrate generate variations in local energy density. These variations produce stress within the medium. The substrate geometry responds by developing small ripples that represent perturbations of the underlying metric structure.</p>
+
+<h3 style="color:var(--accent-fluc);">Conceptual Interpretation</h3>
+<p>According to this framework spacetime geometry is not perfectly smooth at every scale but reflects the dynamical behavior of the substrate medium. Even when no large structures are present, microscopic fluctuations of the underlying fields can produce small variations in the energy distribution. The substrate responds to these variations through minor geometric adjustments. Module 3 therefore illustrates how the vacuum may possess a dynamic microscopic structure in which small energy fluctuations generate corresponding geometric perturbations.</p>
+
+<h3 style="color:var(--accent-fluc);">Visualization Explanation</h3>
+<p>The grid displayed in the simulator represents the geometry of the substrate. The vertical displacement of the grid corresponds to the curvature of the medium. Small oscillatory distortions appear across the grid as the vacuum noise parameter increases. These distortions represent metric perturbations produced by fluctuating energy within the substrate field.</p>
+
+<h3 style="color:var(--accent-fluc);">Scientific Significance</h3>
+<p>This module demonstrates how microscopic fluctuations in the substrate may produce small variations in the geometry of spacetime. In many areas of theoretical physics similar ideas appear in discussions of quantum vacuum fluctuations and stochastic spacetime structures. The simulator illustrates how such fluctuations may be interpreted as small dynamic distortions of an underlying substrate medium characterized by structural parameters $K$ and $P$. By visualizing this mechanism the module provides an intuitive representation of how microscopic vacuum dynamics can influence the geometry of the surrounding space.</p>
+</div>
+`,
+math: `
+<div class="math-process">
+<h2 style="color:var(--accent-fluc); text-align:center;">Explicit Mathematics: Vacuum Fluctuation Geometry</h2>
+
+<h3 style="color:var(--accent-fluc);">Governing Relation</h3>
+<p>Vacuum fluctuations can be represented by variations in the energy density of the substrate:</p>
+<p style="text-align:center; font-size:1.1rem;">
+$$\\delta \\rho_{\\text{vac}} \\neq 0$$
+</p>
+<p>where $\\delta \\rho_{\\text{vac}}$ represents the fluctuation of vacuum energy density around its equilibrium value.</p>
+
+<h3 style="color:var(--accent-fluc);">Stress Response of the Substrate</h3>
+<p>The stress generated by the energy fluctuation can be written as:</p>
+<p style="text-align:center; font-size:1.1rem;">
+$$\\sigma_s = K \\cdot \\epsilon$$
+</p>
+<p>where:</p>
+<ul>
+<li>$\\sigma_s$ — substrate stress</li>
+<li>$K$ — vacuum stiffness</li>
+<li>$\\epsilon$ — local strain generated by the fluctuation</li>
+</ul>
+<p>This relation describes the mechanical response of the substrate medium.</p>
+
+<h3 style="color:var(--accent-fluc);">Wave Energy Density</h3>
+<p>The energy density of the fluctuating field can be expressed as:</p>
+<p style="text-align:center; font-size:1.1rem;">
+$$\\rho_{\\text{vac}} = \\frac{1}{2} \\left[(\\partial_t \\psi)^2 + c^2(\\nabla \\psi)^2 \\right]$$
+</p>
+<p>where:</p>
+<ul>
+<li>$\\psi$ — fluctuating field amplitude</li>
+<li>$\\partial_t \\psi$ — temporal variation of the field</li>
+<li>$\\nabla \\psi$ — spatial gradient of the field</li>
+</ul>
+
+<h3 style="color:var(--accent-fluc);">Metric Perturbation</h3>
+<p>Small perturbations in the geometry can be written as:</p>
+<p style="text-align:center; font-size:1.1rem;">
+$$g_{\\mu\\nu} = g_{\\mu\\nu}^{(0)} + h_{\\mu\\nu}$$
+</p>
+<p>where:</p>
+<ul>
+<li>$g_{\\mu\\nu}^{(0)}$ — equilibrium metric</li>
+<li>$h_{\\mu\\nu}$ — small perturbation produced by vacuum fluctuations</li>
+</ul>
+
+<h3 style="color:var(--accent-fluc);">Relation Between Energy Fluctuation and Geometry</h3>
+<p>The relation between energy fluctuations and geometry perturbations can be written as:</p>
+<p style="text-align:center; font-size:1.1rem;">
+$$\\nabla^2 h_{\\mu\\nu} \\propto \\delta \\rho_{\\text{vac}}$$
+</p>
+<p>This relation indicates that fluctuations in the energy density of the substrate generate small perturbations in the geometric structure of the medium.</p>
+
+<h3 style="color:var(--accent-fluc);">Role of Framework Parameters</h3>
+<p><strong>Vacuum stiffness $K$</strong> determines how strongly the substrate resists geometric distortion. Larger stiffness reduces the amplitude of metric perturbations generated by a given energy fluctuation.</p>
+<p><strong>Synthesis pressure $P$</strong> stabilizes the substrate and redistributes the stress generated by fluctuations across the surrounding region.</p>
+<p>Together these parameters determine how microscopic energy fluctuations produce geometric perturbations within the substrate medium.</p>
+</div>
+`,
+sliders: `<div class="control-item"><div class="label-group"><span>Noise Amplitude</span><input type="number" id="fluc_input" class="digital-entry" value="0.1" oninput="syncVal(this.value, 'fluc_slider')"></div><input type="range" id="fluc_slider" min="0" max="1" step="0.01" value="0.1" oninput="syncVal(this.value, 'fluc_input')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Regime</span><div style="text-align:center; font-size: 1.00rem; color:var(--accent-fluc);">STOCHASTIC METRIC</div></div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Metric Noise</span><div style="text-align:center; font-size: 1.00rem;">$\\delta g \\sim \\langle \\delta \\Phi^2 \\rangle$</div></div>`,
+hierarchy: "Vacuum Noise<br>↓<br>Energy Variations<br>↓<br>Metric Ripples",
+footer: "Spacetime geometry fluctuates in sync with the substrate vacuum.",
+rightNote: "<b>Vibration:</b> Tiny curvature oscillations represent the quantum foam."
+},
+4: {
+title: "Wavepacket Gravitational Drift",
+brief: `
+<div class="math-process">
+<h2 style="color:var(--accent-drift); text-align:center;">Detailed Briefing: Wavepacket Gravitational Drift</h2>
+
+<h3 style="color:var(--accent-drift);">Purpose of the Module</h3>
+<p>Stage 33 Module 4 investigates how localized quantum wave packets move through a curved substrate geometry. Earlier modules of Stage 33 established that energy stored in wavefields can modify the geometry of the substrate and that localized standing waves may manifest as effective mass. Module 3 further illustrated that even small vacuum fluctuations can produce microscopic perturbations of the substrate geometry. Module 4 builds upon these ideas by examining how quantum wave packets propagate within a geometry that has already been altered by energy distributions. The purpose of this module is therefore to demonstrate how the motion of quantum wave packets becomes guided by the curvature of the substrate medium.</p>
+
+<h3 style="color:var(--accent-drift);">Concept</h3>
+<p>In classical mechanics the motion of particles is determined by forces acting upon them. In geometric descriptions of gravity the trajectory of a particle follows a geodesic path determined by the curvature of spacetime. According to this framework the substrate medium forms the geometric structure through which energy and matter propagate. When the substrate becomes curved due to energy concentration or mass formation, the propagation path of a wave packet is altered. Instead of traveling along a straight trajectory, the wave packet gradually bends toward regions where the substrate geometry has been deformed. The module therefore demonstrates the mechanism:</p>
+<div style="background:rgba(56, 189, 248, 0.1); border-left: 3px solid var(--accent-drift); padding: 10px; margin: 15px 0; text-align:center; font-weight:bold;">
+Wavepacket Motion<br>→ Substrate Metric Gradient<br>→ Gravitational Drift
+</div>
+<p>This process illustrates how gravitational motion emerges from the interaction between quantum wave propagation and the geometry of the substrate.</p>
+
+<h3 style="color:var(--accent-drift);">Substrate Parameters</h3>
+<p>The simulator displays the structural parameters of the framework:</p>
+<ul>
+<li><strong>Vacuum Stiffness:</strong> $K = 11.350$</li>
+<li><strong>Synthesis Pressure:</strong> $P = 0.6900$</li>
+</ul>
+<p>Vacuum stiffness determines the rigidity of the substrate medium. Regions with higher stiffness resist curvature more strongly, while regions influenced by energy concentration develop larger geometric deformation. Synthesis pressure maintains equilibrium within the substrate and ensures that curvature propagates smoothly across the medium.</p>
+
+<h3 style="color:var(--accent-drift);">Wavepacket Dynamics</h3>
+<p>The module introduces a localized wave packet representing a quantum excitation traveling through the substrate. The wave packet contains a concentrated envelope of oscillatory energy that moves across the grid structure representing the geometry of the substrate. When the substrate geometry is flat the wave packet travels in a straight trajectory. When curvature is introduced the path of the wave packet bends toward the region where the substrate is deformed.</p>
+
+<h3 style="color:var(--accent-drift);">Visualization</h3>
+<p>The central visualization displays a moving wave packet traveling across a curved substrate grid. The horizontal axis represents spatial position while the vertical displacement of the grid represents geometric curvature. The wave packet appears as a localized oscillatory structure that moves across the surface. When the curvature parameter is small the trajectory remains nearly straight. As curvature increases the path of the wave packet gradually bends toward the center of the deformation. This bending represents the gravitational influence of the substrate geometry on the propagation of the wave.</p>
+
+<h3 style="color:var(--accent-drift);">Emergence Hierarchy</h3>
+<div style="background:rgba(56, 189, 248, 0.05); border: 1px solid var(--accent-drift); border-radius:10px; padding: 15px; text-align:center; margin: 20px 0;">
+<strong>Wavepacket Motion</strong><br>↓<br><strong>Metric Gradient</strong><br>↓<br><strong>Gravitational Deflection</strong>
+</div>
+<p>The wave packet initially propagates through the substrate according to its internal wave dynamics. When the substrate geometry becomes curved the gradient of the metric alters the propagation direction. The wave packet therefore experiences a gradual deflection toward the region of curvature.</p>
+
+<h3 style="color:var(--accent-drift);">Conceptual Interpretation</h3>
+<p>According to this framework the motion of matter and energy arises from the interaction between wave propagation and the geometric structure of the substrate. Particles correspond to localized wave packets of the underlying fields. When these packets propagate through a curved substrate medium their trajectories follow paths determined by the geometry of that medium. The bending of trajectories that appears as gravitational attraction therefore arises from the guiding influence of the substrate geometry.</p>
+
+<h3 style="color:var(--accent-drift);">Visualization Explanation</h3>
+<p>The grid structure in the simulator represents the geometric configuration of the substrate. The curvature of the grid corresponds to the deformation produced by energy concentrations within the medium. The wave packet moving across this grid represents a quantum excitation traveling through the substrate. The bending of the wave packet’s path illustrates how curvature alters the propagation of energy within the medium.</p>
+
+<h3 style="color:var(--accent-drift);">Scientific Significance</h3>
+<p>This module illustrates how gravitational motion can be interpreted as the propagation of energy through a curved substrate medium. Instead of describing gravity as a force acting at a distance, the framework interprets gravitational motion as the natural trajectory followed by wave packets moving through a geometry shaped by energy distributions. The simulator therefore provides an intuitive picture of how quantum excitations propagate within a curved spacetime environment.</p>
+</div>
+`,
+math: `
+<div class="math-process">
+<h2 style="color:var(--accent-drift); text-align:center;">Explicit Mathematics: Wavepacket Gravitational Drift</h2>
+
+<h3 style="color:var(--accent-drift);">Wavepacket Representation</h3>
+<p>A localized quantum wave packet may be represented as:</p>
+<p style="text-align:center; font-size:1.1rem;">
+$$\\Psi(x,t) = A(x,t) e^{i(kx - \\omega t)}$$
+</p>
+<p>where:</p>
+<ul>
+<li>$\\Psi(x,t)$ — wavefunction of the packet</li>
+<li>$A(x,t)$ — slowly varying amplitude envelope</li>
+<li>$k$ — wave number</li>
+<li>$\\omega$ — angular frequency</li>
+</ul>
+<p>The envelope $A(x,t)$ defines the spatial localization of the packet.</p>
+
+<h3 style="color:var(--accent-drift);">Group Velocity</h3>
+<p>The propagation velocity of the wave packet is determined by the group velocity:</p>
+<p style="text-align:center; font-size:1.1rem;">
+$$v_g = \\frac{d\\omega}{dk}$$
+</p>
+<p>which describes the speed at which the envelope of the wave packet moves through the substrate.</p>
+
+<h3 style="color:var(--accent-drift);">Motion in Curved Geometry</h3>
+<p>When the substrate geometry becomes curved, the trajectory of the wave packet follows the geodesic equation:</p>
+<p style="text-align:center; font-size:1.1rem;">
+$$\\frac{d^2 x^\\mu}{ds^2} + \\Gamma^\\mu_{\\alpha\\beta} \\frac{dx^\\alpha}{ds}\\frac{dx^\\beta}{ds} = 0$$
+</p>
+<p>where:</p>
+<ul>
+<li>$x^\\mu$ — spacetime coordinates</li>
+<li>$s$ — affine parameter along the trajectory</li>
+<li>$\\Gamma^\\mu_{\\alpha\\beta}$ — connection coefficients determined by the geometry of the substrate</li>
+</ul>
+
+<h3 style="color:var(--accent-drift);">Metric Structure</h3>
+<p>The geometry through which the wave packet moves is described by the metric:</p>
+<p style="text-align:center; font-size:1.1rem;">
+$$g_{\\mu\\nu} = f(K,P,\\rho)$$
+</p>
+<p>where:</p>
+<ul>
+<li>$K$ — vacuum stiffness</li>
+<li>$P$ — synthesis pressure</li>
+<li>$\\rho$ — local energy density</li>
+</ul>
+<p>This relation expresses the idea that the geometry of the substrate emerges from its structural parameters and energy distribution.</p>
+
+<h3 style="color:var(--accent-drift);">Role of Framework Parameters</h3>
+<p><strong>Vacuum stiffness $K$</strong> determines the resistance of the substrate to deformation. Higher stiffness reduces the curvature produced by energy concentration.</p>
+<p><strong>Synthesis pressure $P$</strong> stabilizes the substrate and regulates the propagation of curvature across the medium.</p>
+<p>Together these parameters determine the geometry that guides the propagation of quantum wave packets.</p>
+</div>
+`,
+sliders: `<div class="control-item"><div class="label-group"><span>Gravitational Tilt</span><input type="number" id="drift_input" class="digital-entry" value="0.0" oninput="syncVal(this.value, 'drift_slider')"></div><input type="range" id="drift_slider" min="-0.5" max="0.5" step="0.01" value="0" oninput="syncVal(this.value, 'drift_input')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Motion</span><div style="text-align:center; font-size: 1.00rem; color:var(--accent-drift);">GEODESIC DRIFT</div></div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Path Equation</span><div style="text-align:center; font-size: 1.00rem;">$\\frac{d^2 x^\\mu}{d\\tau^2} + \\Gamma^\\mu_{\\alpha\\beta} = 0$</div></div>`,
+hierarchy: "Wavepacket Motion<br>↓<br>Metric Gradient<br>↓<br>Gravitational Deflection",
+footer: "The wavepacket bends as the substrate geometry curves.",
+rightNote: "<b>Pathing:</b> Change the tilt to see the wavepacket trajectory curve."
+},
+5: {
+title: "Quantum–Gravity Equilibrium",
+brief: `
+<div class="math-process">
+<h2 style="color:var(--accent-equil); text-align:center;">Detailed Briefing: Quantum–Gravity Equilibrium</h2>
+
+<h3 style="color:var(--accent-equil);">Purpose of the Module</h3>
+<p>Stage 33 Module 5 explores the possibility that quantum wave energy and substrate geometry can reach a stable dynamical equilibrium. Earlier modules of Stage 33 demonstrated how wave energy generates stress within the substrate and how localized standing waves can manifest as effective mass through energy concentration. Module 3 illustrated that even small fluctuations in the vacuum energy distribution can produce metric perturbations, while Module 4 showed that wave packets propagate along trajectories determined by the curvature of the substrate geometry. Module 5 integrates these ideas by examining the conditions under which wave energy and geometric curvature can form a self-consistent configuration that remains stable over time. The purpose of this module is therefore to illustrate the possibility that matter and geometry can coexist in a balanced dynamical state within the substrate framework.</p>
+
+<h3 style="color:var(--accent-equil);">Concept</h3>
+<p>In many physical systems a stable configuration arises when opposing influences reach equilibrium. According to this framework quantum waves carry energy through the substrate medium, and this energy produces geometric curvature by deforming the substrate structure. At the same time the curvature of the substrate influences the propagation of waves by guiding their trajectories. When these two processes interact, a feedback loop emerges: energy shapes geometry, and geometry influences the distribution of energy. If the feedback between these processes becomes balanced, a stable configuration may form in which the energy distribution and the geometric curvature reinforce each other. The module therefore demonstrates the mechanism:</p>
+<div style="background:rgba(16, 185, 129, 0.1); border-left: 3px solid var(--accent-equil); padding: 10px; margin: 15px 0; text-align:center; font-weight:bold;">
+Wave Energy<br>→ Geometry Curvature<br>→ Stabilized Configuration
+</div>
+<p>This feedback structure represents a possible equilibrium state between matter and geometry.</p>
+
+<h3 style="color:var(--accent-equil);">Substrate Parameters</h3>
+<p>The simulator displays the structural constants of the framework:</p>
+<ul>
+<li><strong>Vacuum Stiffness:</strong> $K = 11.350$</li>
+<li><strong>Synthesis Pressure:</strong> $P = 0.6900$</li>
+</ul>
+<p>Vacuum stiffness determines the mechanical resistance of the substrate to deformation. Regions of high stiffness require greater energy density to produce curvature. Synthesis pressure maintains the internal equilibrium of the substrate and regulates the redistribution of stress across the medium. Together these parameters determine how energy concentration produces curvature and how the resulting geometry stabilizes the wave distribution.</p>
+
+<h3 style="color:var(--accent-equil);">Energy–Geometry Feedback</h3>
+<p>The module introduces a parameter representing the energy density of a localized wave configuration. As the energy density increases the substrate geometry begins to deform, creating a curvature well. Once this curvature forms it influences the motion of the wave packet by guiding its propagation toward the center of the deformation. When the wave remains confined within this curvature structure the energy distribution becomes stable. In this situation the curvature produced by the wave energy maintains the conditions necessary for the wave to remain localized.</p>
+
+<h3 style="color:var(--accent-equil);">Visualization</h3>
+<p>The central visualization displays a localized oscillatory wave confined within a curved substrate grid. The grid represents the geometric structure of the substrate. As energy increases the central region of the grid forms a curved depression representing the geometric deformation produced by the energy concentration. The oscillatory wave remains localized within this region, illustrating how the curvature guides and stabilizes the wave configuration. The visual representation therefore demonstrates how energy and geometry can form a self-consistent structure.</p>
+
+<h3 style="color:var(--accent-equil);">Emergence Hierarchy</h3>
+<div style="background:rgba(16, 185, 129, 0.05); border: 1px solid var(--accent-equil); border-radius:10px; padding: 15px; text-align:center; margin: 20px 0;">
+<strong>Wave Energy</strong><br>↓<br><strong>Geometry Curvature</strong><br>↓<br><strong>Stable Configuration</strong>
+</div>
+<p>The energy of the wave generates stress within the substrate. This stress produces curvature in the geometry of the medium. The curvature then stabilizes the wave configuration by guiding its propagation and preventing dispersal.</p>
+
+<h3 style="color:var(--accent-equil);">Conceptual Interpretation</h3>
+<p>According to this framework matter can be interpreted as a stable configuration of energy within the substrate medium. The oscillatory energy of the wave produces curvature in the geometry of the substrate. The resulting curvature then confines the energy distribution, producing a stable feedback system between wave energy and geometry. In this interpretation particles correspond to stable structures in which energy localization and geometric curvature remain mutually reinforcing.</p>
+
+<h3 style="color:var(--accent-equil);">Visualization Explanation</h3>
+<p>The grid shown in the simulator represents the geometric structure of the substrate. The depression in the grid corresponds to the curvature generated by localized energy. The oscillatory wave inside this depression represents the localized energy distribution. The persistence of this configuration illustrates how wave energy and geometric curvature can form a stable system.</p>
+
+<h3 style="color:var(--accent-equil);">Scientific Significance</h3>
+<p>This module illustrates the possibility that matter and geometry can form stable configurations through feedback between energy and curvature. In this interpretation gravitational structure arises from the interaction between localized energy and the geometry of the substrate medium. The module therefore provides an intuitive representation of how energy localization and geometric curvature may coexist in a stable configuration within the framework.</p>
+</div>
+`,
+math: `
+<div class="math-process">
+<h2 style="color:var(--accent-equil); text-align:center;">Explicit Mathematics: Quantum–Gravity Equilibrium</h2>
+
+<h3 style="color:var(--accent-equil);">Energy–Geometry Relation</h3>
+<p>The interaction between energy and geometry can be represented conceptually by:</p>
+<p style="text-align:center; font-size:1.1rem;">
+$$G_{\\mu\\nu} \\propto T_{\\mu\\nu}$$
+</p>
+<p>where:</p>
+<ul>
+<li>$G_{\\mu\\nu}$ — geometric curvature tensor</li>
+<li>$T_{\\mu\\nu}$ — energy–momentum tensor representing the energy distribution</li>
+</ul>
+<p>This relation expresses how energy influences the geometry of the substrate.</p>
+
+<h3 style="color:var(--accent-equil);">Wave Energy Density</h3>
+<p>The energy density of the wave configuration is given by:</p>
+<p style="text-align:center; font-size:1.1rem;">
+$$\\rho_{\\text{wave}} = \\frac{1}{2} \\left[(\\partial_t \\psi)^2 + c^2(\\nabla \\psi)^2 \\right]$$
+</p>
+<p>where:</p>
+<ul>
+<li>$\\psi$ — amplitude of the wavefield</li>
+<li>$\\partial_t \\psi$ — time derivative of the field</li>
+<li>$\\nabla \\psi$ — spatial gradient of the field</li>
+</ul>
+
+<h3 style="color:var(--accent-equil);">Effective Mass</h3>
+<p>The localized energy of the wave corresponds to an effective mass:</p>
+<p style="text-align:center; font-size:1.1rem;">
+$$m_{\\text{eff}} = \\frac{1}{c^2} \\int \\rho_{\\text{wave}} dV$$
+</p>
+<p>where $dV$ represents the spatial volume element.</p>
+
+<h3 style="color:var(--accent-equil);">Geometry Response</h3>
+<p>The curvature generated by this energy distribution may be expressed through the potential equation:</p>
+<p style="text-align:center; font-size:1.1rem;">
+$$\\nabla^2 \\Phi = 4\\pi G \\rho_{\\text{wave}}$$
+</p>
+<p>where $\\Phi$ — gravitational potential generated by the energy density.</p>
+
+<h3 style="color:var(--accent-equil);">Equilibrium Condition</h3>
+<p>A stable configuration occurs when the curvature produced by the energy distribution confines the wave packet so that its energy density remains localized. Conceptually this equilibrium may be represented as:</p>
+<div style="background:rgba(16, 185, 129, 0.05); border: 1px solid var(--accent-equil); border-radius:10px; padding: 15px; text-align:center; margin: 20px 0; font-weight:bold;">
+$$\\text{Wave Energy} \\leftrightarrow \\text{Geometry Curvature}$$
+</div>
+<p>indicating a balanced feedback between energy localization and geometric deformation.</p>
+
+<h3 style="color:var(--accent-equil);">Role of Framework Parameters</h3>
+<p><strong>Vacuum stiffness $K$</strong> determines how strongly the substrate resists deformation produced by energy concentration.</p>
+<p><strong>Synthesis pressure $P$</strong> stabilizes the substrate and distributes stress throughout the medium.</p>
+<p>Together these parameters regulate the interaction between energy localization and geometric curvature within the substrate.</p>
+</div>
+`,
+sliders: `<div class="control-item"><div class="label-group"><span>Feedback Loop</span><input type="number" id="equil_input" class="digital-entry" value="0.5" oninput="syncVal(this.value, 'equil_slider')"></div><input type="range" id="equil_slider" min="0" max="1" step="0.01" value="0.5" oninput="syncVal(this.value, 'equil_input')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Goal</span><div style="text-align:center; font-size: 1.00rem; color:var(--accent-equil);">STABLE FEEDBACK</div></div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Equilibrium</span><div style="text-align:center; font-size: 1.00rem;">$G_{\\mu\\nu} = T_{\\mu\\nu}$</div></div>`,
+hierarchy: "Wave Energy<br>↓<br>Geometry Curvature<br>↓<br>Stable Configuration",
+footer: "Matter and Geometry exist in a self-sustaining resonance loop.",
+rightNote: "<b>Final State:</b> A perfect synchronization of energy and space."
+}
+};
+
+function syncVal(val, targetId) {
+document.getElementById(targetId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+if(!content) return;
+document.getElementById('brief-box-content').innerHTML = content.brief;
+document.getElementById('math-box-content').innerHTML = content.math;
+document.getElementById('control-sliders').innerHTML = content.sliders;
+document.getElementById('active-module-title').innerText = content.title;
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+showScreen('briefing');
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() { showScreen('lab'); runLab(); }
+
+function runLab() {
+const plotArea = document.getElementById('plot-area');
+if (!plotArea) return;
+
+let data = [];
+let layout = {
+paper_bgcolor: 'black',
+plot_bgcolor: 'black',
+margin: {t:30,b:30,l:30,r:30},
+showlegend: false,
+xaxis: { color: '#444', gridcolor: '#222' },
+yaxis: { color: '#444', gridcolor: '#222' }
+};
+
+if (currentTool === 1) {
+const strength = parseFloat(document.getElementById('back_slider')?.value || 0);
+let x = [], y_wave = [], y_grid = [];
+for(let t=-10; t<10; t+=0.1) {
+x.push(t);
+let wave = Math.cos(t) * Math.exp(-(t*t)/10);
+y_wave.push(wave);
+y_grid.push(-strength * wave * wave - 2);
+}
+data = [
+{x: x, y: y_wave, mode: 'lines', line: {color: '#fbbf24', width: 2}},
+{x: x, y: y_grid, mode: 'lines', line: {color: '#444', dash: 'dot'}}
+];
+} else if (currentTool === 2) {
+const energy = parseFloat(document.getElementById('mass_slider')?.value || 0.5);
+let x = [], y_res = [], y_well = [];
+for(let t=-5; t<5; t+=0.1) {
+x.push(t);
+let res = energy * Math.cos(t*4) * Math.exp(-(t*t));
+y_res.push(res);
+y_well.push(-energy * 1.5 * Math.exp(-(t*t)));
+}
+data = [
+{x: x, y: y_res, mode: 'lines', fill: 'tozeroy', line: {color: '#f97316'}},
+{x: x, y: y_well, mode: 'lines', line: {color: '#fb7185', width: 3}}
+];
+} else if (currentTool === 3) {
+const noise = parseFloat(document.getElementById('fluc_slider')?.value || 0.1);
+let x = [], y = [];
+for(let t=0; t<100; t++) {
+x.push(t);
+y.push((Math.random()-0.5) * noise);
+}
+data = [{x: x, y: y, mode: 'lines', line: {color: '#fb7185'}}];
+} else if (currentTool === 4) {
+const tilt = parseFloat(document.getElementById('drift_slider')?.value || 0);
+let x = [], y = [];
+for(let t=0; t<20; t+=0.2) {
+x.push(t);
+y.push(Math.sin(t*2) * Math.exp(-(t-10)*(t-10)/10) + (tilt * t));
+}
+data = [{x: x, y: y, mode: 'lines+markers', marker: {size: 4}, line: {color: '#38bdf8'}}];
+} else if (currentTool === 5) {
+const fb = parseFloat(document.getElementById('equil_slider')?.value || 0.5);
+let x = [], y_wave = [], y_geo = [];
+for(let t=-10; t<10; t+=0.1) {
+x.push(t);
+let val = Math.exp(-(t*t)/(4*fb+1)) * Math.cos(t/(fb+0.1));
+y_wave.push(val);
+y_geo.push(-val*val*fb);
+}
+data = [
+{x: x, y: y_wave, name: 'Wave', line: {color: '#10b981'}},
+{x: x, y: y_geo, name: 'Metric', line: {color: '#fff', width: 1}}
+];
+}
+
+Plotly.newPlot('plot-area', data, layout, {displayModeBar: false});
+}
+
+function resetLab() {
+if (currentTool === 1) document.getElementById('back_slider').value = 0;
+if (currentTool === 2) document.getElementById('mass_slider').value = 0.5;
+if (currentTool === 3) document.getElementById('fluc_slider').value = 0.1;
+if (currentTool === 4) document.getElementById('drift_slider').value = 0;
+if (currentTool === 5) document.getElementById('equil_slider').value = 0.5;
+
+const inputs = document.querySelectorAll('.digital-entry');
+inputs.forEach(inp => {
+const slider = document.getElementById(inp.id.replace('_input', '_slider'));
+if (slider) inp.value = slider.value;
+});
+
+runLab();
+}
+
+showScreen('portal');
+</script>
+</body>
+</html>

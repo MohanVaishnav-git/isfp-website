@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 36 — Substrate–Observer Interaction</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #00ffcc;
+--accent-couple: #38bdf8; --accent-resonance: #fbbf24; --accent-cascade: #f87171; --accent-decohere: #a78bfa; --accent-channel: #4ade80;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-unified); font-family: sans-serif; font-size: 0.85rem; min-width: 350px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls, #nav-summary-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+#screen-lab.active { display: flex; flex-direction: column; height: calc(100vh - 50px); }
+
+#screen-portal { justify-content: flex-start; padding-top: 8dvh; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 70px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.constant-display-box {
+background: #111; border: 1px solid var(--accent-unified); padding: 6px; border-radius: 8px;
+display: flex; justify-content: space-around; margin-bottom: 10px;
+}
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(0, 255, 204, 0.05); border: 1px solid var(--accent-unified); padding: 8px; border-radius: 8px; margin-bottom: 8px; font-size: 0.6rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; }
+#plot-area { flex-grow: 1; width: 100%; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #000; border: 1px solid var(--accent-unified); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer {
+width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem;
+color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 36 — SUBSTRATE–OBSERVER INTERACTION</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">Pre-Measurement Dynamics Lab</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">The Resonance Dynamics of Particle-Detector Coupling in the Vacuum Substrate.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-couple);">
+<h2 style="color:var(--accent-couple);">1. Detector Coupling Field</h2>
+<p>Mapping the $H_{interaction}$ Potential Between Excitations.</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-resonance);">
+<h2 style="color:var(--accent-resonance);">2. Resonant Mode Matching</h2>
+<p>Overlap Analysis of Particle and Detector Oscillations.</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-cascade);">
+<h2 style="color:var(--accent-cascade);">3. Amplification Cascade</h2>
+<p>The Triggering of Macroscopic Substrate Shifts.</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-decohere);">
+<h2 style="color:var(--accent-decohere);">4. Decoherence Boundary</h2>
+<p>Phase Scrambling in the Macroscopic Substrate Environment.</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-channel);">
+<h2 style="color:var(--accent-channel);">5. Outcome Channel Formation</h2>
+<p>Branching of Probability into Macro-Distinct States.</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-unified); background: linear-gradient(135deg, #0f1115 0%, #1a0a1a 100%);">
+<h2 style="color:var(--accent-unified);">6. Stage 36 Summary</h2>
+<p>Coupled System Evolution Dynamics.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color:var(--accent-unified); text-align:center;">Summary: Mathematical Structure of Stage 36</h2>
+<section>
+<h4 style="color:var(--accent-unified);">1. Coupled Particle–Detector Dynamics</h4>
+<p>The measurement process begins when the particle excitation couples to the detector substrate through an interaction Hamiltonian:</p>
+<p style="text-align:center;">$H = H_{p} + H_{D} + H_{int}$</p>
+<p>where $H_{int} = A\,V(x,X)$. The combined system state evolves according to:</p>
+<p style="text-align:center;">$i\hbar \frac{\partial \Psi(x,X,t)}{\partial t} = \left(H_{p}+H_{D}+H_{int}\right)\Psi(x,X,t)$</p>
+<p>This establishes the coupled particle–detector system.</p>
+
+<h4 style="color:var(--accent-unified);">2. Resonant Mode Matching</h4>
+<p>Efficient interaction occurs when the spectral modes of the particle and detector overlap.</p>
+<ul>
+<li>Particle spectral representation: $\psi(\omega)$</li>
+<li>Detector response spectrum: $D(\omega)$</li>
+<li>Resonance condition: $\omega_p \approx \omega_D$</li>
+</ul>
+<p>Spectral overlap integral:</p>
+<p style="text-align:center;">$R=\int \psi(\omega)\,D(\omega)\,d\omega$</p>
+<p>Large $R$ produces strong energy transfer between particle and detector.</p>
+
+<h4 style="color:var(--accent-unified);">3. Amplification Cascade</h4>
+<p>The microscopic detector excitation evolves into macroscopic signal through exponential amplification of detector modes.</p>
+<p>Detector excitation: $\phi(x,t)=\sum_i a_i(t)\chi_i(x)$</p>
+<p>Mode growth equation: $\frac{da_i}{dt}=k_i a_i$</p>
+<p>Solution: $a_i(t)=a_i(0)e^{k_i t}$</p>
+<p>Total detector signal:</p>
+<p style="text-align:center;">$S(t)=\sum_i a_i(0)e^{k_i t}$</p>
+<p>The cascade occurs when the gain exceeds damping: $k_i > \gamma$.</p>
+
+<h4 style="color:var(--accent-unified);">4. Decoherence Dynamics</h4>
+<p>Environmental interaction produces entanglement between detector and environment:</p>
+<p style="text-align:center;">$|\Psi\rangle = \sum_i c_i |s_i\rangle |D_i\rangle |E_i\rangle$</p>
+<p>Reduced density matrix after tracing out environment:</p>
+<p style="text-align:center;">$\rho = \sum_{i,j} c_i c_j^* \langle E_j|E_i\rangle |s_i\rangle |D_i\rangle \langle s_j| \langle D_j|$</p>
+<p>Environmental orthogonality: $\langle E_j|E_i\rangle \rightarrow \delta_{ij}$. Therefore, $\rho_{ij} \rightarrow 0$. The system becomes a classical probability mixture.</p>
+<p>Decoherence decay law: $\rho_{ij}(t)=\rho_{ij}(0)e^{-t/\tau_D}$.</p>
+
+<h4 style="color:var(--accent-unified);">5. Outcome Channel Formation</h4>
+<p>After decoherence the detector state decomposes into stable pointer states $\{|d_1\rangle, |d_2\rangle, ... , |d_n\rangle\}$. Density matrix becomes:</p>
+<p style="text-align:center;">$\rho = \sum_i |c_i|^2 |s_i\rangle |d_i\rangle \langle s_i| \langle d_i|$</p>
+<p>Projection operators defining channels: $P_i = |d_i\rangle\langle d_i|$. Channel decomposition:</p>
+<p style="text-align:center;">$|\Psi\rangle = \sum_i P_i |\Psi\rangle$</p>
+<p>Each component $|\Psi_i\rangle = P_i |\Psi\rangle$ represents a distinct outcome channel.</p>
+
+<h4 style="color:var(--accent-unified);">6. Complete Mathematical Flow of Stage 36</h4>
+<p>The full dynamical sequence of the pre-measurement process is:</p>
+<p style="text-align:center; font-family: monospace;">$\Psi_p \rightarrow H_{int} \rightarrow R \rightarrow S(t) \rightarrow \rho_{ij} \rightarrow 0 \rightarrow P_i$</p>
+<ol>
+<li>Particle excitation</li>
+<li>Interaction with detector</li>
+<li>Resonant spectral overlap</li>
+<li>Amplification cascade</li>
+<li>Environmental decoherence</li>
+<li>Formation of outcome channels</li>
+</ol>
+<p>Stage 36 therefore ends with the formation of dynamically stable outcome channels in the detector substrate. These channels represent the physically available future measurement states from which a single outcome will emerge in the next stage.</p>
+</div>
+</section>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div class="constant-display-box">
+<div class="const-item"><span class="const-label">Coupling λ</span><span class="const-val">0.450</span></div>
+<div class="const-item"><span class="const-label">Resonance ω</span><span class="const-val">1.000</span></div>
+</div>
+<div id="mapping-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Interaction Telemetry</span>
+<span id="epoch-label" style="font-family:monospace; font-size:0.85rem; color:var(--accent-unified);">COUPLED STEADY-STATE</span>
+</div>
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:8px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:6px;">RESET INTERACTION</button>
+<div id="panel-footer-text" style="font-size: 0.75rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.4; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:8px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:6px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Coupling Logic</span>
+<div id="metrics-content" style="font-size:0.75rem; font-family:monospace; line-height:1.7;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Interaction Hierarchy</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.75rem; color: var(--text-dim); line-height: 1.4; background: #000; padding: 10px; border-radius: 8px; border: 1px solid #222; margin-top: auto;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "Detector Coupling Field",
+brief: `<div class="briefing-content">
+<h2 style="color:var(--accent-couple); margin-top: 20px; text-align: center;">Detailed Briefing: Detector Coupling Field</h2>
+
+<h4 style="color:var(--accent-unified);">Conceptual Objective</h4>
+<p>This module introduces the first dynamical step of the measurement process: the interaction between a quantum excitation and a detector system. Before a measurement outcome can appear, the oscillatory excitation representing the quantum state must interact with the physical structure of the measuring apparatus.</p>
+<p>According to this framework, both the particle and the detector are structured excitations embedded in the same vacuum substrate. Measurement therefore occurs through the coupling of oscillatory modes within the substrate itself. The detector does not passively observe the particle; rather, it dynamically interacts with the oscillatory field of the excitation.</p>
+<p>The purpose of this module is to visualize how a localized excitation couples to a detector mode through an interaction field.</p>
+
+<h4 style="color:var(--accent-unified);">Structure of the Visualization</h4>
+<p>The visualization displays two localized oscillatory structures along the spatial axis.</p>
+<ul>
+<li>The left peak represents the particle wavefunction: $$\\psi(x)$$</li>
+<li>The right peak represents the detector response field: $$D(x)$$</li>
+</ul>
+<p>When the interaction begins, these two structures form a combined system state. This mapping is expressed as:</p>
+<p style="text-align:center;">$$\\psi \\otimes D \\rightarrow \\text{System State}$$</p>
+<p>The combined system state represents the initial stage of the measurement interaction.</p>
+
+<h4 style="color:var(--accent-unified);">Meaning of the Coupling Parameter</h4>
+<p>The slider labeled <strong>Coupling Strength λ</strong> controls the magnitude of the interaction between the particle excitation and the detector substrate. Mathematically the interaction is represented by an interaction Hamiltonian:</p>
+<p style="text-align:center;">$$H_{\\text{int}}(x,X)$$</p>
+<p>where $x$ represents particle coordinates and $X$ represents detector coordinates. When the coupling strength is small, the particle and detector remain largely independent systems. As the coupling strength increases, the two oscillatory structures begin to influence each other more strongly. Energy begins to transfer between the particle excitation and the detector substrate.</p>
+
+<h4 style="color:var(--accent-unified);">Resonance and Detector Sensitivity</h4>
+<p>The parameter <strong>Resonance ω</strong> represents the frequency matching between the particle excitation and the detector response mode. Detection occurs most efficiently when the oscillation frequency of the particle matches the natural response frequency of the detector. Under this resonance condition the energy transfer between the particle excitation and the detector becomes much stronger.</p>
+<p>Conceptually the sequence is: <strong>particle oscillation → frequency matching → detector excitation.</strong> This mechanism explains why detectors are typically designed to respond to specific energy or frequency ranges.</p>
+
+<h4 style="color:var(--accent-unified);">Energy Transfer Between Particle and Detector</h4>
+<p>Once the interaction field becomes active, energy begins to transfer between the particle excitation and the detector structure. The oscillatory energy of the particle stimulates oscillations in the detector substrate. The right-hand peak in the visualization therefore represents the detector mode that becomes activated by the incoming excitation.</p>
+<p>The amount of transferred energy increases as the coupling strength increases. Small coupling produces only weak detector response. Strong coupling produces a large detector excitation.</p>
+
+<h4 style="color:var(--accent-unified);">Interaction Hierarchy</h4>
+<p>The right panel of the visualization summarizes the causal sequence of the interaction process:</p>
+<p style="text-align:center;"><strong>Particle → Interaction Field → Detector State</strong></p>
+<p>The particle excitation first interacts with the detector through the interaction field. This interaction modifies the internal state of the detector. Once the detector state begins to change, the system can no longer be described as an isolated particle. The particle and detector now form a coupled dynamical system.</p>
+
+<h4 style="color:var(--accent-unified);">Meaning of the Coupled Steady State</h4>
+<p>The visualization indicates when the system has reached a coupled steady state. In this regime the particle excitation and the detector mode are dynamically linked through the interaction field. The detector has not yet produced a macroscopic measurement signal, but the interaction has already established a strong dynamical correlation between the two systems. This state represents the beginning of particle–detector entanglement.</p>
+
+<h4 style="color:var(--accent-unified);">Mathematical Representation of the Interaction</h4>
+<p>The combined particle–detector system is described by a total Hamiltonian:</p>
+<p style="text-align:center;">$$H = H_{\\text{particle}} + H_{\\text{detector}} + H_{\\text{interaction}}$$</p>
+<p>The interaction term couples the particle state to the detector degrees of freedom. The time evolution of the system follows:</p>
+<p style="text-align:center;">$$i\\hbar \\frac{\\partial \\Psi(x,X,t)}{\\partial t} = H \\Psi(x,X,t)$$</p>
+<p>where $\\Psi(x,X)$ represents the joint particle–detector wavefunction.</p>
+
+<h4 style="color:var(--accent-unified);">Interpretation According to This Framework</h4>
+<p>According to this framework, measurement is not an instantaneous collapse of the wavefunction. Instead it begins as a dynamical interaction between two oscillatory structures embedded in the vacuum substrate. The particle excitation couples to the detector through the interaction field. This coupling gradually transfers oscillatory energy into the detector system.</p>
+<p>As the interaction strengthens, the particle and detector become dynamically correlated and their evolution must be treated as a single coupled system. This interaction stage prepares the system for the later phases of measurement, where detector amplification and outcome selection eventually occur.</p>
+
+<h4 style="color:var(--accent-unified);">Role of This Module in Stage 36</h4>
+<p>This module establishes the first stage of the measurement process: the coupling between the particle excitation and the detector substrate. It demonstrates how a microscopic excitation begins to influence the internal structure of the detector. Subsequent modules will examine how this interaction evolves into amplification of the detector response, loss of phase coherence between competing outcomes, and the eventual formation of a single macroscopic measurement result.</p>
+</div>`,
+
+
+math: `<div class="math-process">
+<h2 style="color:var(--accent-couple); margin-top: 20px; text-align: center;">Explicit Mathematics: Detector Coupling Field</h2>
+
+<h4 style="color:var(--accent-unified);">Primary Mathematical Structure</h4>
+<p>The measurement interaction begins when a particle excitation interacts with the detector substrate. The particle state is represented by the wavefunction:</p>
+<p style="text-align:center;">$$\\psi(x,t)$$</p>
+<p>The detector substrate contains internal dynamical degrees of freedom represented by $D(X,t)$, where $x$ represents particle coordinates and $X$ represents detector coordinates. The combined system is described by the joint state:</p>
+<p style="text-align:center;">$$\\Psi(x,X,t)$$</p>
+
+<h4 style="color:var(--accent-unified);">System Hamiltonian</h4>
+<p>The total Hamiltonian of the particle–detector system is:</p>
+<p style="text-align:center;">$$H = H_{particle} + H_{detector} + H_{interaction}$$</p>
+
+<h4 style="color:var(--accent-unified);">Particle Hamiltonian</h4>
+<p style="text-align:center;">$$H_{particle} = -\\frac{\\hbar^2}{2m}\\nabla^2 + V(x)$$</p>
+
+<h4 style="color:var(--accent-unified);">Detector Hamiltonian</h4>
+<p style="text-align:center;">$$H_{detector} = \\sum_i \\left( \\frac{P_i^2}{2M_i} + U(X_i) \\right)$$</p>
+<p>where $X_i$ represent detector degrees of freedom and $P_i$ are their conjugate momenta.</p>
+
+<h4 style="color:var(--accent-unified);">Interaction Hamiltonian</h4>
+<p>The particle couples to the detector through an interaction field:</p>
+<p style="text-align:center;">$$H_{interaction}(x,X) = A\\,V_{int}(x,X)$$</p>
+<p>where $A$ is the coupling strength parameter controlled in the simulator. The interaction potential can be modeled as $V_{int}(x,X) = f(x-X)$. A common representation for the interaction region is a Gaussian coupling field:</p>
+<p style="text-align:center;">$$V_{int}(x,X) = \\exp \\left( -\\frac{(x-X)^2}{2\\sigma^2} \\right)$$</p>
+<p>This function represents the spatial sensitivity region of the detector.</p>
+
+<h4 style="color:var(--accent-unified);">Time Evolution of the Coupled System</h4>
+<p>The combined particle–detector system evolves according to:</p>
+<p style="text-align:center;">$$i\\hbar \\frac{\\partial \\Psi(x,X,t)}{\\partial t} = \\left( H_{particle} + H_{detector} + H_{interaction} \\right) \\Psi(x,X,t)$$</p>
+<p>This equation governs the dynamical interaction between the particle excitation and the detector substrate.</p>
+
+<h4 style="color:var(--accent-unified);">Resonant Detector Coupling</h4>
+<p>Detection efficiency depends on resonance between particle oscillation frequency and detector mode frequency.</p>
+<ul>
+<li>Particle frequency: $$\\omega_p = \\frac{E}{\\hbar}$$</li>
+<li>Detector natural frequency: $$\\omega_D$$</li>
+</ul>
+<p>Maximum energy transfer occurs when $\\omega_p \\approx \\omega_D$. This resonance condition allows efficient coupling between particle and detector modes.</p>
+
+<h4 style="color:var(--accent-unified);">Energy Transfer Rate</h4>
+<p>The rate of energy transfer from particle to detector can be expressed as:</p>
+<p style="text-align:center;">$$\\Gamma \\propto A^2 \\, |\\psi(X)|^2$$</p>
+<p>where $\\Gamma$ represents the transition rate of detector excitation. The detector response therefore depends on the amplitude of the particle wavefunction at the detector location.</p>
+
+<h4 style="color:var(--accent-unified);">Formation of the Coupled State</h4>
+<p>As the interaction proceeds the system evolves into an entangled state:</p>
+<p style="text-align:center;">$$\\Psi(x,X) = \\sum_i c_i \\, \\psi_i(x) \\, D_i(X)$$</p>
+<p>Each detector configuration $D_i(X)$ becomes correlated with a corresponding particle state $\\psi_i(x)$.</p>
+
+<h4 style="color:var(--accent-unified);">Energy Exchange Between Particle and Detector</h4>
+<p>The energy flow into the detector substrate is determined by the expectation value of the interaction Hamiltonian:</p>
+<p style="text-align:center;">$$\\frac{dE_D}{dt} = \\langle \\Psi | H_{interaction} | \\Psi \\rangle$$</p>
+<p>A nonzero value indicates that oscillatory energy from the particle excitation is being transferred into the detector system.</p>
+
+<h4 style="color:var(--accent-unified);">Interaction Hierarchy</h4>
+<p>The mathematical structure of the interaction follows the causal sequence:</p>
+<p style="text-align:center; font-family: monospace;">$$\\psi(x) \\rightarrow H_{interaction}(x,X) \\rightarrow D(X) \\rightarrow \\Psi(x,X)$$</p>
+<p>According to this framework the measurement process begins with this coupling between particle excitation and detector substrate. The interaction Hamiltonian generates energy transfer and dynamical correlation between the two systems, preparing the system for the later stages of measurement including amplification and outcome formation.</p>
+</div>`,
+
+
+sliders: `<div class="control-item"><div class="label-group"><span>Coupling Strength (λ)</span><input type="number" id="l_in" class="digital-entry" value="0.5" oninput="syncVal(this.value, 'l_sl')"></div><input type="range" id="l_sl" min="0" max="1" step="0.05" value="0.5" oninput="syncVal(this.value, 'l_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Mapping</span><div style="text-align:center; font-size: 0.9rem;">$\\psi \\otimes D \\rightarrow \\text{System State}$</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Coupling Field</span><div style="text-align:center; font-size: 1.0rem;">$H_{int}(x, X)$</div>`,
+hierarchy: "Particle<br>↓<br>Interaction Field<br>↓<br>Detector State",
+footer: "λ defines the magnitude of energy transfer between particle and detector.",
+rightNote: "Measurement is a coupling of oscillatory modes in the substrate."
+},
+2: {
+title: "Resonant Mode Matching",
+brief: `<div class="briefing-content">
+<h2 style="color:var(--accent-resonance); margin-top: 20px; text-align: center;">Detailed Briefing: Resonant Mode Matching</h2>
+
+<h4 style="color:var(--accent-unified);">Conceptual Objective</h4>
+<p>This module explains the second stage of the measurement interaction: resonance between the oscillatory mode of the particle excitation and the oscillatory response modes of the detector. Detection does not occur simply because a particle approaches a detector. Detection occurs when the oscillatory structure of the excitation overlaps spectrally with the oscillatory response modes of the detector substrate.</p>
+<p>According to this framework, both the particle excitation and the detector are oscillatory structures embedded in the same physical substrate. Each structure contains characteristic frequency components. The particle excitation contains a spectrum of oscillatory modes determined by its wavefunction. The detector contains its own natural resonance modes determined by its internal physical structure.</p>
+<p>Measurement becomes possible only when these oscillatory spectra overlap.</p>
+
+<h4 style="color:var(--accent-unified);">Structure of the Visualization</h4>
+<p>The central waveform represents the oscillatory structure of the particle excitation as it approaches the detector. This waveform is localized but contains internal oscillations representing its spectral content.</p>
+<p>The interface label <strong>Spectral Overlap</strong> represents the matching between the spectral distribution of the particle excitation and the spectral response of the detector. When the spectral overlap becomes strong, the detector is able to absorb energy from the excitation.</p>
+<p>The interface therefore shows the transition:</p>
+<p style="text-align:center;"><strong>Mode Overlap → Resonant Transfer → Trigger</strong></p>
+<p>This represents the physical sequence that leads from oscillatory interaction to the initiation of a detector response.</p>
+
+<h4 style="color:var(--accent-unified);">Meaning of the Frequency Match Parameter</h4>
+<p>The slider labeled <strong>Frequency Match ω</strong> controls the alignment between the dominant frequency of the particle excitation and the natural resonance frequency of the detector.</p>
+<p>If the particle oscillation frequency is denoted $$\\omega_p$$ and the detector resonance frequency is $$\\omega_D$$, then the matching condition is:</p>
+<p style="text-align:center;">$$\\omega_p \\approx \\omega_D$$</p>
+<p>When this condition is satisfied, the energy exchange between particle and detector becomes very efficient. When the frequencies differ significantly, the energy transfer becomes weak and the detector remains inactive. This resonance condition explains why detectors respond only to specific ranges of energy or frequency.</p>
+
+<h4 style="color:var(--accent-unified);">Spectral Overlap Mechanism</h4>
+<p>The interface shows the mathematical relation responsible for the resonance condition:</p>
+<p style="text-align:center;">$$\\int \\psi(\\omega) D(\\omega)\\, d\\omega$$</p>
+<p>Here $$\\psi(\\omega)$$ represents the spectral distribution of the particle excitation and $D(\\omega)$ represents the spectral response function of the detector. The overlap integral measures the amount of shared spectral content between the particle and detector modes. When the overlap integral becomes large, the detector receives strong excitation. When the overlap integral approaches zero, the detector cannot respond to the incoming excitation.</p>
+
+<h4 style="color:var(--accent-unified);">Physical Meaning of Resonant Transfer</h4>
+<p>When resonance occurs, the oscillatory energy of the particle is transferred into the detector substrate. This energy transfer occurs through the interaction field introduced in the previous module. However, the efficiency of that interaction depends strongly on the resonance condition.</p>
+<p>Resonance allows the detector to absorb oscillatory energy in a coherent manner. Without resonance, the detector modes cannot efficiently absorb the oscillatory energy of the particle excitation. Therefore resonance acts as the trigger that converts a weak interaction into a strong detector response.</p>
+
+<h4 style="color:var(--accent-unified);">Coupled Steady State</h4>
+<p>The interface indicates when the system reaches a <strong>Coupled Steady State</strong>. At this stage the particle oscillation and detector oscillation are phase synchronized through resonance. This synchronized state represents a strong dynamical coupling between the two systems.</p>
+<p>Although a macroscopic measurement outcome has not yet occurred, the particle excitation has already transferred significant energy into the detector structure. This stage therefore prepares the system for the amplification process that will occur in later measurement stages.</p>
+
+<h4 style="color:var(--accent-unified);">Interaction Hierarchy</h4>
+<p>The right panel summarizes the causal hierarchy responsible for detector activation:</p>
+<p style="text-align:center;"><strong>Mode Overlap → Resonant Transfer → Trigger</strong></p>
+<p>First, the spectral modes of the particle and detector overlap. This overlap allows resonance between the two oscillatory systems. The resonance then triggers energy transfer into the detector structure. Once this trigger occurs, the detector enters an excited state that can propagate through its internal structure.</p>
+
+<h4 style="color:var(--accent-unified);">Interpretation According to This Framework</h4>
+<p>According to this framework, measurement is not initiated by an abstract wavefunction collapse. Instead it begins when a particle excitation resonates with the oscillatory structure of the detector substrate. The detector therefore behaves like a resonant oscillator that responds only to compatible oscillatory modes.</p>
+<p>The resonance interaction converts the particle excitation into a detector excitation through energy transfer in the substrate. This stage is therefore the physical trigger that initiates the measurement chain.</p>
+
+<h4 style="color:var(--accent-unified);">Role of This Module in Stage 36</h4>
+<p>The first module introduced the interaction field connecting the particle and detector. The second module introduces the resonance condition that determines whether that interaction produces a measurable detector response. Together these two modules explain the initial physical conditions required for a measurement interaction to begin.</p>
+<p>Subsequent modules will examine how the detector excitation spreads through the detector structure, how phase coherence between competing outcomes is lost, and how a single measurement outcome eventually emerges.</p>
+</div>`,
+
+math: `<div class="math-process">
+<h2 style="color:var(--accent-resonance); margin-top: 20px; text-align: center;">Explicit Mathematics: Resonant Mode Matching</h2>
+
+<h4 style="color:var(--accent-unified);">Wavefunction Representation of the Incoming Excitation</h4>
+<p>The particle excitation approaching the detector is described by the wavefunction $$\\psi(x,t)$$. A localized wave packet can be represented as:</p>
+<p style="text-align:center;">$$\\psi(x,t) = \\int A(k)\\,e^{i(kx-\\omega t)}\\,dk$$</p>
+<p>where $$\\omega = \\frac{\\hbar k^2}{2m}$$. The coefficient $A(k)$ represents the spectral amplitude of the excitation.</p>
+
+<h4 style="color:var(--accent-unified);">Detector Response Modes</h4>
+<p>The detector contains internal oscillatory modes. These modes can be written as:</p>
+<p style="text-align:center;">$$D_n(x,t) = \\phi_n(x)e^{-i\\omega_n t}$$</p>
+<p>where $$\\omega_n$$ represents the natural resonance frequencies of the detector. Detector response can therefore be represented as a superposition:</p>
+<p style="text-align:center;">$$D(x,t) = \\sum_n c_n D_n(x,t)$$</p>
+
+<h4 style="color:var(--accent-unified);">Spectral Representation</h4>
+<p>To analyze resonance, both particle excitation and detector modes are expressed in frequency space. Fourier transform of the particle state:</p>
+<p style="text-align:center;">$$\\psi(\\omega) = \\int \\psi(x,t)\\,e^{i\\omega t}\\,dt$$</p>
+<p>Detector spectral response $D(\\omega)$ represents the frequency response of the detector.</p>
+
+<h4 style="color:var(--accent-unified);">Overlap Integral</h4>
+<p>The resonance condition is determined by the spectral overlap between particle and detector. The overlap measure is:</p>
+<p style="text-align:center;">$$R = \\int \\psi(\\omega)D(\\omega)\\,d\\omega$$</p>
+<p>A large value of $R$ indicates strong resonance. When $R \\rightarrow 0$, no significant detector response occurs.</p>
+
+<h4 style="color:var(--accent-unified);">Resonance Condition</h4>
+<p>Maximum energy transfer occurs when the particle frequency equals the detector resonance frequency:</p>
+<p style="text-align:center;">$$\\omega_p \\approx \\omega_D$$</p>
+<p>Particle frequency $$\\omega_p = \\frac{E}{\\hbar}$$ and detector resonance $$\\omega_D = \\omega_n$$.</p>
+
+<h4 style="color:var(--accent-unified);">Energy Transfer Rate</h4>
+<p>Energy transfer between particle and detector is proportional to the square of the interaction matrix element:</p>
+<p style="text-align:center;">$$\\Gamma = \\frac{2\\pi}{\\hbar} | \\langle D_n | H_{int} | \\psi \\rangle |^2 \\rho(\\omega)$$</p>
+<p>where $$\\rho(\\omega)$$ represents the density of detector states.</p>
+
+<h4 style="color:var(--accent-unified);">Interaction Hamiltonian</h4>
+<p>The coupling between particle and detector is represented by $H_{int} = A\\,V(x,X)$. A convenient representation of the interaction potential is:</p>
+<p style="text-align:center;">$$V(x,X) = \\exp \\left( -\\frac{(x-X)^2}{2\\sigma^2} \\right)$$</p>
+<p>where $A$ is the coupling parameter controlled in the interface.</p>
+
+<h4 style="color:var(--accent-unified);">Coupled System Evolution</h4>
+<p>The particle–detector system evolves according to:</p>
+<p style="text-align:center;">$$i\\hbar \\frac{\\partial \\Psi(x,X,t)}{\\partial t} = \\left( H_p + H_D + H_{int} \\right) \\Psi(x,X,t)$$</p>
+<p>where $$\\Psi(x,X,t)$$ represents the joint state of the particle and detector.</p>
+
+<h4 style="color:var(--accent-unified);">Formation of the Resonant Detector Mode</h4>
+<p>When resonance occurs, the particle excitation stimulates a detector mode $D_n(x,t)$. The amplitude of the detector mode evolves as:</p>
+<p style="text-align:center;">$$\\frac{dc_n}{dt} = -i \\langle D_n | H_{int} | \\psi \\rangle$$</p>
+<p>As the overlap increases, the detector mode amplitude grows.</p>
+
+<h4 style="color:var(--accent-unified);">Resonant Energy Transfer</h4>
+<p>The power transferred into the detector substrate is $P = \\frac{d}{dt} \\langle H_D \\rangle$, which depends on the interaction Hamiltonian and spectral overlap.</p>
+
+<h4 style="color:var(--accent-unified);">Interaction Hierarchy</h4>
+<p>The mathematical sequence of the interaction is:</p>
+<p style="text-align:center; font-family: monospace;">$$\\psi(\\omega) \\rightarrow R \\rightarrow \\Gamma \\rightarrow D_n$$</p>
+<p>Particle spectral modes first overlap with detector modes. The overlap determines the transition rate. The transition excites a detector resonance mode.</p>
+
+<h4 style="color:var(--accent-unified);">Interpretation According to This Framework</h4>
+<p>According to this framework, the detector responds only when the oscillatory spectrum of the particle overlaps with a natural oscillatory mode of the detector substrate. The overlap integral determines whether resonance occurs. Resonance then drives energy transfer into the detector structure, initiating the physical process that ultimately produces a measurement outcome.</p>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>Frequency Match (ω)</span><input type="number" id="w_in" class="digital-entry" value="1.0" oninput="syncVal(this.value, 'w_sl')"></div><input type="range" id="w_sl" min="0.5" max="1.5" step="0.01" value="1.0" oninput="syncVal(this.value, 'w_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Matching</span><div style="text-align:center; font-size: 1.0rem;">Spectral Overlap</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Overlap Integral</span><div style="text-align:center; font-size: 1.0rem;">$\\int \\psi(\\omega) D(\\omega) d\\omega$</div>`,
+hierarchy: "Mode Overlap<br>↓<br>Resonant Transfer<br>↓<br>Trigger",
+footer: "Perfect resonance occurs when ω = 1.0.",
+rightNote: "Only matching modes can trigger a detection signal."
+},
+3: {
+title: "Amplification Cascade",
+brief: `<div class="briefing-content">
+<h2 style="color:var(--accent-cascade); margin-top: 20px; text-align: center;">Detailed Briefing: Amplification Cascade</h2>
+
+<h4 style="color:var(--accent-unified);">Conceptual Objective</h4>
+<p>This module explains the crucial transition from a microscopic interaction to a macroscopic detector signal. The earlier modules described how a particle excitation couples to the detector substrate and how resonance allows energy transfer between the excitation and detector modes. However, a microscopic excitation by itself is far too small to produce a measurable signal. A detector becomes useful only when it converts a microscopic substrate excitation into a macroscopic observable response.</p>
+<p>According to this framework, this conversion occurs through an amplification cascade within the detector substrate. The detector behaves as a metastable system that is primed to respond to a small trigger. When a resonant interaction deposits energy into the detector substrate, this energy initiates a chain reaction that propagates through the detector structure. The cascade progressively amplifies the original microscopic excitation.</p>
+
+<h4 style="color:var(--accent-unified);">Structure of the Visualization</h4>
+<p>The central visualization shows the growth of a localized excitation that begins as a small disturbance and expands into a larger macroscopic signal. The initial excitation corresponds to the resonant transfer described in the previous module. Once the excitation is deposited into the detector substrate, it begins to propagate through the detector medium.</p>
+<p>The interface label <strong>Micro → Macro</strong> represents the transformation from a microscopic interaction event into a macroscopic signal. This transformation is the defining function of a detector.</p>
+
+<h4 style="color:var(--accent-unified);">Meaning of the Gain Parameter</h4>
+<p>The slider labeled <strong>Gain γ</strong> controls the amplification rate of the detector cascade. Physically, the gain represents how efficiently the detector medium multiplies the incoming excitation.</p>
+<p>A low gain value produces only weak amplification, meaning that the initial excitation quickly dissipates without producing a large signal. When the gain is increased, the detector medium becomes highly responsive and the excitation grows rapidly. The amplification process therefore depends on the internal stability properties of the detector medium.</p>
+
+<h4 style="color:var(--accent-unified);">Signal Gain Equation</h4>
+<p>The right panel shows the mathematical form of the amplification process:</p>
+<p style="text-align:center;">$$S = \\sum a_i e^{kt}$$</p>
+<p>This expression represents the exponential growth of excitation modes in the detector. Each term in the sum corresponds to a detector mode that becomes activated by the incoming excitation. As the cascade progresses, the amplitudes of these modes grow exponentially.</p>
+
+<h4 style="color:var(--accent-unified);">Physical Meaning of the Cascade</h4>
+<p>The detector is constructed from a medium that is close to an instability threshold. This means that a small perturbation can trigger a large response. When the particle excitation deposits energy into the detector substrate, the medium becomes locally unstable and begins to amplify the disturbance.</p>
+<p>The cascade spreads through the detector structure, activating more and more detector modes. This process converts a tiny microscopic excitation into a large macroscopic disturbance that can be measured by classical instrumentation.</p>
+
+<h4 style="color:var(--accent-unified);">Interaction Hierarchy</h4>
+<p>The right panel summarizes the causal sequence responsible for the detector signal:</p>
+<p style="text-align:center;"><strong>Trigger → Substrate Cascade → Macro Signal</strong></p>
+<p>The resonant interaction acts as the trigger. The trigger initiates the amplification cascade in the detector substrate. The cascade then produces a macroscopic signal. This signal is what ultimately appears as a measurement result.</p>
+
+<h4 style="color:var(--accent-unified);">Role of Substrate Instability</h4>
+<p>The amplification cascade requires that the detector medium be prepared in a metastable state. A metastable system is stable under normal conditions but becomes unstable when perturbed beyond a threshold. Examples of such systems include avalanche photodiodes, Geiger counters, and bubble chambers. In all of these detectors, a microscopic interaction produces a large macroscopic response because the detector medium is already primed for amplification.</p>
+<p>According to this framework, the detector substrate behaves in a similar way. The resonant excitation deposits energy into the substrate and pushes the system beyond its stability threshold. The detector then undergoes a cascade amplification process.</p>
+
+<h4 style="color:var(--accent-unified);">Interpretation According to This Framework</h4>
+<p>According to this framework, the measurement process does not begin with wavefunction collapse. Instead, it begins with a sequence of physical processes in the detector substrate. First, the particle excitation interacts with the detector through the interaction field. Second, resonance allows energy transfer between the particle excitation and detector modes. Third, the detector substrate amplifies the deposited excitation through a cascade process.</p>
+<p>This cascade converts the microscopic excitation into a macroscopic signal. The amplification stage is therefore the bridge between the quantum scale and the classical scale.</p>
+
+<h4 style="color:var(--accent-unified);">Role of This Module in Stage 36</h4>
+<p>The first module introduced the interaction field between particle and detector. The second module introduced resonant mode matching. The third module introduces amplification of the detector response.</p>
+<p>Together these modules describe the early stages of the measurement chain. The particle excitation first couples to the detector, then resonates with detector modes, and finally triggers an amplification cascade that produces a measurable signal.</p>
+<p>Subsequent modules will examine how the amplification process suppresses competing quantum alternatives and leads to the emergence of a single stable measurement outcome.</p>
+</div>`,
+
+math: `<div class="math-process">
+<h2 style="color:var(--accent-cascade); margin-top: 20px; text-align: center;">Explicit Mathematics: Amplification Cascade</h2>
+
+<h4 style="color:var(--accent-unified);">Initial Excitation Deposited in the Detector</h4>
+<p>After resonant coupling, the detector receives a small localized excitation. The excitation amplitude in the detector substrate can be written as:</p>
+<p style="text-align:center;">$$\\phi(x,0) = \\phi_0\\,e^{-\\frac{(x-x_0)^2}{2\\sigma^2}}$$</p>
+<p>where $\\phi_0$ is the initial microscopic amplitude produced by the particle–detector interaction.</p>
+
+<h4 style="color:var(--accent-unified);">Time Evolution of the Detector Excitation</h4>
+<p>The detector medium contains many coupled oscillatory modes. The excitation therefore evolves as a superposition:</p>
+<p style="text-align:center;">$$\\phi(x,t) = \\sum_i a_i(t)\\,\\chi_i(x)$$</p>
+<p>where $\\chi_i(x)$ represents detector eigenmodes. The amplitudes $a_i(t)$ evolve according to the dynamical equation:</p>
+<p style="text-align:center;">$$\\frac{d a_i}{dt} = k_i a_i$$</p>
+
+<h4 style="color:var(--accent-unified);">Solution of the Amplification Equation</h4>
+<p>The solution is exponential growth:</p>
+<p style="text-align:center;">$$a_i(t) = a_i(0)e^{k_i t}$$</p>
+<p>The parameter $k_i$ represents the gain coefficient of the detector mode.</p>
+
+<h4 style="color:var(--accent-unified);">Macroscopic Signal Formation</h4>
+<p>The detector signal is the total excitation amplitude in the detector medium:</p>
+<p style="text-align:center;">$$S(t) = \\sum_i a_i(t)$$</p>
+<p>Substituting the exponential solution:</p>
+<p style="text-align:center;">$$S(t) = \\sum_i a_i(0)e^{k_i t}$$</p>
+<p>This corresponds to the signal gain relation displayed in the interface $S = \\sum a_i e^{kt}$. When $k_i > 0$, the excitation grows rapidly.</p>
+
+<h4 style="color:var(--accent-unified);">Threshold Condition for Cascade</h4>
+<p>The detector becomes unstable when the amplification rate exceeds the damping rate. Let $\\gamma$ represent damping in the detector medium. Cascade occurs when:</p>
+<p style="text-align:center;">$$k_i > \\gamma$$</p>
+<p>Under this condition the excitation grows instead of decaying.</p>
+
+<h4 style="color:var(--accent-unified);">Gain Parameter in the Interface</h4>
+<p>The slider labeled <strong>Gain γ</strong> controls the effective amplification coefficient $k_{eff}$. A simple representation is:</p>
+<p style="text-align:center;">$$k_{eff} = k_0\\,\\gamma$$</p>
+<p>where $k_0$ represents the intrinsic gain property of the detector material.</p>
+
+<h4 style="color:var(--accent-unified);">Energy Growth in the Detector</h4>
+<p>The energy stored in the detector excitation is:</p>
+<p style="text-align:center;">$$E_D(t) = \\int |\\phi(x,t)|^2 dx$$</p>
+<p>Substituting the exponential growth, $E_D(t) \\propto e^{2kt}$. Thus the detector energy increases exponentially during the amplification cascade.</p>
+
+<h4 style="color:var(--accent-unified);">Propagation of the Cascade</h4>
+<p>The excitation spreads through the detector medium according to a reaction–diffusion equation:</p>
+<p style="text-align:center;">$$\\frac{\\partial \\phi}{\\partial t} = D\\nabla^2\\phi + k\\phi$$</p>
+<p>where $D$ is the diffusion coefficient describing propagation of the excitation through the detector.</p>
+
+<h4 style="color:var(--accent-unified);">Solution of the Amplification–Propagation Equation</h4>
+<p>For a localized initial excitation:</p>
+<p style="text-align:center;">$$\\phi(x,t) = \\phi_0 \\exp \\left( kt - \\frac{(x-x_0)^2}{4Dt} \\right)$$</p>
+<p>This describes a growing excitation that spreads spatially while its amplitude increases exponentially.</p>
+
+<h4 style="color:var(--accent-unified);">Macroscopic Detector Signal</h4>
+<p>A measurement signal appears when the detector excitation exceeds a macroscopic threshold:</p>
+<p style="text-align:center;">$$S(t) \\ge S_{crit}$$</p>
+<p>At this point the detector output becomes observable.</p>
+
+<h4 style="color:var(--accent-unified);">Interaction Hierarchy</h4>
+<p>The mathematical cascade sequence is:</p>
+<p style="text-align:center; font-family: monospace;">$$\\psi(x) \\rightarrow H_{int} \\rightarrow \\phi(x,t) \\rightarrow S(t)$$</p>
+<p>Particle excitation produces a detector excitation. The detector excitation undergoes exponential amplification. Amplification produces a macroscopic signal.</p>
+
+<h4 style="color:var(--accent-unified);">Interpretation According to This Framework</h4>
+<p>According to this framework, the amplification cascade converts a microscopic substrate excitation into a macroscopic detector signal. The cascade is governed by exponential growth of detector modes once the amplification rate exceeds the damping rate. This process provides the physical bridge between quantum interactions and classical measurement signals.</p>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>Gain (γ)</span><input type="number" id="g_in" class="digital-entry" value="0.5" oninput="syncVal(this.value, 'g_sl')"></div><input type="range" id="g_sl" min="0.1" max="1" step="0.05" value="0.5" oninput="syncVal(this.value, 'g_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Cascade</span><div style="text-align:center; font-size: 1.0rem;">Micro → Macro</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Signal Gain</span><div style="text-align:center; font-size: 1.0rem;">$S = \\sum a_i e^{kt}$</div>`,
+hierarchy: "Trigger<br>↓<br>Substrate Cascade<br>↓<br>Macro Signal",
+footer: "The detector acts as an unstable medium primed for transition.",
+rightNote: "Amplification converts substrate jitter into measurable shifts."
+},
+4: {
+title: "Decoherence Boundary",
+brief: `<div class="briefing-content">
+<h2 style="color:var(--accent-decoherence); margin-top: 20px; text-align: center;">Detailed Briefing: Decoherence Boundary</h2>
+
+<h4 style="color:var(--accent-unified);">Conceptual Objective</h4>
+<p>This module introduces the stage where coherent quantum evolution becomes effectively classical through interaction with the environment. The earlier modules described the coupling between particle and detector, the resonant transfer of energy, and the amplification cascade that converts microscopic excitation into macroscopic detector activity. However, even after amplification, the system may still contain quantum coherence between alternative outcomes.</p>
+<p>The purpose of this module is to describe how environmental interactions destroy observable phase coherence between competing states. This process is known as decoherence. Decoherence does not destroy the quantum state itself; rather, it distributes the phase information across a large number of environmental degrees of freedom.</p>
+<p>According to this framework, decoherence occurs when the detector substrate becomes strongly coupled to the surrounding environment. The environment acts as a reservoir of microscopic degrees of freedom that interact with the detector system and scramble its phase relationships.</p>
+
+<h4 style="color:var(--accent-unified);">Structure of the Visualization</h4>
+<p>The visualization shows a signal that initially contains a coherent peak corresponding to the detector excitation produced by the amplification cascade. As the entropy parameter increases, random fluctuations begin to appear in the signal. These fluctuations represent phase scrambling produced by environmental interactions.</p>
+<p>The interface label <strong>Phase Scrambling</strong> represents the randomization of the phase relationships that originally existed between different quantum amplitudes. Although the central peak remains visible, the surrounding fluctuations indicate that coherence is being lost.</p>
+
+<h4 style="color:var(--accent-unified);">Meaning of the Entropy Parameter</h4>
+<p>The slider labeled <strong>Entropy χ</strong> controls the strength of environmental coupling. A low entropy value corresponds to weak environmental interaction. In this regime the detector system retains strong phase coherence and quantum interference between different states can still occur.</p>
+<p>As the entropy parameter increases, the detector system interacts more strongly with the environment. Each interaction transfers a small amount of phase information into environmental degrees of freedom. Over time these interactions scramble the relative phases between competing states. The system therefore transitions from coherent quantum evolution to classical statistical behavior.</p>
+
+<h4 style="color:var(--accent-unified);">Density Matrix Representation</h4>
+<p>The right panel shows the density matrix relation:</p>
+<p style="text-align:center;">$$\\rho_{ij} \\rightarrow 0$$</p>
+<p>The density matrix describes the statistical state of a quantum system. The diagonal elements represent classical probabilities, while the off-diagonal elements represent quantum coherence between different states. Decoherence causes the off-diagonal terms to decay toward zero. When this occurs, interference between different quantum states becomes unobservable. The system then behaves like a classical probabilistic mixture rather than a coherent quantum superposition.</p>
+
+<h4 style="color:var(--accent-unified);">Interaction Hierarchy</h4>
+<p>The right panel summarizes the causal sequence responsible for decoherence:</p>
+<p style="text-align:center;"><strong>Environment → Phase Mixing → Decoherence</strong></p>
+<p>Environmental interactions produce random phase shifts in the detector system. These phase shifts accumulate over time and destroy coherent phase relationships. The system therefore transitions into a decohered state.</p>
+
+<h4 style="color:var(--accent-unified);">Interpretation According to This Framework</h4>
+<p>According to this framework, decoherence represents the boundary between quantum and classical behavior. The quantum state does not collapse at this stage. Instead, the phase information that originally connected different quantum alternatives becomes distributed throughout the environment. Once this distribution occurs, the system can no longer display quantum interference because the phase information required for interference is no longer locally accessible.</p>
+<p>This process explains why macroscopic systems behave classically even though their microscopic components obey quantum mechanics. The detector system therefore becomes effectively classical after decoherence has occurred.</p>
+
+<h4 style="color:var(--accent-unified);">Role of This Module in Stage 36</h4>
+<p>The earlier modules established the physical chain of events that begins the measurement process. First, the particle excitation couples to the detector through the interaction field. Second, resonance enables efficient energy transfer between the particle and detector modes. Third, amplification converts the microscopic excitation into a macroscopic detector signal.</p>
+<p>The present module introduces the next stage of the measurement chain: the loss of quantum coherence through environmental interaction. Decoherence transforms the amplified detector state into a classical statistical state. This stage prepares the system for the final stage of measurement, where a single stable outcome emerges from the decohered alternatives.</p>
+</div>`,
+
+math: `<div class="math-process">
+<h2 style="color:var(--accent-decoherence); margin-top: 20px; text-align: center;">Explicit Mathematics: Decoherence Boundary</h2>
+
+<h4 style="color:var(--accent-unified);">Quantum State Before Environmental Interaction</h4>
+<p>After amplification, the detector and particle form a correlated quantum state. The combined state can be written as:</p>
+<p style="text-align:center;">$$|\\Psi\\rangle = \\sum_i c_i \\, |s_i\\rangle \\, |D_i\\rangle$$</p>
+<p>where $|s_i\\rangle$ represents particle states and $|D_i\\rangle$ represents corresponding detector states. This state still contains quantum coherence between alternatives.</p>
+
+<h4 style="color:var(--accent-unified);">Density Matrix Representation</h4>
+<p>The system is described by the density matrix:</p>
+<p style="text-align:center;">$$\\rho = |\\Psi\\rangle \\langle \\Psi|$$</p>
+<p>Substituting the superposition state:</p>
+<p style="text-align:center;">$$\\rho = \\sum_{i,j} c_i c_j^* |s_i\\rangle |D_i\\rangle \\langle s_j| \\langle D_j|$$</p>
+<ul>
+<li>Diagonal elements $\\rho_{ii}$ represent classical probabilities.</li>
+<li>Off-diagonal elements $\\rho_{ij}$ represent quantum coherence between different alternatives.</li>
+</ul>
+
+<h4 style="color:var(--accent-unified);">Environmental Coupling</h4>
+<p>The detector interacts with environmental degrees of freedom $E$. The combined system becomes:</p>
+<p style="text-align:center;">$$|\\Psi_{total}\\rangle = \\sum_i c_i |s_i\\rangle |D_i\\rangle |E_i\\rangle$$</p>
+<p>Each detector state becomes correlated with a different environmental state.</p>
+
+<h4 style="color:var(--accent-unified);">Reduced Density Matrix</h4>
+<p>To describe the observable system, the environmental variables are traced out:</p>
+<p style="text-align:center;">$$\\rho_{SD} = \\mathrm{Tr}_E(\\rho_{total})$$</p>
+<p>This produces:</p>
+<p style="text-align:center;">$$\\rho_{SD} = \\sum_{i,j} c_i c_j^* \\langle E_j | E_i \\rangle |s_i\\rangle |D_i\\rangle \\langle s_j| \\langle D_j|$$</p>
+
+<h4 style="color:var(--accent-unified);">Decoherence Condition</h4>
+<p>Environmental states rapidly become orthogonal:</p>
+<p style="text-align:center;">$$\\langle E_j | E_i \\rangle \\rightarrow \\delta_{ij}$$</p>
+<p>This eliminates the off-diagonal elements $\\rho_{ij} \\rightarrow 0$. The density matrix becomes:</p>
+<p style="text-align:center;">$$\\rho_{SD} = \\sum_i |c_i|^2 |s_i\\rangle |D_i\\rangle \\langle s_i| \\langle D_i|$$</p>
+<p>The system now behaves like a classical probability distribution.</p>
+
+<h4 style="color:var(--accent-unified);">Phase Randomization</h4>
+<p>Environmental interactions introduce random phase shifts:</p>
+<p style="text-align:center;">$$c_i \\rightarrow c_i e^{i\\theta_i(t)}$$</p>
+<p>where the phases $\\theta_i(t)$ fluctuate randomly. The interference term between two states becomes $c_i c_j^* e^{i(\\theta_i-\\theta_j)}$. Averaging over environmental fluctuations gives:</p>
+<p style="text-align:center;">$$\\langle e^{i(\\theta_i-\\theta_j)} \\rangle \\rightarrow 0$$</p>
+<p>This mathematically removes interference.</p>
+
+<h4 style="color:var(--accent-unified);">Decoherence Rate</h4>
+<p>The decay of off-diagonal elements typically follows:</p>
+<p style="text-align:center;">$$\\rho_{ij}(t) = \\rho_{ij}(0)\\,e^{-t/\\tau_D}$$</p>
+<p>where $\\tau_D$ is the decoherence timescale. For macroscopic detectors, $\\tau_D \\ll 10^{-20}$ s, so coherence disappears extremely quickly.</p>
+
+<h4 style="color:var(--accent-unified);">Entropy Growth</h4>
+<p>Decoherence increases the entropy of the system. Von Neumann entropy:</p>
+<p style="text-align:center;">$$S = -\\mathrm{Tr}(\\rho \\ln \\rho)$$</p>
+<p>As off-diagonal terms vanish, the entropy increases and the system approaches a classical mixture.</p>
+
+<h4 style="color:var(--accent-unified);">Interaction Hierarchy</h4>
+<p>The mathematical sequence is:</p>
+<p style="text-align:center; font-family: monospace;">$$\\Psi_{SD} \\rightarrow \\Psi_{SDE} \\rightarrow \\rho_{SD} \\rightarrow \\rho_{ij} \\rightarrow 0$$</p>
+<p>Particle–detector system becomes entangled with the environment. Tracing out environmental variables produces a reduced density matrix. Off-diagonal terms vanish, producing classical probabilities.</p>
+
+<h4 style="color:var(--accent-unified);">Interpretation According to This Framework</h4>
+<p>According to this framework, decoherence marks the physical boundary between coherent quantum dynamics and classical statistical behavior. Environmental interactions distribute the phase information of the quantum state into many degrees of freedom. This process suppresses interference and converts the coherent superposition into an effectively classical probability distribution, preparing the system for the emergence of a definite measurement outcome.</p>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>Entropy (Γ)</span><input type="number" id="e_in" class="digital-entry" value="0.5" oninput="syncVal(this.value, 'e_sl')"></div><input type="range" id="e_sl" min="0" max="2" step="0.1" value="0.5" oninput="syncVal(this.value, 'e_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Loss</span><div style="text-align:center; font-size: 1.0rem;">Phase Scrambling</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Density Matrix</span><div style="text-align:center; font-size: 1.0rem;">$\\rho_{ij} \\rightarrow 0$</div>`,
+hierarchy: "Environment<br>↓<br>Phase Mixing<br>↓<br>Decoherence",
+footer: "Decoherence marks the boundary between quantum and classical substrate states.",
+rightNote: "Phase information is not destroyed; it is distributed."
+},
+5: {
+title: "Outcome Channel Formation",
+brief: `<div class="briefing-content">
+<h2 style="color:var(--accent-outcome); margin-top: 20px; text-align: center;">Detailed Briefing: Outcome Channel Formation</h2>
+
+<h4 style="color:var(--accent-unified);">Conceptual Objective</h4>
+<p>This module describes the final stage reached before a measurement outcome becomes selected. The earlier modules established the sequence of physical processes: particle–detector coupling, resonant energy transfer, amplification of the detector excitation, and environmental decoherence that suppresses quantum interference.</p>
+<p>Once decoherence has occurred, the detector system no longer evolves as a coherent superposition of alternatives. Instead, the system reorganizes into distinct dynamical pathways that correspond to different possible measurement outcomes. These pathways are referred to as outcome channels.</p>
+<p>According to this framework, outcome channels are stable dynamical states of the detector substrate that can persist and propagate independently. Each channel corresponds to a particular macroscopic detector configuration.</p>
+
+<h4 style="color:var(--accent-unified);">Structure of the Visualization</h4>
+<p>The visualization shows a localized excitation in the detector substrate that is about to evolve into separate dynamical pathways. At this stage the detector has already undergone amplification and decoherence, so the system no longer maintains phase coherence between different possibilities.</p>
+<p>The interface label <strong>Channel Separation</strong> represents the emergence of distinct dynamical branches of the system evolution. These branches correspond to different possible detector states that could become the final measurement result.</p>
+
+<h4 style="color:var(--accent-unified);">Meaning of the Branching Parameter</h4>
+<p>The slider labeled <strong>Branching τ</strong> controls the degree to which the system separates into distinct outcome channels.</p>
+<p>When the branching parameter is small, the system remains close to a single continuous excitation. As the parameter increases, the detector state begins to separate into multiple independent dynamical channels. These channels represent different macroscopic configurations of the detector.</p>
+
+<h4 style="color:var(--accent-unified);">Pointer States</h4>
+<p>The right panel shows the pointer-state representation:</p>
+<p style="text-align:center;">$$\\{ |d_{\\text{up}}\\rangle , |d_{\\text{down}}\\rangle \\}$$</p>
+<p>Pointer states are stable macroscopic states of the detector that remain robust under environmental interaction. They are the states that ultimately correspond to measurement outcomes. For example, in a spin measurement, the pointer states might represent detector configurations corresponding to spin-up or spin-down.</p>
+<p>Once decoherence has suppressed interference between these states, the system naturally evolves toward one of the pointer states.</p>
+
+<h4 style="color:var(--accent-unified);">Interaction Hierarchy</h4>
+<p>The right panel summarizes the causal structure leading to channel formation:</p>
+<p style="text-align:center;"><strong>Coupled State → Phase Separation → Outcome Channels</strong></p>
+<p>Initially the particle and detector form a coupled quantum state. Environmental interactions then destroy phase coherence between the components of this state. Once phase coherence disappears, the different components of the state evolve independently as distinct dynamical channels.</p>
+
+<h4 style="color:var(--accent-unified);">Interpretation According to This Framework</h4>
+<p>According to this framework, outcome channels represent the set of physically available future states of the detector substrate. The measurement process does not immediately choose one of these channels. Instead, the physical system first establishes the set of possible stable configurations that the detector can adopt.</p>
+<p>Each channel corresponds to a different macroscopic state of the detector and therefore a different possible measurement result. The measurement problem arises because quantum mechanics allows multiple such channels to exist simultaneously at the microscopic level. However, classical observation reveals only a single outcome.</p>
+<p>The formation of outcome channels therefore represents the final stage before outcome selection occurs.</p>
+
+<h4 style="color:var(--accent-unified);">Role of This Module in Stage 36</h4>
+<p>Stage 36 describes the physical dynamics that occur before measurement selection. The modules collectively describe the entire pre-measurement process.</p>
+<ol>
+<li>First, the particle excitation interacts with the detector through an interaction field.</li>
+<li>Second, resonance transfers energy from the particle to the detector.</li>
+<li>Third, amplification converts the microscopic excitation into a macroscopic detector disturbance.</li>
+<li>Fourth, environmental interactions destroy quantum coherence between competing alternatives.</li>
+<li>Fifth, the system reorganizes into separate outcome channels corresponding to stable detector configurations.</li>
+</ol>
+<p>Stage 36 therefore ends with the formation of these outcome channels. The selection of a single channel will occur in the next stage of the measurement process.</p>
+</div>`,
+
+math: `<div class="math-process">
+<h2 style="color:var(--accent-outcome); margin-top: 20px; text-align: center;">Explicit Mathematics: Outcome Channel Formation</h2>
+
+<h4 style="color:var(--accent-unified);">Coupled Particle–Detector State After Amplification</h4>
+<p>After amplification and decoherence, the particle and detector system exists as a correlated state:</p>
+<p style="text-align:center;">$$|\\Psi\\rangle = \\sum_i c_i \\, |s_i\\rangle \\, |D_i\\rangle$$</p>
+<p>where $|s_i\\rangle$ represents particle states and $|D_i\\rangle$ represents detector states. Because decoherence has occurred, the detector states correspond to stable macroscopic configurations.</p>
+
+<h4 style="color:var(--accent-unified);">Pointer State Basis</h4>
+<p>The detector possesses a preferred basis called the pointer basis:</p>
+<p style="text-align:center;">$$\\{ |d_1\\rangle, |d_2\\rangle, ..., |d_n\\rangle \\}$$</p>
+<p>These states remain stable under environmental interaction. For a two-outcome measurement this reduces to:</p>
+<p style="text-align:center;">$$\\{ |d_{\\text{up}}\\rangle , |d_{\\text{down}}\\rangle \\}$$</p>
+<p>Each pointer state corresponds to a distinct detector configuration.</p>
+
+<h4 style="color:var(--accent-unified);">Reduced Density Matrix After Decoherence</h4>
+<p>Tracing over environmental degrees of freedom produces:</p>
+<p style="text-align:center;">$$\\rho = \\sum_i |c_i|^2 |s_i\\rangle |d_i\\rangle \\langle s_i| \\langle d_i|$$</p>
+<p>Off-diagonal coherence terms vanish:</p>
+<p style="text-align:center;">$$\\rho_{ij} \\rightarrow 0 \\quad (i \\ne j)$$</p>
+<p>The system now behaves as a classical mixture of pointer states.</p>
+
+<h4 style="color:var(--accent-unified);">Channel Projection Operators</h4>
+<p>Each outcome channel can be represented by a projection operator:</p>
+<p style="text-align:center;">$$P_i = |d_i\\rangle \\langle d_i|$$</p>
+<p>These operators satisfy $P_i P_j = \\delta_{ij} P_i$ and $\\sum_i P_i = I$, where $I$ is the identity operator.</p>
+
+<h4 style="color:var(--accent-unified);">Channel Decomposition of the State</h4>
+<p>The detector state can be decomposed into outcome channels:</p>
+<p style="text-align:center;">$$|\\Psi\\rangle = \\sum_i P_i |\\Psi\\rangle$$</p>
+<p>Each component $|\\Psi_i\\rangle = P_i |\\Psi\\rangle$ represents a separate dynamical channel.</p>
+
+<h4 style="color:var(--accent-unified);">Branching of the Detector State</h4>
+<p>The evolution of the detector state can be written as:</p>
+<p style="text-align:center;">$$|\\Psi(t)\\rangle = \\sum_i c_i(t)\\,|s_i\\rangle |d_i\\rangle$$</p>
+<p>Each coefficient $c_i(t)$ corresponds to the amplitude of a particular outcome channel. Once decoherence occurs, the channels evolve independently:</p>
+<p style="text-align:center;">$$\\frac{d c_i}{dt} = \\lambda_i c_i$$</p>
+<p>where $\\lambda_i$ represents growth or stability of that detector configuration.</p>
+
+<h4 style="color:var(--accent-unified);">Spatial Representation of Channel Separation</h4>
+<p>If the detector signal is represented as a field $\\phi(x,t)$, then branching corresponds to separation of localized modes:</p>
+<p style="text-align:center;">$$\\phi(x,t) = \\sum_i \\phi_i(x,t)$$</p>
+<p>Each component $\\phi_i(x,t)$ represents an independent outcome channel.</p>
+
+<h4 style="color:var(--accent-unified);">Stability Condition for Pointer States</h4>
+<p>Pointer states satisfy a stability condition under environmental interaction:</p>
+<p style="text-align:center;">$$H_{int} |d_i\\rangle = \\alpha_i |d_i\\rangle$$</p>
+<p>This means the interaction Hamiltonian does not mix pointer states with other states. They therefore remain robust and define the possible classical outcomes.</p>
+
+<h4 style="color:var(--accent-unified);">Probability Associated With Each Channel</h4>
+<p>The probability of a particular channel is $P_i = |c_i|^2$. These probabilities correspond to the Born rule distribution.</p>
+
+<h4 style="color:var(--accent-unified);">Channel Hierarchy</h4>
+<p>The mathematical sequence describing outcome channel formation is:</p>
+<p style="text-align:center; font-family: monospace;">$$|\\Psi\\rangle \\rightarrow \\rho \\rightarrow P_i \\rightarrow |\\Psi_i\\rangle$$</p>
+<ol>
+<li>Coupled quantum state</li>
+<li>Decohered density matrix</li>
+<li>Projection into pointer states</li>
+<li>Independent outcome channels.</li>
+</ol>
+
+<h4 style="color:var(--accent-unified);">Interpretation According to This Framework</h4>
+<p>According to this framework, outcome channels represent dynamically stable configurations of the detector substrate that emerge after amplification and decoherence. The density matrix becomes diagonal in the pointer basis, meaning that the system behaves as a statistical mixture of distinct channels. Each channel corresponds to a possible macroscopic detector state. Stage 36 ends at the formation of these channels, before the physical mechanism that selects a single outcome occurs in the next stage.</p>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>Branching (t)</span><input type="number" id="b_in" class="digital-entry" value="0" oninput="syncVal(this.value, 'b_sl')"></div><input type="range" id="b_sl" min="0" max="1" step="0.05" value="0" oninput="syncVal(this.value, 'b_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Branching</span><div style="text-align:center; font-size: 1.0rem;">Channel Separation</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Pointer States</span><div style="text-align:center; font-size: 1.0rem;">$\\{|d_{up}\\rangle, |d_{down}\\rangle\\}$</div>`,
+hierarchy: "Coupled State<br>↓<br>Phase Separation<br>↓<br>Outcome Channels",
+footer: "Stage 36 stops at the formation of channels, before collapse selection.",
+rightNote: "Outcome channels are the substrate's available future paths."
+}
+};
+
+function syncVal(val, id) {
+const sliderId = id.includes('_in') ? id.replace('_in', '_sl') : id;
+const inputId = id.includes('_sl') ? id.replace('_sl', '_in') : id;
+if(document.getElementById(sliderId)) document.getElementById(sliderId).value = val;
+if(document.getElementById(inputId)) document.getElementById(inputId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+document.getElementById('brief-box-content').innerHTML = content.brief || "Coming Soon";
+document.getElementById('math-box-content').innerHTML = content.math || "Coming Soon";
+document.getElementById('control-sliders').innerHTML = content.sliders;
+document.getElementById('active-module-title').innerText = content.title;
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+showScreen('briefing');
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() {
+showScreen('lab');
+setTimeout(() => {
+runLab();
+window.dispatchEvent(new Event('resize'));
+}, 100);
+}
+
+function runLab() {
+const target = document.getElementById('plot-area');
+if (!target) return;
+let data = [];
+let layout = {
+paper_bgcolor: 'black', plot_bgcolor: 'black', margin: {t:40,b:40,l:50,r:30},
+xaxis: { color: '#666', gridcolor: '#111', range: [-5, 5] },
+yaxis: { color: '#666', gridcolor: '#111', range: [-0.2, 1.2] },
+showlegend: false
+};
+
+if (currentTool === 1) {
+let l = parseFloat(document.getElementById('l_sl')?.value) || 0;
+let x = [], y1 = [], y2 = [];
+for(let i=-5; i<=5; i+=0.1) {
+x.push(i);
+y1.push(Math.exp(-(i+2)*(i+2))); // Particle
+y2.push(l * Math.exp(-(i-2)*(i-2))); // Detector Coupling
+}
+data = [
+{ x, y: y1, line: {color: '#f472b6', width: 2}, name: 'Particle' },
+{ x, y: y2, fill: 'tozeroy', line: {color: '#38bdf8', width: 2}, fillcolor: 'rgba(56, 189, 248, 0.2)', name: 'Detector' }
+];
+} else if (currentTool === 2) {
+let w = parseFloat(document.getElementById('w_sl')?.value) || 1.0;
+let x = [], y = [];
+for(let i=-5; i<=5; i+=0.05) {
+x.push(i);
+let resonance = Math.exp(-(w-1)*(w-1)*50);
+y.push(resonance * Math.sin(10*i) * Math.exp(-i*i));
+}
+data = [{ x, y, line: {color: '#fbbf24', width: 2} }];
+} else if (currentTool === 3) {
+let g = parseFloat(document.getElementById('g_sl')?.value) || 0.5;
+let x = [], y = [];
+for(let i=-5; i<=5; i+=0.1) {
+x.push(i);
+y.push(Math.exp(g*2) * 0.1 * Math.exp(-(i-1)*(i-1)));
+}
+data = [{ x, y, fill: 'tozeroy', line: {color: '#f87171', width: 3}, fillcolor: 'rgba(248, 113, 113, 0.3)' }];
+} else if (currentTool === 4) {
+let e = parseFloat(document.getElementById('e_sl')?.value) || 0.5;
+let x = [], y = [];
+for(let i=-5; i<=5; i+=0.1) {
+x.push(i);
+let noise = (Math.random()-0.5) * e;
+y.push(Math.exp(-i*i) + noise);
+}
+data = [{ x, y, line: {color: '#a78bfa', width: 2} }];
+} else if (currentTool === 5) {
+let b = parseFloat(document.getElementById('b_sl')?.value) || 0;
+let x = [], y1 = [], y2 = [];
+for(let i=-5; i<=5; i+=0.1) {
+x.push(i);
+y1.push((1-b) * Math.exp(-(i+2)*(i+2)));
+y2.push(b * Math.exp(-(i-2)*(i-2)));
+}
+data = [
+{ x, y: y1, line: {color: '#4ade80', width: 2} },
+{ x, y: y2, line: {color: '#4ade80', width: 2} }
+];
+}
+
+Plotly.react('plot-area', data, layout, {responsive: true, displayModeBar: false});
+}
+
+function resetLab() {
+if (currentTool === 1) syncVal(0.5, 'l_sl');
+if (currentTool === 2) syncVal(1.0, 'w_sl');
+if (currentTool === 3) syncVal(0.5, 'g_sl');
+if (currentTool === 4) syncVal(0.5, 'e_sl');
+if (currentTool === 5) syncVal(0, 'b_sl');
+runLab();
+}
+</script>
+</body>
+</html>

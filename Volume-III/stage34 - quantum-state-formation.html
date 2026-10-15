@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 34 — Quantum State Formation</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #00ffcc;
+--accent-res: #2dd4bf; --accent-stab: #a78bfa; --accent-trans: #fb7185; --accent-loc: #38bdf8; --accent-spec: #f59e0b;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100dvh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-unified); font-family: sans-serif; font-size: 0.85rem; min-width: 350px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+
+#screen-portal { justify-content: flex-start; padding-top: 8dvh; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 70px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); height: 90%; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0px auto; grid-template-columns: 320px 1fr 320px; gap: 10px; height: calc(100% - 40px); padding-top: 0px; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.constant-display-box {
+background: #111; border: 1px solid var(--accent-unified); padding: 6px; border-radius: 8px;
+display: flex; justify-content: space-around; margin-bottom: 10px;
+}
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(0, 255, 204, 0.05); border: 1px solid var(--accent-unified); padding: 8px; border-radius: 8px; margin-bottom: 8px; font-size: 0.6rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; height: 100%; position: relative; overflow: hidden; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #000; border: 1px solid var(--accent-unified); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer {
+width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem;
+color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 34 — QUANTUM STATE FORMATION</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">Quantum State Formation Lab</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">Emergence of Discrete Quantum States from Substrate Resonance.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-res);">
+<h2 style="color:var(--accent-res);">1. Resonance Quantization</h2>
+<p>Stable Standing Waves within Structural Constraints.</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-stab);">
+<h2 style="color:var(--accent-stab);">2. Mode Stability Regions</h2>
+<p>Filtering Persistent Oscillations through K and P.</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-trans);">
+<h2 style="color:var(--accent-trans);">3. Quantum State Transitions</h2>
+<p>Discrete Jumps between Energy Resonance Modes.</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-loc);">
+<h2 style="color:var(--accent-loc);">4. Wavefunction Localization</h2>
+<p>Particle-like Concentration of Substrate Energy.</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-spec);">
+<h2 style="color:var(--accent-spec);">5. Quantum Spectrum Formation</h2>
+<p>Synthesis of the Discrete Energy Ladder.</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-unified); background: linear-gradient(135deg, #0f1115 0%, #0a1a1a 100%);">
+<h2 style="color:var(--accent-unified);">6. Mathematical Structure</h2>
+<p>Summary of Quantum State Dynamics.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color:var(--accent-unified); text-align:center;">Summary: Mathematical Structure of Stage 34</h2>
+<h3 style="color: #00d4ff; margin-top: 20px;">Purpose of the Mathematical Summary</h3>
+<p>Stage 34 investigates how discrete quantum states arise from the interaction between oscillatory wavefields and the structured vacuum substrate. Earlier stages of the framework established that spacetime geometry and physical dynamics emerge from the structural parameters vacuum stiffness $K$ and synthesis pressure $P$, and that quantum wavefields appear as oscillatory modes of this substrate medium. Stage 34 extends this structure by demonstrating how resonance, stability filtering, localization, and energy exchange combine to produce the observable quantum state structure. The purpose of this mathematical summary is to present the governing relations that describe the formation, stability, transition, and spectral manifestation of quantum states.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Fundamental Wave Dynamics</h3>
+<p>Oscillatory disturbances within the vacuum substrate obey the wave equation</p>
+<div style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 8px; text-align: center; margin: 15px 0;">
+$$\frac{\partial^2 \Psi}{\partial t^2} = c^2 \nabla^2 \Psi$$
+</div>
+<p>where $\Psi(x,t)$ represents the wavefield amplitude and $c$ is the propagation velocity within the substrate medium. These oscillations represent the fundamental dynamical excitations of the vacuum structure.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Resonance Quantization</h3>
+<p>When oscillations occur within a bounded structural region of length $L$, boundary conditions restrict the allowed wavelengths. The resonance condition requires</p>
+<p style="text-align: center; margin: 10px 0;">
+$$\lambda_n = \frac{2L}{n}$$
+</p>
+<p>where $n$ is an integer resonance mode number. Only oscillatory configurations satisfying this condition remain stable. This constraint produces the discrete set of allowed standing wave modes</p>
+<p style="text-align: center; margin: 10px 0;">
+$$\Psi_n(x,t) = A \sin\left(\frac{n\pi x}{L}\right)\cos(\omega_n t)$$
+</p>
+<p>with resonance frequencies</p>
+<p style="text-align: center; margin: 10px 0;">
+$$\omega_n = \frac{n\pi c}{L}$$
+</p>
+<p>These standing waves represent the fundamental quantized states of the oscillatory system.</p>
+</section>
+
+<section style="margin-bottom: 30px; background: rgba(255, 255, 255, 0.03); padding: 20px; border-radius: 8px;">
+<h3 style="color: #00d4ff; margin-top: 0;">Mode Stability Filtering</h3>
+<p>Not all oscillatory disturbances persist within the substrate. Interaction with the mechanical structure of the medium introduces damping that filters unstable modes. The dynamics of a damped oscillation are described by</p>
+<div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 4px; margin: 15px 0; text-align: center;">
+$$\frac{d^2\Psi}{dt^2} + \gamma \frac{d\Psi}{dt} + \omega_0^2 \Psi = 0$$
+</div>
+<p>The amplitude of unstable oscillations decays exponentially according to</p>
+<p style="text-align: center; margin: 10px 0;">
+$$\Psi(t) = A e^{-\gamma t}\cos(\omega t)$$
+</p>
+<p>Only oscillations that satisfy both resonance alignment and stability filtering remain persistent within the substrate.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Quantum State Transitions</h3>
+<p>Once stable resonance modes exist, transitions between them occur through discrete energy exchanges. The allowed energy levels follow the relation</p>
+<p style="text-align: center; margin: 10px 0;">
+$$E_n = n h \nu$$
+</p>
+<p>The energy difference between adjacent states is therefore</p>
+<p style="text-align: center; margin: 10px 0;">
+$$\Delta E = E_{n+1} - E_n$$
+</p>
+<p>Energy absorption or emission equal to this gap produces a transition</p>
+<p style="text-align: center; margin: 10px 0;">
+$$h\nu = |E_m - E_n|$$
+</p>
+<p>These transitions correspond to the reconfiguration of the oscillatory field from one resonance pattern to another.</p>
+</section>
+
+<section style="margin-bottom: 30px; background: rgba(0, 212, 255, 0.05); padding: 20px; border-radius: 8px;">
+<h3 style="color: #00d4ff; margin-top: 0;">Wavefunction Localization</h3>
+<p>Localized particle-like structures arise when oscillatory wavefields form confined packets. A localized wave packet can be represented by a Gaussian envelope</p>
+<div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 4px; margin: 15px 0; text-align: center;">
+$$\Psi(x) = A e^{-\frac{(x-x_0)^2}{2\sigma^2}}$$
+</div>
+<p>The associated probability density is</p>
+<p style="text-align: center; margin: 10px 0;">
+$$P(x) = |\Psi(x)|^2$$
+</p>
+<p>Localization corresponds to the concentration of oscillatory energy around a central position $x_0$. When the width parameter $\sigma$ becomes small, the energy density becomes sharply peaked, producing particle-like behavior.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Quantum Spectrum Formation</h3>
+<p>The discrete resonance modes produce a quantized energy spectrum. The allowed frequencies associated with the resonance structure are</p>
+<p style="text-align: center; margin: 10px 0;">
+$$\nu_n = \frac{nc}{2L}$$
+</p>
+<p>Substituting into the energy relation yields</p>
+<p style="text-align: center; margin: 10px 0;">
+$$E_n = n h \left(\frac{c}{2L}\right)$$
+</p>
+<p>Transitions between these levels generate spectral lines with frequencies</p>
+<p style="text-align: center; margin: 10px 0;">
+$$\nu_{mn} = \frac{E_m - E_n}{h}$$
+</p>
+<p>The observable spectrum can therefore be represented as</p>
+<div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 4px; margin: 15px 0; text-align: center;">
+$$S(\nu) = \sum_{n} A_n \delta(\nu - \nu_n)$$
+</div>
+<p>where each peak corresponds to a stable resonance mode of the substrate.</p>
+</section>
+
+<section style="margin-bottom: 30px; border-left: 4px solid var(--accent-color); padding-left: 20px;">
+<h3 style="color: #00d4ff;">Relation to Structural Vacuum Parameters</h3>
+<p>The stability and persistence of these oscillatory states depend on the structural parameters of the vacuum substrate. Vacuum stiffness is defined by</p>
+<p style="text-align: center; margin: 10px 0;">$$K = |\nabla C| \quad (\text{Value: } 11.350)$$</p>
+<p>and synthesis pressure is defined by</p>
+<p style="text-align: center; margin: 10px 0;">$$P = -V(N_0) \quad (\text{Value: } 0.6900)$$</p>
+<p>Stiffness regulates the restorative response of the medium and stabilizes standing wave modes. Synthesis pressure maintains the global equilibrium of the substrate and regulates how oscillatory energy distributes across resonance states.</p>
+</section>
+
+<footer style="margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+<h3 style="color: #00d4ff; margin-top: 0;">Unified Emergence Sequence</h3>
+<p style="text-align: center; font-weight: bold; letter-spacing: 2px; margin: 15px 0;">
+$\text{Resonance} \rightarrow \text{Stability Filtering} \rightarrow \text{Discrete States} \rightarrow \text{Localization} \rightarrow \text{Quantum Spectrum}$
+</p>
+<h4 style="color: var(--accent-color);">Interpretation</h4>
+<p style="font-style: italic; font-size: 0.95em;">Stage 34 demonstrates that the quantum state structure arises naturally from the interaction between oscillatory wavefields and the structured vacuum substrate. Quantization, stability, particle localization, and spectral lines all emerge as consequences of resonance dynamics governed by the substrate parameters $K$ and $P$. The discrete quantum spectrum therefore represents the observable fingerprint of the resonance structure supported by the vacuum medium.</p>
+</footer>
+
+<div class="summary-section" style="margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+
+<h3 style="color: var(--accent-color); text-transform: uppercase; letter-spacing: 2px;">Fundamental Resonance Identity</h3>
+
+<p>
+The values <strong>K = 11.350</strong> and <strong>P = 0.6900</strong> are not empirical measurements.
+They are the <em>structural equilibrium parameters</em> of the vacuum substrate derived from the interaction of the three vacuum fields (Stabilizing, Conserving, and Motive).
+These parameters correspond to the <strong>zero-point resonance configuration</strong> where the substrate achieves dynamic balance.
+</p>
+
+<div class="math-box" style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 8px; margin: 20px 0;">
+
+<p style="text-align: center; font-size: 1.1em;">
+The Resonance Identity ($R$):
+$$
+R(K,P) = \frac{K}{K_0}\cdot\frac{P_0}{P} \approx 1
+$$
+</p>
+
+<p style="text-align:center; font-size:0.9em; opacity:0.8;">
+where $K_0 = 11.350$ and $P_0 = 0.6900$ represent the structural equilibrium values of the substrate.
+</p>
+
+</div>
+
+<div class="logic-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 0.9em;">
+
+<div class="logic-item">
+<h4 style="color: #00d4ff; margin-bottom: 5px;">Why K = 11.350?</h4>
+<p>
+This value corresponds to the structural stiffness required for stable curvature formation.
+If $K$ were lower, gravitational binding would be insufficient to maintain coherent structures.
+If $K$ were significantly larger, curvature responses would become unstable and produce excessive geometric rigidity.
+</p>
+</div>
+
+<div class="logic-item">
+<h4 style="color: #00d4ff; margin-bottom: 5px;">Why P = 0.6900?</h4>
+<p>
+The synthesis pressure represents the equilibrium background pressure generated by the stabilizing field.
+At $P = 0.6900$ the substrate maintains global expansion equilibrium while still allowing localized curvature formation.
+This balance permits both cosmic expansion and gravitational structure formation to coexist.
+</p>
+</div>
+
+</div>
+
+<p style="margin-top: 20px; font-style: italic; opacity: 0.8;">
+<strong>Conclusion:</strong>
+When $R = 1$ the interaction between the Stabilizing, Conserving, and Motive fields produces a balanced substrate state.
+Small deviations from this condition alter the curvature response of the vacuum and shift the stability of large-scale cosmic structures.
+</p>
+
+</div>
+
+
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div class="constant-display-box">
+<div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val">11.350</span></div>
+<div class="const-item"><span class="const-label">Pressure P</span><span class="const-val">0.6900</span></div>
+</div>
+<div id="mapping-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Quantization Telemetry</span>
+<span id="epoch-label" style="font-family:monospace; font-size:0.85rem; color:var(--accent-unified);">RESONANCE ACTIVE</span>
+</div>
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:8px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:6px;">RESET PARAMETERS</button>
+<div id="panel-footer-text" style="font-size: 0.75rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.4; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:8px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.62rem; text-transform:uppercase; cursor:pointer; padding:6px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area" style="width:100%; height:100%;"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">State Logic</span>
+<div id="metrics-content" style="font-size:0.75rem; font-family:monospace; line-height:1.7;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Emergence Hierarchy</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.75rem; color: var(--text-dim); line-height: 1.4; background: #000; padding: 10px; border-radius: 8px; border: 1px solid #222; margin-top: auto;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "Resonance Quantization",
+brief: `<div class="briefing-content" style="padding: 0px 40px 40px 40px; line-height: 1.6; color: #e0e0e0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+
+<section style="margin-bottom: 30px;">
+<h2 style="color: var(--accent-color); text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">Detailed Briefing: Resonance Quantization</h2>
+<h3 style="color: #00d4ff; margin-top: 20px;">Purpose of the Module</h3>
+<p>This module introduces the fundamental mechanism through which discrete quantum states arise within the <strong>Synthesis Framework</strong>. The purpose of the visualization is to demonstrate how quantization emerges naturally when oscillatory wavefields interact with the structural constraints of the vacuum substrate. Instead of treating quantum states as abstract rules imposed on particles, this module illustrates that discrete states arise from resonance conditions imposed by the geometry and physical properties of the underlying medium.</p>
+</section>
+
+<section style="margin-bottom: 30px; background: rgba(255,255,255,0.03); padding: 20px; border-radius: 8px; border-left: 4px solid var(--accent-color);">
+<h3 style="color: #00d4ff; margin-top: 0;">Vacuum Substrate Parameters</h3>
+<p>Within the framework, the vacuum is not considered empty space but a structured physical substrate characterized by two fundamental parameters: the <strong>Vacuum Stiffness $K$</strong> and the <strong>Synthesis Pressure $P$</strong>. In this module, these parameters are fixed at their equilibrium values:</p>
+<p style="text-align: center; font-size: 1.2em; margin: 15px 0;">
+$$K = 11.350$$
+$$P = 0.6900$$
+</p>
+<p>The stiffness parameter $K$ determines the restorative response of the substrate when a wavefield propagates through it. It governs how strongly the medium resists deformation and therefore controls the stability of oscillatory modes. The synthesis pressure $P$ represents the global stabilizing pressure of the substrate that maintains the structural equilibrium of the vacuum medium. Together, these two parameters determine how waves propagate, resonate, and stabilize within the substrate.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Resonance Quantization</h3>
+<p>The central concept demonstrated in this module is resonance quantization. When a wave propagates within a bounded region of the substrate, only specific wavelengths are permitted. This restriction arises because the oscillatory field must satisfy boundary conditions imposed by the geometry of the region. Mathematically, the allowed wavelengths are given by the resonance condition:</p>
+<div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 4px; margin: 15px 0; text-align: center;">
+$$\\lambda_n = \\frac{2L}{n}$$
+</div>
+<p>Where $L$ represents the effective structural length of the region and $n$ is an integer mode number. This equation states that the wave must fit an integer number of half-wavelengths inside the resonant domain. If the wave does not satisfy this condition, destructive interference occurs and the oscillation cannot remain stable. Only those wave configurations that meet the integer resonance condition can persist. These stable oscillatory configurations correspond to quantized states.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Role of the Harmonic Node Parameter</h3>
+<p>The control labeled <strong>Harmonic Node ($n$)</strong> allows the user to vary the integer mode number. Each value of $n$ represents a different standing-wave configuration within the substrate. Increasing the value of $n$ increases the number of nodes and antinodes in the wavefield and produces higher-order resonant modes. Each of these modes represents a distinct stable configuration of the oscillatory field. In this way, the visualization demonstrates that the set of allowed quantum states corresponds directly to the set of allowed resonance modes of the substrate.</p>
+</section>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+<div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
+<h4 style="color: #00d4ff; margin-top: 0;">Quantization Telemetry</h4>
+<p style="font-size: 0.9em;">The telemetry panel displays the status <strong>“Resonance Active.”</strong> This indicates that the wavefield currently satisfies the resonance condition and therefore forms a stable standing wave. This telemetry reflects the stability condition of the oscillatory field within the substrate.</p>
+</div>
+<div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; text-align: center;">
+<h4 style="color: #00d4ff; margin-top: 0;">Emergence Hierarchy</h4>
+<p style="font-weight: bold; letter-spacing: 1px;">
+Constraint<br>↓<br>Wavefield<br>↓<br>State
+</p>
+</div>
+</div>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Physical Interpretation</h3>
+<p>This module illustrates a central principle of the <strong>Synthesis Framework</strong>: quantum states emerge from resonance within a structured vacuum medium. Quantization is therefore not an arbitrary postulate but a natural consequence of wave dynamics constrained by the physical properties of the substrate. When the oscillatory phase of the wavefield aligns with the structural geometry of the substrate, constructive interference produces a coherent standing wave.</p>
+</section>
+
+<footer style="margin-top: 40px; padding: 20px; border: 1px dashed rgba(0,212,255,0.3); border-radius: 8px; text-align: center;">
+<h4 style="margin: 0; color: var(--accent-color);">Operational Principle</h4>
+<p style="font-size: 1.2em; font-style: italic; margin: 10px 0;">“Stable states require integer phase alignment.”</p>
+<p style="font-size: 0.85em; opacity: 0.7;">Through this mechanism, the module demonstrates how discrete states emerge naturally from wave dynamics in a structured vacuum substrate.</p>
+</footer>
+
+</div>`,
+math: `<div class="math-section" style="padding: 0px 40px 40px 40px; line-height: 1.6; color: #e0e0e0; font-family: 'Segoe UI', sans-serif;">
+
+<section style="margin-bottom: 30px;">
+<h2 style="color: var(--accent-color); text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">Explicit Mathematics: Resonance Quantization</h2>
+
+<h3 style="color: #00d4ff; margin-top: 20px;">Energy–Wave Relation</h3>
+<p>The oscillatory behavior of quantum wavefields within the substrate medium can be described by the standard wave equation:</p>
+<div style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 8px; text-align: center; margin: 15px 0;">
+$$\\frac{\\partial^2 \\Psi}{\\partial t^2} = c^2 \\nabla^2 \\Psi$$
+</div>
+<p>where $\\Psi(x,t)$ represents the wavefield amplitude and $c$ is the propagation speed within the vacuum substrate. This equation describes how oscillatory disturbances propagate through the medium. Within the <strong>Synthesis Framework</strong>, the vacuum substrate possesses structural properties characterized by stiffness $K$ and synthesis pressure $P$, which regulate the stability and propagation of oscillatory modes.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Resonance Condition</h3>
+<p>When a wave propagates inside a bounded structural domain of length $L$, boundary constraints restrict the allowed wavelengths. The resonance condition requires that the wavefield satisfy:</p>
+<p style="text-align: center; margin: 10px 0;">
+$$\\Psi(0,t)=0, \\qquad \\Psi(L,t)=0$$
+</p>
+<p>Solving the wave equation under these boundary conditions yields discrete wavelength solutions:</p>
+<div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 4px; margin: 15px 0; text-align: center;">
+$$\\lambda_n = \\frac{2L}{n}$$
+</div>
+<p>where $n$ is an integer mode number ($n = 1, 2, 3, 4, \dots$). This relation expresses the fundamental resonance constraint that the oscillatory field must contain an integer number of half wavelengths within the domain.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Standing Wave Modes</h3>
+<p>The spatial structure of the resonant wave modes is therefore defined as:</p>
+<p style="text-align: center; margin: 10px 0;">
+$$\\Psi_n(x,t) = A \\sin\\left(\\frac{n\\pi x}{L}\\right)\\cos(\\omega_n t)$$
+</p>
+<p>where $A$ is the wave amplitude and the mode frequency is:</p>
+<p style="text-align: center; margin: 10px 0;">
+$$\\omega_n = \\frac{n\\pi c}{L}$$
+</p>
+<p>Each integer value of $n$ produces a distinct standing wave configuration within the substrate.</p>
+</section>
+
+<section style="margin-bottom: 30px; background: rgba(0, 212, 255, 0.05); padding: 20px; border-radius: 8px;">
+<h3 style="color: #00d4ff; margin-top: 0;">Energy Quantization</h3>
+<p>The energy associated with each oscillatory mode is proportional to the square of the oscillation frequency ($E_n \\propto \\omega_n^2$). Substituting the expression for $\\omega_n$ yields:</p>
+<p style="text-align: center; font-size: 1.2em; margin: 15px 0;">
+$$E_n \\propto \\left(\\frac{n\\pi c}{L}\\right)^2$$
+</p>
+<p>Thus, the allowed energy states of the system form a discrete set determined by the resonance condition.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Relation to Substrate Parameters</h3>
+<p>The stability of these resonant modes is governed by the structural parameters of the vacuum substrate. The stiffness parameter:</p>
+<p style="text-align: center; margin: 10px 0;">$$K = |\\nabla C|$$</p>
+<p>determines the restorative response of the substrate to oscillatory deformation ($K=11.350$). Higher stiffness leads to stronger stabilization of standing wave modes. The synthesis pressure:</p>
+<p style="text-align: center; margin: 10px 0;">$$P = -V(N_0)$$</p>
+<p>maintains the equilibrium structure ($P=0.6900$) and provides the background stabilization required for coherent wave propagation.</p>
+</section>
+
+<section style="margin-bottom: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+<h3 style="color: #00d4ff;">Resulting Quantized States</h3>
+<p>The discrete resonant modes form the following hierarchy:</p>
+<p style="text-align: center; font-weight: bold; letter-spacing: 2px; margin: 15px 0;">
+$\\text{Constraint} \\rightarrow \\text{Standing Wave} \\rightarrow \\text{Quantized State}$
+</p>
+<p>Each integer resonance mode $n$ corresponds to a distinct stable oscillatory configuration of the substrate. These configurations represent the discrete quantum states observed in physical systems.</p>
+</section>
+
+<footer style="margin-top: 40px; border-left: 4px solid var(--accent-color); padding: 10px 25px; background: rgba(255,255,255,0.02);">
+<h4 style="color: var(--accent-color); margin-top: 0;">Interpretation</h4>
+<p style="font-style: italic; font-size: 0.95em;">Within the <strong>Synthesis Framework</strong>, quantum states arise from the resonance structure of oscillatory fields interacting with the vacuum substrate. The quantization of energy therefore emerges naturally from boundary constraints and resonance stability rather than being imposed as an external rule.</p>
+</footer>
+
+</div>`,
+sliders: `<div class="control-item"><div class="label-group"><span>Harmonic Node (n)</span><input type="number" id="n_in" class="digital-entry" value="2" oninput="syncVal(this.value, 'n_sl')"></div><input type="range" id="n_sl" min="1" max="10" step="1" value="2" oninput="syncVal(this.value, 'n_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Selection</span><div style="text-align:center; font-size: 1.00rem;">INTEGER MODES</div></div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Law</span><div style="text-align:center; font-size: 1.10rem;">$\\lambda_n = 2L/n$</div></div>`,
+hierarchy: "Constraint<br>↓<br>Wavefield<br>↓<br>State",
+footer: "Boundary conditions dictate allowed modes.",
+rightNote: "Stable states require integer phase alignment."
+},
+2: {
+title: "Mode Stability Regions",
+brief: `<div class="briefing-content" style="padding: 0px 40px 40px 40px; line-height: 1.6; color: #e0e0e0; font-family: 'Segoe UI', sans-serif;">
+
+<section style="margin-bottom: 30px;">
+<h2 style="color: var(--accent-color); text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">Detailed Briefing: Mode Stability Regions</h2>
+<h3 style="color: #00d4ff; margin-top: 20px;">Purpose of the Module</h3>
+<p>This module demonstrates how the vacuum substrate acts as a stability filter for oscillatory wave modes. While the previous module showed how discrete resonance modes form, this module explains why only some oscillations persist while others decay. The visualization shows that the structural properties of the vacuum medium determine which oscillations survive long enough to form stable quantum states. The goal of the module is therefore to illustrate how the mechanical structure of the substrate filters unstable oscillations and allows only persistent modes to remain.</p>
+</section>
+
+<section style="margin-bottom: 30px; background: rgba(255,255,255,0.03); padding: 20px; border-radius: 8px; border-left: 4px solid var(--accent-color);">
+<h3 style="color: #00d4ff; margin-top: 0;">Vacuum Substrate Parameters</h3>
+<p>The substrate medium in which the oscillatory field exists is characterized by two structural parameters: <strong>Vacuum Stiffness $K$</strong> and <strong>Synthesis Pressure $P$</strong>. In this module, these parameters are fixed at their equilibrium values:</p>
+<p style="text-align: center; font-size: 1.2em; margin: 15px 0;">
+$$K = 11.350$$
+$$P = 0.6900$$
+</p>
+<p>Vacuum stiffness represents the restoring strength of the substrate when it is disturbed by oscillatory energy. A higher stiffness means that the medium strongly resists deformation and therefore stabilizes coherent oscillations. Synthesis pressure maintains the structural equilibrium of the substrate and ensures that the medium does not collapse or disperse under oscillatory stress. These parameters determine how energy fluctuations behave within the vacuum medium.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Mode Stability Filtering</h3>
+<p>The key concept illustrated in this module is that oscillatory modes must survive the filtering effect of the substrate. When an oscillation forms inside the vacuum medium, it may either stabilize or decay depending on how well it aligns with the structural dynamics of the substrate. Oscillations that match the natural restoring behavior of the medium persist and evolve into stable standing modes. Oscillations that do not align with these structural constraints gradually decay and disappear.</p>
+<p>This behavior is represented visually by two wave traces. The <strong>stable trace</strong> continues oscillating with nearly constant amplitude, representing a mode that has survived the structural filtering process. The <strong>unstable trace</strong> gradually decreases in amplitude, illustrating how oscillations that do not satisfy the stability conditions dissipate over time.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">K-Decay Region</h3>
+<p>The interface panel identifies this filtering zone as the <strong>K-Decay Region</strong>. This region represents the range in which oscillatory disturbances are damped by the stiffness of the substrate. The stiffness parameter effectively acts as a mechanical filter that suppresses oscillations which do not satisfy the resonance conditions.</p>
+<p>The control labeled <strong>Decay Shift</strong> allows the user to adjust the rate at which unstable oscillations decay. Increasing this parameter increases the damping effect, causing unstable modes to lose energy more rapidly. Reducing the parameter allows oscillations to persist longer before dissipating.</p>
+</section>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+<div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
+<h4 style="color: #00d4ff; margin-top: 0;">Quantization Telemetry</h4>
+<p style="font-size: 0.9em;">The telemetry panel indicates the operational state with the label <strong>“Resonance Active.”</strong> This indicates the dominant oscillatory mode shown satisfies the stability conditions of the substrate. The secondary fading trace represents oscillatory noise or unstable modes being filtered out.</p>
+</div>
+<div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; text-align: center;">
+<h4 style="color: #00d4ff; margin-top: 0;">Emergence Hierarchy</h4>
+<p style="font-weight: bold; letter-spacing: 1px;">
+Oscillation<br>↓<br>K-Filter<br>↓<br>Persistence
+</p>
+</div>
+</div>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Stability Law</h3>
+<p>The law displayed in the stability panel expresses the exponential decay behavior of unstable modes:</p>
+<div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 4px; margin: 15px 0; text-align: center;">
+$$e^{-\\gamma t}$$
+</div>
+<p>where $\\gamma$ represents the decay rate and $t$ represents time. This decay mechanism is a natural consequence of the mechanical properties of the vacuum medium. Oscillations that are not reinforced by resonance gradually lose energy through interaction with the substrate structure.</p>
+</section>
+
+<footer style="margin-top: 40px; padding: 20px; border: 1px dashed rgba(0,212,255,0.3); border-radius: 8px; text-align: center;">
+<h4 style="margin: 0; color: var(--accent-color);">Operational Principle</h4>
+<p style="font-size: 1.2em; font-style: italic; margin: 10px 0;">“Noise decays exponentially outside resonance.”</p>
+<p style="font-size: 0.85em; opacity: 0.7;">This module illustrates that quantum stability arises from the interaction between oscillatory wavefields and the mechanical properties of the vacuum substrate.</p>
+</footer>
+
+</div>`,
+math: `<div class="math-section" style="padding: 0px 40px 40px 40px; line-height: 1.6; color: #e0e0e0; font-family: 'Segoe UI', sans-serif;">
+
+<section style="margin-bottom: 30px;">
+<h2 style="color: var(--accent-color); text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">Explicit Mathematics: Mode Stability Regions</h2>
+
+<h3 style="color: #00d4ff; margin-top: 20px;">Oscillatory Wave Dynamics</h3>
+<p>The oscillatory behavior of a wavefield propagating through the vacuum substrate can be described by the classical wave equation:</p>
+<div style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 8px; text-align: center; margin: 15px 0;">
+$$\\frac{\\partial^2 \\Psi}{\\partial t^2} = c^2 \\nabla^2 \\Psi$$
+</div>
+<p>where $\\Psi(x,t)$ represents the oscillatory field amplitude and $c$ is the propagation speed. However, interaction with the substrate introduces damping effects that influence the persistence of oscillations.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Damped Oscillation Equation</h3>
+<p>When dissipation is present, the wave equation includes a damping term. The local dynamics of the oscillatory mode can be approximated by the damped oscillator equation:</p>
+<div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 4px; margin: 15px 0; text-align: center;">
+$$\\frac{d^2 \\Psi}{dt^2} + \\gamma \\frac{d\\Psi}{dt} + \\omega_0^2 \\Psi = 0$$
+</div>
+<p>where $\\gamma$ is the damping coefficient and $\\omega_0$ is the natural oscillation frequency of the mode. This equation describes how oscillatory energy evolves when interacting with the substrate.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Exponential Decay of Unstable Modes</h3>
+<p>The solution to the damped oscillator equation includes an exponential decay factor:</p>
+<p style="text-align: center; margin: 10px 0;">
+$$\\Psi(t) = A e^{-\\gamma t} \\cos(\\omega t)$$
+</p>
+<p>The exponential term $e^{-\\gamma t}$ describes the decay of oscillation amplitude over time. If damping is strong, the oscillation quickly disappears; if weak, the oscillation persists.</p>
+</section>
+
+<section style="margin-bottom: 30px; background: rgba(0, 212, 255, 0.05); padding: 20px; border-radius: 8px;">
+<h3 style="color: #00d4ff; margin-top: 0;">Substrate Stability Filtering</h3>
+<p>Within the <strong>Synthesis Framework</strong>, the damping coefficient is emergent from the structural properties of the substrate. The stiffness parameter $K = |\\nabla C|$ represents the restorative force ($K=11.350$), while synthesis pressure $P = -V(N_0)$ maintains equilibrium ($P=0.6900$). Together, they influence the effective damping coefficient:</p>
+<p style="text-align: center; font-size: 1.2em; margin: 15px 0;">
+$$\\gamma = f(K, P)$$
+</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Stability Condition</h3>
+<p>For oscillatory modes to persist, the restoring influence must overcome dissipative damping. The stability condition is defined as:</p>
+<div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 4px; margin: 15px 0; text-align: center;">
+$$\\omega_0^2 > \\frac{\\gamma^2}{4}$$
+</div>
+<p>If satisfied, the system remains underdamped and oscillations persist. Modes that satisfy resonance also satisfy persistence:</p>
+<p style="text-align: center; margin: 10px 0;">
+$$\\Psi_n(x,t) = A e^{-\\gamma t} \\sin\\left(\\frac{n\\pi x}{L}\\right)$$
+</p>
+</section>
+
+<section style="margin-bottom: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+<h3 style="color: #00d4ff;">Emergence Hierarchy</h3>
+<p style="text-align: center; font-weight: bold; letter-spacing: 2px; margin: 15px 0;">
+$\\text{Oscillation} \\rightarrow \\text{Substrate Filtering} \\rightarrow \\text{Persistent Mode}$
+</p>
+<p>Stable quantum states arise only from oscillatory modes that survive this stability filtering process within the structured vacuum substrate.</p>
+</section>
+
+<footer style="margin-top: 40px; border-left: 4px solid var(--accent-color); padding: 10px 25px; background: rgba(255,255,255,0.02);">
+<h4 style="color: var(--accent-color); margin-top: 0;">Interpretation</h4>
+<p style="font-style: italic; font-size: 0.95em;">Persistent modes satisfy both resonance alignment and stability filtering imposed by the substrate stiffness $K$. Unstable disturbances do not satisfy these conditions and therefore decay exponentially.</p>
+</footer>
+
+</div>`,
+sliders: `<div class="control-item"><div class="label-group"><span>Decay Shift</span><input type="number" id="f_in" class="digital-entry" value="1.0" oninput="syncVal(this.value, 'f_sl')"></div><input type="range" id="f_sl" min="0.5" max="5" step="0.1" value="1.0" oninput="syncVal(this.value, 'f_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Filter</span><div style="text-align:center; font-size: 1.00rem;">K-DECAY REGION</div></div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Stability</span><div style="text-align:center; font-size: 1.20rem;">$e^{-\\gamma t}$</div></div>`,
+hierarchy: "Oscillation<br>↓<br>K-Filter<br>↓<br>Persistence",
+footer: "Higher K increases the threshold for stable oscillations.",
+rightNote: "Noise decays exponentially outside resonance."
+},
+3: {
+title: "Quantum State Transitions",
+brief: `<div class="briefing-content" style="padding: 0px 40px 40px 40px; line-height: 1.6; color: #e0e0e0; font-family: 'Segoe UI', sans-serif;">
+
+<section style="margin-bottom: 30px;">
+<h2 style="color: var(--accent-color); text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">Detailed Briefing: Quantum State Transitions</h2>
+<h3 style="color: #00d4ff; margin-top: 20px;">Purpose of the Module</h3>
+<p>This module explains how transitions occur between discrete quantum states once resonance modes have formed and passed the stability filtering of the substrate. The previous modules established that only specific oscillatory configurations can exist as stable modes of the vacuum medium. The purpose of this module is to demonstrate how a system moves from one such stable mode to another. Instead of continuous change, the transition occurs as a discrete jump between allowed states. The visualization illustrates that the system cannot occupy intermediate configurations between two resonance modes; it must move directly from one stable configuration to another.</p>
+</section>
+
+<section style="margin-bottom: 30px; background: rgba(255,255,255,0.03); padding: 20px; border-radius: 8px; border-left: 4px solid var(--accent-color);">
+<h3 style="color: #00d4ff; margin-top: 0;">Vacuum Substrate Parameters</h3>
+<p>The oscillatory system exists within the vacuum substrate characterized by the structural parameters stiffness $K$ and synthesis pressure $P$. In this module these parameters remain fixed at their equilibrium values</p>
+<p style="text-align: center; font-size: 1.2em; margin: 15px 0;">
+$$K = 11.350$$
+$$P = 0.6900$$
+</p>
+<p>Vacuum stiffness determines the structural rigidity of the substrate and therefore the stability of the resonance modes themselves. Synthesis pressure maintains the global equilibrium of the substrate and regulates the energy balance during transitions between states. These parameters ensure that the system moves between stable configurations without destabilizing the structure of the medium.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Discrete Jump Dynamics</h3>
+<p>The interface panel labels the transition mechanism as “Discrete Jump.” This indicates that the system moves abruptly from one stable configuration to another when sufficient energy is exchanged. Because only specific resonance modes are permitted, the system cannot gradually slide between them. Instead the oscillatory configuration reorganizes itself into the next allowed mode.</p>
+<p>The visualization represents this behavior as a staircase structure. Each horizontal segment represents a stable state in which the system maintains a constant energy configuration. The vertical step between levels represents the transition event during which the system moves to a new resonance mode.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Energy Gap Between States</h3>
+<p>The panel labeled GAP shows the mathematical expression</p>
+<div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 4px; margin: 15px 0; text-align: center;">
+$$E_{n+1} - E_n$$
+</div>
+<p>This expression represents the energy difference between two adjacent states. For a transition to occur the system must exchange precisely this amount of energy with its environment. If the required energy difference is not available, the transition cannot occur and the system remains in its current state. This gap structure is what produces the discrete spectrum observed in quantum systems.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Jump Step Control</h3>
+<p>The control labeled Jump Step allows the user to move between successive quantum states. Increasing the step advances the system to higher energy states, while decreasing the step returns it to lower states. Each step corresponds to a change in the resonance mode number that characterizes the oscillatory configuration of the system. The visualization therefore shows how the system evolves through a sequence of discrete resonance modes.</p>
+</section>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+<div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
+<h4 style="color: #00d4ff; margin-top: 0;">Quantization Telemetry</h4>
+<p style="font-size: 0.9em;">The telemetry panel displays the status “Resonance Active.” This indicates that the system remains in a stable resonant configuration during each plateau of the staircase. Only during the vertical transition does the configuration reorganize to form the next stable mode. This telemetry emphasizes that the system always resides in a well-defined resonance state.</p>
+</div>
+<div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; text-align: center;">
+<h4 style="color: #00d4ff; margin-top: 0;">Emergence Hierarchy</h4>
+<p style="font-weight: bold; letter-spacing: 1px;">
+State A<br>↓<br>Phase Jump<br>↓<br>State B
+</p>
+</div>
+</div>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Physical Interpretation</h3>
+<p>This module demonstrates that quantum transitions arise from the reconfiguration of oscillatory modes within the vacuum substrate. Each stable mode corresponds to a particular resonance pattern of the wavefield. When energy is absorbed or emitted, the wavefield reorganizes itself into a different resonance pattern. The transition therefore represents a structural reconfiguration of the oscillatory field rather than the motion of a classical particle between positions.</p>
+</section>
+
+<footer style="margin-top: 40px; padding: 20px; border: 1px dashed rgba(0,212,255,0.3); border-radius: 8px; text-align: center;">
+<h4 style="margin: 0; color: var(--accent-color);">Operational Principle</h4>
+<p style="font-size: 1.2em; font-style: italic; margin: 10px 0;">“System cannot occupy the gap between modes.”</p>
+<p style="font-size: 0.85em; opacity: 0.7;">This principle summarizes the fundamental reason why quantum systems exhibit discrete transitions. Because only specific resonance configurations are permitted by the substrate, intermediate configurations cannot exist as stable states.</p>
+</footer>
+
+<section style="margin-top: 30px;">
+<h3 style="color: #00d4ff;">Role of Synthesis Pressure</h3>
+<p>The message in the lower panel emphasizes that synthesis pressure maintains transition equilibrium. During a transition event the energy distribution within the substrate changes. The synthesis pressure ensures that this redistribution does not destabilize the medium and allows the system to settle into a new equilibrium configuration. Through this mechanism the vacuum substrate maintains the stability of quantum state transitions while preserving the discrete structure of the resonance spectrum.</p>
+</section>
+
+<section style="margin-top: 30px;">
+<h3 style="color: #00d4ff;">Mathematical Gap Law</h3>
+<p>The transition between two states is governed by the energy difference</p>
+<div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 4px; margin: 15px 0; text-align: center;">
+$$\\Delta E = E_{n+1} - E_n$$
+</div>
+<p>This relation defines the precise amount of energy that must be absorbed or emitted for the system to move between adjacent resonance modes. Because this difference is fixed by the structure of the resonance spectrum, transitions occur only at discrete energy values.</p>
+</section>
+
+<section style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+<h3 style="color: #00d4ff;">Interpretation within the Framework</h3>
+<p>Within the Synthesis Framework quantum transitions represent structural reorganizations of oscillatory modes in the vacuum substrate. The discrete energy ladder arises from resonance quantization, and transitions correspond to jumps between these resonant configurations. The staircase visualization therefore represents the energy landscape of the oscillatory system, where each step corresponds to a stable resonance state and each vertical jump represents the moment when the wavefield reorganizes into a new configuration.</p>
+</section>
+
+</div>
+`,
+math: `<div class="math-section" style="padding: 0px 40px 40px 40px; line-height: 1.6; color: #e0e0e0; font-family: 'Segoe UI', sans-serif;">
+
+<section style="margin-bottom: 30px;">
+<h2 style="color: var(--accent-color); text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">Explicit Mathematics: Quantum State Transitions</h2>
+
+<h3 style="color: #00d4ff; margin-top: 20px;">Discrete Energy Spectrum</h3>
+<p>Once resonance quantization has established stable oscillatory modes within the vacuum substrate, the system possesses a discrete set of allowed energy states. These states correspond to the integer resonance modes derived earlier. The energy associated with each mode may be expressed as</p>
+<div style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 8px; text-align: center; margin: 15px 0;">
+$$E_n = n h \\nu$$
+</div>
+<p>where $n$ is the resonance mode number, $h$ is Planck’s constant, and $\\nu$ is the fundamental oscillation frequency of the substrate mode. Each integer value of $n$ corresponds to a distinct standing-wave configuration of the oscillatory field within the vacuum medium.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Energy Gap Between States</h3>
+<p>Because the allowed states are discrete, the system cannot change energy continuously. The energy difference between two adjacent states is given by</p>
+<p style="text-align: center; margin: 10px 0;">
+$$\\Delta E = E_{n+1} - E_n$$
+</p>
+<p>Substituting the expression for the energy spectrum yields</p>
+<p style="text-align: center; margin: 10px 0;">
+$$\\Delta E = (n+1)h\\nu - nh\\nu$$
+</p>
+<p>which simplifies to</p>
+<div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 4px; margin: 15px 0; text-align: center;">
+$$\\Delta E = h\\nu$$
+</div>
+<p>Thus transitions between neighboring states always involve a fixed quantum of energy determined by the fundamental oscillation frequency.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">General Transition Law</h3>
+<p>For transitions between arbitrary states $m$ and $n$, the energy exchange becomes</p>
+<p style="text-align: center; margin: 10px 0;">
+$$\\Delta E = E_m - E_n$$
+</p>
+<p>where the emitted or absorbed radiation frequency satisfies</p>
+<p style="text-align: center; margin: 10px 0;">
+$$h\\nu = |E_m - E_n|$$
+</p>
+<p>This relation expresses the conservation of energy during a quantum transition.</p>
+</section>
+
+<section style="margin-bottom: 30px; background: rgba(0, 212, 255, 0.05); padding: 20px; border-radius: 8px;">
+<h3 style="color: #00d4ff; margin-top: 0;">Wavefunction Phase Reconfiguration</h3>
+<p>Within the oscillatory description of the substrate, each resonance state corresponds to a standing wave configuration</p>
+<p style="text-align: center; margin: 10px 0;">
+$$\\Psi_n(x,t) = A \\sin\\left(\\frac{n\\pi x}{L}\\right)\\cos(\\omega_n t)$$
+</p>
+<p>During a transition the wavefield reorganizes from one standing wave configuration to another</p>
+<p style="text-align: center; font-size: 1.2em; margin: 15px 0;">
+$$\\Psi_n \\rightarrow \\Psi_{n+1}$$
+</p>
+<p>This reconfiguration represents a phase restructuring of the oscillatory field rather than a continuous deformation.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Transition Dynamics</h3>
+<p>The transition can be represented as a discrete change in the resonance frequency</p>
+<p style="text-align: center; margin: 10px 0;">
+$$\\omega_{n+1} - \\omega_n$$
+</p>
+<p>Since the energy of an oscillatory system is related to its frequency</p>
+<p style="text-align: center; margin: 10px 0;">
+$$E = \\hbar \\omega$$
+</p>
+<p>the energy difference becomes</p>
+<p style="text-align: center; margin: 10px 0;">
+$$\\Delta E = \\hbar(\\omega_{n+1} - \\omega_n)$$
+</p>
+<p>This equation describes how the change in oscillation frequency produces the quantized energy gap between states.</p>
+</section>
+
+<section style="margin-bottom: 30px; border-left: 4px solid var(--accent-color); padding-left: 20px;">
+<h3 style="color: #00d4ff;">Substrate Coupling</h3>
+<p>Within the <strong>Synthesis Framework</strong> the transition occurs through interaction between the oscillatory wavefield and the structured vacuum substrate. The structural parameters</p>
+<p style="text-align: center; margin: 10px 0;">$$K = |\\nabla C| \\quad \\text{and} \\quad P = -V(N_0)$$</p>
+<p>govern the stability of the resonance modes and regulate the energy exchange process during transitions. Vacuum stiffness $K$ ($11.350$) maintains the structural rigidity required for stable standing-wave configurations, while synthesis pressure $P$ ($0.6900$) stabilizes the substrate during the redistribution of energy that occurs when the wavefield reorganizes.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Transition Condition</h3>
+<p>A transition can occur only when the system exchanges exactly the required energy difference</p>
+<div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 4px; margin: 15px 0; text-align: center;">
+$$\\Delta E = E_{n+1} - E_n$$
+</div>
+<p>If this energy is not available, the system remains in its existing state.</p>
+</section>
+
+<footer style="margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+<h4 style="color: var(--accent-color); margin-top: 0;">Interpretation</h4>
+<p style="font-style: italic; font-size: 0.95em;">The mathematics therefore demonstrates that quantum transitions correspond to discrete reorganizations of standing wave modes within the vacuum substrate. Each allowed state represents a stable resonance pattern, and transitions occur only when the oscillatory field reconfigures into another permitted pattern. This structure produces the step-like energy ladder visualized in the module, where each plateau represents a stable resonance mode and each vertical step represents a discrete transition between these modes.</p>
+</footer>
+
+</div>`,
+sliders: `<div class="control-item"><div class="label-group"><span>Jump Step</span><input type="number" id="j_in" class="digital-entry" value="1" oninput="syncVal(this.value, 'j_sl')"></div><input type="range" id="j_sl" min="1" max="5" step="1" value="1" oninput="syncVal(this.value, 'j_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Dynamics</span><div style="text-align:center; font-size: 1.00rem;">DISCRETE JUMP</div></div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Gap</span><div style="text-align:center; font-size: 1.10rem;">$E_{n+1} - E_n$</div></div>`,
+hierarchy: "State A<br>↓<br>Phase Jump<br>↓<br>State B",
+footer: "System cannot occupy the gap between modes.",
+rightNote: "Pressure P maintains transition equilibrium."
+},
+4: {
+title: "Wavefunction Localization",
+brief: `<div class="briefing-content" style="padding: 0px 40px 40px 40px; line-height: 1.6; color: #e0e0e0; font-family: 'Segoe UI', sans-serif;">
+
+<section style="margin-bottom: 30px;">
+<h2 style="color: var(--accent-color); text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">Detailed Briefing: Wavefunction Localization</h2>
+<h3 style="color: #00d4ff; margin-top: 20px;">Purpose of the Module</h3>
+<p>This module explains how oscillatory wavefields within the vacuum substrate can concentrate energy into localized regions that behave as particle-like entities. Earlier modules established how resonance creates discrete modes and how stability filtering allows only persistent oscillations to survive. The purpose of this module is to demonstrate how such oscillatory fields can become spatially concentrated, producing localized energy packets that correspond to the physical appearance of particles.</p>
+</section>
+
+<section style="margin-bottom: 30px; background: rgba(255,255,255,0.03); padding: 20px; border-radius: 8px; border-left: 4px solid var(--accent-color);">
+<h3 style="color: #00d4ff; margin-top: 0;">Vacuum Substrate Parameters</h3>
+<p>The wavefield exists within the vacuum substrate defined by the structural parameters stiffness $K$ and synthesis pressure $P$. In this module these parameters remain fixed at their equilibrium values</p>
+<p style="text-align: center; font-size: 1.2em; margin: 15px 0;">
+$$K = 11.350$$
+$$P = 0.6900$$
+</p>
+<p>Vacuum stiffness determines how strongly the substrate resists deformation caused by oscillatory disturbances. This resistance helps maintain coherent wave structures. Synthesis pressure maintains the global equilibrium of the substrate and stabilizes localized energy concentrations. Together these parameters allow wave energy to become confined without destabilizing the surrounding medium.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Localized Energy Packet</h3>
+<p>The panel labeled “Localized Energy” indicates that the oscillatory wavefield is not uniformly distributed across space. Instead the energy becomes concentrated around a central region forming a wave packet. The visualization shows an oscillatory pattern whose amplitude is largest at the center and gradually decreases toward the edges.</p>
+<p>This pattern represents the formation of a localized energy configuration within the substrate. The oscillations remain present but their amplitude envelope confines them to a limited spatial region. Such localized structures correspond to the particle-like manifestations observed in quantum systems.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Wavefunction Width Control</h3>
+<p>The control labeled **Width $\\sigma$** allows the user to change the spatial width of the wave packet. This parameter controls how tightly the oscillatory energy is localized. When $\\sigma$ is large the oscillations spread over a wider region and the localization becomes weaker. When $\\sigma$ is small the oscillatory energy becomes tightly concentrated near the center. Reducing the width therefore produces a sharper and more clearly defined energy concentration.</p>
+</section>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+<div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
+<h4 style="color: #00d4ff; margin-top: 0;">Quantization Telemetry</h4>
+<p style="font-size: 0.9em;">The telemetry panel displays the state “Resonance Active.” This indicates that the oscillatory field forming the localized packet remains a coherent resonance mode of the substrate. The oscillation is therefore not random noise but a stable structure supported by the underlying medium.</p>
+</div>
+<div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; text-align: center;">
+<h4 style="color: #00d4ff; margin-top: 0;">Emergence Hierarchy</h4>
+<p style="font-weight: bold; letter-spacing: 1px;">
+Wavefield<br>↓<br>Binding<br>↓<br>Particle
+</p>
+</div>
+</div>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Born Probability Law</h3>
+<p>The panel labeled “Logic” shows the relation</p>
+<div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 4px; margin: 15px 0; text-align: center;">
+$$P(x) = |\\Psi|^2$$
+</div>
+<p>This relation states that the probability of finding a localized excitation at position $x$ is proportional to the square of the wave amplitude. Within the framework this probability interpretation arises naturally because the energy density of the oscillatory field is proportional to the square of its amplitude. Regions of larger amplitude therefore correspond to regions where energy concentration is highest.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Particle Interpretation</h3>
+<p>The operational message in the interface states that a tighter sigma produces a distinct particle center. This means that when the wave packet becomes sufficiently localized the oscillatory energy behaves as if it occupies a definite spatial location. The particle-like behavior therefore emerges from the localization of wave energy rather than from a fundamental point-like object.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Physical Interpretation</h3>
+<p>This module illustrates that particles can be understood as localized oscillatory structures within the vacuum substrate. Instead of being elementary objects moving through empty space, particles represent stable wave packets formed by the concentration of oscillatory energy. The localization process occurs because the structural properties of the vacuum medium allow oscillations to bind into confined configurations. These configurations maintain coherence due to the stabilizing influence of stiffness $K$ and synthesis pressure $P$.</p>
+</section>
+
+<footer style="margin-top: 40px; padding: 20px; border: 1px dashed rgba(0,212,255,0.3); border-radius: 8px; text-align: center;">
+<h4 style="margin: 0; color: var(--accent-color);">Operational Principle</h4>
+<p style="font-size: 1.2em; font-style: italic; margin: 10px 0;">“Particles are localized oscillatory energy configurations.”</p>
+<p style="font-size: 0.85em; opacity: 0.7;">Through this mechanism the framework explains how particle-like entities can emerge naturally from the dynamics of oscillatory wavefields within a structured vacuum medium.</p>
+</footer>
+
+</div>
+`,
+math: `<div class="math-section" style="padding: 0px 40px 40px 40px; line-height: 1.6; color: #e0e0e0; font-family: 'Segoe UI', sans-serif;">
+
+<section style="margin-bottom: 30px;">
+<h2 style="color: var(--accent-color); text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">Explicit Mathematics: Wavefunction Localization</h2>
+
+<h3 style="color: #00d4ff; margin-top: 20px;">Wave Packet Formation</h3>
+<p>A localized quantum state can be described mathematically as a superposition of many oscillatory wave modes. Instead of a single infinite sinusoidal wave, a localized structure forms when multiple frequencies combine to produce a spatial envelope. The wavefunction of such a packet can be written as</p>
+<div style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 8px; text-align: center; margin: 15px 0;">
+$$\\Psi(x,t) = \\int A(k)\\,e^{i(kx-\\omega t)}\\,dk$$
+</div>
+<p>where $A(k)$ represents the amplitude distribution over wave numbers $k$. The interference of these component waves produces a localized structure in space.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Gaussian Localization</h3>
+<p>A commonly used representation of a localized packet is the Gaussian wave packet. In this representation the spatial profile of the oscillatory envelope is given by</p>
+<div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 4px; margin: 15px 0; text-align: center;">
+$$\\Psi(x) = A\\,e^{-\\frac{(x-x_0)^2}{2\\sigma^2}}$$
+</div>
+<p>where $A$ is the amplitude of the packet, $x_0$ is the central position of the packet, and $\\sigma$ is the spatial width parameter controlling localization. The parameter $\\sigma$ determines how tightly the wave energy is confined. Smaller values of $\\sigma$ produce stronger localization of the oscillatory energy.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Probability Density</h3>
+<p>The probability density associated with the wavefunction is given by the Born relation</p>
+<p style="text-align: center; margin: 10px 0;">
+$$P(x) = |\\Psi(x)|^2$$
+</p>
+<p>Substituting the Gaussian wavefunction gives</p>
+<p style="text-align: center; margin: 10px 0;">
+$$P(x) = A^2 e^{-\\frac{(x-x_0)^2}{\\sigma^2}}$$
+</p>
+<p>This function describes how the energy density of the wavefield is concentrated around the central position $x_0$.</p>
+</section>
+
+<section style="margin-bottom: 30px; background: rgba(0, 212, 255, 0.05); padding: 20px; border-radius: 8px;">
+<h3 style="color: #00d4ff; margin-top: 0;">Energy Density of the Wave Packet</h3>
+<p>The energy density of the oscillatory field is related to both temporal and spatial gradients of the wavefunction</p>
+<div style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 8px; text-align: center; margin: 15px 0;">
+$$\\rho(x,t) = \\frac{1}{2}\\left[(\\partial_t \\Psi)^2 + c^2(\\nabla \\Psi)^2\\right]$$
+</div>
+<p>Regions where the amplitude of the wavefunction is large correspond to regions of high energy density. Localization of the wavefunction therefore corresponds to localization of energy within the substrate.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Relation to Substrate Parameters</h3>
+<p>Within the <strong>Synthesis Framework</strong> the stability of localized wave packets is influenced by the structural properties of the vacuum substrate. The stiffness parameter</p>
+<p style="text-align: center; margin: 10px 0;">$$K = |\\nabla C|$$</p>
+<p>represents the restoring strength of the medium when oscillatory energy concentrates in a region ($K = 11.350$). Higher stiffness supports the formation of stable localized packets. The synthesis pressure</p>
+<p style="text-align: center; margin: 10px 0;">$$P = -V(N_0)$$</p>
+<p>maintains the global equilibrium ($P = 0.6900$) and prevents localized oscillations from dispersing. These parameters regulate the balance between dispersion and confinement that allows localized oscillatory packets to persist.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Dispersion and Packet Stability</h3>
+<p>Wave packets tend to spread due to dispersion. The dispersion relation</p>
+<p style="text-align: center; margin: 10px 0;">$$\\omega = \\omega(k)$$</p>
+<p>determines how the packet evolves in time. If the frequency depends strongly on the wave number $k$, different components travel at different speeds and the packet spreads. Stable localization requires that the restoring properties of the substrate counteract this dispersion.</p>
+</section>
+
+<section style="margin-bottom: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+<h3 style="color: #00d4ff;">Particle Emergence</h3>
+<p>When localization is sufficiently strong the oscillatory energy becomes confined to a small region of space. The localized wave packet then behaves as a particle-like entity. Mathematically this corresponds to a sharply peaked probability distribution</p>
+<p style="text-align: center; margin: 10px 0;">
+$$P(x) \\approx \\delta(x-x_0)$$
+</p>
+<p>in the limit of very small $\\sigma$.</p>
+</section>
+
+<footer style="margin-top: 40px; border-left: 4px solid var(--accent-color); padding: 10px 25px; background: rgba(255,255,255,0.02);">
+<h4 style="color: var(--accent-color); margin-top: 0;">Interpretation within the Framework</h4>
+<p style="margin-bottom: 10px;">The mathematics shows that particle-like behavior emerges from the localization of oscillatory wave energy. Instead of being fundamental point objects, particles correspond to stable localized packets of oscillatory energy within the vacuum substrate. The hierarchy of this process can therefore be written as</p>
+<p style="text-align: center; font-weight: bold; letter-spacing: 2px; margin: 15px 0;">
+$\\text{Wavefield} \\rightarrow \\text{Localization} \\rightarrow \\text{Particle}$
+</p>
+<p style="font-style: italic; font-size: 0.95em;">Stable particles arise when the oscillatory wavefield forms a confined and persistent energy packet supported by the structural properties of the vacuum substrate characterized by stiffness $K$ and synthesis pressure $P$.</p>
+</footer>
+
+</div>`,
+sliders: `<div class="control-item"><div class="label-group"><span>Width σ</span><input type="number" id="s_in" class="digital-entry" value="1.0" oninput="syncVal(this.value, 's_sl')"></div><input type="range" id="s_sl" min="0.2" max="3" step="0.1" value="1.0" oninput="syncVal(this.value, 's_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Packet</span><div style="text-align:center; font-size: 1.00rem;">LOCALIZED ENERGY</div></div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Logic</span><div style="text-align:center; font-size: 1.10rem;"<div>$P(x) = |\\Psi|^2$</div></div>`,
+hierarchy: "Wavefield<br>↓<br>Binding<br>↓<br>Particle",
+footer: "Smaller σ corresponds to higher particle definition.",
+rightNote: "A tight sigma creates a distinct particle center."
+},
+5: {
+title: "Quantum Spectrum Formation",
+brief: `<div class="briefing-content" style="padding: 0px 40px 40px 40px; line-height: 1.6; color: #e0e0e0; font-family: 'Segoe UI', sans-serif;">
+
+<section style="margin-bottom: 30px;">
+<h2 style="color: var(--accent-color); text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">Detailed Briefing: Quantum Spectrum Formation</h2>
+<h3 style="color: #00d4ff; margin-top: 20px;">Purpose of the Module</h3>
+<p>This module demonstrates how the complete quantum energy spectrum emerges from the resonance structure of the vacuum substrate. The previous modules established how resonance quantization produces discrete modes, how substrate stiffness filters unstable oscillations, how transitions occur between stable modes, and how localized wave packets form particle-like structures. The purpose of this module is to show how all these mechanisms combine to generate the observable spectrum of discrete energy levels. The visualization presents these energy levels as spectral peaks, representing the allowed resonant configurations of the oscillatory system.</p>
+</section>
+
+<section style="margin-bottom: 30px; background: rgba(255,255,255,0.03); padding: 20px; border-radius: 8px; border-left: 4px solid var(--accent-color);">
+<h3 style="color: #00d4ff; margin-top: 0;">Vacuum Substrate Parameters</h3>
+<p>The oscillatory system exists within the structured vacuum substrate characterized by the parameters stiffness $K$ and synthesis pressure $P$. In this module these parameters are fixed at their equilibrium values</p>
+<p style="text-align: center; font-size: 1.2em; margin: 15px 0;">
+$$K = 11.350$$
+$$P = 0.6900$$
+</p>
+<p>Vacuum stiffness determines the mechanical response of the substrate to oscillatory disturbances and therefore influences which resonant modes can remain stable. Synthesis pressure maintains the equilibrium structure of the substrate and regulates how oscillatory energy distributes across different resonance modes. Together these parameters determine the structure of the allowed energy spectrum.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Spectral Line Formation</h3>
+<p>The panel labeled “Spectral Lines” indicates that the oscillatory system produces discrete peaks rather than a continuous energy distribution. Each peak corresponds to a stable resonance mode of the vacuum substrate. The visualization shows several sharp peaks separated by regions where no stable oscillatory modes exist.</p>
+<p>These peaks represent the characteristic spectral signature of the system. Because only specific resonance configurations are permitted by the structural properties of the substrate, energy can only appear at these discrete values.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Peak Scan Control</h3>
+<p>The control labeled **Peak Scan** allows the user to explore different portions of the spectrum by adjusting how many resonance modes are displayed. Increasing the value reveals additional spectral peaks corresponding to higher resonance modes. Each additional peak represents another allowed oscillatory configuration of the substrate. This control illustrates how the discrete energy ladder grows as higher resonance modes become accessible.</p>
+</section>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+<div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
+<h4 style="color: #00d4ff; margin-top: 0;">Quantization Telemetry</h4>
+<p style="font-size: 0.9em;">The telemetry panel displays the status “Resonance Active.” This indicates that the peaks shown in the visualization correspond to stable resonant modes rather than transient oscillations. Each spectral peak therefore represents a persistent energy configuration supported by the structure of the substrate. The absence of peaks between these positions indicates that intermediate configurations cannot remain stable.</p>
+</div>
+<div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; text-align: center;">
+<h4 style="color: #00d4ff; margin-top: 0;">Emergence Hierarchy</h4>
+<p style="font-weight: bold; letter-spacing: 1px;">
+Resonance<br>↓<br>P-Filter<br>↓<br>Spectrum
+</p>
+</div>
+</div>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Planck Relation</h3>
+<p>The law panel shows the fundamental relation</p>
+<div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 4px; margin: 15px 0; text-align: center;">
+$$E = n h \\nu$$
+</div>
+<p>This relation connects the discrete resonance modes to the quantized energy levels observed in quantum systems. The integer $n$ corresponds to the resonance mode number, $h$ is Planck’s constant, and $\\nu$ is the fundamental oscillation frequency. Each spectral peak therefore corresponds to a specific integer resonance mode of the oscillatory system.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Role of Synthesis Pressure</h3>
+<p>The operational message at the bottom of the interface states that pressure $P$ shifts the allowed spectral lines. This indicates that the equilibrium pressure of the substrate influences the exact positions of the resonance frequencies. Changes in synthesis pressure slightly modify the structural conditions under which oscillations occur, thereby shifting the positions of the spectral peaks. This mechanism resembles how physical conditions such as pressure and density influence spectral lines in real physical systems.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Physical Interpretation</h3>
+<p>This module demonstrates that the quantum spectrum is not an abstract mathematical property but a direct manifestation of resonance in a structured vacuum substrate. Each spectral line represents a stable oscillatory configuration of the underlying medium. The discrete energy spectrum therefore emerges naturally from the interaction between oscillatory wavefields and the structural properties of the vacuum substrate characterized by stiffness $K$ and synthesis pressure $P$.</p>
+</section>
+
+<footer style="margin-top: 40px; padding: 20px; border: 1px dashed rgba(0,212,255,0.3); border-radius: 8px; text-align: center;">
+<h4 style="margin: 0; color: var(--accent-color);">Operational Principle</h4>
+<p style="font-size: 1.2em; font-style: italic; margin: 10px 0;">“The spectrum is the resonant fingerprint of the substrate.”</p>
+<p style="font-size: 0.85em; opacity: 0.7;">Through this mechanism the framework explains the origin of the quantized energy spectrum as the fingerprint of resonance modes supported by the vacuum medium.</p>
+</footer>
+
+</div>
+`,
+math: `<div class="math-section" style="padding: 0px 40px 40px 40px; line-height: 1.6; color: #e0e0e0; font-family: 'Segoe UI', sans-serif;">
+
+<section style="margin-bottom: 30px;">
+<h2 style="color: var(--accent-color); text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">Explicit Mathematics: Quantum Spectrum Formation</h2>
+
+<h3 style="color: #00d4ff; margin-top: 20px;">Resonant Energy Levels</h3>
+<p>Once resonance quantization establishes stable oscillatory modes within the vacuum substrate, each allowed mode corresponds to a discrete energy level. The energy associated with each resonance mode is given by the Planck relation</p>
+<div style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 8px; text-align: center; margin: 15px 0;">
+$$E_n = n h \\nu$$
+</div>
+<p>where $n$ is the resonance mode number, $h$ is Planck’s constant, and $\\nu$ is the fundamental oscillation frequency of the system. Each integer value of $n$ therefore corresponds to a specific allowed energy state of the oscillatory field.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Resonant Frequency Structure</h3>
+<p>The oscillatory modes arise from standing wave conditions within the substrate. The allowed wavelengths satisfy the resonance condition</p>
+<p style="text-align: center; margin: 10px 0;">
+$$\\lambda_n = \\frac{2L}{n}$$
+</p>
+<p>where $L$ represents the effective structural length of the resonant domain. The corresponding frequencies are therefore</p>
+<p style="text-align: center; margin: 10px 0;">
+$$\\nu_n = \\frac{c}{\\lambda_n}$$
+</p>
+<p>Substituting the wavelength relation gives</p>
+<div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 4px; margin: 15px 0; text-align: center;">
+$$\\nu_n = \\frac{nc}{2L}$$
+</div>
+<p>Thus the allowed frequencies are equally spaced multiples of the fundamental frequency.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Energy Spectrum</h3>
+<p>Substituting the resonance frequency into the energy relation yields</p>
+<p style="text-align: center; margin: 10px 0;">
+$$E_n = n h \\left(\\frac{c}{2L}\\right)$$
+</p>
+<p>which shows that the energy levels form a discrete ladder determined by the resonance structure of the substrate.</p>
+</section>
+
+<section style="margin-bottom: 30px; background: rgba(0, 212, 255, 0.05); padding: 20px; border-radius: 8px;">
+<h3 style="color: #00d4ff; margin-top: 0;">Spectral Line Formation</h3>
+<p>When a system transitions between two energy levels, the emitted or absorbed radiation frequency is determined by the energy difference</p>
+<div style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 8px; text-align: center; margin: 15px 0;">
+$$h\\nu = E_m - E_n$$
+</div>
+<p>where $m > n$. Substituting the energy spectrum yields</p>
+<p style="text-align: center; margin: 10px 0;">
+$$\\nu = \\frac{E_m - E_n}{h}$$
+</p>
+<p>This relation determines the frequencies that appear as spectral lines.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Discrete Spectrum Structure</h3>
+<p>The set of possible spectral frequencies is therefore</p>
+<p style="text-align: center; margin: 10px 0;">
+$$\\nu_{mn} = \\frac{E_m - E_n}{h}$$
+</p>
+<p>Each allowed pair of energy levels produces a specific spectral line. Because the energy levels themselves are discrete, the resulting spectrum also consists of discrete peaks.</p>
+</section>
+
+<section style="margin-bottom: 30px; border-left: 4px solid var(--accent-color); padding-left: 20px;">
+<h3 style="color: #00d4ff;">Relation to Substrate Parameters</h3>
+<p>Within the <strong>Synthesis Framework</strong> the structure of the resonance spectrum is influenced by the structural properties of the vacuum substrate. The stiffness parameter</p>
+<p style="text-align: center; margin: 10px 0;">$$K = |\\nabla C|$$</p>
+<p>controls the restoring force acting on oscillatory disturbances ($K = 11.350$). Higher stiffness increases the stability of resonant modes and sharpens the spectral peaks. The synthesis pressure</p>
+<p style="text-align: center; margin: 10px 0;">$$P = -V(N_0)$$</p>
+<p>regulates the equilibrium configuration ($P = 0.6900$). Changes in this pressure slightly modify the resonance conditions and therefore shift the frequencies of the spectral lines.</p>
+</section>
+
+<section style="margin-bottom: 30px;">
+<h3 style="color: #00d4ff;">Spectral Density Representation</h3>
+<p>The observable spectrum can be represented mathematically as a set of narrow peaks in the energy density distribution</p>
+<div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 4px; margin: 15px 0; text-align: center;">
+$$S(\\nu) = \\sum_{n} A_n \\delta(\\nu - \\nu_n)$$
+</div>
+<p>where $A_n$ represents the amplitude of each spectral line and $\\delta$ is the Dirac delta function indicating sharply localized frequencies.</p>
+</section>
+
+<footer style="margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+<h4 style="color: var(--accent-color); margin-top: 0;">Interpretation</h4>
+<p style="margin-bottom: 10px;">The mathematics therefore shows that the quantum spectrum arises from the resonance structure of oscillatory modes in the vacuum substrate. Each spectral peak corresponds to a stable resonance configuration of the underlying medium.</p>
+<p style="text-align: center; font-weight: bold; letter-spacing: 2px; margin: 15px 0;">
+$\\text{Resonance Modes} \\rightarrow \\text{Discrete Energies} \\rightarrow \\text{Spectral Lines}$
+</p>
+<p style="font-style: italic; font-size: 0.95em;">The observable quantum spectrum is therefore the direct fingerprint of the resonance structure supported by the vacuum substrate characterized by stiffness $K$ and synthesis pressure $P$.</p>
+</footer>
+
+</div>
+`,
+sliders: `<div class="control-item"><div class="label-group"><span>Peak Scan</span><input type="number" id="l_in" class="digital-entry" value="5" oninput="syncVal(this.value, 'l_sl')"></div><input type="range" id="l_sl" min="1" max="10" step="1" value="5" oninput="syncVal(this.value, 'l_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Density</span><div style="text-align:center; font-size: 1.00rem;">SPECTRAL LINES</div></div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Planck</span><div style="text-align:center; font-size: 1.10rem;"<div>$E = n h \\nu$</div></div>`,
+hierarchy: "Resonance<br>↓<br>P-Filter<br>↓<br>Spectrum",
+footer: "Spectral peaks are fingerprints of the substrate.",
+rightNote: "Pressure P shifts the allowed spectral lines."
+}
+};
+
+function syncVal(val, targetId) {
+document.getElementById(targetId).value = val;
+const inputId = targetId.replace('_sl', '_in').replace('_slider', '_input');
+if(document.getElementById(inputId)) document.getElementById(inputId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+if(!content) return;
+document.getElementById('brief-box-content').innerHTML = content.brief;
+document.getElementById('math-box-content').innerHTML = content.math;
+document.getElementById('control-sliders').innerHTML = content.sliders;
+document.getElementById('active-module-title').innerText = content.title;
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+showScreen('briefing');
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() { showScreen('lab'); runLab(); }
+
+function runLab() {
+const target = document.getElementById('plot-area');
+if (!target) return;
+let data = [];
+let layout = {
+paper_bgcolor: 'black', plot_bgcolor: 'black', margin: {t:30,b:30,l:30,r:30},
+xaxis: { color: '#444', gridcolor: '#111', zeroline: false },
+yaxis: { color: '#444', gridcolor: '#111', zeroline: false }
+};
+
+if (currentTool === 1) {
+let n = document.getElementById('n_sl')?.value || 2;
+let x = [], y = [];
+for(let i=0; i<=10; i+=0.1) { x.push(i); y.push(Math.sin(n * Math.PI * i / 10)); }
+data = [{ x, y, mode: 'lines', fill: 'tozeroy', line: {color: '#00ffcc', width: 3} }];
+} else if (currentTool === 2) {
+let f = document.getElementById('f_sl')?.value || 1;
+let x = [], y = [], y2 = [];
+for(let i=0; i<10; i+=0.1) {
+x.push(i); y.push(Math.sin(i * 1.5));
+y2.push(Math.sin(i * 3 * f) * Math.exp(-0.3 * i));
+}
+data = [{ x, y, line: {color: '#a78bfa', width: 3} }, { x, y: y2, line: {color: '#333', dash: 'dot'} }];
+} else if (currentTool === 3) {
+let j = parseInt(document.getElementById('j_sl')?.value || 1);
+let x = [0, 1, 1, 2, 2, 3, 3, 4], y = [j, j, j+1, j+1, j+2, j+2, j+3, j+3];
+data = [{ x, y, mode: 'lines+markers', line: {color: '#fb7185', shape: 'hv', width: 2} }];
+} else if (currentTool === 4) {
+let s = document.getElementById('s_sl')?.value || 1;
+let x = [], y = [];
+for(let i=-6; i<=6; i+=0.1) { x.push(i); y.push(Math.exp(-i*i/(2*s*s)) * Math.cos(4*i/s)); }
+data = [{ x, y, mode: 'lines', fill: 'tozeroy', line: {color: '#38bdf8'} }];
+} else if (currentTool === 5) {
+let l = parseInt(document.getElementById('l_sl')?.value || 5);
+let x = [], y = [];
+for(let i=0; i<10; i+=0.02) {
+x.push(i); let val = 0;
+for(let k=1; k<=l; k++) val += Math.exp(-Math.pow(i-k, 2)/0.005);
+y.push(val);
+}
+data = [{ x, y, mode: 'lines', fill: 'tozeroy', line: {color: '#f59e0b'} }];
+}
+Plotly.newPlot('plot-area', data, layout, {responsive: true, displayModeBar: false});
+}
+
+function resetLab() {
+// Determine which tool is active and reset its specific parameters
+if (currentTool === 1) {
+// Reset Resonance Quantization to Mode 1
+syncVal(2, 'n_in', 'n_sl');
+document.getElementById('n_sl').value = 2;
+} else if (currentTool === 2) {
+// Reset Mode Stability Regions (K is fixed, reset Amplitude)
+syncVal(1, 'f_in', 'f_sl');
+document.getElementById('f_sl').value = 1;
+} else if (currentTool === 3) {
+// Reset Quantum State Transitions to default Power
+syncVal(1, 'j_in', 'j_sl');
+document.getElementById('j_sl').value = 1;
+} else if (currentTool === 4) {
+// Reset Wavefunction Localization to Sigma 1.0
+syncVal(1.0, 's_in', 's_sl');
+document.getElementById('s_sl').value = 1.0;
+} else if (currentTool === 5) {
+// Reset Quantum Spectrum Formation to Frequency 1
+syncVal(5, 'l_in', 'l_sl');
+document.getElementById('l_sl').value = 5;
+}
+
+// Trigger the visualization refresh
+runLab();
+}
+
+showScreen('portal');
+</script>
+</body>
+</html>

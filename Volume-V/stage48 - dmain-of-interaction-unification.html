@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 48 — Domain of Interaction Unification</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #6366f1;
+--accent-gauge: #38bdf8; --accent-symmetry: #818cf8; --accent-hierarchy: #c084fc; --accent-triad: #fb7185; --accent-framework: #4ade80;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6;
+--accent-gold: #fbbf24;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-unified); font-family: sans-serif; font-size: 0.85rem; min-width: 450px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls, #nav-summary-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+#screen-lab.active { display: flex; flex-direction: column; height: calc(100vh - 50px); }
+
+#screen-portal { justify-content: flex-start; padding-top: 3dvh; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 10px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 2px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; padding-bottom: 0px; }
+.module-subtitle { text-align: center; font-family: sans-serif; color: var(--accent-gold); margin-bottom: 12px; font-weight: bold; letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 0px; }
+
+.primary-constant-box { background: #000; border: 1px solid var(--accent-unified); padding: 2px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 8px; }
+.secondary-structure-box { background: rgba(99, 102, 241, 0.05); border: 1px dashed var(--accent-unified); padding: 3px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 12px; }
+
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(99, 102, 241, 0.05); border: 1px solid var(--accent-unified); padding: 5px; border-radius: 5px; margin-bottom: 8px; font-size: 0.7rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; }
+#plot-area { flex-grow: 1; width: 100%; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #fff; border: 1px solid var(--accent-unified); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer { width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem; color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 48 — DOMAIN OF INTERACTION UNIFICATION</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">Interaction Unification</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">Forces as structured expressions of symmetry necessity.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-gauge);">
+<h2 style="color:var(--accent-gauge);">1. Gauge Structure</h2>
+<p>Invariance Requirement: $\boxed{ D_\mu = \partial_\mu - i A_\mu }$<br>Interaction as Symmetry Necessity</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-symmetry);">
+<h2 style="color:var(--accent-symmetry);">2. Fundamental Symmetries</h2>
+<p>Triadic Types: $\boxed{ U(1), SU(2), SU(3) }$<br>Different Symmetries, Different Interaction Types</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-hierarchy);">
+<h2 style="color:var(--accent-hierarchy);">3. Structural Hierarchy</h2>
+<p>Self-Interaction: $\boxed{ U(1) \subset SU(2) \subset SU(3) }$<br>Complexity defines Interaction Strength</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-triad);">
+<h2 style="color:var(--accent-triad);">4. Triadic Unification</h2>
+<p>The Law of Three: $\boxed{ (C, O, N) \leftrightarrow (S, M, B) }$<br>Structural Correspondence Mapping</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-framework);">
+<h2 style="color:var(--accent-framework);">5. Unified Framework</h2>
+<p>The Master Action: $\boxed{ \mathcal{L} = \sum -\frac{1}{4} F_{\mu\nu}^a F^{\mu\nu a} }$<br>Structured Manifestations of One Field</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-unified);">
+<h2 style="color:var(--accent-unified);">6. Stage 48 Summary</h2>
+<p>Forces as Structured Symmetry.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Summary — Mathematical Structure</h2>
+<h3 style="color:var(--accent-blue); text-align: center; margin-bottom: 20px;">Stage 48: Interaction from Symmetry</h3>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔷 1. FOUNDATIONAL AXIOM</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">
+\boxed{ \text{Local symmetry invariance necessitates the existence of interaction} }
+</p>
+<p>Mathematical form: $D_\mu = \partial_\mu + i \mathcal{A}_\mu$</p>
+<p>$\mathcal{A}_\mu = \text{gauge connection enforcing local invariance}$</p>
+
+<h3 style="color: #fbbf24; margin-top: 20px; margin-bottom: 10px;">🔷 2. SYMMETRY → INTERACTION</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">
+\boxed{ \text{Gauge invariance} \Rightarrow \text{Connection} \Rightarrow \text{Interaction} }
+</p>
+<p>Field strength: $\mathcal{F}_{\mu\nu} = \partial_\mu \mathcal{A}_\nu - \partial_\nu \mathcal{A}_\mu + i [\mathcal{A}_\mu, \mathcal{A}_\nu]$</p>
+
+<h3 style="color: #fbbf24; margin-top: 20px; margin-bottom: 10px;">🔷 3. CLASSIFICATION OF INTERACTIONS</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">
+\boxed{ \text{Interaction type is determined by Lie algebra structure} }
+</p>
+<p>Lie algebra: $[T^a, T^b] = i f^{abc} T^c$</p>
+<p>Cases: <br>
+$f^{abc} = 0 \rightarrow$ Abelian $\rightarrow$ Linear interaction <br>
+$f^{abc} \neq 0 \rightarrow$ Non-Abelian $\rightarrow$ Self-interacting</p>
+
+<h3 style="color: #fbbf24; margin-top: 20px; margin-bottom: 10px;">🔷 4. FUNDAMENTAL TRIAD</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">
+\boxed{ G = U(1) \times SU(2) \times SU(3) }
+</p>
+<p>Interpretation: <br>
+$U(1) \rightarrow$ Stabilizing (Abelian) <br>
+$SU(2) \rightarrow$ Mediating (weak non-Abelian) <br>
+$SU(3) \rightarrow$ Binding (strong non-Abelian)</p>
+
+<h3 style="color: #fbbf24; margin-top: 20px; margin-bottom: 10px;">🔷 5. FIELD DYNAMICS</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">
+\boxed{ \mathcal{L}_{gauge} = -\frac{1}{4} F^2 -\frac{1}{4} W^2 -\frac{1}{4} G^2 }
+</p>
+<p>Matter interaction: $\mathcal{L}_{int} = \bar{\psi}\gamma^\mu \mathcal{A}_\mu \psi$</p>
+
+<h3 style="color: #fbbf24; margin-top: 20px; margin-bottom: 10px;">🔷 6. ORIGIN OF FORCE HIERARCHY</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">
+\boxed{ \text{Interaction strength emerges from algebraic structure} }
+</p>
+<p>Key term: $F_{\mu\nu}^a = \partial_\mu A_\nu^a - \partial_\nu A_\mu^a + g f^{abc} A_\mu^b A_\nu^c$</p>
+<p>Structural implication: <br>
+$f^{abc} = 0 \rightarrow$ no self-interaction $\rightarrow$ weak <br>
+$f^{abc} \neq 0 \rightarrow$ self-interaction $\rightarrow$ strong</p>
+
+<h3 style="color: #fbbf24; margin-top: 20px; margin-bottom: 10px;">🔷 7. TRIADIC INTERACTION STRUCTURE</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">
+\boxed{ \mathcal{A}_\mu = g_1 B_\mu + g_2 W_\mu + g_3 G_\mu }
+</p>
+<p>Interaction vector: $\mathcal{I} = \begin{pmatrix} g_1 \\ g_2 \\ g_3 \end{pmatrix}$</p>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">
+\boxed{ g_1^2 + g_2^2 + g_3^2 = \text{constant} }
+</p>
+
+<h3 style="color: #fbbf24; margin-top: 20px; margin-bottom: 10px;">🔷 8. UNIFIED FIELD STRUCTURE</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">
+\boxed{ D_\mu = \partial_\mu + i \mathcal{A}_\mu }
+</p>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">
+\boxed{ \mathcal{F}_{\mu\nu} = \partial_\mu \mathcal{A}_\nu - \partial_\nu \mathcal{A}_\mu + i[\mathcal{A}_\mu, \mathcal{A}_\nu] }
+</p>
+
+<h3 style="color: #fbbf24; margin-top: 20px; margin-bottom: 10px;">🔷 9. SYMMETRY DIFFERENTIATION</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">
+\boxed{ \text{Unified symmetry} \rightarrow \text{observable interaction sectors} }
+</p>
+<p>Mechanism: $\mathcal{L}_\Phi = |D_\mu \Phi|^2 - V(\Phi)$</p>
+<p>$V(\Phi) = \lambda (\Phi^\dagger \Phi - v^2)^2$</p>
+
+<h3 style="color: #fbbf24; margin-top: 20px; margin-bottom: 10px;">🔷 10. FINAL STRUCTURAL FLOW</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">
+\boxed{ \Psi \;\rightarrow\; \text{Geometry} \;\rightarrow\; \text{Symmetry} \;\rightarrow\; \text{Interaction} \;\rightarrow\; \text{Unified Framework} }
+</p>
+
+<h3 style="color: #fbbf24; margin-top: 20px; margin-bottom: 10px;">🔷 11. COMPLETE STRUCTURAL IDENTITY</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">
+\boxed{ \mathcal{L} = \bar{\psi}(i\gamma^\mu D_\mu - m)\psi - \frac{1}{4} \mathcal{F}_{\mu\nu}\mathcal{F}^{\mu\nu} }
+</p>
+
+<h3 style="color: #fbbf24; margin-top: 25px; margin-bottom: 10px;">🔷 🔶 COMPLETION THEOREM — STAGE 48</h3>
+<p style="text-align: center; font-weight: bold; color: #fbbf24;">\boxed{ \textbf{Theorem (Interaction from Symmetry Completion)} }</p>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">
+\boxed{ \text{All fundamental interactions arise as necessary consequences of local gauge invariance of a unified symmetry structure,} }
+</p>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">
+\boxed{ \text{with their diversity, strength, and hierarchy determined entirely by the algebraic structure of the underlying Lie groups.} }
+</p>
+<p style="margin-top: 15px;">Formal Expression:</p>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">
+\boxed{ G = U(1) \times SU(2) \times SU(3) \;\Rightarrow\; \mathcal{A}_\mu \;\Rightarrow\; \mathcal{F}_{\mu\nu} \;\Rightarrow\; \mathcal{L} }
+</p>
+<p style="margin-top: 15px;">Structural Consequences:</p>
+<ul>
+<li>Interaction is not fundamental input $\Rightarrow \text{It is a structural necessity}$</li>
+<li>Force diversity is not arbitrary $\Rightarrow \text{It is symmetry-determined}$</li>
+<li>Force hierarchy is not empirical coincidence $\Rightarrow \text{It arises from algebraic complexity}$</li>
+<li>Unification is not force merging $\Rightarrow \text{It is structured differentiation}$</li>
+</ul>
+
+<h3 style="color: #fbbf24; margin-top: 25px; margin-bottom: 10px;">🔷 FINAL STATEMENT OF STAGE 48</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6; margin-bottom: 0;">
+\boxed{ \text{Interaction is the inevitable manifestation of symmetry, and the universe is a unified gauge structure expressing itself through differentiated forces.} }
+</p>
+</div>
+</section>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div id="active-module-result" class="module-subtitle">--</div>
+<div class="primary-constant-box">
+<div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val">11.350</span></div>
+<div class="const-item"><span class="const-label">Synthesis P</span><span class="const-val">0.6900</span></div>
+</div>
+
+<div id="structure-box-area"></div>
+<div id="mapping-box-area"></div>
+
+<div class="diagnostic-panel">
+<span class="diag-title">Symmetry Telemetry</span>
+<div id="telemetry-area"></div>
+</div>
+
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-unified); font-size:0.75rem; cursor:pointer; padding:6px;">RESET SYMMETRY</button>
+<div id="panel-footer-text" style="font-size: 0.75rem; color: var(--text-dim); padding: 2px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.2; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:8px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Interaction Logic</span>
+<div id="metrics-content" style="font-size:0.65rem; font-family:monospace; line-height:1.3;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Structural Realization</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.65rem; color: var(--text-dim); line-height: 1.4; background: #000; padding: 5px; border-radius: 0px; border: 1px solid #222; margin-top: auto;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "GAUGE STRUCTURE",
+result: "Interactions arise from symmetry",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Gauge Structure</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">🔷 CORE MESSAGE</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ \\text{Interaction arises from the requirement of local symmetry invariance} }$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 CONCEPTUAL FOUNDATION</h3>
+<p>At this stage, interaction is no longer introduced as an independent physical entity. Instead, it is derived as a direct consequence of symmetry. A field may possess symmetry under transformations. When this symmetry is global, the transformation is uniform across space and time, and the system remains internally consistent without requiring additional structure.</p>
+<p>However, when symmetry is made local—meaning it varies from point to point—the field can no longer maintain consistency under ordinary variation. This breakdown is not a flaw but a structural signal: the system requires an additional mechanism to preserve coherence. This requirement leads to the emergence of a connection within the field. This connection is what manifests as a gauge field.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 EMERGENCE OF INTERACTION</h3>
+<p>The introduction of a gauge field is not arbitrary. It is necessitated by the requirement that local symmetry must be preserved. When the field undergoes local transformations, the ordinary derivative fails to maintain invariance. To correct this, a modified derivative—incorporating a connection—is introduced. This connection compensates for local variations and restores symmetry. Thus, interaction arises as this compensating structure.</p>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ \\text{Interaction = symmetry-preserving connection} }$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 PHYSICAL INTERPRETATION</h3>
+<p>From this perspective: <strong>Gauge field = structural connector</strong>; <strong>Interaction = correction mechanism</strong>; <strong>Force = observable manifestation of this correction</strong>. Interaction is therefore not something that acts on the field from outside. It is generated internally as the field maintains its structural integrity. This establishes a key principle: <strong>👉 Before force appears, interaction exists as a structural necessity</strong>.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 STRUCTURAL LOGIC</h3>
+<p style="text-align: center; font-style: italic; color: #38bdf8;">$$\\text{Symmetry} \\rightarrow \\text{Local Variation} \\rightarrow \\text{Constraint} \\rightarrow \\text{Connection} \\rightarrow \\text{Interaction}$$</p>
+<p>This sequence defines the origin of all interactions within the framework.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 ROLE IN THE FRAMEWORK</h3>
+<p>This module marks the transition from Symmetry as an abstract property to Interaction as a structural consequence. It establishes that: Interactions are not fundamental inputs; they emerge from deeper structural requirements. This aligns directly with the framework’s principle that: <strong>$$\\text{Structure precedes physical manifestation}$$</strong>.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 GRAPH INTERPRETATION PARAGRAPH</h3>
+<p>The visualization represents the structural response of a field to local symmetry variation. The horizontal axes correspond to spatial connection and local phase variation, while the vertical axis represents the induced structural adjustment required to maintain invariance. The undulating surface illustrates that when symmetry transformations vary across space, the field cannot remain flat or uniform. Instead, it develops curvature-like adjustments that encode the required connection. These adjustments are not external forces but internal responses of the field structure. The graph thus makes explicit that interaction emerges as a geometric necessity for preserving local symmetry.</p>
+
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 KEY INSIGHT</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ \\text{Interaction is not imposed — it is required} }$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 TRANSITION TO MODULE 2</h3>
+<p>Once interaction is understood as arising from symmetry, the next step follows naturally:</p>
+<p style="text-align: center; font-weight: bold; color: #38bdf8;">$$\\boxed{ \\text{Different symmetries} \\rightarrow \\text{Different interactions} }$$</p>
+<p>This leads directly to the classification of interaction types.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">FINAL INSIGHT</h3>
+<p style="margin-bottom: 0;">Symmetry is not structure—it is the condition before structure.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 1 Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Fundamental Identity:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\text{Interaction} \\equiv \\text{Symmetry-Preserving Connection}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The vacuum transitions from a state of rest to a localized disturbance, representing the first departure from the void toward manifestation.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: Gauge Structure</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">🔷 1. FIELD AND GLOBAL SYMMETRY</h3>
+<p>Consider a complex field: $$\\psi(x)$$ Under a global U(1) transformation: $$\\psi(x) \\rightarrow \\psi'(x) = e^{i\\alpha} \\psi(x)$$ where $\\alpha = \\text{constant}$. Invariance of derivative: $$\\partial_\\mu \\psi \\rightarrow e^{i\\alpha} \\partial_\\mu \\psi$$ ✔ Symmetry preserved. ✔ No additional structure required.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 2. LOCAL SYMMETRY TRANSFORMATION</h3>
+<p>Now promote symmetry to local: $$\\psi(x) \\rightarrow \\psi'(x) = e^{i\\alpha(x)} \\psi(x)$$ Action on derivative: $$\\partial_\\mu \\psi \\rightarrow e^{i\\alpha(x)} \\left( \\partial_\\mu \\psi + i (\\partial_\\mu \\alpha) \\psi \\right)$$ ❌ Extra term appears. ❌ Invariance broken.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 3. INTRODUCTION OF GAUGE CONNECTION</h3>
+<p>Define the covariant derivative: $$D_\\mu = \\partial_\\mu + i g A_\\mu$$ Transformation requirement: $$D_\\mu \\psi \\rightarrow e^{i\\alpha(x)} D_\\mu \\psi$$ This requires: $$A_\\mu \\rightarrow A_\\mu' = A_\\mu - \\frac{1}{g} \\partial_\\mu \\alpha(x)$$ ✔ Local symmetry restored. ✔ Connection introduced.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 4. FIELD STRENGTH (CURVATURE)</h3>
+<p>Define the field strength tensor: $$F_{\\mu\\nu} = \\partial_\\mu A_\\nu - \\partial_\\nu A_\\mu$$ <strong>Properties:</strong> Measures curvature of connection; Gauge invariant: $$F_{\\mu\\nu} \\rightarrow F_{\\mu\\nu}$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 5. LAGRANGIAN STRUCTURE</h3>
+<p>Free field: $$\\mathcal{L}_0 = \\bar{\\psi}(i\\gamma^\\mu \\partial_\\mu - m)\\psi$$ With gauge interaction: $$\\mathcal{L} = \\bar{\\psi}(i\\gamma^\\mu D_\\mu - m)\\psi = \\bar{\\psi}(i\\gamma^\\mu \\partial_\\mu - m)\\psi - g \\bar{\\psi}\\gamma^\\mu A_\\mu \\psi$$ Gauge field term: $$\\mathcal{L}_{gauge} = -\\frac{1}{4} F_{\\mu\\nu}F^{\\mu\\nu}$$ Total Lagrangian: $$\\boxed{ \\mathcal{L} = \\bar{\\psi}(i\\gamma^\\mu D_\\mu - m)\\psi - \\frac{1}{4}F_{\\mu\\nu}F^{\\mu\\nu} }$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 6. STRUCTURAL RESULT</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ \\text{Local symmetry} \\Rightarrow \\text{Gauge connection} \\Rightarrow \\text{Interaction term} }$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 7. INTERPRETATION IN FRAMEWORK LANGUAGE</h3>
+<ul>
+<li><strong>$\\partial_\\mu$</strong> &rarr; unconstrained variation</li>
+<li><strong>$A_\\mu$</strong> &rarr; structural connection</li>
+<li><strong>$F_{\\mu\\nu}$</strong> &rarr; curvature of interaction</li>
+<li><strong>$g$</strong> &rarr; coupling strength</li>
+</ul>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 FINAL MATHEMATICAL STATEMENT</h3>
+<p style="margin-bottom: 0; text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ \\text{Interaction emerges from enforcing local gauge invariance} }$$</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Mathematical Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Gauge Principle:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\delta\\mathcal{L} = 0 \\; (\\forall \\alpha(x))$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The mathematical requirement of local invariance forces the existence of the gauge field $A_\\mu$, proving that forces are not external additions but geometric necessities of symmetry preservation.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>TRANSFORMATION (U)</span><input type="number" id="u_in" class="digital-entry" value="1.0" oninput="syncVal(this.value, 'u_sl')"></div><input type="range" id="u_sl" min="0" max="2" step="0.1" value="1.0" oninput="syncVal(this.value, 'u_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">GAUGE PRINCIPLE</span><div style="text-align:center; font-size: 0.8rem;">Interaction = Requirement of local gauge invariance<p>Gauge fields = connections enforcing invariance</p></div>`,
+lawBox: `<div class="definition-box"><span class="def-title">CORE INSIGHT</span><div style="text-align:center; font-size: 0.9rem;">Interaction arises from local symmetry invariance.</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Type</span><span class="const-val">INVARIANT</span></div><div class="const-item"><span class="const-label">Entity</span><span class="const-val">GAUGE FIELD</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-gauge);">LOCAL INVARIANCE: ENFORCED</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.95rem;">Local Symmetry Transformation<br>↓<br>Covariant Derivative (Connection)<br>↓<br>Interaction Term`,
+hierarchy: `<div style="color: var(--accent-gauge); font-weight: bold; font-size: 0.95rem;">Interaction: Symmetry Requirement</div>`,
+footer: "The interaction field is the structural 'glue' that keeps the field consistent.",
+rightNote: `<div style="color: #818cf8; line-height: 1.3; font-size: 0.90rem;">Before force appears, interaction is a structural requirement of symmetry.<p>Surface deformation represents connection-induced adjustment maintaining local symmetry</p></div>`
+},
+
+2: {
+title: "FUNDAMENTAL SYMMETRIES",
+result: "Different Symmetries $\\rightarrow$ Different Forces",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing : Fundamental Symmetry Types</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">🔷 1. CONCEPTUAL FOUNDATION</h3>
+<p>At this stage, the framework moves from the origin of interaction (Module 1) to the diversity of interactions. The key principle established here is: <strong>$$\\boxed{ \\text{Different symmetry groups produce different interaction structures} }$$</strong> This is not an empirical classification, but a structural necessity. Symmetry is no longer just a constraint — it becomes the generator of diversity.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 2. THE THREE FUNDAMENTAL SYMMETRY CLASSES</h3>
+<p>The framework identifies a minimal triadic set of symmetry groups:</p>
+<ul>
+<li><strong>(1) Abelian Symmetry — U(1):</strong> Commutative group; Linear structure; No self-interaction. $$[A, B] = 0$$. <strong>👉 Produces:</strong> Electromagnetic interaction (EM); Long-range, linear behavior.</li>
+<li><strong>(2) Non-Abelian Symmetry — SU(2):</strong> Non-commutative group; Weak self-interaction; Intermediate structure. $$[T^a, T^b] = i f^{abc} T^c$$. <strong>👉 Produces:</strong> Weak interaction; Short-range, partially self-coupled.</li>
+<li><strong>(3) Non-Abelian Symmetry — SU(3):</strong> Fully non-Abelian; Strong self-interaction; High structural complexity. $$[T^a, T^b] = i f^{abc} T^c \\quad (\\text{richer structure})$$. <strong>👉 Produces:</strong> Strong interaction (color force); Confinement and non-linearity.</li>
+</ul>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 3. STRUCTURAL INTERPRETATION</h3>
+<p>The progression $U(1) \\;\\rightarrow\\; SU(2) \\;\\rightarrow\\; SU(3)$ represents increasing degrees of freedom, increasing algebraic richness, and increasing self-interaction. <strong>Core structural law:</strong> $$\\boxed{ \\text{Interaction complexity} \\propto \\text{Symmetry structure complexity} }$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 4. INTERACTION LOGIC (FROM UI PANEL)</h3>
+<p style="text-align: center; font-family: monospace;">
+\\text{Abelian } U(1) \\;-\\; (\\text{EM})<br>
+&darr;<br>
+\\text{Non-Abelian } SU(2) \\;-\\; (\\text{Weak})<br>
+&darr;<br>
+\\text{Non-Abelian } SU(3) \\;-\\; (\\text{Strong/Color})
+</p>
+<p><strong>Interpretation:</strong> U(1) &rarr; no internal interaction; SU(2) &rarr; partial internal coupling; SU(3) &rarr; full self-coupling.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 5. STRUCTURAL REALIZATION</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ \\text{Symmetry} \\;\\Rightarrow\\; \\text{Structured Interaction Diversity} }$$</p>
+<p>This means forces are not independent entities; they are expressions of symmetry types.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 6. GRAPH INTERPRETATION PARAGRAPH</h3>
+<p>The visualization represents the structural classification of interactions as a function of symmetry type. The horizontal axes encode degrees of freedom and generator structure, while the vertical axis represents the symmetry group rank. The three geometric layers correspond to U(1), SU(2), and SU(3), showing increasing structural complexity. As one moves upward, the symmetry transitions from Abelian to non-Abelian, introducing non-commutativity and self-interaction. The expanding geometry illustrates that interaction diversity is not arbitrary but emerges from the intrinsic algebraic structure of symmetry groups. This graph makes explicit that different forces are geometric manifestations of different symmetry structures.</p>
+
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 7. DEEP INSIGHT</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ \\text{Symmetry is the DNA of interaction} }$$</p>
+<p>Structure determines behavior; Algebra determines physics; Diversity emerges from order.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 8. FRAMEWORK SIGNIFICANCE</h3>
+<p>This module establishes that: The Standard Model groups are not accidental; they form a minimal complete structural basis; Interaction diversity is derived, not assumed.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 FINAL STATEMENT</h3>
+<p style="margin-bottom: 0; text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ \\text{Different symmetries &rarr; Different forces} }$$</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 2 Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Algebraic Basis:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\mathcal{G} = \\{U(1), SU(2), SU(3)\\}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The interaction field branches into distinct physical manifestations, defined by the specific commutation relations of its underlying symmetry generators.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics : Fundamental Symmetry Types</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">🔷 1. LIE GROUP STRUCTURE</h3>
+<p>A symmetry group G is defined by generators $T^a$: $$U = e^{i \\alpha^a T^a}$$ Lie algebra: $$[T^a, T^b] = i f^{abc} T^c$$ where $f^{abc} =$ structure constants, which define the nature of interaction.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 2. ABELIAN CASE — U(1)</h3>
+<p>Generator: $T = 1$. Commutation: $$[T, T] = 0$$ ✔ Abelian. ✔ No self-interaction. Gauge field: $$D_\\mu = \\partial_\\mu + i g A_\\mu$$ Field strength: $$F_{\\mu\\nu} = \\partial_\\mu A_\\nu - \\partial_\\nu A_\\mu$$ <strong>Key result: $$\\boxed{ \\text{No self-coupling term} }$$</strong></p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 3. NON-ABELIAN CASE — SU(2)</h3>
+<p>Generators: $T^a = \\frac{\\sigma^a}{2} \\quad (a = 1,2,3)$ (Pauli matrices). Commutation: $$[T^a, T^b] = i \\epsilon^{abc} T^c$$ Gauge field: $$D_\\mu = \\partial_\\mu + i g A_\\mu^a T^a$$ Field strength: $$F_{\\mu\\nu}^a = \\partial_\\mu A_\\nu^a - \\partial_\\nu A_\\mu^a + g \\epsilon^{abc} A_\\mu^b A_\\nu^c$$ <strong>Key result: $$\\boxed{ \\text{Self-interaction term appears} }$$</strong></p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 4. NON-ABELIAN CASE — SU(3)</h3>
+<p>Generators: $T^a = \\frac{\\lambda^a}{2} \\quad (a = 1,\\dots,8)$ (Gell-Mann matrices). Commutation: $$[T^a, T^b] = i f^{abc} T^c$$ Gauge field: $$D_\\mu = \\partial_\\mu + i g A_\\mu^a T^a$$ Field strength: $$F_{\\mu\\nu}^a = \\partial_\\mu A_\\nu^a - \\partial_\\nu A_\\mu^a + g f^{abc} A_\\mu^b A_\\nu^c$$ <strong>Key result: $$\\boxed{ \\text{Strong non-linear self-interaction} }$$</strong></p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 5. LAGRANGIAN FORM (GENERAL)</h3>
+<p>$$\\mathcal{L} = \\bar{\\psi}(i\\gamma^\\mu D_\\mu - m)\\psi - \\frac{1}{4} F_{\\mu\\nu}^a F^{\\mu\\nu a}$$ Interaction term: $$\\bar{\\psi}\\gamma^\\mu A_\\mu^a T^a \\psi$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 6. STRUCTURAL COMPARISON</h3>
+<table style="width:100%; color: #e2e8f0; border-collapse: collapse; margin-top: 10px;">
+<tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+<th style="text-align:left; padding: 8px;">Group</th>
+<th style="text-align:left; padding: 8px;">Commutation</th>
+<th style="text-align:left; padding: 8px;">Field Strength</th>
+<th style="text-align:left; padding: 8px;">Self-Interaction</th>
+</tr>
+<tr>
+<td style="padding: 8px;">U(1)</td>
+<td style="padding: 8px;">0</td>
+<td style="padding: 8px;">Linear</td>
+<td style="padding: 8px;">❌ None</td>
+</tr>
+<tr>
+<td style="padding: 8px;">SU(2)</td>
+<td style="padding: 8px;">$\epsilon^{abc}$</td>
+<td style="padding: 8px;">Non-linear</td>
+<td style="padding: 8px;">✔ Weak</td>
+</tr>
+<tr>
+<td style="padding: 8px;">SU(3)</td>
+<td style="padding: 8px;">$f^{abc}$</td>
+<td style="padding: 8px;">Strongly non-linear</td>
+<td style="padding: 8px;">✔ Strong</td>
+</tr>
+</table>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 7. CORE STRUCTURAL RESULT</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ f^{abc} \\neq 0 \\;\\Rightarrow\\; \\text{Self-interaction} }$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 8. FRAMEWORK INTERPRETATION</h3>
+<p>Structure constants $f^{abc} \\rightarrow$ encode internal geometry of symmetry. Non-zero algebra &rarr; produces interaction richness.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 FINAL MATHEMATICAL STATEMENT</h3>
+<p style="margin-bottom: 0; text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ \\text{Different Lie algebras} \\Rightarrow \\text{Different interaction structures} }$$</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Mathematical Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Algebraic Operator:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\hat{G} = [\\hat{T}^a, \\hat{T}^b]$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The transition from linear to non-linear interaction is mathematically identical to the transition from commuting to non-commuting symmetry generators.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>SYMMETRY TYPE</span><input type="number" id="s_in" class="digital-entry" value="1" oninput="syncVal(this.value, 's_sl')"></div><input type="range" id="s_sl" min="1" max="3" step="1" value="1" oninput="syncVal(this.value, 's_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">SYMMETRY TYPES</span><div style="text-align:center; font-size: 0.9rem;">U(1): Phase symmetry | SU(2): Weak isospin symmetry | SU(3): Color symmetry</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">CORE INSIGHT</span><div style="text-align:center; font-size: 0.9rem;">Different symmetry groups produce distinct interaction structures.</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Group</span><span class="const-val">TRIADIC TYPE</span></div><div class="const-item"><span class="const-label">Entity</span><span class="const-val">STRUCTURAL GENUS</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-symmetry);">GROUP RANK: DETECTED</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.9rem;">Abelian U(1) - (EM)<br>↓<br>Non-Abelian SU(2) - (Weak)<br>↓<br>Non-Abelian SU(3) - (Strong/Color)`,
+hierarchy: `<div style="color: var(--accent-symmetry); font-weight: bold; font-size: 0.9rem;">Symmetry → Structured Interaction Diversity</div>`,
+footer: "Why these three? They represent the minimal triadic set for a complete universe.",
+rightNote: `<div style="color: #818cf8; line-height: 1.25; font-size: 0.8rem;">Symmetry determines the form of interaction.<p>Non-Abelian groups ⇒ self-interacting gauge fields</p><p>Interaction diversity arises from symmetry group structure</p><p>Minimal symmetry set generating interaction diversity</p></div>`
+},
+
+3: {
+title: "STRUCTURAL HIERARCHY",
+result: "Gauge structure unifies interactions",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing : Structural Hierarchy of Forces</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">🔷 1. CONCEPTUAL FOUNDATION</h3>
+<p>Having established that: Interactions arise from symmetry (Module 1) and Different symmetries produce different forces (Module 2), this module answers the deeper question: <strong>$$\\boxed{ \\text{Why do forces have different strengths and behaviors?} }$$</strong> The answer is: <strong>$$\\boxed{ \\text{Force hierarchy arises from symmetry complexity} }$$</strong></p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 2. STRUCTURAL ORIGIN OF FORCE HIERARCHY</h3>
+<p>The framework introduces a hierarchical ordering of interactions based on: Algebraic structure, Generator complexity, and Degree of self-interaction. Fundamental progression: $$U(1) \\;\\rightarrow\\; SU(2) \\;\\rightarrow\\; SU(3)$$</p>
+
+<table style="width:100%; color: #e2e8f0; border-collapse: collapse; margin-top: 10px; margin-bottom: 15px;">
+<tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+<th style="text-align:left; padding: 8px;">Symmetry</th>
+<th style="text-align:left; padding: 8px;">Structure</th>
+<th style="text-align:left; padding: 8px;">Interaction Nature</th>
+</tr>
+<tr>
+<td style="padding: 8px;">U(1)</td>
+<td style="padding: 8px;">Abelian</td>
+<td style="padding: 8px;">Linear, weakest</td>
+</tr>
+<tr>
+<td style="padding: 8px;">SU(2)</td>
+<td style="padding: 8px;">Non-Abelian</td>
+<td style="padding: 8px;">Moderate, mixed</td>
+</tr>
+<tr>
+<td style="padding: 8px;">SU(3)</td>
+<td style="padding: 8px;">Non-Abelian (rich)</td>
+<td style="padding: 8px;">Strong, self-interacting</td>
+</tr>
+</table>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 3. INTERACTION LOGIC (FROM UI PANEL)</h3>
+<p style="text-align: center; font-style: italic;">$$\\text{Generator Structure (Lie Algebra)} \\;\\rightarrow\\; \\text{Non-Abelian Self-Interaction} \\;\\rightarrow\\; \\text{Effective Coupling Strength}$$</p>
+<p><strong>Interpretation:</strong> More generators &rarr; richer algebra; Non-zero commutators &rarr; internal coupling; Internal coupling &rarr; stronger interaction.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 4. COUPLING DEPTH AND NON-LINEARITY</h3>
+<p>The framework introduces: $$\\text{Coupling Depth} \\equiv \\text{degree of internal interaction}$$ Structural law: <strong>$$\\boxed{ \\text{Non-Abelian structure} \\Rightarrow \\text{Non-linear interaction} }$$</strong></p>
+<ul>
+<li><strong>U(1):</strong> No self-coupling &rarr; linear</li>
+<li><strong>SU(2):</strong> Partial self-coupling &rarr; weak non-linearity</li>
+<li><strong>SU(3):</strong> Strong self-coupling &rarr; highly non-linear</li>
+</ul>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 5. STRUCTURAL REALIZATION</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ \\text{Hierarchy} \\;\\Rightarrow\\; \\text{Structural Depth} }$$</p>
+<p>This means force strength is not arbitrary; it is a direct consequence of algebraic structure.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 6. GRAPH INTERPRETATION</h3>
+<p>The visualization represents the structural hierarchy of interactions as a function of symmetry complexity. The horizontal axis encodes the symmetry level progressing from U(1) to SU(2) to SU(3), while the vertical axis represents interaction intensity arising from coupling structure. The depth axis reflects coupling range or structural reach. As the symmetry group becomes more complex, non-Abelian self-interaction emerges, leading to stronger and more non-linear dynamics. The increasing bar depth illustrates that interaction strength is not externally imposed but arises from internal algebraic structure. This graph makes explicit that force hierarchy is a direct manifestation of symmetry complexity.</p>
+
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 7. DEEP INSIGHT</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ \\text{Structure is strength} }$$</p>
+<p>U(1) is simple &rarr; weak; SU(3) is self-binding &rarr; strong.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 8. FRAMEWORK SIGNIFICANCE</h3>
+<p>This module establishes that: Force hierarchy is derived, not assumed; Strength emerges from internal structure, not external parameters; The Standard Model hierarchy has a structural origin.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 9. EXTENDED INSIGHT</h3>
+<p style="text-align: center; font-style: italic; color: #38bdf8;">$$\\boxed{ \\text{Force hierarchy = hierarchy of symmetry complexity and self-interaction} }$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 FINAL STATEMENT</h3>
+<p style="margin-bottom: 0; text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ \\text{Increasing symmetry complexity} \\Rightarrow \\text{Increasing interaction strength} }$$</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 3 Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Hierarchical Scaling:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\alpha_{s} > \\alpha_{w} > \\alpha_{em}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The relative magnitudes of physical forces are mathematically locked to the internal complexity of their respective symmetry representations.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: Structural Hierarchy of Forces</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">🔷 1. GENERAL NON-ABELIAN GAUGE STRUCTURE</h3>
+<p>For a Lie group G with generators $T^a$: $$[T^a, T^b] = i f^{abc} T^c$$ Covariant derivative: $$D_\\mu = \\partial_\\mu + i g A_\\mu^a T^a$$ Field strength tensor: $$F_{\\mu\\nu}^a = \\partial_\\mu A_\\nu^a - \\partial_\\nu A_\\mu^a + g f^{abc} A_\\mu^b A_\\nu^c$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 2. ORIGIN OF NON-LINEARITY</h3>
+<p>The key structural term: $$g f^{abc} A_\\mu^b A_\\nu^c$$ <strong>Interpretation:</strong> Exists only if $f^{abc} \\neq 0$; Represents gauge boson self-interaction. <strong>Structural condition:</strong></p>
+<p style="text-align: center; font-weight: bold;">$$\\boxed{ f^{abc} = 0 \\;\\Rightarrow\\; \\text{No self-interaction (Abelian)} }$$</p>
+<p style="text-align: center; font-weight: bold;">$$\\boxed{ f^{abc} \\neq 0 \\;\\Rightarrow\\; \\text{Self-interaction (Non-Abelian)} }$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 3. HIERARCHY FROM ALGEBRA</h3>
+<p>Define effective interaction structure: $$\\mathcal{I} \\sim g^2 \\left( \\partial A + f A A \\right)$$ Cases:</p>
+<ul>
+<li><strong>(1) Abelian U(1):</strong> $F_{\\mu\\nu} = \\partial_\\mu A_\\nu - \\partial_\\nu A_\\mu$. $$\\mathcal{I}_{U(1)} \\sim g^2 (\\partial A)^2$$ ✔ Linear. ✔ No internal coupling.</li>
+<li><strong>(2) SU(2):</strong> $F_{\\mu\\nu}^a = \\partial_\\mu A_\\nu^a - \\partial_\\nu A_\\mu^a + g \\epsilon^{abc} A_\\mu^b A_\\nu^c$. $$\\mathcal{I}_{SU(2)} \\sim g^2 \\left[ (\\partial A)^2 + g (\\partial A)(A A) + g^2 (A A)^2 \\right]$$ ✔ Weak non-linearity.</li>
+<li><strong>(3) SU(3):</strong> $F_{\\mu\\nu}^a = \\partial_\\mu A_\\nu^a - \\partial_\\nu A_\\mu^a + g f^{abc} A_\\mu^b A_\\nu^c$. $$\\mathcal{I}_{SU(3)} \\sim g^2 \\left[ (\\partial A)^2 + g (\\partial A)(A A) + g^2 (A A)^2 \\right]$$ ✔ Strong non-linearity (larger generator set).</li>
+</ul>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 4. GENERATOR COUNT AND COMPLEXITY</h3>
+<p>$$\\text{dim}(G) = \\text{number of generators}$$</p>
+<table style="width:100%; color: #e2e8f0; border-collapse: collapse; margin-top: 10px; margin-bottom: 10px;">
+<tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+<th style="text-align:left; padding: 8px;">Group</th>
+<th style="text-align:left; padding: 8px;">Generators</th>
+<th style="text-align:left; padding: 8px;">Structure</th>
+</tr>
+<tr>
+<td style="padding: 8px;">U(1)</td>
+<td style="padding: 8px;">1</td>
+<td style="padding: 8px;">Simple</td>
+</tr>
+<tr>
+<td style="padding: 8px;">SU(2)</td>
+<td style="padding: 8px;">3</td>
+<td style="padding: 8px;">Moderate</td>
+</tr>
+<tr>
+<td style="padding: 8px;">SU(3)</td>
+<td style="padding: 8px;">8</td>
+<td style="padding: 8px;">Complex</td>
+</tr>
+</table>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ \\text{More generators} \\Rightarrow \\text{More interaction channels} }$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 5. SELF-INTERACTION CASCADE</h3>
+<p>From Yang–Mills Lagrangian: $$\\mathcal{L}_{YM} = -\\frac{1}{4} F_{\\mu\\nu}^a F^{\\mu\\nu a}$$ Expanding: $$\\mathcal{L}_{YM} = -\\frac{1}{4} (\\partial A)^2 - \\frac{1}{2} g f^{abc} (\\partial A) A A - \\frac{1}{4} g^2 (f^{abc} A^b A^c)^2$$ <strong>Terms:</strong> $(\\partial A)^2 \\rightarrow$ kinetic; $(\\partial A) A A \\rightarrow$ 3-boson interaction; $(A A)^2 \\rightarrow$ 4-boson interaction. <strong>Key result:</strong></p>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ \\text{Higher algebraic structure} \\Rightarrow \\text{Higher-order interactions} }$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 6. EFFECTIVE COUPLING DEPTH</h3>
+<p>Define structural measure: $$\\mathcal{C} \\sim f^{abc} f^{abc}$$</p>
+<ul>
+<li><strong>U(1):</strong> $\\mathcal{C} = 0$</li>
+<li><strong>SU(2):</strong> finite</li>
+<li><strong>SU(3):</strong> larger</li>
+</ul>
+<p style="text-align: center; font-weight: bold; color: #38bdf8;">$$\\boxed{ \\text{Coupling depth} \\propto \\text{Algebraic structure} }$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 7. STRUCTURAL HIERARCHY FORMULA</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ \\text{Interaction Strength} \\sim g^2 \\left(1 + f A + f^2 A^2 \\right) }$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 FINAL MATHEMATICAL STATEMENT</h3>
+<p style="margin-bottom: 0; text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ f^{abc} \\neq 0 \\;\\text{and increasing generator structure} \\;\\Rightarrow\\; \\text{Increasing interaction strength and non-linearity} }$$</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Mathematical Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Structural Coupling:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\mathcal{G}_{eff} \\propto \\text{Tr}(T^a T^b)$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The divergence in force magnitudes is mathematically derived from the internal "volume" of the symmetry group's generator manifold and its self-coupling structure constants.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>COMPLEXITY (C)</span><input type="number" id="c_in" class="digital-entry" value="1" oninput="syncVal(this.value, 'c_sl')"></div><input type="range" id="c_sl" min="1" max="3" step="1" value="1" oninput="syncVal(this.value, 'c_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">FORCE SCALE</span><div style="text-align:center; font-size: 0.8rem;">Abelian (U(1)) → Non-Abelian (SU(2)) → Self-Interacting (SU(3))</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">CORE INSIGHT</span><div style="text-align:center; font-size: 0.9rem;">The hierarchy of forces arises from increasing structural complexity of symmetry.</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Scale</span><span class="const-val">HIERARCHICAL</span></div><div class="const-item"><span class="const-label">Entity</span><span class="const-val">COUPLING DEPTH</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-hierarchy);">COUPLING: NON-LINEAR (Non-Abelian structure)</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.9rem;">Generator Structure (Lie Algebra)<br>↓<br>Non-Abelian Self-Interaction<br>↓<br>Effective Coupling Strength`,
+hierarchy: `<div style="color: var(--accent-hierarchy); font-weight: bold; font-size: 0.95rem;">Hierarchy: Structural Depth</div>`,
+footer: "Structural complexity governs both strength and range of interaction.",
+rightNote: `<div style="color: #c084fc; line-height: 1.3; font-size: 0.9rem;">U(1) is simple; SU(3) is self-binding. Structure is strength.<p>Force hierarchy = hierarchy of symmetry complexity and self-interaction</p></div>`
+},
+
+4: {
+title: "TRIADIC UNIFICATION",
+result: "Coupling define interaction strength",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing : Triadic Interaction Unification</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">🔷 1. CONCEPTUAL FOUNDATION</h3>
+<p>After establishing: Symmetry generates interaction (Module 1), Different symmetries produce different forces (Module 2), and Force hierarchy arises from structural complexity (Module 3), this module answers: <strong>$$\\boxed{ \\text{How do all interactions unify into a single structural system?} }$$</strong> Core principle: <strong>$$\\boxed{ \\text{Unification arises from triadic structural necessity} }$$</strong></p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 2. THE TRIADIC STRUCTURE OF INTERACTIONS</h3>
+<p>The framework identifies a three-fold structural decomposition: $U(1), \\quad SU(2), \\quad SU(3)$. But now interpreted not merely as groups — rather as functional roles:</p>
+<ul>
+<li><strong>(1) U(1) — Stabilizing:</strong> Abelian; Linear; Provides background consistency.</li>
+<li><strong>(2) SU(2) — Mediating:</strong> Non-Abelian; Intermediate mixing; Enables interaction transitions.</li>
+<li><strong>(3) SU(3) — Binding:</strong> Strongly non-Abelian; Self-interacting; Produces structural cohesion.</li>
+</ul>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ \\text{Stabilizing} \\;\\rightarrow\\; \\text{Mediating} \\;\\rightarrow\\; \\text{Binding} }$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 3. INTERACTION LOGIC (FROM UI PANEL)</h3>
+<p style="text-align: center; font-style: italic;">$$\\text{Neutral Balance} \\;\\rightarrow\\; \\text{Active Binding} \\;\\rightarrow\\; \\text{Passive Stability}$$</p>
+<p><strong>Structural interpretation:</strong> Stability alone &rarr; no interaction; Binding alone &rarr; uncontrolled collapse; Mediation &rarr; balances the system. Therefore: <strong>$$\\boxed{ \\text{Interaction requires triadic balance} }$$</strong></p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 4. TRIADIC ALIGNMENT</h3>
+<p>The framework introduces: $$\\text{Triad: Structurally aligned } (U(1), SU(2), SU(3))$$ <strong>Meaning:</strong> The three interactions are not independent; they are mutually defining components. <strong>Structural law:</strong> $$\\boxed{ \\text{Forces are coordinated expressions of a single triadic structure} }$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 5. STRUCTURAL REALIZATION</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ \\text{Unification} \\;\\Rightarrow\\; \\text{Triadic Law} }$$</p>
+<p>This implies: No force exists in isolation; each force derives meaning from the others; the system is structurally closed.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 6. GRAPH INTERPRETATION</h3>
+<p>The visualization represents the triadic structure of fundamental interactions in a three-dimensional interaction space. Each axis corresponds to one symmetry component: stabilizing U(1), mediating SU(2), and binding SU(3). The three nodes represent the dominant role of each interaction within this structural space, positioned according to their functional contribution. The geometric configuration shows that no interaction lies independently on a single axis; instead, each occupies a coordinated position within the triad. The triangular balance illustrates that interaction unification is not a merging into one force, but a structured coexistence of three interdependent components. This graph makes explicit that unity is achieved through balanced structural differentiation.</p>
+
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 7. DEEP INSIGHT</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ \\text{Three forces from one triadic base} }$$</p>
+<p>Unity precedes diversity; Structure precedes magnitude.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 8. FRAMEWORK SIGNIFICANCE</h3>
+<p>This module establishes that: Unification is not reduction to one force; it is structured coexistence; the Standard Model groups form a necessary triadic system.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 9. EXTENDED INSIGHT</h3>
+<p style="text-align: center; font-style: italic; color: #38bdf8;">$$\\boxed{ \\text{Unification} = \\text{Structured coexistence of } U(1), SU(2), SU(3) }$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 10. WHAT THIS FRAMEWORK HAVE ACHIEVED HERE</h3>
+<p>Not just unification of forces &rarr; but unification as triadic structural necessity. Not just coexistence &rarr; but functional differentiation within unity. A deeper structural insight:</p>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ \\Psi \\rightarrow \\text{Geometry} \\rightarrow \\text{Symmetry} \\rightarrow \\text{Interaction} \\rightarrow \\text{Unified Framework} }$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 FINAL STATEMENT</h3>
+<p style="margin-bottom: 0; text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ \\text{Unity emerges as triadic balance of stabilizing, mediating, and binding interactions} }$$</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 4 Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Unified Product:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\mathcal{G}_{total} = SU(3) \\times SU(2) \\times U(1)$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The interactions achieve structural closure, forming a complete triadic system that governs the stability, mediation, and binding of the physical universe.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics : Triadic Interaction Unification</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">🔷 1. PRODUCT GAUGE STRUCTURE</h3>
+<p>The Standard Model gauge structure: $$\\boxed{ G = U(1)_Y \\times SU(2)_L \\times SU(3)_C }$$ Total covariant derivative: $$D_\\mu = \\partial_\\mu + i g_1 Y B_\\mu + i g_2 W_\\mu^a \\tau^a + i g_3 G_\\mu^a \\lambda^a$$ <strong>Interpretation:</strong> $B_\\mu \\rightarrow U(1)$ (stabilizing); $W_\\mu^a \\rightarrow SU(2)$ (mediating); $G_\\mu^a \\rightarrow SU(3)$ (binding).</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 2. TRIADIC DECOMPOSITION OF INTERACTION</h3>
+<p>Define interaction operator: $$\\mathcal{I}_\\mu = g_1 Y B_\\mu + g_2 W_\\mu^a \\tau^a + g_3 G_\\mu^a \\lambda^a$$ Structural form: $$\\boxed{ \\mathcal{I}_\\mu = \\mathcal{I}_\\mu^{(U(1))} + \\mathcal{I}_\\mu^{(SU(2))} + \\mathcal{I}_\\mu^{(SU(3))} }$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 3. FIELD STRENGTHS (TRIAD)</h3>
+<ul>
+<li><strong>(1) Abelian:</strong> $$F_{\\mu\\nu} = \\partial_\\mu B_\\nu - \\partial_\\nu B_\\mu$$</li>
+<li><strong>(2) Non-Abelian SU(2):</strong> $$W_{\\mu\\nu}^a = \\partial_\\mu W_\\nu^a - \\partial_\\nu W_\\mu^a + g_2 \\epsilon^{abc} W_\\mu^b W_\\nu^c$$</li>
+<li><strong>(3) Non-Abelian SU(3):</strong> $$G_{\\mu\\nu}^a = \\partial_\\mu G_\\nu^a - \\partial_\\nu G_\\mu^a + g_3 f^{abc} G_\\mu^b G_\\nu^c$$</li>
+</ul>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 4. TOTAL GAUGE LAGRANGIAN</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ \\mathcal{L}_{gauge} = -\\frac{1}{4} F_{\\mu\\nu}F^{\\mu\\nu} -\\frac{1}{4} W_{\\mu\\nu}^a W^{\\mu\\nu a} -\\frac{1}{4} G_{\\mu\\nu}^a G^{\\mu\\nu a} }$$</p>
+<p>Matter coupling: $$\\mathcal{L}_{int} = \\bar{\\psi} \\gamma^\\mu \\left( i g_1 Y B_\\mu + i g_2 W_\\mu^a \\tau^a + i g_3 G_\\mu^a \\lambda^a \\right)\\psi$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 5. TRIADIC BALANCE CONDITION (STRUCTURAL FORM)</h3>
+<p>Define total interaction magnitude: $$\\mathcal{I}_{total}^2 = g_1^2 + g_2^2 + g_3^2$$ Normalize: $$\\hat{g}_i = \\frac{g_i}{\\sqrt{g_1^2 + g_2^2 + g_3^2}}$$ Then: $$\\boxed{ \\hat{g}_1^2 + \\hat{g}_2^2 + \\hat{g}_3^2 = 1 }$$ <strong>Interpretation:</strong> Interaction exists within a triadic parameter space; balance defines physical realization.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 6. STRUCTURAL ROLE ENCODING</h3>
+<p>Define mapping: $(U(1), SU(2), SU(3)) \\;\\rightarrow\\; (S, M, B)$. Effective interaction: $$\\mathcal{I}_\\mu = g_S S_\\mu + g_M M_\\mu + g_B B_\\mu$$ Constraint: $$\\boxed{ \\text{Stable interaction requires all three components} }$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 7. TRIADIC INTERACTION TENSOR (ABSTRACT FORM)</h3>
+<p>Define: $$\\mathcal{T}_\\mu = \\begin{pmatrix} g_1 B_\\mu \\\\ g_2 W_\\mu \\\\ g_3 G_\\mu \\end{pmatrix}$$ Interaction norm: $$|\\mathcal{T}|^2 = g_1^2 B^2 + g_2^2 W^2 + g_3^2 G^2$$ <strong>Interpretation: $$\\boxed{ \\text{Interaction is a vector in triadic symmetry space} }$$</strong></p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 8. STRUCTURAL RESULT</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ U(1) \\oplus SU(2) \\oplus SU(3) \\;\\Rightarrow\\; \\text{Complete interaction basis} }$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 FINAL MATHEMATICAL STATEMENT</h3>
+<p style="margin-bottom: 0; text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ \\text{Total interaction = triadic sum of stabilizing, mediating, and binding components} }$$</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Mathematical Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Unified Invariant:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\text{Tr}(\\mathcal{F}_{\\mu\\nu} \\mathcal{F}^{\\mu\\nu})$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The triadic unification completes the structural map of fundamental forces, where the physical universe is mathematically constrained to the combined eigenspace of its three primary symmetry groups.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>TRIAD BALANCE</span><input type="number" id="t_in" class="digital-entry" value="1" oninput="syncVal(this.value, 't_sl')"></div><input type="range" id="t_sl" min="1" max="3" step="1" value="1" oninput="syncVal(this.value, 't_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">TRIADIC MAPPING</span><div style="text-align:center; font-size: 0.75rem;">U(1): Stabilizing | SU(2): Mediating | SU(3): Binding</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">CORE INSIGHT</span><div style="text-align:center; font-size: 0.85rem; line-height: 1.3;">Unification arises from the triadic structure of fundamental interaction groups.</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Balance</span><span class="const-val">TRIADIC</span></div><div class="const-item"><span class="const-label">Entity</span><span class="const-val">SYNTHESIS UNIT</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-triad);">TRIAD: Structurally aligned (U(1), SU(2), SU(3))</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.8rem;">U(1): Stabilizing (Abelian, linear)<br>↓<br>SU(2): Mediating (non-Abelian, weak mixing)<br>↓<br>SU(3): Binding (non-Abelian, self-interacting)`,
+hierarchy: `<div style="color: var(--accent-triad); font-weight: bold; font-size: 0.95rem;">Unification: Triadic Law</div>`,
+footer: "The three interactions are distinct expressions of a single underlying structural framework.",
+rightNote: `<div style="color: #fb7185; line-height: 1.3; font-size: 0.85rem;">Three interactions emerge from one triadic structure. Structure precedes strength.<p>Unification = structured coexistence of U(1), SU(2), SU(3) as a triadic system</p></div>`
+},
+
+5: {
+title: "UNIFIED FRAMEWORK",
+result: "Unity $\\rightarrow$ structured diversity of forces",
+resultSize: "0.80rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing : Unified Interaction Framework</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">🔷 1. CONCEPTUAL FOUNDATION</h3>
+<p>After establishing: Interaction arises from symmetry (Module 1), Different symmetries produce different forces (Module 2), Force hierarchy emerges from structural complexity (Module 3), and Unification exists as a triadic structure (Module 4), we now arrive at the final realization: <strong>$$\\boxed{ \\text{All interactions are structured expressions of a single unified symmetry} }$$</strong></p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 2. THE UNIFIED VIEW</h3>
+<p>The framework asserts: $$\\boxed{ \\text{Interactions are not independent entities} }$$ Instead: $$\\boxed{ \\text{They are differentiated expressions of one underlying structure} }$$ Structural flow: $$\\boxed{ \\text{Unified Symmetry} \\;\\rightarrow\\; \\text{Symmetry Breaking / Differentiation} \\;\\rightarrow\\; \\text{Observable Interaction Sectors} }$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 3. FROM UNITY TO DIVERSITY</h3>
+<p>At the highest level: There is one coherent field structure; this structure contains latent symmetry potential. Differentiation mechanism: $$\\text{Unity} \\;\\rightarrow\\; \\text{Symmetry} \\;\\rightarrow\\; \\text{Differentiation}$$ Result: <strong>Electromagnetic, Weak, and Strong</strong> are not separate — they are manifestations of differentiation.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 4. STRUCTURAL REALIZATION</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ \\text{Framework} \\;\\Rightarrow\\; \\text{Unified Expressions} }$$</p>
+<p>Meaning: Forces are expressions, not fundamental divisions. Core statement: $$\\boxed{ \\text{All forces = Expressions of symmetry} }$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 5. COHERENCE OF THE FRAMEWORK</h3>
+<p>The system is defined as: $$\\text{Framework: Coherent}$$ <strong>Interpretation:</strong> No contradictions between forces; no need for artificial unification; unity is intrinsic.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 6. GRAPH INTERPRETATION PARAGRAPH (MANDATORY)</h3>
+<p>The visualization represents the unified interaction framework as a continuous distribution in a three-dimensional structural space. The axes encode structural density, symmetry potential, and total field coherence. Each point represents a possible local manifestation of interaction arising from the underlying unified symmetry. The scattered yet bounded distribution shows that interactions are not isolated entities but configurations within a single coherent manifold. The density variation reflects how symmetry differentiation produces distinct interaction sectors while maintaining overall unity. This graph makes explicit that the observable diversity of forces emerges from a unified structural field through differentiation rather than separation.</p>
+
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 7. DEEP INSIGHT</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ \\text{The universe is a single structured field manifesting through diverse symmetries} }$$</p>
+<p>Further: $$\\boxed{ \\text{Interactions are coherent potentials, not independent objects} }$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 8. FRAMEWORK SIGNIFICANCE</h3>
+<p>This module establishes: True unification is structural, not forced; diversity arises from controlled differentiation; and the Standard Model is a projection of deeper unity.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 9. EXTENDED INSIGHT</h3>
+<p style="text-align: center; font-style: italic; color: #38bdf8;">$$\\boxed{ \\text{Unity} \\;\\rightarrow\\; \\text{Symmetry} \\;\\rightarrow\\; \\text{Differentiation} \\;\\rightarrow\\; \\text{Observable interactions} }$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 10. WHAT THIS FRAMEWORK HAVE ACHIEVED HERE</h3>
+<p>Not just Standard Model description &rarr; but a structural derivation of interaction diversity. Not just unification &rarr; but unification as structured differentiation. A complete arc:</p>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ \\Psi \\rightarrow \\text{Geometry} \\rightarrow \\text{Symmetry} \\rightarrow \\text{Interaction} \\rightarrow \\text{Unified Framework} }$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 FINAL STATEMENT</h3>
+<p style="margin-bottom: 0; text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ \\text{All interactions are unified as structured expressions of a single underlying symmetry} }$$</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 5 Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Symmetry Synthesis:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\mathcal{S}_{unified} \\xrightarrow{break} \\sum \\mathcal{I}_{k}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The final module completes the synthesis, showing that the divergence of physical forces is a secondary effect of the primary structural coherence of the field.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics : Unified Interaction Framework</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">🔷 1. UNIFIED GAUGE STRUCTURE</h3>
+<p>The complete interaction framework is expressed as: $$\\boxed{ G = U(1)_Y \\times SU(2)_L \\times SU(3)_C }$$ Total covariant derivative: $$D_\\mu = \\partial_\\mu + i g_1 Y B_\\mu + i g_2 W_\\mu^a \\tau^a + i g_3 G_\\mu^a \\lambda^a$$ Unified interpretation: $$\\boxed{ D_\\mu = \\partial_\\mu + i \\mathcal{A}_\\mu }$$ where $$\\mathcal{A}_\\mu = g_1 B_\\mu + g_2 W_\\mu^a \\tau^a + g_3 G_\\mu^a \\lambda^a$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 2. TOTAL FIELD STRENGTH (UNIFIED FORM)</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ \\mathcal{F}_{\\mu\\nu} = \\partial_\\mu \\mathcal{A}_\\nu - \\partial_\\nu \\mathcal{A}_\\mu + i [\\mathcal{A}_\\mu, \\mathcal{A}_\\nu] }$$</p>
+<p>Decomposition: $$\\mathcal{F}_{\\mu\\nu} = F_{\\mu\\nu} + W_{\\mu\\nu} + G_{\\mu\\nu}$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 3. UNIFIED LAGRANGIAN</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ \\mathcal{L} = \\bar{\\psi}(i\\gamma^\\mu D_\\mu - m)\\psi - \\frac{1}{4} \\mathcal{F}_{\\mu\\nu} \\mathcal{F}^{\\mu\\nu} }$$</p>
+<p>Expanded form: $$\\mathcal{L} = \\bar{\\psi}(i\\gamma^\\mu \\partial_\\mu - m)\\psi - \\bar{\\psi}\\gamma^\\mu \\mathcal{A}_\\mu \\psi - \\frac{1}{4} \\left( F^2 + W^2 + G^2 + \\text{cross terms} \\right)$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 4. SYMMETRY BREAKING (STRUCTURAL DIFFERENTIATION)</h3>
+<p>Introduce scalar field $\\Phi$: $$\\mathcal{L}_\\Phi = |D_\\mu \\Phi|^2 - V(\\Phi)$$ Potential: $$V(\\Phi) = \\lambda (\\Phi^\\dagger \\Phi - v^2)^2$$ Result: $$\\boxed{ G \\;\\rightarrow\\; U(1)_{EM} \\times SU(3)_C }$$ <strong>Interpretation:</strong> Unified symmetry &rarr; differentiated sectors; Weak + EM &rarr; separated; Strong remains independent.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 5. INTERACTION SPACE REPRESENTATION</h3>
+<p>Define interaction vector: $$\\mathcal{I} = \\begin{pmatrix} g_1 \\\\ g_2 \\\\ g_3 \\end{pmatrix}$$ Norm: $$|\\mathcal{I}|^2 = g_1^2 + g_2^2 + g_3^2$$ Normalized: $$\\hat{\\mathcal{I}} = \\frac{\\mathcal{I}}{\\sqrt{g_1^2 + g_2^2 + g_3^2}}$$ Constraint: $$\\boxed{ \\hat{g}_1^2 + \\hat{g}_2^2 + \\hat{g}_3^2 = 1 }$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 6. STRUCTURAL DIFFERENTIATION OPERATOR</h3>
+<p>Define: $$\\mathcal{D}_{sym} : \\text{Unified symmetry} \\rightarrow \\text{interaction sectors}$$. Action: $$\\mathcal{D}_{sym}(G) = (U(1), SU(2), SU(3))$. Physical realization: $$\\boxed{ \\text{Observable forces = projections of unified symmetry} }$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 7. COHERENT FIELD INTERPRETATION</h3>
+<p>Define unified field: $$\\Psi_{total}$$. Interaction relation: $$D_\\mu \\Psi_{total} = (\\partial_\\mu + i \\mathcal{A}_\\mu)\\Psi_{total}$$ <strong>Meaning: $$\\boxed{ \\text{All interactions act through one unified connection} }$$</strong></p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 8. FINAL STRUCTURAL FORM</h3>
+<p style="text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ \\text{Unified Field} \\xrightarrow{\\text{Symmetry}} \\text{Gauge Structure} \\xrightarrow{\\text{Differentiation}} \\text{Observable Forces} }$$</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">🔷 FINAL MATHEMATICAL STATEMENT</h3>
+<p style="margin-bottom: 0; text-align: center; font-weight: bold; color: #f472b6;">$$\\boxed{ \\mathcal{L} = \\bar{\\psi}(i\\gamma^\\mu D_\\mu - m)\\psi - \\frac{1}{4} \\mathcal{F}_{\\mu\\nu}\\mathcal{F}^{\\mu\\nu} \\quad \\Rightarrow \\quad \\text{All interactions as one unified gauge structure} }$$</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 5 Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Final Structural Synthesis:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\text{Total Lagrangian} = \\text{Unified Field Theory}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The mathematical completion of the Interaction Suite proves that what appear as distinct forces are actually structurally necessary projections of a single, coherent gauge field.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>UNIFICATION STATE</span><input type="number" id="f_in" class="digital-entry" value="1" oninput="syncVal(this.value, 'f_sl')"></div><input type="range" id="f_sl" min="0" max="1" step="0.1" value="1" oninput="syncVal(this.value, 'f_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">UNIFIED MANIFESTATION</span><div style="text-align:center; font-size: 0.85rem;">All interactions are expressions of underlying symmetry</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">CORE INSIGHT</span><div style="text-align:center; font-size: 0.8rem; line-height: 1.3;">Interactions are not independent; they are structured expressions of an underlying unified symmetry.</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Reality</span><span class="const-val">UNIFIED</span></div><div class="const-item"><span class="const-label">Entity</span><span class="const-val">TOTAL FIELD</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-framework);">FRAMEWORK: COHERENT</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Unified Symmetry<br>↓<br>Symmetry Breaking / Differentiation<br>↓<br>Observable Interaction Sectors`,
+hierarchy: `<div style="color: var(--accent-framework); font-weight: bold;">Framework: Unified Expressions</div>`,
+footer: "The triadic structure is complete; the interaction framework emerges as a unified system.<p>The dynamic distribution represents the underlying symmetry potential prior to its differentiation into distinct interaction sectors.</p>",
+rightNote: `<div style="color: #4ade80; line-height: 1.25; font-size: 0.8rem;">The universe is a single structured field manifesting through diverse symmetries.<p>The unified framework is a dynamic manifold in which interactions are not separate entities but differentiated expressions of an underlying coherent structure.</p><p>Unity → Symmetry → Differentiation → Observable interactions</p></div>`
+}
+};
+
+function syncVal(val, id) {
+const sliderId = id.includes('_in') ? id.replace('_in', '_sl') : id;
+const inputId = id.includes('_sl') ? id.replace('_sl', '_in') : id;
+if(document.getElementById(sliderId)) document.getElementById(sliderId).value = val;
+if(document.getElementById(inputId)) document.getElementById(inputId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+document.getElementById('brief-box-content').innerHTML = content.brief;
+document.getElementById('math-box-content').innerHTML = content.math;
+document.getElementById('control-sliders').innerHTML = content.sliders;
+
+// Dynamic Header update
+document.getElementById('active-module-title').innerText = content.title;
+const resultEl = document.getElementById('active-module-result');
+resultEl.innerText = content.result;
+resultEl.style.fontSize = content.resultSize || "0.65rem";
+
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('metrics-content').innerHTML = content.metricsContent;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+
+document.getElementById('structure-box-area').innerHTML = content.structure;
+document.getElementById('telemetry-area').innerHTML = content.telemetry;
+
+showScreen('briefing');
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() {
+showScreen('lab');
+setTimeout(() => { runLab(); window.dispatchEvent(new Event('resize')); }, 100);
+}
+
+function runLab() {
+const target = document.getElementById('plot-area');
+if (!target) return;
+let data = [];
+let layout = {
+paper_bgcolor: 'black', plot_bgcolor: 'black', margin: {t:60,b:10,l:0,r:0},
+showlegend: true,
+font: { family: 'sans-serif', size: 10 },
+legend: { font: { color: '#94a3b8' }, x: 0.8, y: 0.9 },
+scene: {
+xaxis: { title: 'Symmetry X', visible: true, gridcolor: '#222', color: '#38bdf8' },
+yaxis: { title: 'Symmetry Y', visible: true, gridcolor: '#222', color: '#38bdf8' },
+zaxis: { title: 'Coupling Strength', visible: true, gridcolor: '#222', color: '#c084fc' },
+camera: { eye: { x: 1.5, y: 1.5, z: 1.2 } },
+aspectmode: 'cube'
+}
+};
+
+if (currentTool === 1) { // GAUGE STRUCTURE
+let u = parseFloat(document.getElementById('u_sl')?.value || 1.0);
+let x_v = [], y_v = [], z_v = [];
+for (let x = -5; x <= 5; x += 0.2) {
+for (let y = -5; y <= 5; y += 0.2) {
+x_v.push(x); y_v.push(y);
+z_v.push(Math.sin(x*u) * Math.cos(y*u));
+}
+}
+data.push({ type: 'mesh3d', x: x_v, y: y_v, z: z_v, intensity: z_v, colorscale: 'Blues', opacity: 0.8, name: 'Gauge Field' });
+layout.title = { text: "LOCAL GAUGE INVARIANCE", font: { color: '#38bdf8', size: 16 } };
+layout.scene.xaxis.title = 'Local Phase Coordinate (θ)'; layout.scene.yaxis.title = 'Spatial Connection (Aμ)'; layout.scene.zaxis.title = 'Invariance Curvature (Fμν)';
+
+
+} else if (currentTool === 2) { // SYMMETRY TYPES
+let s = parseInt(document.getElementById('s_sl')?.value || 1);
+let colors = ['#38bdf8', '#818cf8', '#c084fc'];
+let names = ['U(1) Abelian', 'SU(2) Non-Abelian', 'SU(3) Color'];
+for(let i=0; i<s; i++) {
+let r = i + 1;
+let tx=[], ty=[], tz=[];
+for(let a=0; a<Math.PI*2; a+=0.1) {
+tx.push(r * Math.cos(a)); ty.push(r * Math.sin(a)); tz.push(i);
+}
+data.push({ type: 'scatter3d', mode: 'lines', x: tx, y: ty, z: tz, line: { color: colors[i], width: 4 }, name: names[i] });
+}
+layout.title = { text: "FUNDAMENTAL SYMMETRY TYPES", font: { color: '#818cf8', size: 16 } };
+layout.scene.xaxis.title = 'Generator Rotation (Tᵃ)'; layout.scene.yaxis.title = 'Degree of Freedom (df)'; layout.scene.zaxis.title = 'Group Rank (n)';
+
+
+} else if (currentTool === 3) { // HIERARCHY
+let c = parseInt(document.getElementById('c_sl')?.value || 1);
+for (let i = 1; i <= 3; i++) {
+let scale = Math.pow(i, 2);
+data.push({
+type: 'scatter3d', mode: 'lines', x: [-scale, scale], y: [i, i], z: [0, 0],
+line: { color: i <= c ? '#c084fc' : '#222', width: i*5 },
+name: `Level ${i} Complexity`
+});
+}
+layout.title = { text: "STRUCTURAL HIERARCHY OF FORCES", font: { color: '#c084fc', size: 16 } };
+layout.scene.xaxis.title = 'Coupling Range (r)'; layout.scene.yaxis.title = 'Symmetry Level (L)'; layout.scene.zaxis.title = 'Interaction Intensity (α)';
+
+
+} else if (currentTool === 4) { // TRIADIC
+let t = parseInt(document.getElementById('t_sl')?.value || 1);
+let triad = [
+{ x: 0, y: 2, z: 0, name: 'SU(3) - Binding' },
+{ x: -1.7, y: -1, z: 0, name: 'SU(2) - Mediating' },
+{ x: 1.7, y: -1, z: 0, name: 'U(1) - Stabilizing' }
+];
+for(let i=0; i<3; i++) {
+data.push({
+type: 'scatter3d', mode: 'markers+text', x: [triad[i].x], y: [triad[i].y], z: [0],
+marker: { size: 15, color: i+1 === t ? '#fb7185' : '#444' },
+text: [triad[i].name], textposition: 'top center', name: triad[i].name
+});
+}
+layout.title = { text: "TRIADIC INTERACTION UNIFICATION", font: { color: '#fb7185', size: 16 } };
+layout.scene.xaxis.title = 'Stabilizing Vector (U₁)'; layout.scene.yaxis.title = 'Binding Vector (SU₃)'; layout.scene.zaxis.title = 'Mediating Potential (SU₂)';
+
+} else if (currentTool === 5) { // FRAMEWORK
+let f = parseFloat(document.getElementById('f_sl')?.value || 1.0);
+let x_v=[], y_v=[], z_v=[];
+for(let i=0; i<100; i++) {
+x_v.push(Math.random()*10-5); y_v.push(Math.random()*10-5); z_v.push(Math.random()*10-5);
+}
+data.push({ type: 'scatter3d', mode: 'markers', x: x_v, y: y_v, z: z_v, marker: { size: 4, color: '#4ade80', opacity: f }, name: 'Unified Symmetry' });
+layout.title = { text: "UNIFIED INTERACTION FRAMEWORK", font: { color: '#4ade80', size: 16 } };
+layout.scene.xaxis.title = 'Symmetry Potential (Ψ)'; layout.scene.yaxis.title = 'Structural Density (ρ)'; layout.scene.zaxis.title = 'Total Field Coherence (ℒ)';
+}
+
+Plotly.react('plot-area', data, layout, {responsive: true, displayModeBar: false});
+}
+
+function resetLab() {
+if(currentTool===1) syncVal(1.0, 'u_sl');
+if(currentTool===2) syncVal(1, 's_sl');
+if(currentTool===3) syncVal(1, 'c_sl');
+if(currentTool===4) syncVal(1, 't_sl');
+if(currentTool===5) syncVal(1, 'f_sl');
+}
+
+window.onload = () => { showScreen('portal'); };
+</script>
+</body>
+</html>

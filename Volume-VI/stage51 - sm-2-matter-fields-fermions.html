@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 51 — Matter Fields (Fermions)</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #3b82f6;
+--accent-field: #60a5fa; --accent-family: #f87171; --accent-gen: #fbbf24; --accent-rep: #c084fc; --accent-matter: #2dd4bf;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6;
+--accent-gold: #fbbf24;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-matter); font-family: sans-serif; font-size: 0.85rem; min-width: 450px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls, #nav-summary-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+#screen-lab.active { display: flex; flex-direction: column; height: calc(100vh - 50px); }
+
+#screen-portal { justify-content: flex-start; padding-top: 7dvh; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 50px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 2px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; padding-bottom: 0px; }
+.module-subtitle { text-align: center; font-family: sans-serif; color: var(--accent-gold); margin-bottom: 12px; font-weight: bold; letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.primary-constant-box { background: #000; border: 1px solid var(--accent-unified); padding: 2px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 8px; }
+.secondary-structure-box { background: rgba(59, 130, 246, 0.05); border: 1px dashed var(--accent-unified); padding: 3px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 12px; }
+
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(59, 130, 246, 0.05); border: 1px solid var(--accent-unified); padding: 5px; border-radius: 5px; margin-bottom: 8px; font-size: 0.7rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; }
+#plot-area { flex-grow: 1; width: 100%; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #fff; border: 1px solid var(--accent-unified); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer { width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem; color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 51 — MATTER FIELDS (FERMIONS)</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">Matter Fields (Fermions)</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">The population of symmetry representations.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-field);">
+<h2 style="color:var(--accent-field);">1. Matter as Field Content</h2>
+<p>Reality = Fields, not objects.<br>$\psi(x)$ as symmetry inhabitant.</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-family);">
+<h2 style="color:var(--accent-family);">2. Classification</h2>
+<p>Quarks vs. Leptons.<br>The two families of matter.</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-gen);">
+<h2 style="color:var(--accent-gen);">3. Generations</h2>
+<p>Replication Structure.<br>Three tiers of existence.</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-rep);">
+<h2 style="color:var(--accent-rep);">4. Representation</h2>
+<p>Transformation Rules.<br>Identity as Symmetry Behavior.</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-matter);">
+<h2 style="color:var(--accent-matter);">5. Complete Matter Content</h2>
+<p>The Standard Model Spectrum.<br>The non-random structure of being.</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-unified);">
+<h2 style="color:var(--accent-unified);">6. Stage 51 Summary</h2>
+<p>Matter is Symmetry-Structured Content.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vauxhnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color: var(--accent-blue); text-align: center; margin-top: 30px; border-bottom: 2px solid rgba(59, 130, 246, 0.3); padding-bottom: 10px;">STAGE 51 — MATHEMATICAL STRUCTURE</h2>
+<h3 style="color: #94a3b8; text-align: center; margin-bottom: 30px;">Matter Fields (Fermions): Population of Representations</h3>
+
+<div class="section" style="margin-bottom: 25px;">
+<h4 style="color: #fbbf24;">🔹 1. Fundamental Structure</h4>
+<p>Gauge group: $G = SU(3)_C \times SU(2)_L \times U(1)_Y$</p>
+<p>Fermion fields: $\psi^{R_\alpha}_i(x)$ where:
+<ul style="list-style-type: none;">
+<li>• $R_\alpha$: representation</li>
+<li>• $i = 1,2,3$: generation index</li>
+</ul></p>
+</div>
+
+<div class="section" style="margin-bottom: 25px;">
+<h4 style="color: #fbbf24;">🔹 2. Matter as Field Content</h4>
+<p>Quantum field expansion: $\psi(x) = \int \frac{d^3p}{(2\pi)^3} \sum_s \left( a_s(p) u_s(p) e^{-ipx} + b_s^\dagger(p) v_s(p) e^{ipx} \right)$</p>
+<p>👉 Matter = quantized excitation of fields</p>
+</div>
+
+<div class="section" style="margin-bottom: 25px;">
+<h4 style="color: #fbbf24;">🔹 3. Representation Structure</h4>
+<p>Each field transforms as: $\psi^{R_\alpha} \sim (R_C, R_L, Y)$</p>
+<p>Transformation law: $\psi(x) \rightarrow D_{R_\alpha}(U(x)) \psi(x)$</p>
+<p>👉 Identity defined by representation</p>
+</div>
+
+<div class="section" style="margin-bottom: 25px;">
+<h4 style="color: #fbbf24;">🔹 4. Classification (Families)</h4>
+<p>Partition of representations: $\mathcal{R} = \mathcal{R}_{\text{quark}} \cup \mathcal{R}_{\text{lepton}}$</p>
+<p>Condition: $R_C \neq 1 \Rightarrow \text{quark} \quad,\quad R_C = 1 \Rightarrow \text{lepton}$</p>
+</div>
+
+<div class="section" style="margin-bottom: 25px;">
+<h4 style="color: #fbbf24;">🔹 5. Generation Replication</h4>
+<p>$\psi^{R_\alpha}_i, \quad i = 1,2,3$</p>
+<p>Lagrangian: $\mathcal{L}_f = \sum_{\alpha}\sum_{i=1}^{3} \bar{\psi}^{R_\alpha}_i (i\gamma^\mu D_\mu - m_{\alpha i}) \psi^{R_\alpha}_i$</p>
+<p>👉 Identical symmetry, different masses</p>
+</div>
+
+<div class="section" style="margin-bottom: 25px;">
+<h4 style="color: #fbbf24;">🔹 6. Covariant Structure</h4>
+<p>$D_\mu = \partial_\mu + i g_s G_\mu^a T^a + i g W_\mu^i \tau^i + i g' B_\mu Y$</p>
+<p>👉 Interaction encoded via representation generators</p>
+</div>
+
+<div class="section" style="margin-bottom: 25px;">
+<h4 style="color: #fbbf24;">🔹 7. Charge Structure</h4>
+<p>Electric charge operator: $Q = T^3 + \frac{Y}{2}$</p>
+<p>Eigenvalue equation: $Q \psi = q \psi$</p>
+<p>👉 Observable charges from symmetry generators</p>
+</div>
+
+<div class="section" style="margin-bottom: 25px;">
+<h4 style="color: #fbbf24;">🔹 8. Complete Matter Spectrum</h4>
+<p>$\mathcal{M} = \bigoplus_{\alpha} \bigoplus_{i=1}^{3} \psi^{R_\alpha}_i$</p>
+<p>Explicitly: $\{u,d,c,s,t,b,e,\mu,\tau,\nu_e,\nu_\mu,\nu_\tau\}$</p>
+</div>
+
+<div class="section" style="margin-bottom: 25px;">
+<h4 style="color: #fbbf24;">🔹 9. Consistency Constraint</h4>
+<p>Anomaly cancellation: $\sum_{\alpha} Y = 0, \quad \sum_{\alpha} Y^3 = 0$</p>
+<p>👉 Only consistent representation sets are realized</p>
+</div>
+
+<div class="section" style="margin-bottom: 25px;">
+<h4 style="color: #fbbf24;">🔹 10. Structural Closure</h4>
+<p>Matter content satisfies: $\forall R_\alpha \in \mathcal{R}, \quad \exists \; \psi^{R_\alpha}_i$</p>
+<p>👉 Representation space is fully populated</p>
+</div>
+
+<div class="section" style="margin-bottom: 25px; text-align: center;">
+<h4 style="color: #fbbf24;">🔹 11. Structural Chain</h4>
+<p style="background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 8px; border: 1px solid var(--accent-blue); display: inline-block;">
+$\text{Symmetry} \rightarrow \text{Representation} \rightarrow \text{Field} \rightarrow \text{Quantized Excitation} \rightarrow \text{Particle} \rightarrow \text{Complete Matter Spectrum}$
+</p>
+</div>
+
+<div class="section" style="margin-bottom: 25px; text-align: center;">
+<h4 style="color: #fbbf24;">🔹 12. Final Mathematical Statement</h4>
+<p> Matter is the complete, anomaly-free, generation-replicated population of fermionic representations of the gauge group G</p>
+</div>
+
+<p style="text-align: center; font-style: italic; color: #94a3b8;">🔹 13. One-Line Compression: Matter is symmetry realized as a fully populated spectrum of quantized field representations.</p>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 40px 0;">
+
+<h2 style="color: #f472b6; text-align: center; margin-bottom: 10px;">CLOSURE / COMPLETION THEOREM</h2>
+<h3 style="color: #94a3b8; text-align: center; margin-bottom: 30px;">Matter Fields (Fermions): Structural Completion of the Spectrum</h3>
+
+<div class="section" style="margin-bottom: 25px; text-align: center;">
+<h4 style="color: #fbbf24;">🔹 1. Theorem Statement</h4>
+<p> According to this framework, the fermionic matter sector is fully determined as the complete, anomaly-free, generation-replicated population of all allowed representations of the gauge group G</p>
+</div>
+
+<div class="section" style="margin-bottom: 25px;">
+<h4 style="color: #fbbf24;">🔹 2. Formal Structure</h4>
+<p>Given: $G = SU(3)_C \times SU(2)_L \times U(1)_Y$</p>
+<p>Let: $\mathcal{R} = \{ R_\alpha \}$ be the set of all allowed fermionic representations satisfying consistency constraints.</p>
+<p>Then the matter content is: $\mathcal{M} = \bigoplus_{\alpha} \bigoplus_{i=1}^{3} \psi^{R_\alpha}_i$</p>
+</div>
+
+<div class="section" style="margin-bottom: 25px;">
+<h4 style="color: #fbbf24;">🔹 3. Conditions for Completion</h4>
+<p>The matter sector is structurally complete if and only if:
+<ul style="list-style-type: none;">
+<li><strong>(i) Representation Completeness:</strong> $\forall R_\alpha \in \mathcal{R}, \quad \exists \; \psi^{R_\alpha}_i$</li>
+<li><strong>(ii) Generation Replication:</strong> $i = 1,2,3 \quad \Rightarrow \quad \psi^{R_\alpha}_1,\; \psi^{R_\alpha}_2,\; \psi^{R_\alpha}_3$</li>
+<li><strong>(iii) Gauge Consistency (Anomaly Cancellation):</strong> $\sum_{\alpha} \text{Tr}\left[Y \{T^a, T^b\}\right] = 0, \quad \sum_{\alpha} Y^3 = 0$</li>
+<li><strong>(iv) Covariant Realization:</strong> $D_\mu \psi^{R_\alpha}_i$ is well-defined for all $(\alpha, i)$</li>
+</ul></p>
+</div>
+
+<div class="section" style="margin-bottom: 25px;">
+<h4 style="color: #fbbf24;">🔹 4. Proof Sketch (Structural)</h4>
+<ol style="color: #e2e8f0; line-height: 1.6;">
+<li>Gauge symmetry G fixes the allowed representations $\mathcal{R}$</li>
+<li>Representation theory defines transformation behavior: $\psi \rightarrow D_R(U)\psi$</li>
+<li>Quantum field construction yields fermionic fields: $\psi^{R_\alpha}_i(x)$</li>
+<li>Generation structure introduces replication index i</li>
+<li>Anomaly cancellation restricts admissible $\mathcal{R}$</li>
+<li>Physical realization requires population of all allowed states</li>
+</ol>
+<p style="text-align: center;">$\Rightarrow \mathcal{M} = \bigoplus_{\alpha,i} \psi^{R_\alpha}_i$</p>
+</div>
+
+<div class="section" style="margin-bottom: 25px;">
+<h4 style="color: #fbbf24;">🔹 5. Interpretation</h4>
+<p>• Matter is not an arbitrary collection of particles</p>
+<p>• Matter is not externally assigned content</p>
+<p style="text-align: center;">$\text{Matter} = \text{Realization of allowed symmetry representations}$</p>
+</div>
+
+<div class="section" style="margin-bottom: 25px;">
+<h4 style="color: #fbbf24;">🔹 6. Closure Property</h4>
+<p>No additional fermionic states are required if: $\mathcal{M} \text{ satisfies all symmetry and anomaly constraints} \Rightarrow \text{Matter sector is closed}$</p>
+</div>
+
+<div class="section" style="margin-bottom: 25px;">
+<h4 style="color: #fbbf24;">🔹 7. Minimality Statement</h4>
+<p>The realized spectrum is minimal if: $\text{Removing any } \psi^{R_\alpha}_i \Rightarrow \text{violation of consistency}$</p>
+</div>
+
+<div class="section" style="margin-bottom: 25px;">
+<h4 style="color: #fbbf24;">🔹 8. Structural Consequence</h4>
+<p>$\text{Symmetry structure} \Longrightarrow \text{Complete matter spectrum}$</p>
+<p>There is no independent freedom to choose matter content arbitrarily.</p>
+</div>
+
+<div class="section" style="margin-bottom: 25px; text-align: center;">
+<h4 style="color: #fbbf24;">🔹 9. Final Closure Statement</h4>
+<p> According to synthesis framework, matter is the fully populated, structurally necessary realization of fermionic representations of G, completing the matter sector</p>
+</div>
+
+<p style="text-align: center; font-style: italic; color: #94a3b8;">🔹 10. Conceptual Compression: Matter is not added to symmetry — it is the completion of symmetry.</p>
+
+<div class="section" style="margin-top: 30px; text-align: center; border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 20px;">
+<h4 style="color: #fbbf24;">🔹 11. Transition Statement</h4>
+<p>With the matter spectrum fully established: $\text{Next: Interaction emergence via gauge dynamics}$</p>
+</div>
+</div>
+
+</section>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div id="active-module-result" class="module-subtitle">--</div>
+<div class="primary-constant-box">
+<div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val">11.350</span></div>
+<div class="const-item"><span class="const-label">Synthesis P</span><span class="const-val">0.6900</span></div>
+</div>
+
+<div id="structure-box-area"></div>
+<div id="mapping-box-area"></div>
+
+<div class="diagnostic-panel">
+<span class="diag-title">Realization Telemetry</span>
+<div id="telemetry-area"></div>
+</div>
+
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-unified); font-size:0.75rem; cursor:pointer; padding:6px;">RESET FIELD</button>
+<div id="panel-footer-text" style="font-size: 0.75rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.3; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:8px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Symmetry Logic</span>
+<div id="metrics-content" style="font-size:0.65rem; font-family:monospace; line-height:1.3;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Structural Outcome</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.65rem; color: var(--text-dim); line-height: 1.4; background: #000; padding: 5px; border-radius: 0px; border: 1px solid #222; margin-top: auto;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "MATTER AS FIELD CONTENT",
+result: "Matter is structured excitation of fields",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Matter as Field Content — Particle Emergence</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Starting Point (Context from Previous Stage)</h3>
+<p>Stage 50 established: $$SU(3) \\times SU(2) \\times U(1) \\;\\longrightarrow\\; \\text{Gauge Structure of Reality}$$. Interactions, charges, and symmetry structure were fully defined. 👉 However, one essential question remains: <strong>What is it that carries these symmetries?</strong></p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Core Question of This Module</h3>
+<p><strong>What is matter, fundamentally?</strong> More precisely: What is a particle? What is the entity that carries charge and interaction? How does matter arise from field structure?</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Conceptual Development</h3>
+<p><strong>(A) Structural Setup:</strong> At this stage, gauge fields exist, symmetry structure is defined, and interaction rules are established. But: 👉 There is no content yet.</p>
+<p><strong>(B) Emergence Step:</strong> Matter is introduced as <strong>Field Content</strong>, not particles directly. 👉 Fundamental shift: $$\\text{Particle} \\;\\not=\\; \\text{fundamental}$$; $$\\text{Field} \\;\\text{is fundamental}$$.</p>
+<p><strong>(C) Quantization Step:</strong> Fields are not continuous classical entities. They are <strong>Quantized</strong>. This introduces discrete excitations, energy quanta, and observable particle states.</p>
+<p><strong>(D) Particle Emergence:</strong> A particle is defined as: <strong>Quantized excitation of a field mode</strong>. 👉 This is the central transformation: $$\\text{Field} \\;\\longrightarrow\\; \\text{Excitation} \\;\\longrightarrow\\; \\text{Particle}$$.</p>
+<p><strong>(E) Fermionic Nature:</strong> Matter fields are Spin = $$1/2$$ and obey Fermi–Dirac statistics. 👉 Therefore: $$\\text{Matter fields} = \\text{Fermionic fields}$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Key Structural Insight</h3>
+<p>$$\\text{Fields} \\;\\longrightarrow\\; \\text{Quantized excitations} \\;\\longrightarrow\\; \\text{Particles}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Mathematical Anchor (Light)</h3>
+<p>Field operator: $$\\psi(x)$$. Quantization: $$\\psi(x) \\;\\longrightarrow\\; \\hat{\\psi}(x)$$. Particle creation: $$a^\\dagger |0\\rangle = |1\\rangle$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Physical Interpretation</h3>
+<p>Matter is not a solid object; it is a localized excitation of an underlying field. Examples: Electron &rarr; excitation of electron field; Quark &rarr; excitation of quark field. 👉 Reality becomes: <strong>Field-based continuum with discrete excitations</strong>.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Graph Interpretation Paragraph (MANDATORY)</h3>
+<p>The graph represents field excitation over spacetime coordinates. Axes correspond to: X-axis (spacetime coordinate), Y-axis (internal field phase), and Z-axis (excitation amplitude). The flat surface represents the vacuum field (no excitation). Deviation from this surface represents excitation amplitude. 👉 The key insight: <strong>Particles correspond to localized deviations (peaks) in field amplitude</strong>. Thus, the graph visually demonstrates: $$\\text{Vacuum} \\;\\longrightarrow\\; \\text{Excitation} \\;\\longrightarrow\\; \\text{Particle}$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Role of This Module</h3>
+<p>This module introduces: Matter as field content, the Quantum nature of fields, and Particle as a derived entity. 👉 It provides the substance on which symmetry acts.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 9. WHAT THIS MODULE ACHIEVES (FINAL LINE)</h3>
+<p style="margin-bottom: 0;">👉 This module establishes: $$\\boxed{ \\text{Fields} \\;\\longrightarrow\\; \\text{quantized excitations} \\;\\longrightarrow\\; \\text{particles} }$$</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Ontological Shift:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\hat{\\Psi}(x) \\implies |n \\rangle$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The fundamental substrate of reality is the quantum field; particles are not primary objects but rather the discrete, quantized vibrational modes emerging from that underlying field continuum.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: Matter as Quantized Field Excitation</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Starting Mathematical Object</h3>
+<p>Begin with a fermionic field: $$\\psi(x)$$. Where: $$x = (t, \\mathbf{x})$$ is spacetime and $$\\psi$$ is a spinor field.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Core Definition</h3>
+<p>Promote the classical field to an operator: $$\\psi(x) \\;\\longrightarrow\\; \\hat{\\psi}(x)$$. This operator-valued field defines quantum field theory.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Key Construction / Quantization</h3>
+<p>Expand the field in momentum modes: $$\\hat{\\psi}(x) = \\sum_s \\int \\frac{d^3 p}{(2\\pi)^3} \\left[ a_s(p) u_s(p) e^{-ipx} + b_s^\\dagger(p) v_s(p) e^{ipx} \\right]$$. Where: $$a_s(p)$$ is the annihilation operator, $$b_s^\\dagger(p)$$ is the creation operator (antiparticles), and $$u_s, v_s$$ are the spinor solutions. 👉 The field decomposes into creation and annihilation modes.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Expanded Operator Structure</h3>
+<p>Operators satisfy anti-commutation relations: $$\\{ a_s(p), a_{s'}^\\dagger(p') \\} = (2\\pi)^3 \\delta^{(3)}(p - p') \\delta_{ss'}$$; $$\\{ b_s(p), b_{s'}^\\dagger(p') \\} = (2\\pi)^3 \\delta^{(3)}(p - p') \\delta_{ss'}$$; $$\\{a, a\\} = \\{b, b\\} = 0$$. 👉 Anti-commutation encodes fermionic statistics.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Special Case (Vacuum and Excitations)</h3>
+<p>Define vacuum state: $$a_s(p)|0\\rangle = 0, \\quad b_s(p)|0\\rangle = 0$$. Single-particle state: $$|p, s\\rangle = a_s^\\dagger(p) |0\\rangle$$. 👉 Particle = excitation above vacuum.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Transformation Property</h3>
+<p>Under gauge transformation: $$\\psi(x) \\;\\rightarrow\\; U(x)\\psi(x)$$. Operator transforms similarly: $$\\hat{\\psi}(x) \\;\\rightarrow\\; U(x)\\hat{\\psi}(x)$$. 👉 Ensures matter fields carry symmetry representation.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Physical Quantity Extraction</h3>
+<p>Number operator: $$N = \\int d^3 p \\; a_s^\\dagger(p) a_s(p)$$. Eigenvalue: $$N |n\\rangle = n |n\\rangle$$. 👉 Extracts particle number from field excitations.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Hamiltonian Structure</h3>
+<p>Energy operator: $$H = \\int d^3 p \\; E_p \\left( a_s^\\dagger(p)a_s(p) + b_s^\\dagger(p)b_s(p) \\right)$$. 👉 Energy is carried by excitation modes.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 9. Final Mathematical Statement (MANDATORY)</h3>
+<p style="margin-bottom: 0;">$$\\boxed{ \\text{Particles are eigenstates created by operator excitations of quantized fermionic fields} }$$</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Operator Realization:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\hat{\\psi}(x) |0\\rangle \\rightarrow |1\\text{ particle}\\rangle$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The mathematical transition from field to particle is rigorously completed by the second quantization of the spinor field, where particles are formally identified as localized, quantized excitations of the underlying field operator.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>EXCITATION LEVEL</span><input type="number" id="e_in" class="digital-entry" value="0" oninput="syncVal(this.value, 'e_sl')"></div><input type="range" id="e_sl" min="0" max="100" step="1" value="0" oninput="syncVal(this.value, 'e_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.8rem;">Particle = Quantized excitation of a field mode</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Reality is Field-Based Continuity</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Spin</span><span class="const-val">1/2</span></div><div class="const-item"><span class="const-label">Entity</span><span class="const-val">FERMION</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-field);">FIELD: QUANTIZED</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Symmetry Representation Space<br>↓<br>Field Operators<br>↓<br>Quantized Excitations (Particles)`,
+hierarchy: `<div style="color: var(--accent-field); font-weight: bold; font-size: 0.95rem;">Matter: Quantized field excitation</div>`,
+footer: "Reality is a series of overlapping fields, not a collection of voids.",
+rightNote: `<div style="color: #60a5fa; line-height: 1.3; margin-top: 8px; padding: 10px; font-size: 0.9rem;">Matter fields provide the substance for the symmetry to act upon.<p>👉 This Module Establishes:<br>Fields → quantized excitations → particles</p></div>`
+},
+
+2: {
+title: "CLASSIFICATION OF FERMIONS",
+result: "Quarks and Leptons: The two families",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Classification of Fermions — Quarks and Leptons</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Starting Point (Context from Previous Module)</h3>
+<p>Module 1 established: $$\\text{Fields} \\;\\longrightarrow\\; \\text{quantized excitations} \\;\\longrightarrow\\; \\text{particles}$$. Matter now exists as: Fermionic field excitations and Carriers of symmetry representation. 👉 However, all particles are not identical.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Core Question of This Module</h3>
+<p><strong>How is matter structurally classified?</strong> More precisely: Why are there different types of fermions? What distinguishes one matter field from another? What determines particle families?</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Conceptual Development</h3>
+<p><strong>(A) Structural Setup:</strong> From Stage 50: Gauge symmetry exists: $$SU(3) \\times SU(2) \\times U(1)$$. Matter fields carry representations of this symmetry. 👉 Therefore, each field has interaction properties.</p>
+<p><strong>(B) Classification Principle:</strong> Matter is classified by <strong>Interaction capacity</strong>, not by mass or size. 👉 Fundamental rule: $$\\text{What a particle interacts with} \\;\\longrightarrow\\; \\text{what it is}$$.</p>
+<p><strong>(C) Strong Interaction as Divider:</strong> Key structural distinction: $$SU(3)_C \\quad (\\text{Color Charge})$$. Two possibilities: Carries color charge &rarr; interacts strongly; Does not carry color &rarr; no strong interaction.</p>
+<p><strong>(D) Emergence of Two Families:</strong> This leads to bifurcation: $$\\text{Fermions} \\;\\longrightarrow\\; \\begin{cases} \\text{Quarks} & (\\text{Strong + Weak + EM}) \\\\ \\text{Leptons} & (\\text{Weak + EM only}) \\end{cases}$$. 👉 This is not arbitrary &mdash; it is representation-based.</p>
+<p><strong>(E) Representation Structure:</strong> Quarks: $$\\psi_q \\sim (3, \\cdot, \\cdot)$$. Leptons: $$\\psi_l \\sim (1, \\cdot, \\cdot)$$. 👉 Difference arises from: $$SU(3)_C \\text{ representation}$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Key Structural Insight</h3>
+<p>$$\\text{Gauge representation} \\;\\longrightarrow\\; \\text{interaction capacity} \\;\\longrightarrow\\; \\text{matter classification}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Mathematical Anchor (Light)</h3>
+<p>Color charge operator: $$T^a_C$$. Condition: $$T^a_C \\psi = 0 \\;\\Rightarrow\\; \\text{Lepton}$$; $$T^a_C \\psi \\neq 0 \\;\\Rightarrow\\; \\text{Quark}$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Physical Interpretation</h3>
+<p><strong>Quarks:</strong> Participate in strong interaction, confined inside hadrons. <strong>Leptons:</strong> Do not feel strong force, exist freely (e.g., electron, neutrino). 👉 Observable distinction emerges from symmetry structure.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Graph Interpretation Paragraph (MANDATORY)</h3>
+<p>The graph represents fermion classification in representation space. Axes correspond to: X-axis (interaction domain: Strong &rarr; None), Y-axis (symmetry branching: representation separation), and Z-axis (representation index). Points on one side correspond to quarks (non-zero color charge). Points on the other correspond to leptons (zero color charge). 👉 The spatial separation in the graph reflects: <strong>Presence or absence of SU(3) charge</strong>. Thus, the visualization shows matter branching from symmetry structure.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Role of This Module</h3>
+<p>This module establishes: First structural classification of matter, Connection between symmetry and particle identity, and Foundation for all fermion families. 👉 It introduces matter differentiation.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 9. WHAT THIS MODULE ACHIEVES (FINAL LINE)</h3>
+<p style="margin-bottom: 0;">👉 This module establishes: $$\\boxed{ \\text{Gauge representation} \\;\\longrightarrow\\; \\text{interaction capacity} \\;\\longrightarrow\\; \\text{matter classification} }$$</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Symmetry Branching:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\text{Rep}_{SU(3)} \\in \\{ \\mathbf{3}, \\mathbf{1} \\}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The bifurcation of matter into quarks and leptons is the direct physical manifestation of the field's representation under the color symmetry group, defining the fundamental interaction topology of the universe.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: Fermion Classification via Gauge Representation</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Starting Mathematical Object</h3>
+<p>Gauge group: $$G = SU(3)_C \\times SU(2)_L \\times U(1)_Y$$. Fermion field: $$\\psi(x)$$ assigned to a representation: $$\\psi \\sim (R_C, R_L, Y)$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Core Definition</h3>
+<p>Generators act on the field as: $$T^a_C \\psi = T^a_{(R_C)} \\psi$$; $$T^i_L \\psi = T^i_{(R_L)} \\psi$$; $$Y \\psi = y \\psi$$. 👉 Representation determines interaction properties.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Key Construction / Classification Rule</h3>
+<p>Strong interaction coupling arises from covariant derivative term: $$D_\\mu \\psi = \\partial_\\mu \\psi + i g_3 G_\\mu^a T^a_C \\psi + i g_2 W_\\mu^i T^i_L \\psi + i g_1 B_\\mu Y \\psi$$. Classification condition: $$T^a_C \\psi = 0 \\;\\Rightarrow\\; \\text{No strong interaction}$$; $$T^a_C \\psi \\neq 0 \\;\\Rightarrow\\; \\text{Strong interaction present}$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Expanded Representation Structure</h3>
+<p><strong>Quarks:</strong> $$\\psi_q \\sim (3, R_L, Y)$$. Generators: $$T^a_C \\neq 0$$. Thus: $$D_\\mu \\psi_q \\supset i g_3 G_\\mu^a T^a_C \\psi_q$$.</p>
+<p><strong>Leptons:</strong> $$\\psi_l \\sim (1, R_L, Y)$$. Trivial representation: $$T^a_C = 0$$. Thus: $$D_\\mu \\psi_l \\not\\supset g_3 G_\\mu^a$$. 👉 No coupling to gluon field.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Special Case (Trivial Representation)</h3>
+<p>For singlet representation: $$R_C = 1$$. Then: $$T^a_C = 0 \\quad \\forall a$$. 👉 Completely decoupled from strong interaction.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Transformation Property</h3>
+<p>Under gauge transformation: $$\\psi \\rightarrow U_C(x)\\,U_L(x)\\,U_Y(x)\\,\\psi$$. For quarks: $$U_C(x) \\neq 1$$. For leptons: $$U_C(x) = 1$$. 👉 Leptons are invariant under $$SU(3)_C$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Physical Quantity Extraction</h3>
+<p>Strong interaction current: $$J^\\mu_a = \\bar{\\psi} \\gamma^\\mu T^a_C \\psi$$. For quarks: $$J^\\mu_a \\neq 0$$. For leptons: $$J^\\mu_a = 0$$. 👉 Current determines interaction presence.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Final Mathematical Statement (MANDATORY)</h3>
+<p> Fermion classification is determined by the representation of $SU(3)_C$ with trivial representation yielding leptons and non-trivial representation yielding quarks.</p>
+
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Representation-Based Differentiation:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\text{Tr}(T^a T^b) \\neq 0 \\iff \\text{Quark Field}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The mathematical identity of matter is strictly defined by the trace of its generator representations, where the vanishing of the color-charge operator rigorously isolates the leptonic sector from the hadronic continuum.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>FAMILY SORTING</span><input type="number" id="f_in" class="digital-entry" value="0" oninput="syncVal(this.value, 'f_sl')"></div><input type="range" id="f_sl" min="0" max="100" step="1" value="0" oninput="syncVal(this.value, 'f_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">SORTING RULE</span><div style="text-align:center; font-size: 0.8rem;">Color charge ≠ 0 → Quarks<br>Color charge = 0 → Leptons</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.8rem; color: var(--accent-gold);">Families are defined by Interaction Capacity</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Type</span><span class="const-val">DICHOTOMIC</span></div><div class="const-item"><span class="const-label">Entity</span><span class="const-val">FAMILIES</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-family);">FAMILIES: REPRESENTATION-DERIVED</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Gauge Representation<br>↓<br>Color Charge (SU(3))<br>↓<br>Quark/Lepton Classification`,
+hierarchy: `<div style="color: var(--accent-family); font-weight: bold; font-size: 0.95rem;">Structure: Matter Branching</div>`,
+footer: "Nature divides matter based on its ability to 'feel' the forces.",
+rightNote: `<div style="color: #f87171; line-height: 1.3; margin-top: 8px; padding: 10px; font-size: 0.9rem;">Electrons and Neutrinos are the light inhabitants; Quarks are the heavy core.<p>👉 This Module Establishes:<br>Gauge charge → matter classification</p></div>`
+},
+
+3: {
+title: "GENERATIONS (REPLICATION)",
+result: "Nature uses replication with variation",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Generations of Fermions — Triadic Replication</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Starting Point (Context from Previous Module)</h3>
+<p>Module 2 established: $$\\text{Gauge representation} \\;\\longrightarrow\\; \\text{interaction capacity} \\;\\longrightarrow\\; \\text{matter classification}$$. Matter is now divided into: Quarks (with strong interaction) and Leptons (without strong interaction). 👉 However, classification alone is incomplete.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Core Question of This Module</h3>
+<p><strong>Why does matter appear in multiple generations?</strong> More precisely: Why are there three copies of fermions? Why do particles repeat with different masses? What is the structural origin of generations?</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Conceptual Development</h3>
+<p><strong>(A) Structural Setup:</strong> At this stage, fermion types are defined (quarks and leptons) and gauge representations are fixed. 👉 Yet, observation shows: <strong>Replication of identical structures</strong>.</p>
+<p><strong>(B) Observation of Generations:</strong> Empirically: $$\\text{Fermions} \\;\\longrightarrow\\; 3 \\text{ generations}$$. Each generation contains: Same interaction properties and Same symmetry representation.</p>
+<p><strong>(C) Variation Across Generations:</strong> Key distinction: $$\\text{Symmetry structure} = \\text{identical}$$; $$\\text{Mass spectrum} = \\text{different}$$. 👉 Therefore: $$\\text{Generation} = \\text{Replication + Variation}$$.</p>
+<p><strong>(D) Structural Interpretation:</strong> This implies that representation space remains unchanged, while only the parameter (mass scale) varies. 👉 Replication is not arbitrary duplication, but structured repetition.</p>
+<p><strong>(E) Triadic Pattern:</strong> Observed structure: Generation 1, Generation 2, Generation 3. 👉 No additional stable generations are observed. This leads to: <strong>Finite replication structure (triadic)</strong>.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Key Structural Insight</h3>
+<p>$$\\text{Identical symmetry structure} \\;\\longrightarrow\\; \\text{replicated matter hierarchy}$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Mathematical Anchor (Light)</h3>
+<p>Field labeling: $$\\psi_i, \\quad i = 1,2,3$$. Mass hierarchy: $$m_1 < m_2 < m_3$$. Representation: $$\\psi_i \\sim (R_C, R_L, Y) \\quad \\forall i$$. 👉 Same symmetry, different parameters.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Physical Interpretation</h3>
+<p><strong>First generation:</strong> Lightest and stable (dominates visible matter). <strong>Higher generations:</strong> Heavier and unstable (decay to lower generations). 👉 Observable universe is primarily: <strong>First generation matter</strong>.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Graph Interpretation Paragraph (MANDATORY)</h3>
+<p>The graph represents generation replication in parameter space. Axes correspond to: X-axis (replication index / generation number), Y-axis (symmetry invariance: constant across generations), and Z-axis (mass scale: increasing across generations). Points align vertically in symmetry dimension, indicating identical structure. They separate along mass axis, showing variation. 👉 The visualization demonstrates: <strong>Constant symmetry + varying mass &rarr; generation hierarchy</strong>.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Role of This Module</h3>
+<p>This module introduces: Replication structure of matter, Separation of symmetry and parameter variation, and Basis of fermion hierarchy. 👉 It explains why matter appears in multiple layers.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 9. WHAT THIS MODULE ACHIEVES (FINAL LINE)</h3>
+<p style="margin-bottom: 0;">👉 This module establishes: $$\\boxed{ \\text{Symmetry structure} \\;\\longrightarrow\\; \\text{replication into matter generations} }$$</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Hierarchical Symmetry:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\Psi = \\{ \\psi_1, \\psi_2, \\psi_3 \\}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The triadic replication of matter confirms that the underlying symmetry structure is preserved across distinct energy scales, manifesting as a mass-dependent hierarchy that defines the layered complexity of physical reality.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: Fermion Generations as Replicated Representations</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Starting Mathematical Object</h3>
+<p>Gauge group: $$G = SU(3)_C \\times SU(2)_L \\times U(1)_Y$$. Fermion fields labeled by generation index: $$\\psi_i(x), \\quad i = 1,2,3$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Core Definition</h3>
+<p>Each generation transforms under the same representation: $$\\psi_i \\sim (R_C, R_L, Y) \\quad \\forall i$$. 👉 Generations are identical in symmetry structure.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Key Construction / Replication Structure</h3>
+<p>The fermionic Lagrangian: $$\\mathcal{L}_f = \\sum_{i=1}^{3} \\bar{\\psi}_i \\left(i \\gamma^\\mu D_\\mu - m_i \\right)\\psi_i$$. Where: $$D_\\mu$$ is the same covariant derivative for all $$i$$, and $$m_i$$ is the generation-dependent mass. 👉 Replication appears as a sum over identical field structures.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Expanded Structure (Mass Variation)</h3>
+<p>Mass hierarchy: $$m_1 < m_2 < m_3$$. Explicitly: $$\\mathcal{L}_f = \\bar{\\psi}_1 (i\\gamma^\\mu D_\\mu - m_1)\\psi_1 + \\bar{\\psi}_2 (i\\gamma^\\mu D_\\mu - m_2)\\psi_2 + \\bar{\\psi}_3 (i\\gamma^\\mu D_\\mu - m_3)\\psi_3$$. 👉 Only the mass term differentiates generations.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Special Case (Degenerate Limit)</h3>
+<p>If $$m_1 = m_2 = m_3$$, then: $$\\mathcal{L}_f = \\sum_i \\bar{\\psi}_i (i\\gamma^\\mu D_\\mu - m)\\psi_i$$. 👉 Generations become indistinguishable.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Transformation Property</h3>
+<p>Under gauge transformation: $$\\psi_i(x) \\rightarrow U(x)\\psi_i(x)$$ for all $$i$$, where $$U(x) \\in SU(3)_C \\times SU(2)_L \\times U(1)_Y$$. 👉 All generations transform identically.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Physical Quantity Extraction</h3>
+<p>Number operator per generation: $$N_i = \\int d^3p \\; a_i^\\dagger(p) a_i(p)$$. Total particle number: $$N = \\sum_{i=1}^{3} N_i$$. 👉 Each generation contributes independently.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Mixing Structure (Minimal Form)</h3>
+<p>General basis transformation: $$\\psi_i \\rightarrow U_{ij}\\psi_j$$, where $$U \\in U(3)$$. 👉 Mixing arises from basis rotations between generations.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 9. Final Mathematical Statement</h3>
+<p> Fermion generations are replicated copies of identical gauge representations, distinguished only by mass parameters and related mixing structures.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Symmetry Invariance:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\delta_{ij} \\mathcal{L}_{kin} \\implies \\text{Flavor Symmetry}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The mathematical consistency of the three generations rests upon the invariance of the kinetic term under unitary transformations, while the structural differentiation is uniquely isolated within the mass matrix eigenvalues.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>GENERATION (1-3)</span><input type="number" id="g_in" class="digital-entry" value="1" oninput="syncVal(this.value, 'g_sl')"></div><input type="range" id="g_sl" min="1" max="3" step="1" value="1" oninput="syncVal(this.value, 'g_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">REPLICATION RULE</span><div style="text-align:center; font-size: 0.8rem;">Symmetry structure = identical<br>Mass spectrum = generation-dependent (derived variation)</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">Existence repeats in three octaves</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Count</span><span class="const-val">3</span></div><div class="const-item"><span class="const-label">Entity</span><span class="const-val">REPLICATION</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-gen);">GENERATIONS: TRIPLED</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Structural Seed (Underlying Symmetry Structure)<br>↓<br>Replicated Field Structure (Structurally Derived in this framework)<br>↓<br>Generation Hierarchy (Observed)`,
+hierarchy: `<div style="color: var(--accent-gen); font-weight: bold; margin-bottom: 2px; font-size: 1.00rem;">Pattern: Triadic Replication</div>`,
+footer: "Most of the visible universe is made only of the first generation.",
+rightNote: `<div style="color: #fbbf24; line-height: 1.3; margin-top: 5px; padding: 5px; font-size: 0.8rem;">The origin of three generations is not explained in the Standard Model, but emerges as a structural consequence in this framework.<p>👉 This Module Establishes:<br>Symmetry structure → replication into matter generations</p></div>`
+},
+
+4: {
+title: "REPRESENTATION UNDER SYMMETRY",
+result: "Identity is defined by symmetry transformation",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing : Representation Under Symmetry (Particle Identity)</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Core Principle</h3>
+<p>Particle identity is not an intrinsic label but is defined through how a field transforms under symmetry. A particle corresponds to a representation of the gauge group: $$G = SU(3)_C \\times SU(2)_L \\times U(1)_Y$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Structural Idea</h3>
+<p>Each fermion field belongs to a representation space: $$\\psi \\in \\mathcal{H}_R$$, where: $$R = (R_C, R_L, Y)$$. 👉 The tuple $$(R_C, R_L, Y)$$ defines the identity.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Transformation-Based Identity</h3>
+<p>Under a gauge transformation: $$\\psi(x) \\rightarrow U(x)\\psi(x), \\quad U(x) \\in G$$. The transformation law itself defines what the particle is. 👉 Identity = transformation behavior.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Mapping to Physical Particles</h3>
+<p>Examples: <strong>Electron:</strong> $$(1,2,-\\tfrac{1}{2}) \\oplus (1,1,-1)$$. <strong>Up quark:</strong> $$(3,2,+\\tfrac{1}{6})$$. <strong>Down quark:</strong> $$(3,2,+\\tfrac{1}{6})$$. 👉 Same structure &rarr; same identity class; Different representation &rarr; different particle.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Representation Space Interpretation</h3>
+<p>A field is not a point object but a vector in representation space: $$\\psi = \\begin{pmatrix} \\psi_1 \\\\ \\psi_2 \\\\ \\vdots \\end{pmatrix}$$. Symmetry operations rotate this vector. 👉 Identity persists through transformation.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Observable Meaning</h3>
+<p>Physical observables correspond to invariant quantities: $$\\mathcal{O} = \\bar{\\psi}\\psi, \\quad \\bar{\\psi}\\gamma^\\mu\\psi$$. These remain invariant under: $$\\psi \\rightarrow U\\psi$$. 👉 Observations reflect symmetry-invariant content.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Conceptual Clarification</h3>
+<p>Identity is not position-based. Identity is not substance-based. Identity is representation-based. 👉 Particle = carrier of symmetry representation.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Graph Interpretation Paragraph</h3>
+<p>The visualization shows a continuous trajectory in representation space under symmetry transformations. Axes correspond to components of internal symmetry space (e.g., SU(2), SU(3), U(1)). The curve represents continuous transformation under group action. The same curve does not change identity, only its state within representation space. 👉 The graph illustrates that identity is preserved under transformation while state evolves.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 9. Structural Conclusion</h3>
+<p>Gauge group G &rarr; Representation R &rarr; Field transformation behavior &rarr; Particle identity.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 10. Final Establishment</h3>
+<p>👉 This Module Establishes: $$\\boxed{ \\text{Symmetry representation} \\;\\longrightarrow\\; \\text{particle identity} }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 11. One-Line Compression</h3>
+<p style="margin-bottom: 0;">A particle is the representation through which symmetry acts.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Identity Vector:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\mathbf{I} \\in \\text{Rep}(G)$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The fundamental identity of any particle species is rigorously defined by its position within the representation space of the total gauge group, ensuring that physical properties are emergent consequences of geometric symmetry constraints.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: Representation as Particle Identity</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Starting Mathematical Object</h3>
+<p>Gauge group: $$G = SU(3)_C \\times SU(2)_L \\times U(1)_Y$$. Fermion field: $$\\psi(x)$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Core Definition</h3>
+<p>A particle is defined by a representation R of G: $$\\psi \\sim R = (R_C, R_L, Y)$$. 👉 Representation labels define identity.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Transformation Law</h3>
+<p>Under local gauge transformation: $$\\psi(x) \\rightarrow U(x)\\psi(x), \\quad U(x) \\in G$$. Decomposed: $$U(x) = U_C(x)\\, U_L(x)\\, e^{i \\alpha(x) Y}$$. Where: $$U_C \\in SU(3)_C$$, $$U_L \\in SU(2)_L$$, and $$Y$$ is the hypercharge generator.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Representation Action</h3>
+<p>Field transforms according to its representation matrices: $$\\psi(x) \\rightarrow D_R(U(x))\\,\\psi(x)$$. Where: $$D_R: G \\rightarrow GL(n)$$. 👉 Representation map defines transformation behavior.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Covariant Derivative (Structure Encoding)</h3>
+<p>$$D_\\mu = \\partial_\\mu + i g_s G_\\mu^a T^a + i g W_\\mu^i \\tau^i + i g' B_\\mu Y$$. Where generators act in representation R: $$T^a, \\; \\tau^i, \\; Y$$. 👉 Identity encoded in generator action.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Fermion Lagrangian</h3>
+<p>$$\\mathcal{L}_f = \\bar{\\psi}(i \\gamma^\\mu D_\\mu - m)\\psi$$. Gauge invariance requires: $$\\mathcal{L}_f$$ invariant under $$\\psi \\rightarrow D_R(U)\\psi$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Generator Eigenstructure</h3>
+<p>Charges arise as eigenvalues: $$Y \\psi = y \\psi$$; $$T^3 \\psi = t^3 \\psi$$. 👉 Eigenvalues define observable identity components.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Example Representations</h3>
+<p><strong>Left-handed lepton doublet:</strong> $$\\psi_L = \\begin{pmatrix} \\nu_L \\\\ e_L \\end{pmatrix} \\sim (1,2,-\\tfrac{1}{2})$$. <strong>Right-handed electron:</strong> $$e_R \\sim (1,1,-1)$$. 👉 Different representations &rarr; different identities.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 9. Representation Space Structure</h3>
+<p>State space: $$\\psi \\in \\mathbb{C}^n$$. Transformation: $$\\psi \\rightarrow D_R(U)\\psi$$. Invariant norm: $$\\bar{\\psi}\\psi = \\psi^\\dagger \\gamma^0 \\psi$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 10. Invariant Quantities</h3>
+<p>Observables must satisfy: $$\\mathcal{O}(\\psi) = \\mathcal{O}(D_R(U)\\psi)$$. Examples: $$\\bar{\\psi}\\psi, \\quad \\bar{\\psi}\\gamma^\\mu \\psi$$. 👉 Physical quantities are representation-invariant.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 11. Special Case (Trivial Representation)</h3>
+<p>If $$R = \\text{trivial}$$, then $$D_R(U) = 1$$ and $$\\psi \\rightarrow \\psi$$. 👉 No interaction &rarr; symmetry singlet.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 12. Final Mathematical Statement</h3>
+<p style="margin-bottom: 0;">$$\\boxed{ \\text{Particle identity is fully specified by the representation } R \\text{ under the gauge group } G }$$</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Transformation Geometry:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$D_R(G) \\cong \\text{Particle Species}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The mathematical isomorphism between group representations and physical particle species provides the definitive structural mapping of the universe, where the internal geometry of symmetry transformations dictates the entire taxonomy of matter.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>TRANSFORMATION</span><input type="number" id="r_in" class="digital-entry" value="0" oninput="syncVal(this.value, 'r_sl')"></div><input type="range" id="r_sl" min="0" max="100" step="1" value="0" oninput="syncVal(this.value, 'r_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">IDENTITY RULE</span><div style="text-align:center; font-size: 0.8rem;">Particle = Representation of symmetry group</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">To exist is to transform</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Label</span><span class="const-val">REP (Representation)</span></div><div class="const-item"><span class="const-label">Entity</span><span class="const-val">IDENTITY</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-rep);">REPRESENTATION: ASSIGNED</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.9rem;">Gauge Group G<br>↓<br>Representation of G<br>↓<br>Physical State Identity`,
+hierarchy: `<div style="color: var(--accent-rep); font-weight: bold; font-size: 0.95rem;">Identity: Representation of symmetry</div>`,
+footer: "Without symmetry, there is no way to define what a particle is.",
+rightNote: `<div style="color: #c084fc; line-height: 1.3; margin-top: 8px; padding: 10px; font-size: 0.9rem;">Physical observations correspond to transformation behavior under symmetry.<p>👉 This Module Establishes:<br>Symmetry representation → particle identity</p></div>`
+},
+
+5: {
+title: "COMPLETE MATTER CONTENT",
+result: "The structured spectrum of reality",
+resultSize: "0.85rem",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing : Complete Matter Content (Populated Spectrum)</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Core Principle</h3>
+<p>Matter is not arbitrary; it is the complete realization of all allowed symmetry representations under the gauge structure: $$G = SU(3)_C \\times SU(2)_L \\times U(1)_Y$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Structural Idea</h3>
+<p>Once symmetry is fixed (Stage 50), representations are defined (Module 4), and generations are replicated (Module 3), then: 👉 <strong>The full matter spectrum emerges as a populated set of representation states.</strong></p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Mathematical Content of Matter</h3>
+<p>Matter fields: $$\{\\psi_i^R\}, \\quad i = 1,2,3$$. Where $$R$$ is the allowed representation and $$i$$ is the generation index. Total matter content: $$\\mathcal{M} = \\bigcup_{R} \\bigcup_{i=1}^{3} \\psi_i^R$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Spectrum Completion</h3>
+<p>For each representation $$R \\in \\{ \\text{quarks, leptons} \\}$$, all corresponding states are populated: $$\\text{Matter Spectrum} = \\text{All allowed } (R, i)$$. 👉 No partial realization &mdash; structure is filled.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Interpretation of “Populated”</h3>
+<p>“Populated” means: Each allowed representation exists physically, each generation is realized, and each charge configuration appears in nature. 👉 Symmetry slots &rarr; physically occupied states.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Observable Structure</h3>
+<p>Matter spectrum includes: Quarks (color triplets), Leptons (color singlets), and Three generations. Observable set: $$\{u,d,c,s,t,b,e,\\mu,\\tau,\\nu_e,\\nu_\\mu,\\nu_\\tau\}$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Structural Constraint</h3>
+<p>Not all mathematically possible representations appear. Only consistent and anomaly-free sets are realized: $$\\sum \\text{anomalies} = 0$$. 👉 Physical spectrum is constrained, not arbitrary.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Graph Interpretation Paragraph</h3>
+<p>The visualization shows a discrete set of points distributed across representation space. Axes correspond to internal symmetry coordinates (representation labels, generation depth). Each point represents a realized fermion state. Vertical separation reflects generation hierarchy, while horizontal spread reflects different representation types (quarks vs leptons). 👉 The graph illustrates that matter is a structured population of allowed symmetry states, not a continuous or random distribution.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 9. Conceptual Clarification</h3>
+<p>Matter is not independently created entities. Matter is not arbitrary particle listing. Matter is the filled structure of symmetry possibilities. 👉 Reality = occupied representation space.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 10. Structural Flow</h3>
+<p>Symmetry structure &rarr; Allowed representations &rarr; Generation replication &rarr; Spectrum population &rarr; Physical matter content.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 11. Final Establishment</h3>
+<p>👉 This Module Establishes: $$\\boxed{ \\text{Symmetry structure} \\;\\longrightarrow\\; \\text{populated matter spectrum} }$$</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 12. One-Line Compression</h3>
+<p style="margin-bottom: 0;">Matter is the complete population of allowed symmetry representations.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Spectrum Realization:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\mathcal{M} = \\bigoplus_{R, i} \\psi_i^R$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The transition to a populated spectrum marks the definitive instantiation of the symmetry framework into physical reality, where every consistent representation of the gauge group is necessarily realized as a distinct matter species within the triadic generation structure.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematics: Complete Matter Spectrum (Population of Representations)</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #fbbf24; margin-bottom: 10px;">🔹 1. Starting Mathematical Object</h3>
+<p>Gauge group: $$G = SU(3)_C \\times SU(2)_L \\times U(1)_Y$$. Set of allowed fermion representations: $$\\mathcal{R} = \\{ R_\\alpha \\}$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 2. Core Definition</h3>
+<p>Matter fields are indexed by representation and generation: $$\\psi^{R_\\alpha}_i(x), \\quad i = 1,2,3$$. 👉 Full matter content is a double-indexed set.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 3. Total Matter Spectrum</h3>
+<p>$$\\mathcal{M} = \\bigoplus_{\\alpha} \\; \\bigoplus_{i=1}^{3} \\psi^{R_\\alpha}_i$$. 👉 Direct sum over representations and generations.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 4. Explicit Representation Set (Standard Model)</h3>
+<p>$$\\mathcal{R} = \\left\\{ (3,2,+\\tfrac{1}{6}), (3,1,+\\tfrac{2}{3}), (3,1,-\\tfrac{1}{3}), (1,2,-\\tfrac{1}{2}), (1,1,-1) \\right\\}$$. (Optional inclusion: $$(1,1,0)$$ &mdash; right-handed neutrino, if present).</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 5. Generation Replication</h3>
+<p>For each $$R_\\alpha$$: $$\\psi^{R_\\alpha}_1,\\; \\psi^{R_\\alpha}_2,\\; \\psi^{R_\\alpha}_3$$. 👉 Identical representation, different mass eigenstates.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 6. Fermionic Lagrangian (Complete Spectrum)</h3>
+<p>$$\\mathcal{L}_f = \\sum_{\\alpha} \\sum_{i=1}^{3} \\bar{\\psi}^{R_\\alpha}_i \\left(i \\gamma^\\mu D_\\mu - m_{\\alpha i}\\right) \\psi^{R_\\alpha}_i$$. 👉 Mass matrix distinguishes states.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 7. Covariant Derivative (Representation-Dependent)</h3>
+<p>$$D_\\mu = \\partial_\\mu + i g_s G_\\mu^a T^a_{(R_\\alpha)} + i g W_\\mu^i \\tau^i_{(R_\\alpha)} + i g' B_\\mu Y_{(R_\\alpha)}$$. 👉 Generators depend on representation $$R_\\alpha$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 8. Anomaly Cancellation Constraint</h3>
+<p>Consistency condition: $$\\sum_{\\alpha} \\text{Tr}\\left[ Y \\{T^a, T^b\\} \\right] = 0$$; $$\\sum_{\\alpha} Y^3 = 0$$. 👉 Only anomaly-free representation sets are allowed.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 9. Charge Extraction</h3>
+<p>Electric charge operator: $$Q = T^3 + \\frac{Y}{2}$$. Eigenvalue relation: $$Q \\psi = q \\psi$$. 👉 Observed particle charges derived from representation.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 10. Spectrum Completeness Condition</h3>
+<p>All allowed states: $$\\forall R_\\alpha \\in \\mathcal{R}, \\quad \\exists \\; \\psi^{R_\\alpha}_i$$. 👉 No missing representations in the realized spectrum.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 11. Number Operator (Population)</h3>
+<p>$$N_{\\alpha i} = \\int d^3p \\; a^\\dagger_{\\alpha i}(p) a_{\\alpha i}(p)$$. Total matter population: $$N = \\sum_{\\alpha} \\sum_{i=1}^{3} N_{\\alpha i}$$.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 12. Special Case (Incomplete Spectrum)</h3>
+<p>If $$\\exists R_\\alpha$$ such that no $$\\psi^{R_\\alpha}_i$$: 👉 Spectrum incomplete &rarr; structural inconsistency.</p>
+
+<h3 style="color: #fbbf24; margin-top: 15px; margin-bottom: 10px;">🔹 13. Final Mathematical Statement</h3>
+<p> The matter content is the complete, anomaly-free direct sum of all allowed fermionic representations of G, replicated across generations.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #fbbf24; font-size: 1.2rem; margin-bottom: 10px;">Structural Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Populated Direct Sum:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\mathcal{M} = \\bigoplus_{\\text{anomaly-free}} \\mathbf{R}_i$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The mathematical completion of the matter spectrum signifies the transition from potential to actual content, where the direct sum of all anomaly-free representations provides the definitive inventory of the physical universe.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>MANIFESTATION (%)</span><input type="number" id="m_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'm_sl')"></div><input type="range" id="m_sl" min="0" max="100" step="1" value="100" oninput="syncVal(this.value, 'm_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">SYNTHESIS CONCLUSION</span><div style="text-align:center; font-size: 0.8rem;">Matter = Realization of allowed symmetry states</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">GOLDEN AXIOM</span><div style="text-align:center; font-size: 0.9rem; color: var(--accent-gold);">Nothing is arbitrary in the Unified Field</div>`,
+structure: `<div class="secondary-structure-box"><div class="const-item"><span class="const-label">Status</span><span class="const-val">POPULATED</span></div><div class="const-item"><span class="const-label">Group</span><span class="const-val">SM-COMPLETE</span></div></div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.85rem; color:var(--accent-matter);">SPECTRUM: REALIZED</span>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.9rem;">Symmetry Structure<br>↓<br>Field Population<br>↓<br>Physical Matter Content`,
+hierarchy: `<div style="color: var(--accent-matter); font-weight: bold; font-size: 1.00rem;">Reality: Populated symmetry structure</div>`,
+footer: "The universe is a structured population of its internal symmetry.",
+rightNote: `<div style="color: var(--accent-gold); line-height: 1.3; margin-top: 8px; padding: 10px; font-size: 0.85rem;">The matter spectrum is now populated. The next question is: how do interactions arise?<p>👉 This Module Establishes:<br>Symmetry structure → populated matter spectrum</p></div>`
+}
+};
+
+function syncVal(val, id) {
+const sliderId = id.includes('_in') ? id.replace('_in', '_sl') : id;
+const inputId = id.includes('_sl') ? id.replace('_sl', '_in') : id;
+if(document.getElementById(sliderId)) document.getElementById(sliderId).value = val;
+if(document.getElementById(inputId)) document.getElementById(inputId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+document.getElementById('brief-box-content').innerHTML = content.brief;
+document.getElementById('math-box-content').innerHTML = content.math;
+document.getElementById('control-sliders').innerHTML = content.sliders;
+
+document.getElementById('active-module-title').innerText = content.title;
+const resultEl = document.getElementById('active-module-result');
+resultEl.innerText = content.result;
+resultEl.style.fontSize = content.resultSize || "0.65rem";
+
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('metrics-content').innerHTML = content.metricsContent;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+document.getElementById('structure-box-area').innerHTML = content.structure;
+document.getElementById('telemetry-area').innerHTML = content.telemetry;
+showScreen('briefing');
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() {
+showScreen('lab');
+setTimeout(() => { runLab(); window.dispatchEvent(new Event('resize')); }, 100);
+}
+
+function runLab() {
+const target = document.getElementById('plot-area');
+if (!target) return;
+let data = [];
+let layout = {
+paper_bgcolor: 'black', plot_bgcolor: 'black', margin: {t:60,b:10,l:0,r:0},
+showlegend: true, font: { family: 'sans-serif', size: 10 },
+legend: { font: { color: '#e5e7eb' }, x: 0.7, y: 0.9, bgcolor: 'rgba(0,0,0,0.5)' },
+scene: {
+xaxis: { gridcolor: '#222', color: '#94a3b8' },
+yaxis: { gridcolor: '#222', color: '#94a3b8' },
+zaxis: { gridcolor: '#222', color: '#94a3b8' },
+camera: { eye: { x: 1.5, y: 1.5, z: 1.2 } }
+}
+};
+
+if (currentTool === 1) { // MATTER AS FIELD CONTENT
+let excitation = parseFloat(document.getElementById('e_sl')?.value || 0) / 100;
+let x = Array.from({length: 40}, (_, i) => i - 20);
+let y = Array.from({length: 40}, (_, i) => i - 20);
+let z = [];
+for(let i=0; i<x.length; i++) {
+let row = [];
+for(let j=0; j<y.length; j++) {
+let dist = Math.sqrt(x[i]**2 + y[j]**2);
+row.push(excitation * 10 * Math.exp(-dist/5) * Math.cos(dist/2));
+}
+z.push(row);
+}
+data.push({ type: 'surface', z: z, colorscale: 'Blues', showscale: true, name: 'Matter Field Inhabitant' });
+layout.title = { text: "FIELD EXCITATION (PARTICLE EMERGENCE)", font: { color: '#60a5fa' } };
+layout.scene.xaxis.title = "Spacetime Coordinate (x)";
+layout.scene.yaxis.title = "Internal Field Phase (φ)";
+layout.scene.zaxis.title = "Excitation Amplitude (ψ)";
+
+
+} else if (currentTool === 2) { // CLASSIFICATION
+let f = parseFloat(document.getElementById('f_sl')?.value || 0) / 100;
+
+// Quarks (Strong Coupling) - They move outward as f increases
+data.push({
+type: 'scatter3d', mode: 'markers',
+x: [2 * f, 2 * f, 2 * f],
+y: [0, f, -f],
+z: [0, 0, 0],
+marker: { size: 15, color: '#f87171' },
+name: 'Quarks (Strong Coupling)'
+});
+
+// Leptons (Weak Only) - They move in the opposite direction
+data.push({
+type: 'scatter3d', mode: 'markers',
+x: [-2 * f, -2 * f],
+y: [0.5 * f, -0.5 * f],
+z: [0, 0, 0],
+marker: { size: 10, color: '#60a5fa' },
+name: 'Leptons (Weak Only)'
+});
+
+layout.title = { text: "FERMION FAMILIES", font: { color: '#f87171' } };
+layout.scene.xaxis.title = "Interaction Domain (Strong ↔ None)";
+layout.scene.yaxis.title = "Symmetry Branching (Quark ↔ Lepton)";
+layout.scene.zaxis.title = "Representation Index";
+
+
+} else if (currentTool === 3) { // GENERATIONS
+let gen = parseInt(document.getElementById('g_sl')?.value || 1);
+let colors = ['#3b82f6', '#fbbf24', '#f43f5e'];
+for(let i=1; i<=gen; i++) {
+data.push({ type: 'scatter3d', mode: 'markers+lines', x: [i, i], y: [0, 1], z: [0, i], marker: { size: 10 + i*5, color: colors[i-1] }, name: `Generation ${i}` });
+}
+layout.title = { text: "TRIADIC GENERATION REPLICATION", font: { color: '#fbbf24' } };
+layout.scene.xaxis.title = "Pattern Replication";
+layout.scene.yaxis.title = "Symmetry Invariance";
+layout.scene.zaxis.title = "Mass Octave (Generation)";
+
+
+} else if (currentTool === 4) { // REPRESENTATION
+let rot = parseFloat(document.getElementById('r_sl')?.value || 0) / 10;
+let t = Array.from({length: 100}, (_, i) => i * 0.1);
+data.push({ type: 'scatter3d', mode: 'lines', x: t.map(p => Math.cos(p + rot)), y: t.map(p => Math.sin(p + rot)), z: t, line: { color: '#c084fc', width: 4 }, name: 'Symmetry Transformation Path' });
+layout.title = { text: "REPRESENTATION TRANSFORMATION", font: { color: '#c084fc' } };
+layout.scene.xaxis.title = "SU(3) Color Projection";
+layout.scene.yaxis.title = "SU(2) Isospin Projection";
+layout.scene.zaxis.title = "U(1) Hypercharge Projection";
+
+
+} else if (currentTool === 5) { // COMPLETE MATTER CONTENT
+let m = parseFloat(document.getElementById('m_sl')?.value || 0) / 100;
+
+// The 12 Fundamental Fermions of the Standard Model
+// Ordered: [u, d (G1)], [e, ν (G1)], [c, s (G2)], [μ, νμ (G2)], [t, b (G3)], [τ, ντ (G3)]
+let labels = ['u', 'd', 'e', 'ν', 'c', 's', 'μ', 'νμ', 't', 'b', 'τ', 'ντ'];
+
+let x = [], y = [], z = [], colors = [];
+
+for (let i = 0; i < 12; i++) {
+// Spiral Geometry: Angle and Radius expand with slider 'm'
+let angle = i * (Math.PI / 4);
+let radius = (2 + i * 0.5) * m;
+
+x.push(radius * Math.cos(angle));
+y.push(radius * Math.sin(angle));
+z.push(i * 1.5 * m); // Vertical "Generation Depth"
+
+// --- SYMMETRY-FAMILY COLOR LOGIC ---
+// Quarks (u, d, c, s, t, b) -> Red (#f87171)
+// Leptons (e, ν, μ, νμ, τ, ντ) -> Blue (#60a5fa)
+// Indices: 0,1,4,5,8,9 are Quarks.
+if ([0, 1, 4, 5, 8, 9].includes(i)) {
+colors.push('#f87171'); // Quark Red
+} else {
+colors.push('#60a5fa'); // Lepton Blue
+}
+}
+
+data.push({
+type: 'scatter3d',
+mode: 'markers+text',
+x: x, y: y, z: z,
+text: labels,
+textfont: { color: '#e5e7eb', size: 11 },
+textposition: 'top center',
+marker: {
+size: 8,
+color: colors, // Applying the family-based colors
+opacity: Math.min(1, m * 1.5), // Fade in effect
+line: { color: '#000', width: 1 }
+},
+name: 'Matter Spectrum'
+});
+
+layout.title = { text: "TOTAL MATTER SPECTRUM (POPULATED)", font: { color: '#2dd4bf' } };
+layout.scene.xaxis.title = "Representation Space X";
+layout.scene.yaxis.title = "Representation Space Y";
+layout.scene.zaxis.title = "Generation Depth";
+
+// Adjust camera for a better "Spiral" view
+layout.scene.camera = { eye: { x: 1.8, y: 1.8, z: 1.5 } };
+}
+
+Plotly.react('plot-area', data, layout, {responsive: true, displayModeBar: false});
+}
+
+function resetLab() {
+if(currentTool===1) syncVal(0, 'e_sl');
+if(currentTool===2) syncVal(0, 'f_sl');
+if(currentTool===3) syncVal(1, 'g_sl');
+if(currentTool===4) syncVal(0, 'r_sl');
+if(currentTool===5) syncVal(100, 'm_sl');
+}
+
+window.onload = () => { showScreen('portal'); };
+</script>
+</body>
+</html>

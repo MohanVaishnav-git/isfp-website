@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 43 — Domain of Symmetry (Part 1)</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #00ffcc;
+--accent-internal: #f472b6; --accent-global: #38bdf8; --accent-local: #fbbf24; --accent-gauge: #a78bfa; --accent-structure: #4ade80;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-unified); font-family: sans-serif; font-size: 0.85rem; min-width: 350px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls, #nav-summary-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+#screen-lab.active { display: flex; flex-direction: column; height: calc(100vh - 50px); }
+
+#screen-portal { justify-content: flex-start; padding-top: 4dvh; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 50px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+/* PRIMARY CONSTANTS - UNIVERSAL */
+.primary-constant-box {
+background: #000; border: 1px solid var(--accent-unified); padding: 6px; border-radius: 8px;
+display: flex; justify-content: space-around; margin-bottom: 8px;
+}
+/* SECONDARY STRUCTURE - STAGE SPECIFIC */
+.secondary-structure-box {
+background: rgba(0, 255, 204, 0.05); border: 1px dashed var(--accent-unified); padding: 6px; border-radius: 8px;
+display: flex; justify-content: space-around; margin-bottom: 12px;
+}
+
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(0, 255, 204, 0.05); border: 1px solid var(--accent-unified); padding: 5px; border-radius: 5px; margin-bottom: 8px; font-size: 0.7rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; }
+#plot-area { flex-grow: 1; width: 100%; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #000; border: 1px solid var(--accent-unified); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer {
+width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem;
+color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 43 — ORIGIN OF SYMMETRY</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">Domain of Symmetry Portal</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">Establishing the internal structure and the necessity of the Gauge Principle.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-internal);">
+<h2 style="color:var(--accent-internal);">1. Internal Substrate Structure</h2>
+<p>Scalar → Multi-component: $\boxed{ \Psi \in \mathbb{C}^N }$</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-global);">
+<h2 style="color:var(--accent-global);">2. Emergence of Global Symmetry</h2>
+<p>Invariance under Rotation: $\boxed{ \Psi \rightarrow U\Psi }$</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-local);">
+<h2 style="color:var(--accent-local);">3. Local Symmetry Breakdown</h2>
+<p>Breaking the Derivative: $\boxed{ \partial_\mu \Psi \not\rightarrow U(x)\partial_\mu \Psi }$</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-gauge);">
+<h2 style="color:var(--accent-gauge);">4. The Gauge Principle</h2>
+<p>Compensating Connection: $\boxed{ D_\mu = \partial_\mu + iA_\mu }$</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-structure);">
+<h2 style="color:var(--accent-structure);">5. Structural Interpretation</h2>
+<p>The Origin of Interactions: $\boxed{ U(1) \times SU(2) \times SU(3) }$</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-unified); background: linear-gradient(135deg, #050505 0%, #111 100%);">
+<h2 style="color:var(--accent-unified);">6. Stage 43 Summary</h2>
+<p>The Inevitability of Gauge Fields.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color:var(--accent-unified); text-align:center;">SUMMARY: MATHEMATICAL STRUCTURE OF STAGE 43 AND COMPLETION THEOREM</h2>
+<section>
+<h3 style="color: #38bdf8; margin-bottom: 10px;">From Internal Space to Interaction Dynamics</h3>
+
+<h4 style="color: #f472b6; margin-top: 15px;">1. Field Extension</h4>
+<p>According to this framework, the transition from a scalar to a multi-component field is defined as:</p>
+<div style="text-align: center; margin: 10px 0;">
+$\Psi(x) \in \mathbb{C} \;\rightarrow\; \Psi(x) \in \mathbb{C}^N, \quad \Psi(x) = \begin{pmatrix} \psi_1(x) \\ \vdots \\ \psi_N(x) \end{pmatrix}$
+</div>
+
+<h4 style="color: #f472b6; margin-top: 15px;">2. Emergent Symmetry</h4>
+<p>According to this framework, $SU(N)$ symmetry emerges to preserve the internal norm:</p>
+<div style="text-align: center; margin: 10px 0;">
+$\Psi(x) \rightarrow U \Psi(x), \quad U \in SU(N), \quad \Psi^\dagger \Psi = \text{invariant}$
+</div>
+
+<h4 style="color: #f472b6; margin-top: 15px;">3. Global Invariance</h4>
+<p>According to this framework, for constant $U$, the derivative commutes, ensuring Lagrangian invariance:</p>
+<div style="text-align: center; margin: 10px 0;">
+$\partial_\mu (U\Psi) = U \partial_\mu \Psi \quad (\partial_\mu U = 0) \implies \mathcal{L} = \partial_\mu \Psi^\dagger \partial^\mu \Psi \Rightarrow \mathcal{L}' = \mathcal{L}$
+</div>
+
+<h4 style="color: #f472b6; margin-top: 15px;">4. Local Symmetry Breakdown</h4>
+<p>According to this framework, position-dependent transformations break the standard derivative's covariance:</p>
+<div style="text-align: center; margin: 10px 0;">
+$\Psi(x) \rightarrow U(x)\Psi(x) \implies \partial_\mu (U(x)\Psi) = U(x)\partial_\mu \Psi + (\partial_\mu U(x))\Psi \implies \mathcal{L}' \neq \mathcal{L}$
+</div>
+
+<h4 style="color: #f472b6; margin-top: 15px;">5. Covariant Restoration</h4>
+<p>According to this framework, symmetry is restored by introducing the gauge field $A_\mu$ and the covariant derivative $D_\mu$:</p>
+<div style="text-align: center; margin: 10px 0;">
+$D_\mu = \partial_\mu + i g A_\mu, \quad D_\mu \Psi \rightarrow U(x) D_\mu \Psi, \quad A_\mu \rightarrow U A_\mu U^{-1} - \frac{i}{g}(\partial_\mu U)U^{-1}$
+</div>
+
+<h4 style="color: #f472b6; margin-top: 15px;">6. Field Strength (Curvature)</h4>
+<p>According to this framework, the gauge field curvature is defined through the commutator:</p>
+<div style="text-align: center; margin: 10px 0;">
+$[D_\mu, D_\nu] = i g F_{\mu\nu}, \quad F_{\mu\nu} = \partial_\mu A_\nu - \partial_\nu A_\mu + i g [A_\mu, A_\nu]$
+</div>
+
+<h4 style="color: #f472b6; margin-top: 15px;">7. Gauge-Invariant Dynamics</h4>
+<p>According to this framework, the dynamics of the interaction are governed by the invariant Lagrangian:</p>
+<div style="text-align: center; margin: 10px 0;">
+$\mathcal{L}_{\text{gauge}} = -\frac{1}{4}\text{Tr}(F_{\mu\nu}F^{\mu\nu})$
+</div>
+
+<h4 style="color: #f472b6; margin-top: 15px;">8. Structural Chain</h4>
+<p style="text-align: center; font-weight: bold;">
+$\Psi \in \mathbb{C}^N \Rightarrow U \in SU(N) \Rightarrow \text{Global Invariance} \Rightarrow \text{Local Breakdown} \Rightarrow D_\mu \Rightarrow F_{\mu\nu} \Rightarrow \text{Interaction}$
+</p>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<h3 style="color: #38bdf8; text-align: center; margin-bottom: 20px;">📜 STAGE 43 — COMPLETION THEOREM</h3>
+<p><strong>Theorem (Emergence of Gauge Interaction from Internal Structure)</strong></p>
+<p>Let $\Psi(x) \in \mathbb{C}^N$ be a multi-component field defined on spacetime.</p>
+<p><strong>If:</strong></p>
+<ul>
+<li>The field admits transformations $\Psi(x) \rightarrow U(x)\Psi(x), \quad U(x) \in SU(N)$</li>
+<li>The theory requires invariance under local transformations</li>
+</ul>
+<p><strong>Then:</strong></p>
+<p>(A) <strong>Ordinary derivatives fail:</strong> $\partial_\mu (U(x)\Psi) \neq U(x)\partial_\mu \Psi$</p>
+<p>(B) <strong>A compensating field is required:</strong> There exists a field $A_\mu(x)$ such that $D_\mu = \partial_\mu + i g A_\mu$ restores covariance: $D_\mu \Psi \rightarrow U(x) D_\mu \Psi$</p>
+<p>(C) <strong>Gauge field acquires curvature:</strong> $[D_\mu, D_\nu] = i g F_{\mu\nu}$</p>
+<p>(D) <strong>Interaction emerges:</strong> $F_{\mu\nu} \neq 0 \Rightarrow \text{non-trivial dynamics}$</p>
+
+<p><strong>Conclusion:</strong> A multi-component field with local symmetry necessarily gives rise to a gauge field, whose curvature defines interaction dynamics.</p>
+
+<h4 style="color: #f472b6; margin-top: 15px;">Final Compact Form</h4>
+<p style="text-align: center;">
+$\text{Local symmetry of } \Psi \in \mathbb{C}^N \Rightarrow D_\mu = \partial_\mu + i g A_\mu \Rightarrow [D_\mu, D_\nu] = i g F_{\mu\nu} \Rightarrow \text{Interaction dynamics}$
+</p>
+
+<div style="padding: 15px; background: rgba(56, 189, 248, 0.1); border-left: 4px solid #38bdf8; margin-top: 20px;">
+<h4 style="color: #38bdf8; margin-top: 0;">🎯 Ultimate Insight of Stage 43</h4>
+<p style="margin-bottom: 0;">Interaction is not fundamental — it is the curvature required to preserve local symmetry of internal structure.</p>
+</div>
+</section>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div class="primary-constant-box">
+<div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val">11.350</span></div>
+<div class="const-item"><span class="const-label">Synthesis P</span><span class="const-val">0.6900</span></div>
+</div>
+<div class="secondary-structure-box">
+<div class="const-item"><span class="const-label">Internal Degree of Freedom (N)</span><span id="display-n" class="const-val">3</span></div>
+<div class="const-item"><span class="const-label">Symetry Group</span><span id="display-group" class="const-val">SU(3)(Emergent)</span></div>
+</div>
+<div id="mapping-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Symmetry Telemetry</span>
+<span id="epoch-label" style="font-family:monospace; font-size:0.85rem; color:var(--accent-unified);">INTERNAL SYMMETRY: ESTABLISHED</span>
+</div>
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:0px; margin-bottom:0px; background:transparent; border:1px solid #333; color:var(--accent-unified); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:6px;">RESET SYMMETRY</button>
+<div id="panel-footer-text" style="font-size: 0.75rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.3; margin-top: auto; margin-bottom: 0;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:2px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:6px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Symmetry Logic</span>
+<div id="metrics-content" style="font-size:0.65rem; font-family:monospace; line-height:1.3;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Structural Result</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.65rem; color: var(--text-dim); line-height: 1.4; background: #000; padding: 10px; border-radius: 0px; border: 1px solid #222; margin-top: auto; margin-bottom: 0;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "INTERNAL STRUCTURE",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Internal Space Extension and Origin of Symmetry</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Core Transition</h3>
+<p>According to this framework, a scalar field has only a single value at each point: $\\Psi(x)$. Such a field has no internal structure, no multiple components, and no possibility of transformation. Therefore, a scalar field cannot support symmetry.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Internal Space Emergence</h3>
+<p>According to this framework, to enable structure, the field extends into an internal space. The field becomes multi-component:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\Psi(x) = \\begin{pmatrix} \\psi_1(x) \\\\ \\psi_2(x) \\\\ \\psi_3(x) \\end{pmatrix}$$
+</div>
+<p>This introduces internal degrees of freedom ($N = 3$), a space independent of physical coordinates, and multiple components that can relate to each other.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Meaning of Internal Space</h3>
+<p>According to this framework, internal space is a structural space, not physical space. It is a space of degrees of freedom and the minimal requirement for transformations. Each component represents a direction in this internal space.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Emergence of Transformations</h3>
+<p>According to this framework, with multiple components, transformations become possible: $\\Psi(x) \\rightarrow U \\Psi(x)$, where $U$ is a transformation matrix. Components mix under transformation.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Birth of Symmetry</h3>
+<p>According to this framework, if the system remains unchanged under transformation, $\\Psi \\rightarrow U \\Psi$, then symmetry exists as invariance under transformation.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Emergent Symmetry Group</h3>
+<p>According to this framework, for a 3-component field, $SU(3)$ arises naturally as the symmetry group. It is not imposed; it is determined by internal structure.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Structural Logic</h3>
+<p style="text-align: center; color: #f472b6;">
+$$\\text{Scalar Field} \\rightarrow \\text{Internal Degrees (N > 1)} \\rightarrow \\text{Multi-component Field} \\rightarrow \\text{Symmetry Emerges}$$
+</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Key Insight</h3>
+<p>According to this framework, symmetry is not fundamental — it emerges from internal structure.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Role of This Module</h3>
+<p>According to this framework, this module establishes the origin of symmetry, the necessity of internal degrees of freedom, and the foundation for all later symmetry operations.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Forward Link</h3>
+<p>According to this framework, this leads directly to Module 2 (Symmetry acting through transformations), Module 3 (Breakdown under local variation), Module 4 (Gauge restoration), and Module 5 (Interaction emergence).</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">11. Final Statement</h3>
+<p style="margin-bottom: 0;">According to this framework, internal degrees of freedom create internal space. Internal space enables transformations. Symmetry emerges as invariance under these transformations.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 1 Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Structural Origin:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\Psi(x) \\rightarrow \\text{Internal Space} \\rightarrow SU(3)$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Symmetry is not an external rule, but a consequence of the field's internal degrees of freedom and structural invariance.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematical Formulation: Internal Space & Symmetry</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8e0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Scalar Field (Initial State)</h3>
+<p>According to this framework, a scalar field is a single complex-valued function with no internal index and no non-trivial symmetry structure:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\Psi(x) \\in \\mathbb{C}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Extension to Multi-Component Field</h3>
+<p>According to this framework, we introduce internal degrees of freedom $N = 3$, turning the field into a vector in internal space with index $i = 1,2,3$:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\Psi(x) \\rightarrow \\Psi(x) \\in \\mathbb{C}^3, \\quad \\Psi(x) = \\begin{pmatrix} \\psi_1(x) \\\\ \\psi_2(x) \\\\ \\psi_3(x) \\end{pmatrix}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Internal Vector Space</h3>
+<p>According to this framework, the field exists in a vector space $V \\cong \\mathbb{C}^3$. We define the inner product as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\langle \\Psi, \\Psi \\rangle = \\Psi^\\dagger \\Psi = \\sum_{i=1}^{3} |\\psi_i(x)|^2$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Global Transformation</h3>
+<p>According to this framework, we define the transformation $\\Psi(x) \\rightarrow \\Psi'(x) = U \\Psi(x)$, where $U \\in SU(3)$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Definition of SU(3)</h3>
+<p>According to this framework, $SU(3)$ is the set of $3 \\times 3$ complex matrices that are unitary and have a determinant of 1:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$SU(3) = \\{ U \\in \\mathbb{C}^{3 \\times 3} \\mid U^\\dagger U = I, \\det U = 1 \\}$$
+</div>
+<p>It is unitary (preserves norm), special (determinant = 1), and has a dimension of 8 generators.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Invariance of Norm</h3>
+<p>According to this framework, the norm is invariant under $U$:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\Psi'^\\dagger \\Psi' = (U\\Psi)^\\dagger (U\\Psi) = \\Psi^\\dagger U^\\dagger U \\Psi = \\Psi^\\dagger \\Psi$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Infinitesimal Transformation</h3>
+<p>According to this framework, for $a = 1, \\dots, 8$, with $T^a$ as generators and $\\alpha^a$ as real parameters, the transformation is:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$U = I + i \\alpha^a T^a \\implies \\Psi \\rightarrow \\Psi + i \\alpha^a T^a \\Psi$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Generator Algebra</h3>
+<p>According to this framework, generators satisfy the following relation with structure constants $f^{abc}$:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$[T^a, T^b] = i f^{abc} T^c$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Symmetry Condition (Global)</h3>
+<p>According to this framework, a system is symmetric if $\\mathcal{L}(\\Psi) = \\mathcal{L}(U\\Psi)$. For a free field $\\mathcal{L} = \\partial_\\mu \\Psi^\\dagger \\partial^\\mu \\Psi$, the global transformation $\\partial_\\mu \\Psi \\rightarrow U \\partial_\\mu \\Psi$ ensures $\\mathcal{L}$ is invariant.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Mathematical Summary</h3>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\Psi(x) \\in \\mathbb{C}^3, \\quad \\Psi \\rightarrow U\\Psi, \\quad U \\in SU(3), \\quad \\Psi^\\dagger \\Psi = \\text{invariant}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">11. Final Mathematical Statement</h3>
+<p style="margin-bottom: 0;">According to this framework, a multi-component field $\\Psi \\in \\mathbb{C}^3$ admits transformations $U \\in SU(3)$ that preserve the inner product $\\Psi^\\dagger \\Psi$, establishing symmetry as invariance under these transformations.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 1 Math Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Symmetry Invariance:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\mathcal{L}(\\Psi) = \\mathcal{L}(U\\Psi)$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The mathematical structure of the multi-component field necessitates $SU(3)$ invariance to maintain the integrity of the internal vector space.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>NUMBER OF COMPONENTS (N)</span><input type="number" id="n_in" class="digital-entry" value="3" oninput="syncVal(this.value, 'n_sl')"></div><input type="range" id="n_sl" min="1" max="5" step="1" value="3" oninput="syncVal(this.value, 'n_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MULTI-COMPONENT FIELD ($\\Psi$)</span><div style="text-align:center; font-size: 0.9rem;">$\\Psi = (\\psi_1, \\psi_2, \\psi_3)$</div></div>`,
+lawBox: `<div class="definition-box"><span class="def-title">CORE IDEA</span><div style="text-align:center; font-size: 0.8rem;">Internal degrees of freedom give rise to symmetry</div></div>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.85rem;">Scalar Field<br>↓<br>Internal Space Emerges (N>1)<br>↓<br>Multi-component Field ($\\Psi$)<br>↓<br>Symmetry Necessarily Emerges</div>`,
+hierarchy: `<div style="color: #f472b6; font-weight: bold;">Symmetry Emerges from Internal Structure</div>`,
+footer: "Scalar field extends into internal space → multi-component field → symmetry emerges.",
+rightNote: `<div style="color: #00ffcc; line-height: 1.4; font-size: 0.85rem;">All Symmetry emerges from internal structure.`
+},
+
+2: {
+title: "GLOBAL SYMMETRY",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Global Symmetry and Invariance</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Starting Point: Established Symmetry</h3>
+<p>According to this framework, from Module 1, the field has internal structure as a multi-component field $\\Psi(x) \\in \\mathbb{C}^3$, and the symmetry group $SU(3)$ emerges. Now the question is: How does symmetry act?</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Global Transformation</h3>
+<p>According to this framework, a global transformation acts uniformly at all points:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\Psi(x) \\rightarrow \\Psi'(x) = U \\Psi(x)$$
+</div>
+<p>where $U \\in SU(3)$ and $U$ is constant (independent of $x$). The key property is that the same transformation applies everywhere in spacetime.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Meaning of Global Symmetry</h3>
+<p>According to this framework, global symmetry means the system is invariant under uniform internal transformations. The internal structure rotates identically at all points; this is a uniform internal rotation.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Invariance of the System</h3>
+<p>According to this framework, for symmetry to exist, physical laws must remain unchanged. Consider the example Lagrangian:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\mathcal{L} = \\partial_\\mu \\Psi^\\dagger \\, \\partial^\\mu \\Psi$$
+</div>
+<p>Under transformation $\\Psi \\rightarrow U \\Psi$ and $\\partial_\\mu \\Psi \\rightarrow U \\partial_\\mu \\Psi$, it follows that $\\mathcal{L} \\rightarrow \\mathcal{L}$. The Lagrangian remains invariant.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Core Principle</h3>
+<p>According to this framework, symmetry equals invariance under transformation. If $\\mathcal{L}(\\Psi) = \\mathcal{L}(U\\Psi)$, then symmetry is present.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Why Global Symmetry Works</h3>
+<p>According to this framework, it works because $U$ is constant, meaning derivatives commute with the transformation:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\partial_\\mu (U\\Psi) = U \\, \\partial_\\mu \\Psi$$
+</div>
+<p>No mismatch arises during the operation.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Structural Interpretation</h3>
+<p>According to this framework, global symmetry implies that the internal structure is preserved, transformations do not distort dynamics, and the system maintains uniform internal consistency.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Symmetry Hierarchy</h3>
+<p>According to this framework, depending on the number of components, we see $U(1)$ for phase symmetry ($N = 1$), $SU(2)$ for 2-component symmetry, and $SU(3)$ for 3-component symmetry. In this module, $SU(3)$ acts as the global symmetry.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Role of This Module</h3>
+<p>According to this framework, this module establishes how symmetry operates, the concept of invariance, and the validity of global transformations.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Limitation (Critical for Next Step)</h3>
+<p>According to this framework, global symmetry assumes $U = \\text{constant}$. But in reality, transformations may vary, $U \\rightarrow U(x)$, which leads to the breakdown of symmetry under local transformations discussed in Module 3.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">11. Final Statement</h3>
+<p style="margin-bottom: 0;">According to this framework, global symmetry is the invariance of the system under uniform internal transformations. Because the transformation is constant, derivatives remain consistent, and the system preserves its structure.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Global Symmetry Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Uniform Invariance:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\partial_\\mu (U\\Psi) = U \\partial_\\mu \\Psi$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The system remains invariant because the transformation matrix $U$ is spatially independent, allowing the dynamics to remain undistorted.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematical Formulation: Global Symmetry</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8e0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Field Definition</h3>
+<p>According to this framework, we define the multi-component field as a vector in $\\mathbb{C}^3$:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\Psi(x) \\in \\mathbb{C}^3, \\quad \\Psi(x) = \\begin{pmatrix} \\psi_1(x) \\\\ \\psi_2(x) \\\\ \\psi_3(x) \\end{pmatrix}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Global Transformation</h3>
+<p>According to this framework, the transformation is defined such that the matrix $U$ is spatially independent:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\Psi(x) \\rightarrow \\Psi'(x) = U \\Psi(x), \\quad U \\in SU(3), \\quad \\partial_\\mu U = 0$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Derivative Transformation</h3>
+<p>According to this framework, since $U$ is constant, the derivative commutes with the transformation:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\partial_\\mu \\Psi(x) \\rightarrow \\partial_\\mu \\Psi'(x) = \\partial_\\mu (U \\Psi) = U \\, \\partial_\\mu \\Psi$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Lagrangian (Free Field)</h3>
+<p>According to this framework, the free field Lagrangian is given by:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\mathcal{L} = \\partial_\\mu \\Psi^\\dagger \\, \\partial^\\mu \\Psi$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Transformation of Lagrangian</h3>
+<p>According to this framework, under the transformation $\\Psi \\rightarrow U \\Psi$ and $\\partial_\\mu \\Psi \\rightarrow U \\partial_\\mu \\Psi$, the adjoint transforms as $\\Psi^\\dagger \\rightarrow \\Psi^\\dagger U^\\dagger$ and $\\partial_\\mu \\Psi^\\dagger \\rightarrow (\\partial_\\mu \\Psi^\\dagger) U^\\dagger$. Substituting these into the Lagrangian:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\mathcal{L}' = (\\partial_\\mu \\Psi^\\dagger) U^\\dagger \\, U \\, (\\partial^\\mu \\Psi) = \\partial_\\mu \\Psi^\\dagger \\, \\partial^\\mu \\Psi = \\mathcal{L}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Invariance Condition</h3>
+<p>According to this framework, the Lagrangian is invariant under global transformation because $\\mathcal{L}(\\Psi) = \\mathcal{L}(U\\Psi)$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Norm Invariance</h3>
+<p>According to this framework, the norm transforms as follows, maintaining its value:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\Psi^\\dagger \\Psi \\rightarrow (U\\Psi)^\\dagger (U\\Psi) = \\Psi^\\dagger U^\\dagger U \\Psi = \\Psi^\\dagger \\Psi$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Infinitesimal Transformation</h3>
+<p>According to this framework, for constant parameters $\\alpha^a$, the infinitesimal transformation is:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$U = I + i \\alpha^a T^a, \\quad \\Psi \\rightarrow \\Psi + i \\alpha^a T^a \\Psi$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Generator Algebra</h3>
+<p>According to this framework, the generators obey the commutation relation:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$[T^a, T^b] = i f^{abc} T^c$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Mathematical Summary</h3>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\Psi \\rightarrow U\\Psi, \\quad U \\in SU(3), \\quad \\partial_\\mu(U\\Psi) = U\\partial_\\mu\\Psi, \\quad \\mathcal{L} = \\partial_\\mu \\Psi^\\dagger \\partial^\\mu \\Psi \\Rightarrow \\mathcal{L}' = \\mathcal{L}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">11. Final Mathematical Statement</h3>
+<p style="margin-bottom: 0;">According to this framework, a global transformation $U \\in SU(3)$, constant in spacetime, commutes with derivatives and preserves both the norm and the Lagrangian, establishing global symmetry as invariance under uniform internal transformations.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 2 Math Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Commutation Property:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\partial_\\mu U = 0 \\implies [\\partial_\\mu, U] = 0$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">Global invariance is guaranteed by the spatial independence of the symmetry transformation matrix $U$.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>GLOBAL TRANSFORMATION U</span><input type="number" id="u_in" class="digital-entry" value="1.0" oninput="syncVal(this.value, 'u_sl')"></div><input type="range" id="u_sl" min="0" max="6.28" step="0.1" value="1.0" oninput="syncVal(this.value, 'u_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">SYMMETRY GROUPS</span><div style="text-align:center; font-size: 0.75rem;">U(1): Phase (N = 1)<br>SU(2): 2-component (N = 2)<br>SU(3): 3-component (N = 3)</div></div>`,
+lawBox: `<div class="definition-box"><span class="def-title">CORE IDEA</span><div style="text-align:center; font-size: 0.8rem;">Symmetry = invariance under transformation</div></div>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.90rem;">Transformation U<br>↓<br>Lagrangian Invariant<br>↓<br>Global Symmetry Established</div>`,
+hierarchy: `<div style="color: #38bdf8; font-weight: bold; font-size: 0.85rem;">Global Invariance Established</div>`,
+footer: "Symmetry acts through global transformations; it is not imposed externally.",
+rightNote: `<div style="color: #38bdf8; line-height: 1.4; font-size: 0.85rem;">Symmetry is invariance under internal transformations.`
+},
+
+3: {
+title: "LOCAL SYMMETRY BREAKDOWN",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Local Symmetry Breakdown</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Starting Point: Global Symmetry Works</h3>
+<p>According to this framework, from Module 2, symmetry holds under global transformation where $\\Psi(x) \\rightarrow U \\Psi(x)$ and $U = \\text{constant}$. This ensures invariance because the derivative commutes perfectly: $\\partial_\\mu (U\\Psi) = U \\, \\partial_\\mu \\Psi$. No inconsistency arises in the global limit.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Extension to Local Symmetry</h3>
+<p>According to this framework, we now consider a more general transformation where the symmetry operation varies with position: $\\Psi(x) \\rightarrow \\Psi'(x) = U(x)\\Psi(x)$, where $U(x) = e^{i\\theta(x)}$. The key shift is that the transformation is no longer uniform—it varies across spacetime.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Derivative Mismatch</h3>
+<p>According to this framework, when we apply the derivative to the transformed field $\\partial_\\mu \\Psi'(x) = \\partial_\\mu (U(x)\\Psi(x))$, the product rule generates an extra term:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\partial_\\mu (U\\Psi) = (\\partial_\\mu U)\\Psi + U \\partial_\\mu \\Psi$$
+</div>
+<p>This creates a critical problem: the term $(\\partial_\\mu U)\\Psi$ does not vanish, does not match the original structure, and breaks transformation consistency.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Breakdown of Invariance</h3>
+<p>According to this framework, because of this extra term, the derivative of the field no longer transforms covariantly: $\\partial_\\mu \\Psi \\nrightarrow U(x)\\partial_\\mu \\Psi$. Consequently, the Lagrangian is no longer invariant: $\\mathcal{L}(\\Psi) \\neq \\mathcal{L}(U(x)\\Psi)$. Local symmetry is broken under ordinary derivatives.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Structural Meaning</h3>
+<p>According to this framework, this breakdown implies that internal transformations vary across space and ordinary derivatives detect this variation, causing the system to develop internal inconsistency. The core insight is that ordinary derivatives do not respect local transformations.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Gauge Inconsistency</h3>
+<p>According to this framework, this mismatch is structural rather than accidental. It indicates a missing compensating structure. Symmetry demands consistency, and since local variation introduces a mismatch, a corrective mechanism is required to restore balance.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Role of This Module</h3>
+<p>According to this framework, this module establishes the fundamental limitation of global symmetry, the failure of local symmetry under $\\partial_\\mu$, and the absolute necessity of introducing a new field to bridge the gap.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Bridge to Next Module</h3>
+<p>According to this framework, this failure leads directly to the introduction of the gauge field $A_\\mu$. This new field will compensate for the derivative mismatch and restore local symmetry to the system.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Final Statement</h3>
+<p style="margin-bottom: 0;">According to this framework, when transformations become local, ordinary derivatives introduce an additional term that breaks invariance. This reveals a structural inconsistency, indicating the necessity of a compensating field to restore symmetry.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Local Breakdown Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Invariance Failure:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\partial_\\mu (U(x)\\Psi) \\neq U(x)\\partial_\\mu \\Psi$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The spatial dependence of the transformation matrix $U(x)$ creates an obstruction that ordinary calculus cannot resolve without additional degrees of freedom.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematical Formulation: Local Symmetry Breakdown</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8e0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Field Definition</h3>
+<p>According to this framework, we define the multi-component field as a vector in the internal space:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\Psi(x) \\in \\mathbb{C}^3$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Local Transformation</h3>
+<p>According to this framework, we introduce position-dependent parameters $\\theta^a(x)$ for the $SU(3)$ generators $T^a$:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\Psi(x) \\rightarrow \\Psi'(x) = U(x)\\Psi(x), \\quad U(x) = e^{i\\theta^a(x) T^a}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Derivative Acting on Transformed Field</h3>
+<p>According to this framework, applying the derivative to the transformed field requires the product rule:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\partial_\\mu \\Psi'(x) = \\partial_\\mu \\big(U(x)\\Psi(x)\\big) \\implies \\partial_\\mu (U\\Psi) = (\\partial_\\mu U)\\Psi + U \\partial_\\mu \\Psi$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Explicit Mismatch Term</h3>
+<p>According to this framework, the transformed derivative contains a mismatch term that prevents covariant transformation:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\partial_\\mu \\Psi'(x) = U(x)\\partial_\\mu \\Psi(x) + (\\partial_\\mu U(x))\\Psi(x)$$
+</div>
+<p>Because $(\\partial_\\mu U(x))\\Psi(x) \\neq 0$, the standard derivative does not transform as $\\partial_\\mu \\Psi \\rightarrow U(x)\\partial_\\mu \\Psi$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Infinitesimal Form</h3>
+<p>According to this framework, let $U(x) = I + i\\theta^a(x) T^a$. Then the derivative of the transformation matrix is $\\partial_\\mu U(x) = i (\\partial_\\mu \\theta^a(x)) T^a$. Substituting this gives:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\partial_\\mu \\Psi'(x) = U \\partial_\\mu \\Psi + i (\\partial_\\mu \\theta^a) T^a \\Psi$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Lagrangian Transformation</h3>
+<p>According to this framework, starting with the free field Lagrangian $\\mathcal{L} = \\partial_\\mu \\Psi^\\dagger \\, \\partial^\\mu \\Psi$, the local transformation introduces terms that ensure $\\mathcal{L}' \\neq \\mathcal{L}$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Source of Breakdown</h3>
+<p>According to this framework, the breaking term is explicitly identified as $(\\partial_\\mu U)\\Psi$, or in infinitesimal form:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$i (\\partial_\\mu \\theta^a) T^a \\Psi$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Mathematical Statement of Failure</h3>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\partial_\\mu (U(x)\\Psi) = U(x)\\partial_\\mu \\Psi + (\\partial_\\mu U(x))\\Psi \\neq U(x)\\partial_\\mu \\Psi$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Consequence</h3>
+<p>According to this framework, the failure of the derivative to transform covariantly means $\\mathcal{L}(\\Psi) \\neq \\mathcal{L}(U(x)\\Psi)$, proving that local symmetry is broken.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Final Mathematical Statement</h3>
+<p style="margin-bottom: 0;">According to this framework, for local transformations $U(x)$, the derivative introduces an additional term $(\\partial_\\mu U)\\Psi$, which breaks invariance and prevents the Lagrangian from remaining symmetric.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 3 Math Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Transformation Mismatch:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\delta (\\partial_\\mu \\Psi) = i (\\partial_\\mu \\theta^a) T^a \\Psi$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The breakdown occurs because the derivative operator acts on the local phase parameters, necessitating a gauge connection to restore invariance.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>LOCAL VARIATION ($\\theta(x)$)</span><input type="number" id="j_in" class="digital-entry" value="0.5" oninput="syncVal(this.value, 'j_sl')"></div><input type="range" id="j_sl" min="0" max="2" step="0.1" value="0.5" oninput="syncVal(this.value, 'j_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">LOCAL TRANSFORMATION U(x)</span><div style="text-align:center; font-size: 0.8rem;">$U(x) = e^{i\\theta(x)}$</div></div>`,
+lawBox: `<div class="definition-box"><span class="def-title">CORE IDEA</span><div style="text-align:center; font-size: 0.8rem;">Ordinary derivatives break local symmetry</div></div>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.90rem;">Local Transformation θ(x)<br>↓<br>Derivative Mismatch ($\\partial_\\mu$ fails)<br>↓<br>Local Symmetry Breakdown</div>`,
+hierarchy: `<div style="color: #fbbf24; font-weight: bold;">Gauge Inconsistency Identified</div>`,
+footer: "Local transformations create inconsistency → a compensating structure is required.",
+rightNote: `<div style="color: #fbbf24; line-height: 1.4; font-size: 0.85rem;">Local symmetry requires a compensating field.<p>Local symmetry fails under ordinary derivatives (∂μ), which do not respect local transformations—necessitating a compensating gauge field.</p>`
+},
+
+4: {
+title: "GAUGE PRINCIPLE",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Gauge Restoration and Covariant Derivative</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Starting Point: Local Symmetry Breakdown</h3>
+<p>According to this framework, from Module 3, the local transformation $\\Psi(x) \\rightarrow U(x)\\Psi(x)$ causes the ordinary derivative to produce a mismatch: $\\partial_\\mu (U\\Psi) = U \\partial_\\mu \\Psi + (\\partial_\\mu U)\\Psi$. The extra term breaks invariance. The fundamental problem is that ordinary derivatives do not preserve local symmetry.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Need for a Compensating Structure</h3>
+<p>According to this framework, to restore symmetry, the extra term must be cancelled. This requires a new structure to be introduced, leading directly to the gauge field $A_\\mu$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Introduction of Gauge Field</h3>
+<p>According to this framework, we define a new field $A_\\mu(x)$ that depends on spacetime and acts in the internal space to compensate for local variation.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Covariant Derivative</h3>
+<p>According to this framework, we replace the ordinary derivative $\\partial_\\mu \\rightarrow D_\\mu$. We define the covariant derivative as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$D_\\mu \\Psi = (\\partial_\\mu + i g A_\\mu)\\Psi$$
+</div>
+<p>where $g$ is the coupling constant and $A_\\mu$ is the gauge field. The key idea is to modify the derivative to respect local symmetry.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Restoration of Symmetry</h3>
+<p>According to this framework, under the transformation $\\Psi \\rightarrow U(x)\\Psi$, the covariant derivative transforms as $D_\\mu \\Psi \\rightarrow U(x) D_\\mu \\Psi$. No extra term remains, and the structure is perfectly preserved.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Meaning of Gauge Field</h3>
+<p>According to this framework, the gauge field compensates for local variation, ensures consistency across spacetime, and acts as a connection in the internal space. The core insight is that gauge fields are strictly required to maintain local symmetry.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Structural Interpretation</h3>
+<p>According to this framework, the transition from $\\partial_\\mu \\rightarrow D_\\mu$ represents a shift from ordinary change to structured change, moving from inconsistency to compensated transformation.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Role of This Module</h3>
+<p>According to this framework, this module establishes the absolute necessity of gauge fields, the concept of the covariant derivative, and the successful restoration of local symmetry.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Bridge to Next Module</h3>
+<p>According to this framework, once the gauge field is introduced, it must have its own structure. Its variation defines the dynamics, leading directly to the field strength $F_{\\mu\\nu}$ in Module 5.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Final Statement</h3>
+<p style="margin-bottom: 0;">According to this framework, local symmetry is broken by ordinary derivatives. By introducing a gauge field and replacing the derivative with a covariant derivative, the mismatch is compensated and symmetry is restored.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Gauge Restoration Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Restored Invariance:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$D_\\mu (U\\Psi) = U D_\\mu \\Psi$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The inclusion of the gauge field $A_\\mu$ cancels the unwanted derivative of the transformation matrix, allowing the system to maintain its symmetry locally.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematical Formulation: Gauge Restoration</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8e0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Local Transformation</h3>
+<p>According to this framework, the field transforms locally with position-dependent parameters:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\Psi(x) \\rightarrow \\Psi'(x) = U(x)\\Psi(x), \\quad U(x) = e^{i\\theta^a(x) T^a}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Failure of Ordinary Derivative</h3>
+<p>According to this framework, the ordinary derivative fails to transform covariantly due to the product rule:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\partial_\\mu \\Psi'(x) = U(x)\\partial_\\mu \\Psi(x) + (\\partial_\\mu U(x))\\Psi(x)$$
+</div>
+<p>Consequently, $\\partial_\\mu \\Psi \\nrightarrow U(x)\\partial_\\mu \\Psi$.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Introduction of Gauge Field</h3>
+<p>According to this framework, we define a gauge field $A_\\mu(x)$ composed of the generators of $SU(3)$:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$A_\\mu(x) = A_\\mu^a(x) T^a$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Covariant Derivative</h3>
+<p>According to this framework, the covariant derivative $D_\\mu$ is defined to replace the ordinary derivative:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$D_\\mu = \\partial_\\mu + i g A_\\mu(x) \\implies D_\\mu \\Psi = (\\partial_\\mu + i g A_\\mu)\\Psi$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Transformation of Gauge Field</h3>
+<p>According to this framework, to require $D_\\mu \\Psi \\rightarrow U(x) D_\\mu \\Psi$, the gauge field must obey a specific transformation law:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$A_\\mu \\rightarrow A'_\\mu = U A_\\mu U^{-1} - \\frac{i}{g} (\\partial_\\mu U) U^{-1}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Covariant Transformation</h3>
+<p>According to this framework, under the transformation $D_\\mu \\Psi \\rightarrow (\\partial_\\mu + i g A'_\\mu)(U\\Psi)$, the terms cancel such that $D_\\mu \\Psi \\rightarrow U(x) D_\\mu \\Psi$. No mismatch term remains.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Lagrangian with Covariant Derivative</h3>
+<p>According to this framework, the locally invariant Lagrangian is constructed as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\mathcal{L} = (D_\\mu \\Psi)^\\dagger (D^\\mu \\Psi)$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Invariance of Lagrangian</h3>
+<p>According to this framework, since $D_\\mu \\Psi \\rightarrow U D_\\mu \\Psi$ and $(D_\\mu \\Psi)^\\dagger \\rightarrow (D_\\mu \\Psi)^\\dagger U^\\dagger$, the transformation yields:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\mathcal{L} \\rightarrow (D_\\mu \\Psi)^\\dagger U^\\dagger U (D^\\mu \\Psi) = \\mathcal{L}$$
+</div>
+<p>The Lagrangian is now perfectly invariant under local transformations.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Mathematical Summary</h3>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$D_\\mu = \\partial_\\mu + i g A_\\mu, \\quad D_\\mu \\Psi \\rightarrow U(x) D_\\mu \\Psi, \\quad A_\\mu \\rightarrow U A_\\mu U^{-1} - \\frac{i}{g}(\\partial_\\mu U)U^{-1}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Final Mathematical Statement</h3>
+<p style="margin-bottom: 0;">According to this framework, by replacing the ordinary derivative with the covariant derivative $D_\\mu = \\partial_\\mu + i g A_\\mu$, and assigning a transformation law to the gauge field $A_\\mu$, the derivative transforms consistently under local symmetry, restoring invariance of the system.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 4 Math Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Restoration Law:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\delta A_\\mu = \\frac{1}{g} \\partial_\\mu \\theta^a T^a + i [\\theta, A_\\mu]$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The gauge field $A_\\mu$ provides the necessary "connection" to subtract the spatial variation of the transformation, ensuring covariant dynamics.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>GAUGE COUPLING (g)</span><input type="number" id="g_in" class="digital-entry" value="1.0" oninput="syncVal(this.value, 'g_sl')"></div><input type="range" id="g_sl" min="0" max="2" step="0.1" value="1.0" oninput="syncVal(this.value, 'g_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">COVARIANT DERIVATIVE</span><div style="text-align:center; font-size: 0.8rem;">$D_\\mu \\Psi = (\\partial_\\mu + i g A_\\mu)\\Psi$<br>$D_\\mu \\Psi \\rightarrow U(x)\\, D_\\mu \\Psi$</div></div>`,
+lawBox: `<div class="definition-box"><span class="def-title">CORE IDEA</span><div style="text-align:center; font-size: 0.8rem;">Gauge fields restore local symmetry</div></div>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.90rem;">Gauge Field $A_\\mu$<br>↓<br>Covariant Derivative $D_\\mu$<br>↓<br>Local Symmetry Restored</div>`,
+hierarchy: `<div style="color: #a78bfa; font-weight: bold; font-size: 0.85rem;">Local Symmetry Restored</div>`,
+footer: "Gauge field $A_\\mu$ restores local symmetry by compensating derivative mismatch.",
+rightNote: `<div style="color: #fbbf24; line-height: 1.4; font-size: 0.85rem;">Local symmetry is maintained by the gauge field $A_\\mu$.<p>Replace ordinary derivative with covariant derivative</p>`
+},
+
+5: {
+title: "STRUCTURAL INTERPRETATION",
+
+brief: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Detailed Briefing: Field Strength and Interaction Dynamics</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8f0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Starting Point: Gauge Field Introduced</h3>
+<p>According to this framework, from Module 4, the gauge field $A_\\mu$ is introduced and the covariant derivative $D_\\mu \\Psi = (\\partial_\\mu + i g A_\\mu)\\Psi$ restores local symmetry. Symmetry is now restored. The next question is: What is the structure of the gauge field itself? The gauge field cannot remain arbitrary; it must have internal consistency, dynamics, and physical meaning.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Field Strength Definition</h3>
+<p>According to this framework, the structure of the gauge field is captured by $F_{\\mu\\nu}$. For the Abelian case:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$F_{\\mu\\nu} = \\partial_\\mu A_\\nu - \\partial_\\nu A_\\mu$$
+</div>
+<p>For the non-Abelian case ($SU(3)$):</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$F_{\\mu\\nu} = \\partial_\\mu A_\\nu - \\partial_\\nu A_\\mu + i g [A_\\mu, A_\\nu]$$
+</div>
+<p>The key meaning is that field strength measures the variation of the gauge field.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Interpretation as Curvature</h3>
+<p>According to this framework, field strength represents curvature in internal space, the non-trivial structure of the gauge field, and deviation from uniformity. The core insight is: Gauge field $\\rightarrow$ curvature $\\rightarrow$ interaction.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Emergence of Interaction</h3>
+<p>According to this framework, interactions arise because the gauge field varies across spacetime, and this variation affects field behavior. The curvature encodes interaction dynamics. In this structural meaning, $A_\\mu$ is the connection (structure) and $F_{\\mu\\nu}$ is the curvature (dynamics). Interaction is not added—it emerges from structure.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Interaction Hierarchy</h3>
+<p>According to this framework, different symmetry groups correspond to different interactions: $U(1)$ for Electromagnetic, $SU(2)$ for Weak, and $SU(3)$ for Strong. In this framework, the interaction type follows directly from the symmetry structure.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Role of This Module</h3>
+<p>According to this framework, this module establishes the structure of gauge field dynamics, the concept of field strength, and the emergence of interactions.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Completion of Stage 16</h3>
+<p>According to this framework, this module completes the chain: Internal structure $\\rightarrow$ Symmetry $\\rightarrow$ Global invariance $\\rightarrow$ Local breakdown $\\rightarrow$ Gauge restoration $\\rightarrow$ Interaction emergence.</p>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Final Statement</h3>
+<p style="margin-bottom: 0;">According to this framework, gauge fields define internal structure, but their variation defines dynamics. Field strength represents this variation, and interactions arise from this intrinsic structure of the gauge field.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Interaction Dynamics Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Field Curvature:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$F_{\\mu\\nu} = \\frac{1}{ig} [D_\\mu, D_\\nu]$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The interaction is mathematically identified as the non-commutativity of the covariant derivatives, signifying a curved internal manifold.</p>
+</div>
+</div>`,
+
+math: `
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align: center;">Explicit Mathematical Formulation: Field Strength & Interaction</h2>
+
+<div class="briefing-content" style="font-size: 0.9rem; line-height: 1.5; color: #e2e8e0; text-align: justify; padding: 0px 40px 40px 40px;">
+<h3 style="color: #38bdf8; margin-bottom: 10px;">1. Gauge Field Definition</h3>
+<p>According to this framework, the gauge field is defined in terms of the $SU(3)$ generators $T^a$ for $a = 1, \dots, 8$:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$A_\\mu(x) = A_\\mu^a(x)\\, T^a$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">2. Covariant Derivative</h3>
+<p>According to this framework, the covariant derivative acting on the field $\\Psi$ is:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$D_\\mu = \\partial_\\mu + i g A_\\mu, \\quad D_\\mu \\Psi = (\\partial_\\mu + i g A_\\mu)\\Psi$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">3. Field Strength via Commutator</h3>
+<p>According to this framework, the field strength operator is defined through the commutator of covariant derivatives:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$[D_\\mu, D_\\nu]\\Psi = i g\\, F_{\\mu\\nu} \\Psi$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">4. Explicit Form (Non-Abelian)</h3>
+<p>According to this framework, for non-Abelian groups like $SU(3)$, the field strength includes a self-interaction term:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$F_{\\mu\\nu} = \\partial_\\mu A_\\nu - \\partial_\\nu A_\\mu + i g [A_\\mu, A_\\nu]$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">5. Component Form</h3>
+<p>According to this framework, the field strength can be expanded into components using structure constants $f^{abc}$:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$F_{\\mu\\nu} = F_{\\mu\\nu}^a T^a, \\quad F_{\\mu\\nu}^a = \\partial_\\mu A_\\nu^a - \\partial_\\nu A_\\mu^a - g f^{abc} A_\\mu^b A_\\nu^c$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">6. Abelian Limit (U(1))</h3>
+<p>According to this framework, in the Abelian limit where $[A_\\mu, A_\\nu] = 0$, the expression simplifies to the standard Maxwell form:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$F_{\\mu\\nu} = \\partial_\\mu A_\\nu - \\partial_\\nu A_\\mu$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">7. Transformation Property</h3>
+<p>According to this framework, the field strength transforms covariantly under local transformations:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$F_{\\mu\\nu} \\rightarrow F'_{\\mu\\nu} = U(x) F_{\\mu\\nu} U^{-1}(x)$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">8. Gauge-Invariant Quantity</h3>
+<p>According to this framework, physical observables are constructed from gauge-invariant quantities such as the trace of the field strength square:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\text{Tr}(F_{\\mu\\nu} F^{\\mu\\nu}) = \\text{invariant}$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">9. Gauge Field Lagrangian</h3>
+<p>According to this framework, the kinetic term for the gauge field itself is defined as:</p>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$\\mathcal{L}_{\\text{gauge}} = -\\frac{1}{4} \\, \\text{Tr}(F_{\\mu\\nu} F^{\\mu\\nu})$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">10. Mathematical Summary</h3>
+<div style="text-align: center; margin: 15px 0; color: #f472b6;">
+$$[D_\\mu, D_\\nu] = i g F_{\\mu\\nu}, \\quad F_{\\mu\\nu} = \\partial_\\mu A_\\nu - \\partial_\\nu A_\\mu + i g [A_\\mu, A_\\nu]$$
+</div>
+
+<h3 style="color: #38bdf8; margin-top: 15px; margin-bottom: 10px;">11. Final Mathematical Statement</h3>
+<p style="margin-bottom: 0;">According to this framework, the field strength $F_{\\mu\\nu}$, defined through the commutator of covariant derivatives, encodes the curvature of the gauge field and governs interaction dynamics, with gauge-invariant quantities constructed from $F_{\\mu\\nu}$.</p>
+</div>
+
+<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+<div style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<h2 style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 10px;">Module 5 Math Summary</h2>
+<div style="font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+<span style="color: #94a3b8;">Yang-Mills Structure:</span><br>
+<span style="color: #f472b6; font-size: 1.2rem;">$$\\mathcal{L} = -\\frac{1}{4} F_{\\mu\\nu}^a F^{a\\mu\\nu}$$</span>
+<p style="margin-top: 10px; color: #e2e8f0;">The interaction term in $F_{\\mu\\nu}$ signifies that non-Abelian gauge fields carry their own charge, leading to the self-interaction characteristic of the Strong force.</p>
+</div>
+</div>`,
+
+sliders: `<div class="control-item"><div class="label-group"><span>INTERACTION SCALE</span><input type="number" id="s_in" class="digital-entry" value="1.0" oninput="syncVal(this.value, 's_sl')"></div><input type="range" id="s_sl" min="0.5" max="2" step="0.1" value="1.0" oninput="syncVal(this.value, 's_in')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">SYMMETRY STRUCTURE</span><div style="text-align:center; font-size: 0.85rem; line-height: 1.5;">Gauge fields define interaction structure.<br>FIELD STRENGTH<br>$F_{\\mu\\nu} = \\partial_\\mu A_\\nu - \\partial_\\nu A_\\mu$<br>$F_{\\mu\\nu} = \\partial_\\mu A_\\nu - \\partial_\\nu A_\\mu + i g [A_\\mu, A_\\nu]$</div></div>`,
+lawBox: `<div class="definition-box"><span class="def-title">CORE IDEA</span><div style="text-align:center; font-size: 0.9rem;">Interactions arise from gauge field structure</div></div>`,
+metricsContent: `<div style="text-align: center; color: #94a3b8; font-family: monospace; font-size: 0.90rem;">Gauge Field $A_{\\mu\\nu}$<br>↓<br>Field Strength $F_{\\mu\\nu}$<br>↓<br>Interaction Dynamics</div>`,
+hierarchy: `<div style="color: #4ade80; font-weight: bold; font-size: 0.95rem;">Interaction Dynamics Defined</div>`,
+footer: "Field strength $F_{\\mu\\nu}$ defines interaction dynamics.",
+rightNote: `<div style="color: #fbbf24; line-height: 1.4; font-size: 0.85rem;">Interactions are governed by field strength $F_{\\mu\\nu}$.<p>Gauge field → curvature → interaction</p>`
+}
+};
+
+function syncVal(val, id) {
+const sliderId = id.includes('_in') ? id.replace('_in', '_sl') : id;
+const inputId = id.includes('_sl') ? id.replace('_sl', '_in') : id;
+if(document.getElementById(sliderId)) document.getElementById(sliderId).value = val;
+if(document.getElementById(inputId)) document.getElementById(inputId).value = val;
+if(id.includes('n_')) {
+document.getElementById('display-n').innerText = val;
+const groups = ["Scalar", "U(1)", "SU(2)", "SU(3)", "SU(4)", "SU(5)"];
+document.getElementById('display-group').innerText = groups[val] || "Complex";
+}
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+document.getElementById('brief-box-content').innerHTML = content.brief;
+document.getElementById('math-box-content').innerHTML = content.math;
+document.getElementById('control-sliders').innerHTML = content.sliders;
+document.getElementById('active-module-title').innerText = content.title;
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('metrics-content').innerHTML = content.metricsContent;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+showScreen('briefing');
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() {
+showScreen('lab');
+setTimeout(() => { runLab(); window.dispatchEvent(new Event('resize')); }, 100);
+}
+
+function runLab() {
+const target = document.getElementById('plot-area');
+if (!target) return;
+
+let data = [];
+let layout = {
+paper_bgcolor: 'black', plot_bgcolor: 'black', margin: {t:40,b:40,l:50,r:30},
+xaxis: { color: '#666', gridcolor: '#111', showticklabels: false, zeroline: false },
+yaxis: { color: '#666', gridcolor: '#111', showticklabels: false, zeroline: false },
+showlegend: true, font: { family: 'Georgia, serif', size: 10 },
+title: { font: { color: '#fff', size: 14 } },
+legend: { font: { color: '#94a3b8' }, x: 0, y: 1 }
+};
+
+if (currentTool === 1) { // MODULE 1: INTERNAL SUBSTRATE STRUCTURE
+let n = parseInt(document.getElementById('n_sl')?.value || 3);
+let intensity = parseFloat(document.getElementById('n_sl')?.value || 3) * 0.5; // Scale visual by N
+
+let x_surf = [], y_surf = [], z_surf = [];
+let size = 20;
+
+// 1. THE BASE SUBSTRATE SURFACE (The "Physical" Layer)
+for (let i = 0; i < size; i++) {
+let r_x = [], r_y = [], r_z = [];
+for (let j = 0; j < size; j++) {
+let u = (i / (size - 1)) * 10 - 5;
+let v = (j / (size - 1)) * 10 - 5;
+r_x.push(u);
+r_y.push(v);
+// Subtle substrate ripple
+r_z.push(Math.sin(u * 0.8) * Math.cos(v * 0.8) * 0.5);
+}
+x_surf.push(r_x); y_surf.push(r_y); z_surf.push(r_z);
+}
+
+data.push({
+type: 'surface',
+x: x_surf, y: y_surf, z: z_surf,
+name: 'Substrate Plane',
+colorscale: [[0, '#0f172a'], [1, '#1e293b']],
+showscale: false,
+opacity: 0.4,
+lighting: { ambient: 0.8 }
+});
+
+// 2. THE INTERNAL DIMENSIONAL PROBE (The "Mathematical" Layer)
+// We visualize the N-components at the center point (0,0) as a Complex Vector Cluster
+for (let k = 0; k < n; k++) {
+let phase = (k / n) * Math.PI * 2;
+let radius = 2.5;
+
+// Internal Vector components
+let v_x = radius * Math.cos(phase);
+let v_y = radius * Math.sin(phase);
+let v_z = k * 1.2; // Vertical stacking to show discrete components Ψ_i
+
+data.push({
+type: 'scatter3d',
+mode: 'lines+markers',
+name: `Component Ψ_${k+1}`,
+x: [0, v_x],
+y: [0, v_y],
+z: [0, v_z],
+line: {
+color: k % 2 === 0 ? '#f472b6' : '#00ffcc',
+width: 8,
+reversescale: false
+},
+marker: {
+size: 5,
+color: '#fff',
+symbol: 'circle'
+}
+});
+}
+
+layout.showlegend = true;
+layout.legend = { font: { color: '#94a3b8', size: 10 }, x: 0, y: 1 };
+
+layout.scene = {
+xaxis: { title: 'Space X', gridcolor: '#222', showticklabels: false },
+yaxis: { title: 'Space Y', gridcolor: '#222', showticklabels: false },
+zaxis: {
+title: 'Internal Depth (C^N)',
+gridcolor: '#333',
+range: [-2, 10],
+backgroundcolor: "rgb(5, 5, 5)",
+showbackground: true
+},
+camera: { eye: { x: 1.8, y: 1.8, z: 1.2 } },
+aspectmode: 'manual',
+aspectratio: { x: 1, y: 1, z: 1 }
+};
+
+layout.title = {
+text: `MODULE 1: INTERNAL SPACE EXTENSION (Ψ ∈ ℂ${n})`,
+font: { color: '#f472b6', size: 14 }
+};
+
+
+} else if (currentTool === 2) {
+// MODULE 2: GLOBAL SYMMETRY (STABILIZED VISUAL)
+let angle = parseFloat(document.getElementById('u_sl')?.value || 0);
+
+let x_pts = [], y_pts = [], z_pts = [];
+let u_vec = [], v_vec = [], w_vec = [];
+
+// 1. Reset data to a clean array
+data = [];
+
+// 2. Generate Grid of Internal Vectors
+for (let i = -2; i <= 2; i += 1.0) {
+for (let j = -2; j <= 2; j += 1.0) {
+x_pts.push(i);
+y_pts.push(j);
+z_pts.push(0);
+
+// GLOBAL: Every vector rotates by the exact same angle 'u'
+u_vec.push(Math.cos(angle) * 0.8);
+v_vec.push(Math.sin(angle) * 0.8);
+w_vec.push(0.5);
+}
+}
+
+// Trace 1: The Gauge Vector Field
+data.push({
+type: 'cone',
+x: x_pts, y: y_pts, z: z_pts,
+u: u_vec, v: v_vec, w: w_vec,
+name: 'Global Phase U',
+colorscale: [[0, '#0f172a'], [1, '#38bdf8']],
+showscale: false,
+sizemode: 'absolute',
+sizeref: 1.5,
+anchor: 'tail'
+});
+
+// 3. FULL LAYOUT OVERRIDE (Ensures 3D Scene is rendered)
+layout = {
+paper_bgcolor: 'black',
+plot_bgcolor: 'black',
+margin: {t:40, b:40, l:0, r:0},
+showlegend: true,
+legend: { font: { color: '#94a3b8' }, x: 0, y: 1 },
+scene: {
+xaxis: { range: [-3, 3], gridcolor: '#222', title: 'Space X', color: '#666' },
+yaxis: { range: [-3, 3], gridcolor: '#222', title: 'Space Y', color: '#666' },
+zaxis: { range: [-1, 2], gridcolor: '#222', title: 'Internal', color: '#666' },
+camera: { eye: { x: 1.5, y: 1.5, z: 1.2 } },
+aspectmode: 'cube'
+},
+title: {
+text: `GLOBAL SYMMETRY: UNIFORM INTERNAL ROTATION (U = ${angle.toFixed(2)} rad)`,
+font: { color: '#38bdf8', size: 14 }
+}
+};
+
+
+} else if (currentTool === 3) {
+// MODULE 3: LOCAL SYMMETRY BREAKDOWN (SURGICAL FIX)
+let jitter = parseFloat(document.getElementById('j_sl')?.value || 0.5);
+
+let x_pts = [], y_pts = [], z_pts = [];
+let u_vec = [], v_vec = [], w_vec = [];
+
+data = [];
+
+// Generate Grid with Position-Dependent Rotation
+for (let i = -2; i <= 2; i += 1.0) {
+for (let j = -2; j <= 2; j += 1.0) {
+x_pts.push(i);
+y_pts.push(j);
+z_pts.push(0);
+
+// LOCAL VARIATION: Angle now depends on (i, j) + jitter
+// This simulates U(x) where the phase varies across space
+let local_angle = (Math.sin(i) * Math.cos(j)) * jitter;
+
+u_vec.push(Math.cos(local_angle) * 0.8);
+v_vec.push(Math.sin(local_angle) * 0.8);
+w_vec.push(0.5);
+}
+}
+
+// Trace 1: The Disordered Vector Field
+data.push({
+type: 'cone',
+x: x_pts, y: y_pts, z: z_pts,
+u: u_vec, v: v_vec, w: w_vec,
+name: 'Local Phase U(x)',
+colorscale: [[0, '#0f172a'], [1, '#fbbf24']], // Gold color for "Breakdown"
+showscale: false,
+sizemode: 'absolute',
+sizeref: 1.5,
+anchor: 'tail'
+});
+
+// Trace 2: Connecting lines to show the "Stretch" (Derivative Conflict)
+// We draw lines between a few neighbors to visualize the tension
+data.push({
+type: 'scatter3d',
+mode: 'lines',
+x: [-1, 0, 1], y: [0, 0, 0], z: [0.5, 0.5, 0.5],
+line: { color: '#ff4444', width: 6, dash: 'solid' },
+name: 'Derivative Tension',
+showlegend: true
+});
+
+layout = {
+paper_bgcolor: 'black',
+plot_bgcolor: 'black',
+margin: {t:40, b:40, l:0, r:0},
+showlegend: true,
+scene: {
+xaxis: { range: [-3, 3], gridcolor: '#222', title: 'Space X' },
+yaxis: { range: [-3, 3], gridcolor: '#222', title: 'Space Y' },
+zaxis: { range: [-1, 2], gridcolor: '#222', title: 'Internal' },
+camera: { eye: { x: 1.5, y: 1.5, z: 1.2 } },
+aspectmode: 'cube'
+},
+title: {
+text: `LOCAL SYMMETRY BREAKDOWN (Jitter = ${jitter.toFixed(2)})`,
+font: { color: '#fbbf24', size: 14 }
+}
+};
+
+} else if (currentTool === 4) {
+// MODULE 4: THE GAUGE PRINCIPLE (SURGICAL FIX)
+let coupling = parseFloat(document.getElementById('g_sl')?.value || 1.0);
+
+let x_pts = [], y_pts = [], z_pts = [];
+let u_vec = [], v_vec = [], w_vec = [];
+
+data = [];
+
+// 1. THE SUBSTRATE WITH LOCAL VARIATION (Similar to Mod 3)
+for (let i = -2; i <= 2; i += 1.0) {
+for (let j = -2; j <= 2; j += 1.0) {
+x_pts.push(i);
+y_pts.push(j);
+z_pts.push(0);
+
+// Phase variation U(x)
+let local_angle = (Math.sin(i) * Math.cos(j)) * 0.8;
+
+// THE GAUGE ACTION: Coupling 'g' subtracts the variation
+// As g -> 1.0, the "Effective" rotation aligns to 0
+let effective_angle = local_angle * (1 - coupling);
+
+u_vec.push(Math.cos(effective_angle) * 0.8);
+v_vec.push(Math.sin(effective_angle) * 0.8);
+w_vec.push(0.5);
+}
+}
+
+// Trace 1: The "Restored" Vector Field
+data.push({
+type: 'cone',
+x: x_pts, y: y_pts, z: z_pts,
+u: u_vec, v: v_vec, w: w_vec,
+name: 'Covariant State D_μ',
+colorscale: [[0, '#0f172a'], [1, '#a78bfa']], // Purple/Violet for Gauge Restoration
+showscale: false,
+sizemode: 'absolute',
+sizeref: 1.5,
+anchor: 'tail'
+});
+
+// Trace 2: The Gauge Connection Field A_μ (Visualized as a Grid)
+// This represents the "Structure" that carries the symmetry information
+let gx = [], gy = [], gz = [];
+for(let i=-2; i<=2; i+=0.5) {
+gx.push(i, i, null); gy.push(-2, 2, null); gz.push(0, 0, null);
+}
+for(let j=-2; j<=2; j+=0.5) {
+gx.push(-2, 2, null); gy.push(j, j, null); gz.push(0, 0, null);
+}
+
+data.push({
+type: 'scatter3d',
+mode: 'lines',
+x: gx, y: gy, z: gz,
+line: { color: '#a78bfa', width: 2 * coupling, opacity: 0.3 * coupling },
+name: 'Gauge Field A_μ',
+showlegend: true
+});
+
+layout = {
+paper_bgcolor: 'black',
+plot_bgcolor: 'black',
+margin: {t:40, b:40, l:0, r:0},
+showlegend: true,
+scene: {
+xaxis: { range: [-3, 3], gridcolor: '#222', title: 'Space X' },
+yaxis: { range: [-3, 3], gridcolor: '#222', title: 'Space Y' },
+zaxis: { range: [-1, 2], gridcolor: '#222', title: 'Internal' },
+camera: { eye: { x: 1.5, y: 1.5, z: 1.2 } },
+aspectmode: 'cube'
+},
+title: {
+text: `GAUGE RESTORATION (Coupling g = ${coupling.toFixed(2)})`,
+font: { color: '#a78bfa', size: 14 }
+}
+};
+
+
+} else if (currentTool === 5) {
+// MODULE 5: STRUCTURAL INTERPRETATION (SIZE & RANGE CALIBRATION)
+let s_val = parseFloat(document.getElementById('s_sl')?.value || 1.0);
+
+data = [];
+
+const groups = [
+{ name: 'U(1) - EM (Photon)', r: 0.8, color: '#00f2ff', op: 0.7 },
+{ name: 'SU(2) - Weak (W/Z)', r: 1.6, color: '#ffd700', op: 0.5 },
+{ name: 'SU(3) - Strong (Gluon)', r: 2.4, color: '#39ff14', op: 0.3 }
+];
+
+groups.forEach((g) => {
+let x = [], y = [], z = [];
+let res = 18; // Balanced resolution
+
+for(let i=0; i<=res; i++) {
+let lat = (i/res) * Math.PI;
+for(let j=0; j<=res; j++) {
+let lon = (j/res) * 2 * Math.PI;
+// Live scale calculation
+let finalRadius = g.r * s_val;
+x.push(finalRadius * Math.sin(lat) * Math.cos(lon));
+y.push(finalRadius * Math.sin(lat) * Math.sin(lon));
+z.push(finalRadius * Math.cos(lat));
+}
+}
+
+data.push({
+type: 'mesh3d',
+x: x, y: y, z: z,
+alphahull: 0,
+opacity: g.op,
+color: g.color,
+name: g.name,
+showlegend: true,
+lighting: { ambient: 0.8, diffuse: 0.9 }
+});
+});
+
+// RE-CALIBRATED RANGE: Tightening the box to make the shells look larger
+layout.scene = {
+xaxis: { visible: false, range: [-4, 4] },
+yaxis: { visible: false, range: [-4, 4] },
+zaxis: { visible: false, range: [-4, 4] },
+camera: { eye: { x: 1.5, y: 1.5, z: 1.2 } },
+aspectmode: 'cube'
+};
+
+layout.title = {
+text: `STRUCTURAL SYMMETRY HIERARCHY (Scale: ${s_val.toFixed(1)}x)`,
+font: { color: '#39ff14', size: 16 }
+};
+
+Plotly.react('plot-area', data, layout);
+}
+
+
+
+Plotly.react('plot-area', data, layout, {responsive: true, displayModeBar: false});
+}
+
+function resetLab() {
+if (currentTool === 1) syncVal(3, 'n_sl');
+if (currentTool === 2) syncVal(1.0, 'u_sl');
+if (currentTool === 3) syncVal(0.5, 'j_sl');
+if (currentTool === 4) syncVal(1.0, 'g_sl');
+if (currentTool === 5) syncVal(1.0, 's_sl');
+runLab();
+}
+</script>
+</body>
+</html>

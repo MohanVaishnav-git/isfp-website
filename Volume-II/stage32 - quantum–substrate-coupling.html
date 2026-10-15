@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 32 — Quantum–Substrate Coupling</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #a855f7;
+--accent-wave: #c084fc; --accent-planck: #818cf8; --accent-prob: #a855f7; --accent-mode: #ec4899; --accent-interface: #fb7185;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100dvh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-unified); font-family: sans-serif; font-size: 0.85rem; min-width: 350px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+
+#screen-portal { justify-content: flex-start; padding-top: 4dvh; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 70px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); height: 90%; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0px auto; grid-template-columns: 320px 1fr 320px; gap: 10px; height: calc(100% - 40px); padding-top: 0px; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.constant-display-box {
+background: #111; border: 1px solid var(--accent-unified); padding: 6px; border-radius: 8px;
+display: flex; justify-content: space-around; margin-bottom: 10px;
+}
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(168, 85, 247, 0.05); border: 1px solid var(--accent-unified); padding: 8px; border-radius: 8px; margin-bottom: 8px; font-size: 0.6rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; height: 100%; position: relative; overflow: hidden; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #fff; border: 1px solid #9333ea; padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer {
+width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem;
+color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 32 — QUANTUM–SUBSTRATE COUPLING</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-brief" id="launch-lab-btn" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">Quantum Emergence Lab</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">Mapping Substrate Wavefields to Quantum States.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-wave);">
+<h2 style="color:var(--accent-wave);">1. Quantum Wave Emergence</h2>
+<p>Converging Stochastic Fluctuations into $\Psi$.</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-planck);">
+<h2 style="color:var(--accent-planck);">2. Planck Scale Excitation Map</h2>
+<p>High-Frequency Limits of the Substrate Medium.</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-prob);">
+<h2 style="color:var(--accent-prob);">3. Quantum Probability Field</h2>
+<p>Density Emergence from Wave Amplitude.</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-mode);">
+<h2 style="color:var(--accent-mode);">4. Localized Mode Formation</h2>
+<p>Standing Waves as Discrete Particle States.</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-interface);">
+<h2 style="color:var(--accent-interface);">5. Quantum–Geometry Interface</h2>
+<p>Wave Propagation in Curved Substrate Metric.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer" style="padding: 10px 0;">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div class="constant-display-box">
+<div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val" id="val-k-global">11.350</span></div>
+<div class="const-item"><span class="const-label">Pressure P</span><span class="const-val" id="val-p-global">0.6900</span></div>
+</div>
+<div id="mapping-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Wavefield Telemetry</span>
+<span id="epoch-label" style="font-family:monospace; font-size:0.85rem; color:var(--accent-unified);">QUANTUM COHERENCE ACTIVE</span>
+</div>
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:8px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.62rem; text-transform:uppercase; cursor:pointer; padding:6px;">RESTORE EQUILIBRIUM</button>
+<div id="panel-footer-text" style="font-size: 0.75rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.4; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:8px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.62rem; text-transform:uppercase; cursor:pointer; padding:6px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area" style="width:100%; height:100%;"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Emergent Logic</span>
+<div id="metrics-content" style="font-size:0.75rem; font-family:monospace; line-height:1.7;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Quantum Hierarchy</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.75rem; color: var(--text-dim); line-height: 1.4; background: #000; padding: 10px; border-radius: 8px; border: 1px solid #222; margin-top: auto;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "Quantum Wave Emergence",
+brief: `
+<style>
+.brief-header { color: var(--accent-color); border-bottom: 1px solid var(--accent-color); opacity: 0.9; padding-bottom: 4px; }
+.brief-sub { color: #fff; font-weight: bold; margin-top: 15px; display: block; border-left: 2px solid var(--accent-color); padding-left: 8px; }
+</style>
+
+<h2 style="color:var(--accent-wave); text-align:center; border-bottom: 2px solid var(--accent-wave); padding-bottom: 10px">Quantum Wave Emergence</h2>
+
+<h3 class="brief-header">Purpose of the Module</h3>
+<p>Module 1 introduces the first step in the transition from classical substrate physics to quantum behavior. The earlier stages of the simulator established the structural properties of the vacuum substrate, including the emergence of spacetime geometry from the interaction of the fundamental fields and the resulting substrate parameters <strong>Vacuum Stiffness K</strong> and <strong>Synthesis Pressure P</strong>.</p>
+<p>The purpose of this module is to explore how microscopic fluctuations of the substrate can organize themselves into coherent oscillatory patterns. According to this framework, quantum wavefunctions may arise from the collective behavior of these underlying substrate fluctuations. The module therefore demonstrates how random field activity can transition into an organized wavefield that resembles the mathematical structure of a quantum wavefunction.</p>
+
+<h3 class="brief-header">Concept</h3>
+<p>At extremely small scales the substrate is not perfectly smooth or static. Instead, it exhibits small stochastic fluctuations produced by the dynamic interaction of the underlying structural fields. These fluctuations appear as random oscillations within the substrate medium. When the stabilizing influence of the substrate becomes sufficiently strong, these random oscillations can synchronize and form coherent oscillatory modes.</p>
+<p>According to this framework, such coherent wave modes may correspond to the physical origin of quantum wavefunctions. The module therefore illustrates the transition:</p>
+<p style="text-align:center;">$$\\text{Stochastic Noise} \\rightarrow \\text{Wavefield Emergence} \\rightarrow \\text{Quantum Wavefunction}$$</p>
+<p>This sequence represents the emergence hierarchy shown on the right panel of the simulator.</p>
+
+<h3 class="brief-header">Fundamental Relation</h3>
+<p>The module introduces a conceptual relation between the substrate field and the quantum wavefunction:</p>
+<p style="text-align:center;">$$\\Psi \\sim \\Phi_{\\text{substrate}}$$</p>
+<p>This expression indicates that the quantum wavefunction may correspond to a coherent oscillatory configuration of the underlying substrate field. The purpose of this relation is not to replace the mathematical formalism of quantum mechanics but to illustrate a possible physical interpretation in which the wavefunction represents an actual dynamical field pattern within the vacuum substrate.</p>
+
+<h3 class="brief-header">Role of the Substrate Parameters</h3>
+<p>Two parameters appear in the control panel of the module: <strong>Vacuum Stiffness K</strong> and <strong>Synthesis Pressure P</strong>. These parameters determine the stability and responsiveness of the substrate medium. Vacuum stiffness (calibrated at 11.350) represents the resistance of the substrate to deformation produced by gradients of the conserving field. Synthesis pressure (calibrated at 0.6900) represents the stabilizing influence generated by the interaction of the fundamental vacuum fields. Together these parameters determine how easily fluctuations within the substrate can synchronize into coherent oscillatory modes.</p>
+
+<h3 class="brief-header">Visual Structure of the Simulation</h3>
+<p>The central panel of the simulator displays the time evolution of the substrate wavefield. The horizontal axis represents the spatial coordinate of the substrate region being simulated, and the vertical axis represents the amplitude of the substrate oscillation. The waveform displayed initially appears highly irregular, reflecting the stochastic fluctuations present within the substrate medium. As the coherence parameter increases, the oscillations gradually organize into smoother periodic patterns. This transition visually demonstrates the emergence of a coherent wavefield from initially random fluctuations.</p>
+
+<h3 class="brief-header">Coherence Control</h3>
+<p>The primary control of the module is the slider labeled <strong>Coherence Level</strong>. This parameter regulates the degree of synchronization among the microscopic oscillations of the substrate. At low coherence values the substrate behaves like a noisy medium dominated by random fluctuations. As the coherence level increases, the stabilizing influence of synthesis pressure causes the fluctuations to align with one another. This alignment gradually produces a coherent oscillatory wave. This process is analogous to the formation of collective oscillations in many physical systems where independent fluctuations become synchronized.</p>
+
+<h3 class="brief-header">Field State Indicator</h3>
+<p>The field state panel displays the transition: <strong>Stochastic → Coherent</strong>. This indicator reflects the current dynamical regime of the substrate field. In the stochastic regime the substrate behaves like a random fluctuating medium. In the coherent regime the oscillations form a stable wave pattern. According to this framework, the coherent regime corresponds to the emergence of a quantum wavefunction.</p>
+
+<h3 class="brief-header">Emergence Hierarchy</h3>
+<p>The right panel displays the conceptual hierarchy: <strong>Stochastic Noise → Wavefield Emergence → Quantum Wavefunction</strong>. This hierarchy summarizes the physical interpretation of the module. Random microscopic fluctuations represent the baseline activity of the substrate. When synchronization occurs, these fluctuations combine into an organized wavefield. This organized wavefield corresponds to the quantum wavefunction used in quantum theory.</p>
+
+<h3 class="brief-header">Conceptual Interpretation</h3>
+<p>According to this framework, quantum wavefunctions may represent coherent oscillatory patterns within the vacuum substrate rather than purely abstract probability amplitudes. In this interpretation the wavefunction describes a real physical wavefield that propagates through the substrate medium. The probabilistic features of quantum mechanics arise from the statistical behavior of these underlying wavefields rather than from fundamental randomness.</p>
+
+<h3 class="brief-header">Scientific Significance</h3>
+<p>The significance of this module lies in its attempt to provide a structural origin for the quantum wavefunction. In standard quantum mechanics the wavefunction is introduced as a fundamental mathematical object without a deeper physical explanation. The module proposes that the wavefunction may instead represent the coherent oscillatory dynamics of the vacuum substrate. This interpretation aligns with broader research directions in emergent quantum theory.</p>
+
+<h3 class="brief-header">Summary</h3>
+<p>Stage 32 Module 1 demonstrates how microscopic stochastic fluctuations of the vacuum substrate may organize into coherent oscillatory wavefields. According to this framework, these coherent oscillations may correspond to the physical origin of quantum wavefunctions. The module therefore illustrates the conceptual transition from random substrate activity to organized wave dynamics that resemble the mathematical structure used in quantum mechanics.</p>
+`,
+sliders: `<div class="control-item"><div class="label-group"><span>Coherence Level</span><input type="number" id="coh_input" class="digital-entry" value="0.0" oninput="syncVal(this.value, 'coh_slider')"></div><input type="range" id="coh_slider" min="0" max="1" step="0.01" value="0" oninput="syncVal(this.value, 'coh_input')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Field State</span><div style="text-align:center; font-size: 1.00rem; color:var(--accent-wave);">STOCHASTIC → COHERENT</div></div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Wave Relation</span><div style="text-align:center; font-size: 1.00rem;">$\\Psi \\sim \\Phi_{substrate}$</div></div>`,
+hierarchy: "Stochastic Noise<br>↓<br>Wavefield Emergence<br>↓<br>Quantum Wavefunction",
+footer: "Coherence arises when the synthesis pressure P stabilizes the fluctuations.",
+rightNote: "<b>Calibration:</b> Increase coherence to see noise transform into a sine wave."
+},
+2: {
+title: "Planck Scale Map",
+brief: `
+<style>
+.brief-header { color: var(--accent-color); border-bottom: 1px solid var(--accent-color); opacity: 0.9; padding-bottom: 4px; }
+.brief-sub { color: #fff; font-weight: bold; margin-top: 15px; display: block; border-left: 2px solid var(--accent-color); padding-left: 8px; }
+</style>
+
+<h2 style="color:var(--accent-wave); text-align:center; border-bottom: 2px solid var(--accent-wave); padding-bottom: 10px">Planck Scale Map</h2>
+
+<h3 class="brief-header">Purpose of the Module</h3>
+<p>Module 2 explores the structural limits of wave propagation in the vacuum substrate when oscillations approach extremely small spatial scales. Earlier modules introduced the emergence of coherent quantum wavefields from stochastic fluctuations. Once coherent oscillations exist, an important question arises: how small can the wavelength of these oscillations become within the physical structure of the substrate? The purpose of this module is therefore to investigate the behavior of the substrate when wave frequencies increase toward extremely high values. According to this framework, the vacuum substrate is not infinitely flexible. Instead, it possesses structural resistance determined by the stiffness parameter <strong>K</strong> and the synthesis pressure <strong>P</strong>. These parameters impose limits on how tightly oscillations of the substrate can be compressed. Module 2 illustrates the concept that the Planck scale may represent the smallest wavelength that the substrate can physically sustain.</p>
+
+<h3 class="brief-header">Concept</h3>
+<p>At moderate frequencies, wave oscillations propagate smoothly through the substrate medium. The substrate behaves like a continuous elastic field that can support waves of many wavelengths. However, as the oscillation frequency increases, the wavelength becomes progressively smaller. When the wavelength approaches extremely small scales, the deformation of the substrate becomes concentrated into very narrow spatial regions. According to this framework, the structural stiffness of the substrate eventually prevents further compression of the wave pattern. The system therefore reaches a regime in which only oscillations above a certain wavelength remain physically sustainable. This behavior is described in the simulator as <strong>Resonance Filtering</strong>. Oscillations whose wavelengths fall below the structural limit cannot propagate and are effectively filtered out by the substrate medium.</p>
+
+<h3 class="brief-header">Fundamental Relation</h3>
+<p>The module introduces the conceptual relation shown in the right panel of the simulator:</p>
+<p style="text-align:center;">$$\\lambda \\ge l_P(K, P)$$</p>
+<p>This expression represents the structural condition that the wavelength of a physical oscillation must remain larger than a minimum value determined by the substrate parameters. The symbol $l_P(K, P)$ represents the effective minimum wavelength allowed by the stiffness and synthesis pressure of the substrate. In conventional physics, the Planck length is introduced through dimensional combinations of fundamental constants. In the interpretation illustrated by this module, the Planck length can instead be understood as the scale at which the elastic structure of the vacuum substrate reaches its physical limit of compression.</p>
+
+<h3 class="brief-header">Role of the Substrate Parameters</h3>
+<p>Two structural parameters appear in the module interface: <strong>Vacuum Stiffness K</strong> (11.350) and <strong>Synthesis Pressure P</strong> (0.6900). Vacuum stiffness describes the resistance of the substrate to spatial gradients of the conserving field and therefore determines how strongly the substrate opposes rapid deformation. Synthesis pressure represents the stabilizing influence produced by the interaction of the fundamental vacuum fields and determines how the substrate maintains its structural integrity. Together these parameters control how tightly oscillatory patterns can be compressed before the substrate reaches its mechanical limit.</p>
+
+<h3 class="brief-header">Visual Structure of the Simulation</h3>
+<p>The central visualization displays a propagating wave whose frequency can be adjusted through the excitation frequency control. The horizontal axis represents spatial position, while the vertical axis represents the amplitude of the oscillatory deformation. At moderate excitation frequencies, the waveform appears smooth and periodic. As the excitation frequency increases, the wavelength becomes shorter and the peaks begin to crowd closer together. As the frequency approaches the structural limit, the amplitude envelope begins to display signs of filtering, representing the inability of the substrate to support oscillations below the minimum wavelength.</p>
+
+<h3 class="brief-header">Scale Limit Indicator</h3>
+<p>The left panel identifies the regime of the simulation as <strong>Resonance Filtering</strong>. This label indicates that the substrate is acting as a physical filter that selectively allows only certain wavelengths to propagate. When the oscillation frequency increases beyond the sustainable limit, the substrate medium suppresses the higher frequency components of the wave. This filtering behavior illustrates the concept that the Planck scale corresponds to a structural cutoff in the vacuum substrate rather than an arbitrary mathematical boundary.</p>
+
+<h3 class="brief-header">Emergent Hierarchy</h3>
+<p>The conceptual hierarchy summarizes the physical interpretation: <strong>Field Stiffness K → Minimum Wavelength → Planck Scale</strong>. This hierarchy expresses the idea that the Planck scale arises naturally from the mechanical properties of the vacuum substrate. The stiffness of the substrate determines the minimum spatial scale that oscillations can physically occupy. That minimum scale corresponds to the Planck length that appears in fundamental physics.</p>
+
+<h3 class="brief-header">Conceptual Interpretation</h3>
+<p>According to this framework, the Planck scale may represent the point at which the vacuum substrate reaches its structural limit of elasticity. Below this scale, the substrate cannot sustain additional spatial compression without violating the stability of its internal field configuration. The Planck length therefore becomes the smallest physically meaningful wavelength that can exist within the medium. Instead of being introduced purely through dimensional constants, the Planck scale emerges as a natural consequence of the structural properties of the vacuum substrate.</p>
+
+<h3 class="brief-header">Scientific Significance</h3>
+<p>The significance of this module lies in its attempt to provide a physical interpretation of the Planck scale. The module proposes that this scale may correspond to the mechanical limit of the vacuum substrate itself. By connecting the Planck scale with the stiffness parameter $K$ and the synthesis pressure $P$, the framework suggests that fundamental quantum limits may arise directly from the structural properties of the vacuum medium.</p>
+
+<h3 class="brief-header">Summary</h3>
+<p>Stage 32 Module 2 demonstrates how increasing wave frequency in the vacuum substrate leads to progressively shorter wavelengths until the structural limit of the medium is reached. According to this framework, the Planck scale represents the smallest wavelength that the substrate can physically support. The module therefore illustrates the concept that the Planck length may emerge from the mechanical properties of the vacuum substrate rather than existing as an unexplained fundamental constant.</p>
+`,
+sliders: `<div class="control-item"><div class="label-group"><span>Excitation Freq</span><input type="number" id="freq_input" class="digital-entry" value="1.0" oninput="syncVal(this.value, 'freq_slider')"></div><input type="range" id="freq_slider" min="1" max="100" step="1" value="1" oninput="syncVal(this.value, 'freq_input')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Scale Limit</span><div style="text-align:center; font-size: 1.00rem; color:var(--accent-planck);">RESONANCE FILTERING</div></div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Planck Limit</span><div style="text-align:center; font-size: 1.00rem;">$\\lambda \\geq l_P(K, P)$</div></div>`,
+hierarchy: "Field Stiffness K<br>↓<br>Minimum Wavelength<br>↓<br>Planck Scale",
+footer: "The Planck length is the structural limit of substrate elasticity.",
+rightNote: "<b>Calibration:</b> Higher frequencies show the substrate's structural limit."
+},
+3: {
+title: "Quantum Probability Field",
+brief: `
+<style>
+.brief-header { color: var(--accent-color); border-bottom: 1px solid var(--accent-color); opacity: 0.9; padding-bottom: 4px; }
+.brief-sub { color: #fff; font-weight: bold; margin-top: 15px; display: block; border-left: 2px solid var(--accent-color); padding-left: 8px; }
+</style>
+
+<h2 style="color:var(--accent-wave); text-align:center; border-bottom: 2px solid var(--accent-wave); padding-bottom: 10px">Quantum Probability Field</h2>
+
+<h3 class="brief-header">Purpose of the Module</h3>
+<p>Module 3 examines how the spatial distribution of a quantum wavefield gives rise to observable probability patterns. In earlier modules of Stage 32, the simulator introduced the emergence of coherent quantum-like oscillations within the vacuum substrate and the structural limits governing their wavelength. Once such a wavefield exists, the next conceptual step is to understand how this wave pattern translates into measurable outcomes. The purpose of this module is therefore to illustrate how the amplitude structure of the substrate wavefield maps into a probability distribution describing where physical localization events are most likely to occur. According to this framework, the probability density used in quantum mechanics may correspond to the spatial concentration of energy within the oscillatory substrate field. The module demonstrates how peaks in wave amplitude naturally produce regions of higher probability density, providing an intuitive visualization of the Born rule.</p>
+
+<h3 class="brief-header">Concept</h3>
+<p>A coherent wave propagating through the substrate carries energy distributed across space. The magnitude of the oscillation at each location determines how strongly the substrate is excited in that region. When the oscillatory field is measured or interacts with another physical system, localization events occur preferentially where the energy density of the wavefield is highest. According to this framework, the probability of observing a particle at a particular location therefore corresponds to the amount of substrate energy stored in the oscillation at that position. The module illustrates this idea by showing how the amplitude profile of a wave is converted into a probability density distribution. Regions of large amplitude correspond to regions where the substrate oscillation is strongest and therefore where localization events become most likely.</p>
+
+<h3 class="brief-header">Fundamental Relation</h3>
+<p>The module introduces the standard quantum relation displayed in the right panel of the simulator:</p>
+<p style="text-align:center;">$$P(x) = |\\Psi|^2$$</p>
+<p>This equation is known as the <strong>Born rule</strong> in quantum mechanics. It states that the probability of detecting a particle at position $x$ is equal to the square of the magnitude of the wavefunction. Within the interpretation illustrated by this simulator, the rule can be understood physically by recognizing that the energy stored in an oscillatory wavefield scales with the square of its amplitude. When the substrate wavefield is squared, the resulting distribution therefore represents the spatial density of energy stored in the oscillation. This energy density determines where interaction events are statistically favored.</p>
+
+<h3 class="brief-header">Role of the Substrate Parameters</h3>
+<p>As in other modules of Stage 32, the parameters <strong>Vacuum Stiffness K</strong> (11.350) and <strong>Synthesis Pressure P</strong> (0.6900) remain visible in the control panel. These parameters define the structural stability of the vacuum substrate and determine how oscillatory energy propagates through the medium. Vacuum stiffness regulates the resistance of the substrate to deformation, while synthesis pressure stabilizes the oscillatory dynamics generated by the interaction of the fundamental vacuum fields. Although the Born-rule mapping itself is independent of the specific values of these parameters, the shape and stability of the underlying wavefield depend on them. The parameters therefore indirectly influence the spatial structure of the resulting probability distribution.</p>
+
+<h3 class="brief-header">Visual Structure of the Simulation</h3>
+<p>The central visualization displays two related curves. The first curve represents the oscillatory wavefield itself, shown as a sinusoidal pattern representing the amplitude of the substrate oscillation. The second visualization overlays a colored region that represents the probability density derived from the square of the wave amplitude. The horizontal axis represents spatial position within the simulated region of the substrate, while the vertical axis represents the magnitude of the oscillatory field. When the amplitude of the wave increases in a particular region, the probability distribution simultaneously grows larger at that location. The visualization therefore demonstrates how peaks in the oscillatory wave automatically generate peaks in the probability density.</p>
+
+<h3 class="brief-header">Density Mapping Mechanism</h3>
+<p>The left panel labels the process occurring in this module as <strong>Density Mapping</strong>. This label refers to the conversion of the wave amplitude profile into a probability density distribution. The amplitude slider allows the user to increase or decrease the magnitude of the oscillatory wave. As the amplitude grows, the corresponding probability peaks become more pronounced. This interaction visually demonstrates the mathematical transformation that converts a wavefunction into a probability field. The mapping illustrates how the square of the amplitude produces localized regions where detection events are statistically favored.</p>
+
+<h3 class="brief-header">Emergent Hierarchy</h3>
+<p>The right panel displays the conceptual hierarchy: <strong>Wave Amplitude → Energy Density → Probability Field</strong>. This hierarchy summarizes the physical interpretation presented in the module. The oscillatory wavefield first determines the amplitude of the substrate oscillation. The energy stored in the oscillation is proportional to the square of this amplitude. The spatial distribution of this energy density then determines the probability distribution associated with observation events.</p>
+
+<h3 class="brief-header">Conceptual Interpretation</h3>
+<p>According to this framework, the probabilistic structure of quantum mechanics may arise from the energetic distribution of oscillatory modes within the vacuum substrate. The wavefunction represents the physical oscillation of the substrate, while the square of its amplitude corresponds to the spatial concentration of energy in that oscillation. When measurement interactions occur, events take place preferentially where the energy density is largest. The probability distribution observed in experiments therefore reflects the energetic structure of the underlying wavefield rather than a fundamentally random process.</p>
+
+<h3 class="brief-header">Scientific Significance</h3>
+<p>The significance of this module lies in its attempt to provide a physical interpretation of the Born rule. In conventional quantum mechanics, the rule is introduced as a postulate without deeper explanation. The simulator illustrates how the rule can be understood as a natural consequence of wave energy distribution. By connecting probability density with the square of the oscillation amplitude, the module provides an intuitive bridge between wave dynamics and statistical measurement outcomes.</p>
+
+<h3 class="brief-header">Summary</h3>
+<p>Stage 32 Module 3 demonstrates how the oscillatory amplitude of a coherent substrate wavefield determines the probability distribution associated with quantum measurement outcomes. According to this framework, the square of the wave amplitude represents the spatial density of energy stored in the substrate oscillation, and this energy density corresponds directly to the probability of observing a localization event. The module therefore provides a visual interpretation of the Born rule by showing how peaks in wave amplitude naturally translate into peaks in probability density within the quantum probability field.</p>
+`,
+sliders: `<div class="control-item"><div class="label-group"><span>Amplitude</span><input type="number" id="amp_input" class="digital-entry" value="1.0" oninput="syncVal(this.value, 'amp_slider')"></div><input type="range" id="amp_slider" min="0" max="2" step="0.01" value="1" oninput="syncVal(this.value, 'amp_input')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Observability</span><div style="text-align:center; font-size: 1.00rem; color:var(--accent-prob);">DENSITY MAPPING</div></div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Born Rule</span><div style="text-align:center; font-size: 1.00rem;">$P(x) = |\\Psi|^2$</div></div>`,
+hierarchy: "Wave Amplitude<br>↓<br>Energy Density<br>↓<br>Probability Field",
+footer: "Probability is the measure of substrate energy localization.",
+rightNote: "<b>Calibration:</b> Notice how peaks in amplitude become peaks in probability."
+},
+
+4: {
+title: "Localized Mode Formation",
+brief: `
+<style>
+.brief-header { color: var(--accent-color); border-bottom: 1px solid var(--accent-color); opacity: 0.9; padding-bottom: 4px; }
+.brief-sub { color: #fff; font-weight: bold; margin-top: 15px; display: block; border-left: 2px solid var(--accent-color); padding-left: 8px; }
+</style>
+
+<h2 style="color:var(--accent-wave); text-align:center; border-bottom: 2px solid var(--accent-wave); padding-bottom: 10px">Localized Mode Formation</h2>
+
+<h3 class="brief-header">Purpose of the Module</h3>
+<p>Module 4 examines how stable localized oscillations of the substrate may correspond to particle-like states. Earlier modules of Stage 32 introduced the emergence of coherent wavefields, structural wavelength limits, and the mapping between wave amplitude and probability density. Once coherent waves exist within the substrate medium, the next conceptual step is to understand how persistent localized structures can form within those waves. The purpose of this module is therefore to explore the formation of standing resonance patterns within the substrate field. According to this framework, particles may correspond to stable standing wave configurations that remain localized because the substrate geometry and internal field tension support resonance conditions. The module illustrates how a coherent wave can become confined into a stable oscillatory mode that behaves like a localized energy structure within the vacuum medium.</p>
+
+<h3 class="brief-header">Concept</h3>
+<p>When a wave propagates freely through a medium, it spreads across space. However, if the boundary conditions of the medium allow certain wavelengths to resonate, the wave may form standing oscillatory patterns that remain spatially confined. Standing waves occur when forward and backward propagating waves interfere constructively, producing a stable pattern of nodes and antinodes. According to this framework, the vacuum substrate can support such resonance conditions because the underlying field tension and synthesis pressure create a structured medium capable of sustaining oscillatory confinement. When a resonance mode becomes stable, the oscillatory energy of the substrate remains concentrated within a localized region rather than dispersing outward. The module therefore illustrates the conceptual transition from a freely propagating quantum wave to a localized resonance structure that behaves as a discrete particle-like excitation of the substrate.</p>
+
+<h3 class="brief-header">Fundamental Relation</h3>
+<p>The module introduces the quantization relation displayed in the right panel of the simulator:</p>
+<p style="text-align:center;">$$E = n \\cdot h(K)$$</p>
+<p>This expression represents the idea that the energy of the resonance state occurs in discrete multiples of a fundamental oscillatory unit determined by the structural properties of the substrate. The integer $n$ represents the resonance mode number, corresponding to the number of standing oscillatory cycles supported by the localized structure. The function $h(K)$ represents the characteristic oscillation scale determined by the stiffness of the substrate. Within this interpretation, discrete particle energies arise from the quantized resonance modes that the substrate medium can sustain.</p>
+
+<h3 class="brief-header">Role of the Substrate Parameters</h3>
+<p>As in the other modules of Stage 32, the substrate parameters <strong>Vacuum Stiffness K</strong> (11.350) and <strong>Synthesis Pressure P</strong> (0.6900) appear in the control panel. Vacuum stiffness determines how strongly the substrate resists spatial deformation and therefore influences the wavelength of the oscillatory modes that can be supported within the medium. Synthesis pressure provides the stabilizing influence that allows oscillatory patterns to maintain coherence and resist dispersal. Together these parameters determine the stability and confinement of resonance structures. When the structural conditions of the substrate support a stable resonance mode, the oscillatory energy remains localized, producing a particle-like configuration of the field.</p>
+
+<h3 class="brief-header">Visual Structure of the Simulation</h3>
+<p>The central visualization displays a localized oscillatory envelope that represents the standing resonance structure formed within the substrate. The horizontal axis represents spatial position, while the vertical axis represents the amplitude of the oscillatory field. Unlike the extended sinusoidal waves seen in earlier modules, the waveform in this visualization forms a single peaked structure with amplitude concentrated near the center of the region. This shape illustrates how the oscillatory energy becomes confined into a localized standing mode. The colored region represents the density of the oscillatory energy stored within the resonance pattern. The peak of the structure corresponds to the location where the oscillation amplitude and energy density are greatest.</p>
+
+<h3 class="brief-header">Resonance Mode Control</h3>
+<p>The primary interactive element of the module is the slider labeled <strong>Resonance Mode</strong>. This control adjusts the integer mode number of the standing wave. When the mode number increases, the structure of the resonance pattern changes, producing additional nodes and oscillatory features within the localized region. Each mode corresponds to a discrete resonance state supported by the substrate. This visual demonstration illustrates the concept that particle states may arise from quantized oscillatory configurations of the vacuum medium.</p>
+
+<h3 class="brief-header">Particle State Indicator</h3>
+<p>The left panel identifies the regime of the simulation as <strong>Standing Resonance</strong>. This label indicates that the oscillatory wave has transitioned from a freely propagating state into a stable standing mode. In this regime, the oscillatory energy no longer spreads across the substrate but remains confined within a localized structure. According to this framework, such standing resonance structures correspond to the physical origin of particle states.</p>
+
+<h3 class="brief-header">Emergent Hierarchy</h3>
+<p>The conceptual hierarchy displayed on the right panel summarizes the formation process: <strong>Field Tension → Stable Resonance → Massive Particle</strong>. This hierarchy expresses the idea that the tension of the substrate field allows stable oscillatory modes to form. These stable resonance structures concentrate oscillatory energy within a localized region. The localized concentration of oscillatory energy manifests as the inertial mass of the particle-like structure.</p>
+
+<h3 class="brief-header">Conceptual Interpretation</h3>
+<p>According to this framework, particles may be understood as stable resonance structures of the vacuum substrate. Instead of being treated as fundamental point-like objects, particles emerge as localized oscillatory configurations sustained by the mechanical properties of the vacuum medium. The discrete energy levels observed in quantum systems arise naturally from the quantized resonance modes that the substrate can support. Each particle therefore corresponds to a specific standing wave configuration within the substrate field.</p>
+
+<h3 class="brief-header">Scientific Significance</h3>
+<p>The significance of this module lies in its attempt to provide a physical interpretation of particle quantization. In conventional quantum theory, discrete particle energies arise from the mathematical structure of quantum wave equations. The simulator illustrates how similar discrete states may arise naturally from resonance conditions in a physical medium. By connecting particle states with standing wave configurations of the substrate, the module offers a structural explanation for quantization that parallels well-known resonance phenomena in classical physics.</p>
+
+<h3 class="brief-header">Summary</h3>
+<p>Stage 32 Module 4 demonstrates how coherent oscillations within the vacuum substrate can form stable localized standing wave modes. According to this framework, such resonance structures correspond to particle-like excitations of the substrate field. The module therefore illustrates the conceptual transition from extended quantum wavefields to discrete localized states whose energies arise from quantized resonance modes supported by the structural properties of the vacuum substrate.</p>
+`,
+sliders: `<div class="control-item"><div class="label-group"><span>Resonance Mode</span><input type="number" id="mode_input" class="digital-entry" value="1" oninput="syncVal(this.value, 'mode_slider')"></div><input type="range" id="mode_slider" min="1" max="5" step="1" value="1" oninput="syncVal(this.value, 'mode_input')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Particle State</span><div style="text-align:center; font-size: 1.00rem; color:var(--accent-mode);">STANDING RESONANCE</div></div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Quantization</span><div style="text-align:center; font-size: 1.00rem;">$E = n \\cdot h(K)$</div></div>`,
+hierarchy: "Field Tension<br>↓<br>Stable Resonance<br>↓<br>Massive Particle",
+footer: "Stable modes occur when the substrate's synthesis pressure P reflects inward.",
+rightNote: "<b>Calibration:</b> Change modes to see the formation of discrete states."
+},
+5: {
+title: "Quantum–Geometry Interface",
+brief: `
+<style>
+.brief-header { color: var(--accent-color); border-bottom: 1px solid var(--accent-color); opacity: 0.9; padding-bottom: 4px; }
+.brief-sub { color: #fff; font-weight: bold; margin-top: 15px; display: block; border-left: 2px solid var(--accent-color); padding-left: 8px; }
+</style>
+
+<h2 style="color:var(--accent-wave); text-align:center; border-bottom: 2px solid var(--accent-wave); padding-bottom: 10px">Quantum–Geometry Interface</h2>
+
+<h3 class="brief-header">Purpose of the Module</h3>
+<p>Module 5 explores how quantum wavefields propagate within a curved substrate geometry. Earlier modules of Stage 32 introduced the emergence of coherent quantum-like oscillations in the substrate, the structural wavelength limit associated with the Planck scale, the mapping between wave amplitude and probability density, and the formation of localized standing resonance modes that correspond to particle-like states. Once particle-like excitations exist within the substrate medium, an essential question arises: how do these quantum waves behave when the substrate itself becomes geometrically curved? The purpose of this module is therefore to illustrate how the geometry generated by the structural vacuum fields influences the propagation of quantum wavefields. According to this framework, the curved geometry established in Stage 31 acts as a guiding structure through which quantum waves propagate. The module therefore demonstrates the coupling between quantum wave dynamics and the geometric structure of the substrate.</p>
+
+<h3 class="brief-header">Concept</h3>
+<p>In the Synthesis Framework, spacetime geometry is not treated as an independent background but emerges from the structural properties of the vacuum substrate determined by the stiffness parameter <strong>K</strong> and the synthesis pressure <strong>P</strong>. When mass-energy concentrations alter the structure of the substrate, the resulting geometry becomes curved. Quantum wavefields that exist within this substrate must therefore propagate through a curved medium rather than through a flat space. The behavior of the wave is influenced by the curvature of the substrate because the path of least action within the medium changes. As a result, the wavefront bends and its propagation direction gradually follows the geometric structure imposed by the substrate. The module illustrates this effect by allowing the curvature of the substrate metric to modify the path of the oscillatory wave.</p>
+
+<h3 class="brief-header">Fundamental Relation</h3>
+<p>The module displays the field equation shown in the right panel of the simulator:</p>
+<p style="text-align:center;">$$(\\Box + m^2)\\Psi = 0$$</p>
+<p>This equation represents a relativistic wave equation describing the propagation of a scalar field within spacetime. In the context of the simulator, the equation illustrates how quantum waves respond to the geometry of the underlying substrate. The operator $\\Box$ represents the curved spacetime wave operator determined by the metric structure of the substrate. The mass term $m$ characterizes the inertia associated with the oscillatory excitation. The equation therefore describes how the oscillatory quantum field evolves within the curved geometry generated by the substrate fields.</p>
+
+<h3 class="brief-header">Role of the Substrate Parameters</h3>
+<p>As in other modules of Stage 32, the parameters <strong>Vacuum Stiffness K</strong> (11.350) and <strong>Synthesis Pressure P</strong> (0.6900) remain visible in the control panel. These parameters determine the mechanical structure of the substrate from which the geometric metric emerges. Variations in the structural fields modify the local geometry of the substrate and therefore alter the paths along which quantum waves propagate. The curvature parameter in the module allows the user to increase or decrease the geometric distortion of the substrate. As the curvature grows, the propagation path of the wave gradually bends, demonstrating the interaction between the quantum wave and the geometric structure of the medium.</p>
+
+<h3 class="brief-header">Visual Structure of the Simulation</h3>
+<p>The central visualization displays a propagating oscillatory wave representing the quantum field. The horizontal axis represents spatial position within the substrate, while the vertical axis represents the amplitude of the wavefield. When the curvature parameter is set to zero, the wave propagates as a regular sinusoidal oscillation along a straight spatial path. As the curvature parameter increases, the oscillation begins to follow a curved trajectory, indicating that the geometry of the substrate is influencing the path of propagation. This bending of the wave illustrates how the structure of the underlying metric alters the evolution of the quantum wavefield.</p>
+
+<h3 class="brief-header">Metric Coupling Mechanism</h3>
+<p>The left panel identifies the current regime of the module as <strong>Metric Coupling</strong>. This label indicates that the oscillatory wavefield is interacting with the geometric structure generated by the substrate fields. In this regime, the propagation of the wave is no longer determined solely by its internal oscillation but also by the curvature of the medium through which it travels. The curvature slider allows the user to gradually increase the strength of this coupling and observe how the wave trajectory responds to the geometric distortion of the substrate.</p>
+
+<h3 class="brief-header">Emergent Hierarchy</h3>
+<p>The conceptual hierarchy displayed in the right panel summarizes the physical interpretation: <strong>Substrate Metric → Wave Propagation → Quantum Gravity</strong>. This hierarchy expresses the idea that the geometry generated by the substrate fields determines how quantum waves move through spacetime. When the geometry becomes curved, the motion of quantum wavefields reflects this curvature. The interaction between wave dynamics and geometric structure therefore represents the interface between quantum behavior and gravitational geometry.</p>
+
+<h3 class="brief-header">Conceptual Interpretation</h3>
+<p>According to this framework, quantum waves and spacetime geometry are not separate phenomena but different aspects of the same underlying substrate dynamics. The structural fields that generate the geometry of spacetime also define the medium through which quantum oscillations propagate. As a result, the evolution of quantum wavefields naturally incorporates the effects of curvature produced by mass-energy distributions. The module therefore illustrates the conceptual connection between quantum field dynamics and gravitational geometry within the substrate model.</p>
+
+<h3 class="brief-header">Scientific Significance</h3>
+<p>The significance of this module lies in its demonstration of how quantum wave propagation can interact with emergent spacetime geometry. One of the central challenges in theoretical physics is understanding the relationship between quantum mechanics and general relativity. The simulator illustrates a conceptual pathway in which both phenomena arise from the dynamics of the same underlying substrate. In this interpretation, quantum fields represent oscillatory modes of the substrate, while spacetime curvature represents the geometric deformation of that same medium.</p>
+
+<h3 class="brief-header">Summary</h3>
+<p>Stage 32 Module 5 demonstrates how quantum wavefields propagate within a curved substrate geometry. According to this framework, the metric structure generated by the vacuum substrate acts as the guiding geometry through which quantum waves move. The module therefore illustrates the interface between quantum dynamics and gravitational curvature by showing how oscillatory wave propagation responds to changes in the underlying substrate metric.</p>
+`,
+sliders: `<div class="control-item"><div class="label-group"><span>Metric Curvature</span><input type="number" id="curv_input" class="digital-entry" value="0.0" oninput="syncVal(this.value, 'curv_slider')"></div><input type="range" id="curv_slider" min="0" max="1" step="0.01" value="0" oninput="syncVal(this.value, 'curv_input')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">Sync State</span><div style="text-align:center; font-size: 1.00rem; color:var(--accent-interface);">METRIC COUPLING</div></div>`,
+lawBox: `<div class="definition-box"><span class="def-title">Field Equation</span><div style="text-align:center; font-size: 1.00rem;">$(\\Box + m^2)\\Psi = 0$</div></div>`,
+hierarchy: "Substrate Metric<br>↓<br>Wave Propagation<br>↓<br>Quantum Gravity",
+footer: "The curved metric from Stage 31 acts as the lens for the quantum wave.",
+rightNote: "<b>Calibration:</b> Apply curvature to see the wave bend as it propagates."
+}
+};
+
+function syncVal(val, targetId) {
+document.getElementById(targetId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+if(!content) return;
+document.getElementById('brief-box-content').innerHTML = content.brief;
+document.getElementById('control-sliders').innerHTML = content.sliders;
+document.getElementById('active-module-title').innerText = content.title;
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+showScreen('briefing');
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+}
+
+function launchLab() { showScreen('lab'); runLab(); }
+
+function runLab() {
+const plotArea = document.getElementById('plot-area');
+if (!plotArea) return;
+
+let data = [];
+let layout = { paper_bgcolor: 'black', plot_bgcolor: 'black', margin: {t:0,b:0,l:0,r:0}, showlegend: false };
+
+if (currentTool === 1) {
+// Quantum Wave Emergence (Noise to Sine)
+const coh = parseFloat(document.getElementById('coh_slider')?.value || 0);
+let x = [], y = [];
+for(let t=0; t<200; t++) {
+x.push(t);
+let noise = (Math.random() - 0.5) * (1 - coh);
+let wave = Math.sin(t * 0.2) * coh;
+y.push(noise + wave);
+}
+data = [{x: x, y: y, mode: 'lines', line: {color: '#c084fc', width: 2}}];
+} else if (currentTool === 2) {
+// Planck Excitation (High Freq Sine)
+const freq = parseFloat(document.getElementById('freq_slider')?.value || 1);
+let x = [], y = [];
+for(let t=0; t<500; t++) {
+x.push(t/10);
+y.push(Math.sin(t * freq * 0.1) * Math.exp(-t/500));
+}
+data = [{x: x, y: y, mode: 'lines', line: {color: '#818cf8', width: 1}}];
+} else if (currentTool === 3) {
+// Probability Field (Sine and Square)
+const amp = parseFloat(document.getElementById('amp_slider')?.value || 1);
+let x = [], y1 = [], y2 = [];
+for(let t=-10; t<10; t+=0.1) {
+x.push(t);
+let psi = amp * Math.sin(t) * Math.exp(-(t*t)/10);
+y1.push(psi); // Ψ
+y2.push(psi*psi); // |Ψ|²
+}
+data = [
+{x: x, y: y1, name: 'Wave', line: {color: '#a855f7', width: 1}},
+{x: x, y: y2, name: 'Prob', fill: 'tozeroy', line: {color: '#ec4899', width: 2}}
+];
+} else if (currentTool === 4) {
+// Standing Mode
+const mode = parseInt(document.getElementById('mode_slider')?.value || 1);
+let x = [], y = [];
+for(let t=-5; t<5; t+=0.05) {
+x.push(t);
+y.push(Math.sin(mode * Math.PI * (t+5)/10) * Math.exp(-(t*t)/4));
+}
+data = [{x: x, y: y, fill: 'tozeroy', line: {color: '#ec4899'}}];
+} else if (currentTool === 5) {
+// Geometry Interface (Curved Wave)
+const curv = parseFloat(document.getElementById('curv_slider')?.value || 0);
+let x = [], y = [];
+for(let t=0; t<20; t+=0.1) {
+x.push(t);
+y.push(Math.sin(t) + (curv * t * t * 0.05));
+}
+data = [{x: x, y: y, mode: 'lines', line: {color: '#fb7185', width: 3}}];
+}
+
+Plotly.newPlot('plot-area', data, layout, {displayModeBar: false});
+}
+
+function resetLab() {
+if (currentTool === 1) document.getElementById('coh_slider').value = 0;
+if (currentTool === 2) document.getElementById('freq_slider').value = 1;
+if (currentTool === 3) document.getElementById('amp_slider').value = 1;
+if (currentTool === 4) document.getElementById('mode_slider').value = 1;
+if (currentTool === 5) document.getElementById('curv_slider').value = 0;
+
+const inputs = document.querySelectorAll('.digital-entry');
+inputs.forEach(inp => {
+const slider = document.getElementById(inp.id.replace('_input', '_slider'));
+if (slider) inp.value = slider.value;
+});
+
+runLab();
+}
+
+showScreen('portal');
+</script>
+</body>
+</html>

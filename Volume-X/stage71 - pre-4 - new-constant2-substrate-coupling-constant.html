@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 71 — New Physical Constant - The Substrate Coupling Constant (κ_S)</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #3b82f6;
+--accent-obs: #94a3b8; --accent-exp: #fbbf24; --accent-master: #c084fc; --accent-lock: #f87171; --accent-final: #2dd4bf;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6;
+--accent-gold: #fbbf24;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-gold); font-family: sans-serif; font-size: 0.85rem; min-width: 450px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls, #nav-summary-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+#screen-lab.active { display: flex; flex-direction: column; height: calc(100vh - 50px); }
+
+#screen-portal { justify-content: flex-start; padding-top: 6dvh; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 50px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 1400px; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 2px; font-weight: bold; letter-spacing: 0.5px; padding-bottom: 0px; }
+.module-subtitle { text-align: center; font-family: sans-serif; color: var(--accent-gold); margin-bottom: 5px; font-weight: bold; letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.primary-constant-box { background: #000; border: 1px solid var(--accent-unified); padding: 2px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 8px; }
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.derivation-box { background: rgba(192, 132, 252, 0.05); border: 1px solid var(--accent-master); padding: 8px; border-radius: 8px; margin-bottom: 10px; text-align: center; }
+.derivation-title { font-size: 0.52rem; color: var(--accent-master); text-transform: uppercase; display: block; border-bottom: 1px solid rgba(192, 132, 252, 0.2); margin-bottom: 5px; font-weight: bold; }
+
+.definition-box { background: rgba(59, 130, 246, 0.05); border: 1px solid var(--accent-unified); padding: 5px; border-radius: 5px; margin-bottom: 8px; font-size: 0.7rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; }
+#plot-area { flex-grow: 1; width: 100%; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #fff; border: 1px solid var(--accent-unified); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer { width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem; color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 71 — NEW PHYSICAL CONSTANT - THE SUBSTRATE COUPLING CONSTANT ($\kappa_S$)</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">New Physical Constant - Substrate Coupling Constant ($\kappa_S$)</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">Defining the fundamental efficiency of energy transfer between the Three Fields.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-unified);">
+<h2 style="color:var(--accent-unified);">1. Interaction Tension ($T_0$)</h2>
+<p>Geometric Mean Calculations<br>Conserving & Motive Interplay</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-exp);">
+<h2 style="color:var(--accent-exp);">2. Manifold Impedance ($Z$)</h2>
+<p>$3\pi/2$ Resistive Ratio<br>$S^3$ Topology Resistance</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-master);">
+<h2 style="color:var(--accent-master);">3. Triadic Field Coupling</h2>
+<p>Field Count Partitioning<br>Substrate Stress Distribution</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-lock);">
+<h2 style="color:var(--accent-lock);">4. The Coupling Identity</h2>
+<p>$\kappa_S \approx 0.19795$<br>Pure Vacuum Coupling Baseline</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-final);">
+<h2 style="color:var(--accent-final);">5. Origin of Weak Mixing</h2>
+<p>$\sin^2 \theta_W$ Correspondence<br>Material Loading Shifts</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-unified);">
+<h2 style="color:var(--accent-unified);">6. Stage 71 Summary</h2>
+<p>Parent Constant of Gauge Efficiency.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color:var(--accent-unified); text-align:center;">Module 6: Rigorous Synthesis of $\kappa_S$</h2>
+
+<section>
+<p>Stage 71 provides the first-principles derivation of the parent coupling constant ($\kappa_S$). While standard physics relies on empirically measured coupling strengths, the <strong>Synthesis Framework</strong> derives gauge efficiency directly from the geometric interaction of the substrate fields.</p>
+
+<h4 style="color: var(--accent-final); border-bottom: 1px solid var(--accent-final); display: inline-block;">1. THE INTERACTION TENSION ($T_0$)</h4>
+<p style="font-size: 0.9rem;">The baseline linear tension is the geometric balance between the conserving field strength ($K$) and the motive pressure ($P$):</p>
+<div style="background: rgba(59,130,246,0.05); padding: 12px; border-radius: 8px; font-family: monospace; border: 1px solid var(--accent-unified); margin: 10px 0; text-align: center;">
+$T_0 = \sqrt{K \cdot P} = \sqrt{11.350 \cdot 0.6900} \approx 2.79848$
+</div>
+
+<h4 style="color: var(--accent-final); border-bottom: 1px solid var(--accent-final); display: inline-block;">2. MANIFOLD IMPEDANCE ($Z$)</h4>
+<p style="font-size: 0.9rem;">Resistance to triadic flow is a function of the $S^3$ geometry's volumetric cross-section:</p>
+<div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin: 10px 0; text-align: center;">
+$Z = \frac{3\pi}{2} \approx 4.71239$
+</div>
+
+<h4 style="color: var(--accent-final); border-bottom: 1px solid var(--accent-final); display: inline-block;">3. THE COUPLING IDENTITY</h4>
+<p style="font-size: 0.9rem;">Total substrate stress equipartitioned across the three functional degrees of freedom:</p>
+<div style="text-align: center; font-size: 1.3rem; padding: 15px; color: var(--accent-gold); background: rgba(251, 191, 36, 0.05); border: 2px solid var(--accent-gold); border-radius: 12px; margin: 15px 0;">
+$\boxed{\kappa_S = \frac{\sqrt{K \cdot P}}{3 \cdot Z} \approx 0.19795}$
+</div>
+
+<h4 style="color: var(--accent-final); border-bottom: 1px solid var(--accent-final); display: inline-block;">4. OBSERVABLE CORRESPONDENCE</h4>
+<p style="font-size: 0.9rem;">This constant acts as the vacuum baseline for the Weak Mixing Angle. Any shift to the standard value ($\approx 0.23$) is interpreted as material loading upon the pure substrate geometry.</p>
+
+<div style="margin-top: 25px; padding: 20px; border: 1px solid var(--accent-unified); border-radius: 12px; background: #000; text-align: center;">
+<h3 style="color: var(--accent-unified); margin: 0; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">Universal Gauge Efficiency</h3>
+<p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 10px;">The Substrate Coupling Constant ($\kappa_S$) represents the mechanical ceiling of field interaction efficiency in a 3-field vacuum system.</p>
+</div>
+</section>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div id="active-module-result" class="module-subtitle">--</div>
+<div class="primary-constant-box">
+<div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val">11.350</span></div>
+<div class="const-item"><span class="const-label">Synthesis P</span><span class="const-val">0.6900</span></div>
+</div>
+<div id="mapping-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Coupling Telemetry</span>
+<div id="telemetry-area"></div>
+</div>
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-unified); font-size:0.75rem; cursor:pointer; padding:6px;">RE-EQUILIBRATE TRIAD</button>
+<div id="panel-footer-text" style="font-size: 0.85rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.3; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:8px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="derivation-box">
+<span class="derivation-title">Derivation Formula</span>
+<div id="derivation-content" style="font-size:0.90rem; padding:5px;"></div>
+</div>
+<div class="diagnostic-panel">
+<span class="diag-title">Emergent Logic</span>
+<div id="metrics-content" style="font-size:0.85rem; text-align:center; padding:5px;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Validation Chain</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.65rem; color: var(--text-dim); line-height: 1.3; background: #000; padding: 5px; border-radius: 0px; border: 1px solid #222; margin-bottom: 0px; margin-top: auto;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "INTERACTION TENSION (T0)",
+result: "Geometric Mean Stability",
+resultSize: "0.85rem",
+derivation: `
+<div style="border: 1px solid var(--accent-unified); padding: 4px; border-radius: 4px; text-align: center; width: 98%; margin: 0 auto;">
+<span style="font-size: 0.55rem; color: var(--accent-unified); display: block; margin-bottom: 2px;">TENSION: $T_0$</span>
+<span style="font-size: 0.85rem; color: #fff;">$\\sqrt{K \\cdot P}$</span>
+<br>
+<span id="calc-result-1" style="font-size: 0.85rem; color: var(--accent-gold); font-family: monospace;">--</span>
+</div>`,
+brief: `<h2>Module 1: Interaction Tension (T0)</h2><p>Determining the baseline linear tension of the substrate resting state. We take the geometric mean of the Conserving field strength (K) and Motive Pressure (P) to define the orthogonal balance.</p>`,
+math: `<h3>Mathematics: Tension Mean</h3>$$T_0 = \\sqrt{11.350 \\cdot 0.6900}$$<p>This defines the fundamental 1D interaction strength before volumetric distribution.</p>`,
+sliders: `<div class="control-item"><div class="label-group"><span>K-DENSITY</span><input type="number" id="m_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'm_sl')"></div><input type="range" id="m_sl" min="0" max="200" step="1" value="100" oninput="syncVal(this.value, 'm_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">$\\{K, P\\}$ → Tension Balance</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">TENSION STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Orthogonally Balanced</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-unified);">MODE: Geometric Mean<br>K: 11.350 | P: 0.6900<br>STATUS: T0 Stabilization</span>`,
+metricsContent: `$T_0 \\approx 2.79848$`,
+hierarchy: `Interaction Tension Validation`,
+footer: "The geometric mean represents the point of maximal equilibrium between preservation and expansion.",
+rightNote: `<div style="color: #94a3b8; line-height: 1.3; margin: 5px; text-align:center; font-size: 0.8rem;">Field tension is the precursor to any manifest force.</div>`
+},
+
+2: {
+title: "MANIFOLD IMPEDANCE (Z)",
+result: "Topology Resistance Resolved",
+resultSize: "0.85rem",
+derivation: `
+<div style="border: 1px solid var(--accent-exp); padding: 4px; border-radius: 4px; text-align: center; width: 98%; margin: 0 auto;">
+<span style="font-size: 0.55rem; color: var(--accent-exp); display: block; margin-bottom: 2px;">IMPEDANCE: $Z$</span>
+<span style="font-size: 0.85rem; color: #fff;">$3\\pi / 2$</span>
+<br>
+<span id="calc-result-2" style="font-size: 0.85rem; color: var(--accent-gold); font-family: monospace;">--</span>
+</div>`,
+brief: `<h2>Module 2: Manifold Impedance (Z)</h2><p>Defining the resistance ($Z$) of the $S^3$ manifold to energy transport. This ratio represents the "geometric tax" incurred when energy moves through a 3D substrate volume.</p>`,
+math: `<h3>Mathematics: Geometric Impedance</h3>$$Z = \\frac{V_{S^3}}{A_{equator}} = \\frac{3\\pi}{2}$$<p>Derived as the volume-to-cross-section ratio of the manifold topology.</p>`,
+sliders: `<div class="control-item"><div class="label-group"><span>TOPOLOGY FLOW</span><input type="number" id="c_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'c_sl')"></div><input type="range" id="c_sl" min="0" max="200" step="1" value="100" oninput="syncVal(this.value, 'c_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">S3 Volume → Cross-section Ratio</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">RESISTANCE STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Topological Fixed Point</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-exp);">CONSTANT: $3\\pi/2$<br>VALUE: 4.7123<br>STATUS: Impedance Active</span>`,
+metricsContent: `$Z \\approx 4.71239$`,
+hierarchy: `Impedance Validation`,
+footer: "Impedance represents the manifold's natural resistance to deformation transport.",
+rightNote: `<div style="color: #94a3b8; line-height: 1.22; margin: 0px; text-align:center; font-size: 0.80rem;">Geometric impedance is the substrate equivalent of electrical resistance.</div>`
+},
+
+3: {
+title: "TRIADIC FIELD COUPLING",
+result: "Equipartition Scaled",
+resultSize: "0.85rem",
+derivation: `
+<div style="border: 1px solid var(--accent-master); padding: 4px; border-radius: 4px; text-align: center; width: 98%; margin: 0 auto;">
+<span style="font-size: 0.55rem; color: var(--accent-master); display: block; margin-bottom: 2px;">SCALE: $\\chi_{eff}$</span>
+<span style="font-size: 0.85rem; color: #fff;">$3 \\cdot Z$</span>
+<br>
+<span id="calc-result-3" style="font-size: 0.85rem; color: var(--accent-gold); font-family: monospace;">--</span>
+</div>`,
+brief: `<h2>Module 3: Triadic Field Coupling</h2><p>Applying the Substrate Equipartition Rule. The total stress must be partitioned across the three functional degrees of freedom (Conserving, Stabilizing, Motive).</p>`,
+math: `<h3>Mathematics: Equipartition Partition</h3>$$\\chi_{eff} = 3 \\cdot Z = \\frac{9\\pi}{2}$$<p>The total denominator ensures that no single field exceeds the manifold's geometric capacity.</p>`,
+sliders: `<div class="control-item"><div class="label-group"><span>FIELD PARTITION</span><input type="number" id="r_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'r_sl')"></div><input type="range" id="r_sl" min="0" max="200" step="1" value="100" oninput="syncVal(this.value, 'r_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Triad Count (3) → Stress Partition</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">PARTITION STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Equipartition Locked</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-master);">FIELDS: 3<br>PARTITION $\\chi$: 14.137<br>STATUS: Distribution Stable</span>`,
+metricsContent: `$\\chi \\approx 14.13716$`,
+hierarchy: `Equipartition Validation`,
+footer: "Stress partitioning prevents singular field collapse by distributing energy across the triad.",
+rightNote: `<div style="color: #94a3b8; line-height: 1.22; margin: 0px; text-align:center; font-size: 0.80rem;">The number 3 is a structural requirement of the Synthesis Law of Three.</div>`
+},
+
+4: {
+title: "THE COUPLING IDENTITY",
+result: "κS Precision Calculation",
+resultSize: "0.85rem",
+derivation: `
+<div style="border: 1px solid var(--accent-lock); padding: 4px; border-radius: 4px; text-align: center; width: 98%; margin: 0 auto;">
+<span style="font-size: 0.55rem; color: var(--accent-lock); display: block; margin-bottom: 2px;">COUPLING CONSTANT: $\\kappa_S$</span>
+<span style="font-size: 0.85rem; color: #fff;">$\\kappa_S = \\frac{T_0}{\\chi_{eff}}$</span>
+<br>
+<span id="calc-result-4" style="font-size: 0.85rem; color: var(--accent-gold); font-family: monospace;">--</span>
+</div>`,
+brief: `<h2>Module 4: The Coupling Identity</h2><p>Finalizing the Substrate Coupling Constant. $\\kappa_S$ represents the pure vacuum's efficiency in transferring motive pressure into stable geometric work.</p>`,
+math: `<h3>Mathematics: The Coupling Identity</h3>$$\\boxed{\\kappa_S = \\frac{\\sqrt{K \\cdot P}}{3 \\cdot Z} \\approx 0.19795}$$<p>This is the Parent Constant from which all manifest gauge couplings derive.</p>`,
+sliders: `<div class="control-item"><div class="label-group"><span>COUPLING FLUX</span><input type="number" id="e_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'e_sl')"></div><input type="range" id="e_sl" min="0" max="200" step="1" value="100" oninput="syncVal(this.value, 'e_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Tension / Partition → Gauge Efficiency</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">IDENTITY STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">$\\kappa_S \\approx$ 0.19795 Resolved</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-lock);">RESULT $\\kappa_S$: 0.19795<br>ALIGNMENT: Substrate Impedance Match<br>STATUS: Identity Locked</span>`,
+metricsContent: `$\\kappa_S \\approx 0.197951$`,
+hierarchy: `Coupling Identity Validation`,
+footer: "$\\kappa_S$ is the mechanical limit of the vacuum's ability to absorb energy before phase-shifting.",
+rightNote: `<div style="color: #94a3b8; line-height: 1.22; margin: 0px; text-align:center; font-size: 0.80rem;">$\\kappa_S$ defines the 'transparency' of the vacuum to motive interactions.</div>`
+},
+
+5: {
+title: "ORIGIN OF WEAK MIXING",
+result: "Standard Physics Bridge",
+resultSize: "0.85rem",
+derivation: `
+<div style="border: 1px solid var(--accent-final); padding: 4px; border-radius: 4px; text-align: center; width: 98%; margin: 0 auto;">
+<span style="font-size: 0.55rem; color: var(--accent-final); display: block; margin-bottom: 2px;">OBSERVED COUPLING</span>
+<span style="font-size: 0.85rem; color: #fff;">$\\sin^2 \\theta_W \\approx \\kappa_S + \\delta_{mat}$</span>
+<br>
+<span id="calc-result-5" style="font-size: 0.85rem; color: var(--accent-gold); font-family: monospace;">--</span>
+</div>`,
+brief: `<h2>Module 5: Origin of the Weak Mixing Angle</h2><p>Bridging substrate mechanics to standard physics. The observed Weak Mixing Angle ($\\sin^2 \\theta_W$) is revealed as the $\\kappa_S$ baseline shifted by local matter-density.</p>`,
+math: `<h3>Mathematics: The Mixing Bridge</h3>$$\\sin^2 \\theta_W (obs) = \\kappa_S + \\text{Non-linear Shift}$$<p>The vacuum baseline ($0.1979$) represents the state of absolute material transparency.</p>`,
+sliders: `<div class="control-item"><div class="label-group"><span>MATERIAL LOADING</span><input type="number" id="f_in" class="digital-entry" value="100" oninput="syncVal(this.value, 'f_sl')"></div><input type="range" id="f_sl" min="0" max="200" step="1" value="100" oninput="syncVal(this.value, 'f_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Substrate κS → Observable Mixing Angle</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">MIXING STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Baseline Shift Calculation</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-final);">$\\kappa_S$: 0.1979<br>OBSERVED $\\sin^2 \\theta_W$ (Mixing Angle): ~0.231<br>STATUS: Shift Monitoring</span>`,
+metricsContent: `Loading Factor ($\\delta_{mat}$): ~0.033`,
+hierarchy: `Mixing Correspondence Validation`,
+footer: "The discrepancy between κS and sin² θW identifies the energy cost of materialization.",
+rightNote: `<div style="color: #94a3b8; line-height: 1.3; margin: 5px; text-align:center; font-size: 0.85rem;">Matter is not empty space; it is a load-bearing tension added to the vacuum.</div>`
+}
+};
+
+function syncVal(val, id) {
+const sliderId = id.includes('_in') ? id.replace('_in', '_sl') : id;
+const inputId = id.includes('_sl') ? id.replace('_sl', '_in') : id;
+if(document.getElementById(sliderId)) document.getElementById(sliderId).value = val;
+if(document.getElementById(inputId)) document.getElementById(inputId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+document.getElementById('brief-box-content').innerHTML = content.brief;
+document.getElementById('math-box-content').innerHTML = content.math;
+document.getElementById('control-sliders').innerHTML = content.sliders;
+document.getElementById('active-module-title').innerText = content.title;
+const resultEl = document.getElementById('active-module-result');
+resultEl.innerText = content.result;
+resultEl.style.fontSize = content.resultSize || "0.75rem";
+document.getElementById('derivation-content').innerHTML = content.derivation;
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('metrics-content').innerHTML = content.metricsContent;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+document.getElementById('telemetry-area').innerHTML = content.telemetry;
+showScreen('briefing');
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() {
+showScreen('lab');
+setTimeout(() => { runLab(); window.dispatchEvent(new Event('resize')); }, 100);
+}
+
+function runLab() {
+const target = document.getElementById('plot-area');
+let data = [];
+let layout = {
+paper_bgcolor: 'black', plot_bgcolor: 'black', margin: {t:60,b:10,l:0,r:0},
+showlegend: true, font: { color: '#eee', size: 10 },
+legend: { x: 0.02, y: 0.98, bgcolor: 'rgba(0,0,0,0.5)', bordercolor: '#3b82f6', borderwidth: 1 }
+};
+
+const KS_IDEAL = 0.197951;
+
+if (currentTool === 1) { // Interaction Tension
+let val = parseFloat(document.getElementById('m_sl')?.value || 100) / 100;
+const P_current = 0.6900; // The physical value for synthesis pressure
+const T0_dynamic = Math.sqrt(11.350 * P_current) * val;
+
+const res = document.getElementById('calc-result-1');
+if(res) res.innerText = "= " + T0_dynamic.toFixed(5) + " (T0)";
+
+let x_range = Array.from({length: 100}, (_, i) => i / 50);
+let y_curve = x_range.map(xi => Math.sqrt(11.350 * xi) * val);
+
+// 1. The Main Profile Curve
+data.push({
+x: x_range, y: y_curve,
+type: 'scatter', mode: 'lines',
+name: 'Interaction Mean',
+line: { color: '#3b82f6', width: 3 }
+});
+
+// 2. The Moving Marker (Dynamic Trace Point)
+data.push({
+x: [P_current],
+y: [T0_dynamic],
+type: 'scatter',
+mode: 'markers+text',
+name: 'Current State',
+text: [T0_dynamic.toFixed(3)], // Cleaned label
+textposition: 'top left', // Nudged to the right to avoid overlapping the line
+textfont: { color: '#ffffff', size: 12 },
+marker: {
+color: '#ffffff',
+size: 12, // Slightly larger for "High-Def" feel
+line: { color: '#3b82f6', width: 2 }
+}
+});
+
+layout.title = { text: "GEOMETRIC MEAN TENSION PROFILE", font: { color: '#3b82f6' } };
+layout.margin = { t: 60, b: 60, l: 60, r: 40 };
+
+layout.xaxis = {
+title: "Applied Field P",
+range: [0, 2],
+gridcolor: '#222'
+};
+
+layout.yaxis = {
+title: "Linear Tension T0",
+range: [0, 6],
+gridcolor: '#222'
+};
+
+
+} else if (currentTool === 2) { // Impedance
+// 1. CAPTURE DYNAMIC INPUT
+// Extracts slider value (0-100) and converts to a 0.0 - 1.0 multiplier
+let val = parseFloat(document.getElementById('c_sl')?.value || 100) / 100;
+
+// 2. CALCULATE DERIVED DYNAMIC VALUE
+// Z = (3π/2) * slider_multiplier
+const Z_base = (3 * Math.PI) / 2;
+const Z_dynamic = Z_base * val;
+
+// 3. UPDATE THE HTML READOUT (Derived Value)
+const res = document.getElementById('calc-result-2');
+if(res) res.innerText = "= " + Z_dynamic.toFixed(5);
+
+// 4. GENERATE DYNAMIC GRAPH DATA
+let x_range = Array.from({length: 100}, (_, i) => i / 20); // x from 0 to 5
+// The slope itself is dynamic: (Z_base * val) defines the steepness
+let y_curve = x_range.map(xi => (Z_base * val) * (xi / 5));
+
+// Profile Trace (The shaded slope)
+data.push({
+x: x_range,
+y: y_curve,
+type: 'scatter',
+mode: 'lines',
+name: 'Z-Resistance',
+fill: 'tozeroy',
+fillcolor: 'rgba(251, 191, 36, 0.1)',
+line: { color: '#fbbf24', width: 3 }
+});
+
+// 5. ADD DYNAMIC TRACE POINT (The moving marker)
+data.push({
+x: [5], // Anchored at the right edge of the flow
+y: [Z_dynamic], // Vertically tracks the calculated derived value
+type: 'scatter',
+mode: 'markers+text',
+name: 'Current State',
+text: [Z_dynamic.toFixed(4)],
+textposition: 'top left',
+textfont: { color: '#ffffff', size: 12 },
+marker: {
+color: '#ffffff',
+size: 12,
+line: { color: '#fbbf24', width: 2 }
+}
+});
+
+// 6. CONFIGURE RESPONSIVE LAYOUT
+layout.title = {
+text: "MANIFOLD IMPEDANCE PROFILE",
+font: { color: '#fbbf24', size: 16 }
+};
+
+layout.margin = { t: 60, b: 60, l: 60, r: 40 };
+
+layout.xaxis = {
+title: { text: "Topology Flow", font: { color: '#94a3b8', size: 11 } },
+range: [0, 5.5],
+gridcolor: '#222',
+zerolinecolor: '#444'
+};
+
+layout.yaxis = {
+title: { text: "Impedance (Z)", font: { color: '#94a3b8', size: 11 } },
+range: [0, 10], // FIXED RANGE: This is what makes the movement visible
+gridcolor: '#222',
+zerolinecolor: '#444'
+};
+
+
+} else if (currentTool === 3) { // Triadic Coupling
+// 1. INPUT CAPTURE (Corrected to 'r_sl')
+const slider = document.getElementById('r_sl');
+let val = slider ? parseFloat(slider.value) / 100 : 1;
+
+// 2. MATHEMATICAL SYNTHESIS
+const Chi_base = 14.13716;
+const Chi_dynamic = Chi_base * val;
+
+// 3. FULL DYNAMIC UPDATE (Readouts & Telemetry)
+const res = document.getElementById('calc-result-3');
+if(res) res.innerText = "= " + Chi_dynamic.toFixed(5);
+
+// Update the second line of telemetry to show 'X'
+const telPartition = document.getElementById('telemetry-partition-3');
+if(telPartition) telPartition.innerText = "PARTITION (X): " + Chi_dynamic.toFixed(3);
+
+// 4. TRIADIC CALCULATION (Law of Three Partitioning)
+let motiveWeight = val;
+let balanceWeight = (3 - motiveWeight) / 2;
+
+// 5. RESTORING ALL GRAPH FEATURES
+data.push({
+values: [balanceWeight, balanceWeight, motiveWeight],
+labels: ['Conserving', 'Stabilizing', 'Motive'],
+type: 'pie',
+hole: 0.45, // Restored hole size for the "Synthesis Center"
+sort: false,
+direction: 'clockwise',
+marker: {
+colors: ['#c084fc', '#2dd4bf', '#fbbf24'], // ISFP Brand Colors
+line: { color: '#0f172a', width: 3 } // High-contrast borders
+},
+textinfo: 'percent',
+textfont: { color: '#ffffff', size: 12 },
+hoverinfo: 'label+value+percent',
+insidetextorientation: 'horizontal'
+});
+
+// 6. RESTORING FULL LAYOUT SPECS
+layout.title = {
+text: "TRIADIC STRESS DISTRIBUTION",
+font: { color: '#c084fc', size: 18, family: 'Arial' },
+x: 0.5,
+y: 0.95
+};
+
+// LEGEND AT TOP LEFT (Restored and Styled)
+layout.showlegend = true;
+layout.legend = {
+x: 0.05,
+y: 1,
+xanchor: 'left',
+yanchor: 'top',
+font: { color: '#94a3b8', size: 11 },
+bgcolor: 'rgba(15, 23, 42, 0.5)', // Subtle dark background for legibility
+bordercolor: '#334155',
+borderwidth: 1
+};
+
+// MARGINS & PADDING (Ensures zero overlap)
+layout.margin = { t: 100, b: 40, l: 50, r: 50 };
+layout.paper_bgcolor = 'rgba(0,0,0,0)';
+layout.plot_bgcolor = 'rgba(0,0,0,0)';
+
+
+} else if (currentTool === 4) { // Coupling Identity
+// 1. DYNAMIC CAPTURE (Ensure ID matches your HTML, assuming 'e_sl')
+const slider = document.getElementById('e_sl');
+let val = slider ? parseFloat(slider.value) / 100 : 1;
+
+// 2. PHYSICAL CONSTANTS & CALCULATION
+const KS_IDEAL = 0.197951; // The base Substrate Coupling Efficiency
+const KS_dynamic = KS_IDEAL * val;
+
+// 3. UPDATE UI LABELS (Surgical nomenclature)
+const res = document.getElementById('calc-result-4');
+if(res) res.innerText = "= " + KS_dynamic.toFixed(6);
+
+// Update Telemetry Result Line
+const telResult = document.getElementById('telemetry-result-4');
+if(telResult) telResult.innerHTML = "RESULT &kappa;<sub>S</sub>: " + KS_dynamic.toFixed(5);
+
+// Update Telemetry Handshake (Physical term)
+const telHandshake = document.getElementById('telemetry-handshake-4');
+if(telHandshake) telHandshake.innerText = "ALIGNMENT: Substrate Impedance Match";
+
+// Update Identity Status (Top Right)
+const identityStatus = document.getElementById('identity-status-4');
+if(identityStatus) identityStatus.innerHTML = "&kappa;<sub>S</sub> " + KS_dynamic.toFixed(5) + " Resolved";
+
+// 4. POLAR GRAPHING (The Efficiency Sphere)
+let theta = Array.from({length: 100}, (_, i) => (i * 360) / 100);
+let r_vals = theta.map(() => KS_dynamic);
+
+// The Efficiency Boundary
+data.push({
+r: r_vals,
+theta: theta,
+type: 'scatterpolar',
+mode: 'lines',
+fill: 'toself',
+fillcolor: 'rgba(248, 113, 113, 0.15)',
+line: { color: '#f87171', width: 2 },
+name: 'Coupling Limit'
+});
+
+// 5. THE DYNAMIC TRACE POINT (The Readable Marker)
+data.push({
+r: [KS_dynamic],
+theta: [45], // Positioned at 45 degrees for optimal legibility
+type: 'scatterpolar',
+mode: 'markers+text',
+name: 'Identity Point',
+text: ['κS: ' + KS_dynamic.toFixed(5)],
+textposition: 'top right',
+textfont: { color: '#ffffff', size: 12 },
+marker: {
+color: '#ffffff',
+size: 10,
+line: { color: '#f87171', width: 2 }
+}
+});
+
+// 6. POLAR LAYOUT CONFIGURATION
+layout.title = {
+text: "SUBSTRATE COUPLING EFFICIENCY (κS)",
+font: { color: '#f87171', size: 16 }
+};
+
+layout.margin = { t: 80, b: 40, l: 50, r: 50 };
+
+layout.polar = {
+bgcolor: 'rgba(0,0,0,0)',
+radialaxis: {
+visible: true,
+range: [0, 0.4], // Locked range to see the sphere expand/contract
+gridcolor: '#334155',
+tickfont: { color: '#94a3b8', size: 10 }
+},
+angularaxis: {
+gridcolor: '#334155',
+tickfont: { color: '#94a3b8', size: 10 }
+}
+};
+
+
+
+} else if (currentTool === 5) { // Weak Mixing Bridge
+// 1. DYNAMIC CAPTURE
+const slider = document.getElementById('f_sl'); // Assuming 'f_sl' for Material Loading
+let val = slider ? parseFloat(slider.value) / 100 : 1;
+
+// 2. PHYSICAL CONSTANTS
+const KS = 0.19795; // Vacuum Coupling
+const SIN2W = 0.23122; // Standard Model Observed Value
+const Delta_Mat = SIN2W - KS; // The "Material Cost" (approx 0.033)
+
+// Dynamic calculation: Base Vacuum + (Material Loading * Shift)
+const observed_dynamic = KS + (Delta_Mat * val);
+
+// 3. UPDATE UI READOUTS
+const res = document.getElementById('calc-result-5');
+if(res) res.innerText = "= " + observed_dynamic.toFixed(5);
+
+// Telemetry: Identifying the specific shift
+const telObserved = document.getElementById('telemetry-observed-5');
+if(telObserved) telObserved.innerText = "OBSERVED: sin²θW (Mixing Angle)";
+
+// 4. BAR GRAPHING (Vacuum vs. Observed)
+data.push({
+x: ['Vacuum κS', 'Observed sin²θW'],
+y: [KS, observed_dynamic],
+type: 'bar',
+marker: {
+color: ['#2dd4bf', '#3b82f6'], // Teal for Vacuum, Blue for Observable
+line: { color: '#ffffff', width: 1 }
+},
+name: 'Coupling Strength'
+});
+
+// 5. LAYOUT CONFIGURATION
+layout.title = {
+text: "VACUUM VS. OBSERVED COUPLING",
+font: { color: '#3b82f6', size: 16 }
+};
+
+layout.margin = { t: 60, b: 60, l: 60, r: 40 };
+
+layout.xaxis = {
+title: { text: "Interaction State", font: { color: '#94a3b8' } },
+gridcolor: '#222'
+};
+
+layout.yaxis = {
+title: { text: "Coupling Value", font: { color: '#94a3b8' } },
+range: [0, 0.3], // Locked range to see the "Loading" bar grow
+gridcolor: '#222'
+};
+}
+
+Plotly.react('plot-area', data, layout, {responsive: true, displayModeBar: false});
+}
+
+function resetLab() {
+syncVal(100, 'm_sl'); syncVal(100, 'c_sl'); syncVal(100, 'r_sl'); syncVal(100, 'e_sl'); syncVal(100, 'f_sl');
+}
+
+window.onload = () => { showScreen('portal'); };
+</script>
+</body>
+</html>
