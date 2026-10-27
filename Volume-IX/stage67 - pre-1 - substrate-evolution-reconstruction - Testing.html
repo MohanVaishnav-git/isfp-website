@@ -601,7 +601,7 @@ if (telArea) {
 telArea.innerHTML = `
 <div style="font-family:monospace; font-size:0.85rem; line-height:1.6;">
 <span style="color:var(--text-dim);">SECTOR:</span> <span style="color:#e5e7eb;">MASTER SYMMETRY</span><br>
-<span style="color:var(--text-dim);">COUPLING:</span> <span style="color:${isUnified ? 'var(--accent-gold)' : '#c084fc'}; font-weight:bold;">${isUnified ? 'g_A = g_B (Unified)' : 'g_A ≠ g_B'}</span><br>
+<span style="color:var(--text-dim);">COUPLING:</span> <span style="color:${isUnified ? 'var(--accent-gold)' : '#c084fc'}; font-weight:bold;">${isUnified ? 'gₐ = gᵦ (Unified)' : 'gₐ ≠ gᵦ'}</span><br>
 <span style="color:var(--text-dim);">RATIO P/K:</span> <span style="color:var(--accent-gold); font-weight:bold;">${true_ms_pk.toExponential(2)}</span><br>
 <span style="color:var(--text-dim);">STATUS:</span> <span style="color:${isUnified ? '#2dd4bf' : '#3b82f6'}; font-weight:bold;">${isUnified ? 'MASTER SYMMETRY ACHIEVED' : 'SCALING TO MASTER SYMMETRY'}</span>
 </div>`;
@@ -616,9 +616,9 @@ metArea.innerHTML = `
 <div style="color:var(--accent-master); font-size:1.1rem; font-weight:bold;">${isUnified ? 'MASTER SYMMETRY ACHIEVED' : 'UPWARD SCALING'}</div>
 <div style="color:#2dd4bf; font-size:0.95rem; margin-bottom:8px;">Scale: ${energyDisplay} GeV</div>
 ${isUnified ?
-`<div style="color:var(--accent-gold); font-weight:bold;">g_MS (Master Unity): ${g_ms_final.toFixed(4)}</div>` :
-`<div style="color:#c084fc;">g_A (Base Mode): ${g_a_current.toFixed(4)}</div>
-<div style="color:#ef4444;">g_B (Higher Mode): ${g_b_current.toFixed(4)}</div>`
+`<div style="color:var(--accent-gold); font-weight:bold;">gₘₛ (Master Unity): ${g_ms_final.toFixed(4)}</div>` :
+`<div style="color:#c084fc;">gₐ (Base Mode): ${g_a_current.toFixed(4)}</div>
+<div style="color:#ef4444;">gᵦ (Higher Mode): ${g_b_current.toFixed(4)}</div>`
 }
 <div style="color:#e5e7eb; border-top:1px solid #333; margin-top:5px; padding-top:5px;">
 GAP Δg: ${currentGap.toFixed(4)}
@@ -648,20 +648,15 @@ data.push({
 x: x_axis, y: x_axis.map(() => g_ms_final),
 type: 'scatter', mode: 'lines',
 line: { color: '#fbbf24', width: 5 },
-name: 'g_MS (Master Symmetry Achieved)'
+name: 'gₘₛ (Master Symmetry Achieved)'
 });
 } else {
-data.push({ x: x_axis, y: x_axis.map(() => g_a_current), type: 'scatter', mode: 'lines', line: { color: '#c084fc', width: 4 }, name: 'g_A (Base)' });
-data.push({ x: x_axis, y: x_axis.map(() => g_b_current), type: 'scatter', mode: 'lines', line: { color: '#ef4444', width: 4 }, name: 'g_B (Higher Mode)' });
+data.push({ x: x_axis, y: x_axis.map(() => g_a_current), type: 'scatter', mode: 'lines', line: { color: '#c084fc', width: 4 }, name: 'gₐ (Base)' });
+data.push({ x: x_axis, y: x_axis.map(() => g_b_current), type: 'scatter', mode: 'lines', line: { color: '#ef4444', width: 4 }, name: 'gᵦ (Higher Mode)' });
 }
 
 layout.xaxis = { title: "Log (P/K)", gridcolor: '#222', range: [LOG_START_GUT, LOG_THRESHOLD_MS] };
 layout.yaxis = { title: "Coupling Strength (g)", gridcolor: '#222', range: [0.5, 0.8] };
-
-
-
-
-
 
 
 
