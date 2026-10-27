@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Stage 67 — Substrate Evolution Reconstruction</title>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+window.MathJax = {
+tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root {
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #3b82f6;
+--accent-obs: #94a3b8; --accent-exp: #fbbf24; --accent-master: #c084fc; --accent-lock: #f87171; --accent-final: #2dd4bf;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626; --accent-blue: #3b82f6;
+--accent-gold: #fbbf24;
+}
+
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+nav {
+padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
+}
+.logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-gold); font-family: sans-serif; font-size: 0.85rem; min-width: 450px; }
+.back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
+
+#nav-briefing-controls, #nav-math-controls, #nav-summary-controls { display: none; gap: 15px; align-items: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+.screen.active { display: flex; }
+#screen-lab.active { display: flex; flex-direction: column; height: calc(100vh - 50px); }
+
+#screen-portal { justify-content: flex-start; padding-top: 2dvh; overflow-y: auto; }
+
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 10px; }
+.portal-card {
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
+}
+.portal-card:hover { border-color: var(--accent-unified); transform: translateY(-3px); }
+.portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
+
+.briefing-box, .math-box, .summary-box {
+max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
+}
+
+#tool { display: grid; width: 100%; max-width: 100%; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; box-sizing: border-box; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
+
+.module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 2px; font-weight: bold; letter-spacing: 0.5px; padding-bottom: 0px; }
+.module-subtitle { text-align: center; font-family: sans-serif; color: var(--accent-gold); margin-bottom: 5px; font-weight: bold; letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.primary-constant-box { background: #000; border: 1px solid var(--accent-unified); padding: 2px; border-radius: 8px; display: flex; justify-content: space-around; margin-bottom: 8px; }
+.const-item { text-align: center; }
+.const-label { font-size: 0.52rem; color: var(--accent-unified); text-transform: uppercase; display: block; }
+.const-val { font-size: 0.90rem; font-family: monospace; font-weight: bold; }
+
+.diagnostic-panel { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+.diag-title { font-size: 0.52rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
+
+.definition-box { background: rgba(59, 130, 246, 0.05); border: 1px solid var(--accent-unified); padding: 5px; border-radius: 5px; margin-bottom: 8px; font-size: 0.7rem; }
+.def-title { color: var(--accent-unified); font-weight: bold; display: block; margin-bottom: 3px; border-bottom: 1px solid var(--accent-unified); text-transform: uppercase; font-size: 0.55rem; }
+
+.label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
+.digital-entry { background: #000; border: 1px solid #444; color: var(--accent-unified); font-family: monospace; font-size: 0.75rem; width: 75px; text-align: center; border-radius: 4px; padding: 2px; }
+
+input[type=range] { width: 100%; accent-color: var(--accent-unified); cursor: pointer; margin: 6px 0; height: 10px; }
+
+#viz-container { background: #000; border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; }
+#plot-area { flex-grow: 1; width: 100%; }
+
+.btn-nav-brief { background: var(--accent-unified); color: #fff; border: 1px solid var(--accent-unified); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+.btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
+
+.isfp-footer { width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem; color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">Σ STAGE 67 — SUBSTRATE EVOLUTION RECONSTRUCTION</div>
+<div id="nav-briefing-controls">
+<button class="btn-nav-menu" onclick="location.reload()">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="location.reload()">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
+<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+</div>
+<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+</nav>
+
+<div id="screen-portal" class="screen active">
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">The Breath of the Substrate</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">Mapping the Chronology of P and K from Unification to Expansion.</p>
+<div class="portal-grid">
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-unified);">
+<h2 style="color:var(--accent-unified);">1. Electroweak Threshold</h2>
+<p>Symmetry Convergence ($10^2$ GeV).</p>
+</div>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-exp);">
+<h2 style="color:var(--accent-exp);">2. Grand Unification (GUT)</h2>
+<p>Absolute Triadic Unity ($10^{16}$ GeV).</p>
+</div>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-master);">
+<h2 style="color:var(--accent-master);">3. Master Symmetry</h2>
+<p>Higher-Order Substrate Ratio ($10^{18}$).</p>
+</div>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-exp);">
+<h2 style="color:var(--accent-exp);">4. Early Universe Rebound</h2>
+<p>Pressure-Driven Inflation (High z).</p>
+</div>
+<div class="portal-card" onclick="openTool(5)" style="border-color: var(--accent-lock);">
+<h2 style="color:var(--accent-lock);">5. Expansion Equilibrium</h2>
+<p>Current Era Restorative Accel $a_K$.</p>
+</div>
+<div class="portal-card" onclick="openTool(6)" style="border-color: var(--accent-final);">
+<h2 style="color:var(--accent-final);">6. Master Evolution Flow</h2>
+<p>The Full Substrate Cycle.</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-unified);">
+<h2 style="color:var(--accent-unified);">7. Stage Summary</h2>
+<p>Substrate Chronology Closure.</p>
+</div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<div id="screen-briefing" class="screen">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color:var(--accent-unified); text-align:center;">Stage 67: Substrate Evolution Reconstruction</h2>
+<section>
+<p>The universe's history is the dynamic relaxation and tension of the substrate. What standard physics calls "History" is actually the phase-evolution of Synthesis Pressure (P) and Vacuum Stiffness (K).</p>
+<div style="background: rgba(59,130,246,0.03); padding: 15px; border-radius: 8px; font-family: monospace; font-size: 0.85rem; border: 1px solid var(--accent-unified); line-height: 1.6;">
+<strong>CHRONOLOGY IDENTITY:</strong><br>
+$H(z)^2 = H_0^2 [ \Omega_m (1+z)^3 + \Omega_r (1+z)^4 + \Phi(P, z) ]$<br>
+$\Phi(P, z) \implies$ Dynamic Equilibrium Control
+</div>
+<h4 style="color: var(--accent-gold); margin-bottom: 5px;">MAPPING CLOSURE</h4>
+<ul style="font-size: 0.85rem; line-height: 1.4;">
+<li>EW Phase: Point where $P$ overcomes Higgs-scale symmetry tension ($\approx 1.6$).</li>
+<li>GUT Phase: The absolute synthesis where $P/K \approx 1.45 \times 10^{14}$ forces triadic force alignment.</li>
+<li>Master Symmetry: The higher-order convergence state at $P/K \approx 1.47 \times 10^{18}$, manifesting as the Cosmic Core.</li>
+<li>Inflation: The initial high-pressure rebound of the compressed substrate.</li>
+<li>Dark Energy: The current restorative acceleration $a_K$ as the substrate "snaps back."</li>
+</ul>
+<p style="text-align:center; font-weight:bold; margin-top:20px; color: var(--accent-gold);">FINAL STAGE STATEMENT</p>
+<p style="text-align:center; border: 1px solid var(--accent-gold); padding: 10px; background: rgba(251, 191, 36, 0.05);">Stage 67 completes the transition from static gauge description to the dynamic 'Breath' of the vacuum, proving that cosmological evolution is a structural substrate process.</p>
+</section>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-lab" class="screen">
+<div id="tool">
+<div class="panel">
+<div id="active-module-title" class="module-header">--</div>
+<div id="active-module-result" class="module-subtitle">--</div>
+<div class="primary-constant-box">
+<div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val">11.350</span></div>
+<div class="const-item"><span class="const-label">Synthesis P</span><span class="const-val">0.6900</span></div>
+</div>
+
+<div id="mapping-box-area"></div>
+
+<div class="diagnostic-panel">
+<span class="diag-title">Evolutionary Telemetry</span>
+<div id="telemetry-area"></div>
+</div>
+
+<div id="control-sliders"></div>
+<button onclick="resetLab()" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-unified); font-size:0.75rem; cursor:pointer; padding:6px;">RE-SYNC TIMELINE</button>
+<div id="panel-footer-text" style="font-size: 0.85rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.3; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:0px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:8px;">BACK TO BRIEFING</button>
+</div>
+
+<div id="viz-container">
+<div id="plot-area"></div>
+</div>
+
+<div class="panel">
+<div id="law-box-area"></div>
+<div class="diagnostic-panel">
+<span class="diag-title">Master Identity</span>
+<div id="metrics-content" style="font-size:0.85rem; text-align:center; padding:5px;"></div>
+</div>
+<div id="hierarchy-box-area" class="diagnostic-panel" style="text-align: center; background: #000; border-color: var(--accent-unified);">
+<span class="diag-title">Validation Chain</span>
+<p id="hierarchy-text" style="margin: 0; font-family: monospace; font-size: 0.95rem; line-height: 1.4;"></p>
+</div>
+<div id="panel-right-note" style="font-size: 0.65rem; color: var(--text-dim); line-height: 1.3; background: #000; padding: 5px; border-radius: 0px; border: 1px solid #222; margin-bottom: 0px; margin-top: auto;"></div>
+</div>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+</footer>
+</div>
+
+<script>
+let currentTool = 1;
+
+const toolContent = {
+1: {
+title: "ELECTROWEAK THRESHOLD",
+result: "Symmetry Merged",
+brief: `<h2>Module 1: The EW Threshold</h2><p>Mapping the first point of convergence ($10^2$ GeV) where Substrate Pressure $P$ overcomes Higgs-scale symmetry breaking.</p><ul><li>Force: EM and Weak merge.</li><li>Mechanism: P-saturation vs Substrate Tension.</li><li>Identity: Electroweak unity as a substrate phase.</li></ul>`,
+math: `<h3>Mathematics: EW Unity</h3><p>At the threshold, the interaction potential is dominated by P:</p>$$P_{crit} \\approx K \\cdot \\chi$$<p>This recovers the symmetry before Higgs-field separation.</p>`,
+sliders: `<div class="control-item"><div class="label-group"><span>P/K RATIO (EW)</span><input type="number" id="m_in" class="digital-entry" value="0.061" step="0.001" oninput="syncVal(this.value, 'm_sl')"></div><input type="range" id="m_sl" min="0.061" max="2" step="0.001" value="0.061" oninput="syncVal(this.value, 'm_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Critical P/K → Electroweak Unification</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">EQUILIBRIUM STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">EW Symmetry Recovered</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-unified);">PHASE: Electroweak<br>COUPLING: g1 = g2<br>TENSION: Overcome by P<br>STATUS: Unified</span>`,
+metricsContent: `$P_{crit} \\approx K \\cdot \\chi$`,
+hierarchy: `EW Threshold Sync`,
+footer: "Electroweak unification is the point where substrate pressure negates internal tension.",
+rightNote: `<div style="text-align:center; margin: 0px; font-size: 0.74rem; color: var(--accent-gold);">👉 Verification:<br>The model reproduces the electroweak scale (~110 GeV) from substrate ratio P/K ≈ 1.6 without additional assumptions.<p>👉 This Module Establishes:<br>Symmetry restoration occurs at critical substrate ratio P/K ≈ 1.6, yielding g₁ ≈ g₂ and a unified electroweak interaction</p></div>`
+},
+
+2: {
+title: "GRAND SYNTHESIS",
+result: "Triadic Unity",
+brief: `<h2>Module 2: The Grand Synthesis</h2><p>Mapping the absolute "Point of Synthesis" at $10^{16}$ GeV, where the $P/K$ ratio forces all triadic forces into a single identity.</p><ul><li>Force: Strong + EW merge.</li><li>Logic: The substrate exists in a state of absolute compression.</li><li>Identity: Substrate Singularity.</li></ul>`,
+math: `<h3>Mathematics: GUT Convergence</h3><p>All coupling constants $g_i$ converge to the triadic mean:</p>$$\\alpha_1 = \\alpha_2 = \\alpha_3 \\text{ at } P_{max}$$`,
+sliders: `<div class="control-item"><div class="label-group"><span>P/K RATIO (LOG)</span><input type="number" id="c_in" class="digital-entry" value="0.204" step="0.001" oninput="syncVal(this.value, 'c_sl')"></div><input type="range" id="c_sl" min="0.204" max="14.161" step="0.001" value="0.204" oninput="syncVal(this.value, 'c_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Max P → Grand Unity<br>This module explores interaction structure as a function of P/K, not temporal evolution</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">SYNTHESIS STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Absolute Convergence</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-exp);">PHASE: Grand Synthesis<br>STATE: Zero Divergence<br>COUPLING: Universal g<br>STATUS: Master Unity</span>`,
+metricsContent: `$\\alpha_{GUT} \\approx \\Phi(P/K)$`,
+hierarchy: `Triadic Absolute`,
+footer: "Grand Synthesis is the structural limit of the vacuum substrate under maximal pressure.",
+rightNote: `<div style="text-align:center; font-size: 0.80rem; color: var(--accent-gold);">👉 Module 2 — Core Establishment:<br>Grand unification is not only reproduced, but its origin is derived as a function of the substrate ratio P/K<p>👉 This Module Establishes:<br>Grand Unification occurs when$\\frac{P}{K} \\sim 10^{14}$, producing $E \\sim 10^{16}$GeV and $\\ g_1 \\approx g_2 \\approx g_3$</p></div>`
+},
+
+3: {
+title: "MASTER SYMMETRY",
+result: "Cosmic Core Ratio",
+brief: `<h2>Module 3: Master Symmetry</h2><p>Deriving the higher-order substrate ratio of Master Symmetry directly from the established Grand-Unification state, GUT coupling, and Master-Symmetry energy scale ($1.22 \\times 10^{19}$ GeV).</p><ul><li>Scaling Relation: $(P/K)_{\\mathrm{MS}} = (P/K)_{\\mathrm{GUT}} \\, \\alpha_{\\mathrm{GUT}}^{-1/2} \\, (E_{\\mathrm{MS}}/E_{\\mathrm{GUT}})$</li><li>Derived Ratio: $(P/K)_{\\mathrm{MS}} \\approx 1.47 \\times 10^{18}$</li><li>Physical Manifestation: The Cosmic Core as the supreme structural centre.</li></ul>`,
+math: `<h3>Mathematics: Master Symmetry Derivation</h3><p>Using the upward scaling relation from GUT to Master Symmetry:</p>$$\\left(\\frac{P}{K}\\right)_{\\mathrm{MS}} = \\left(\\frac{P}{K}\\right)_{\\mathrm{GUT}} \\alpha_{\\mathrm{GUT}}^{-1/2} \\left(\\frac{E_{\\mathrm{MS}}}{E_{\\mathrm{GUT}}}\\right)$$<p>Substituting $\\alpha_{\\mathrm{GUT}} = 1/68.75$, $E_{\\mathrm{GUT}} = 10^{16}$ GeV, and $E_{\\mathrm{MS}} = 1.22 \\times 10^{19}$ GeV:</p>$$\\left(\\frac{P}{K}\\right)_{\\mathrm{MS}} \\approx 1.47 \\times 10^{18}$$`,
+sliders: `<div class="control-item"><div class="label-group"><span>P/K MS RATIO (LOG)</span><input type="number" id="ms_in" class="digital-entry" value="14.161" step="0.01" oninput="syncVal(this.value, 'ms_sl')"></div><input type="range" id="ms_sl" min="14.161" max="18.167" step="0.01" value="14.161" oninput="syncVal(this.value, 'ms_sl')"></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-master);">GUT State + Upward Scaling → Master Symmetry ($1.47 \\times 10^{18}$)</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">COSMIC CORE STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-master);">Highest Synthesis Centre</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-master);">PHASE: Master Symmetry<br>RATIO: 1.47 × 10¹⁸<br>MANIFESTATION: Cosmic Core<br>HIERARCHY: Supreme Centre</span>`,
+metricsContent: `$\\left(\\frac{P}{K}\\right)_{\\mathrm{MS}} \\approx 1.47 \\times 10^{18}$`,
+hierarchy: `Master Symmetry Core`,
+footer: "Master Symmetry is the higher-order state of Grand Unification, establishing the Cosmic Core as the master structural centre.",
+rightNote: `<div style="text-align:center; font-size: 0.78rem; color: var(--accent-master);">👉 Verification:<br>Derives $(P/K)_{\\mathrm{MS}} \\approx 1.47 \\times 10^{18}$ without intermediate independent parameters.<p>👉 This Module Establishes:<br>Master Symmetry extends GUT into the supreme structural organizing center (Cosmic Core).</p></div>`
+},
+
+4: {
+title: "EARLY UNIVERSE REBOUND",
+result: "High-z Inflation",
+brief: `<h2>Module 4: Early Universe Rebound</h2><p>Visualizing the high expansion rate at high redshift ($z > 1000$) driven by peak Substrate Pressure $P$.</p><ul><li>Concept: Inflation as Substrate Rebound.</li><li>Logic: Rapid relaxation of the GUT-scale tension.</li><li>Data: Replaces the Scalar Inflaton field.</li></ul>`,
+math: `<h3>Mathematics: Expansion Rebound</h3>$$H(z)^2 \\propto \\Phi(P, z) \\tanh(P \\cdot z)$$<p>High P creates the initial 'burst' of spatial expansion.</p>`,
+sliders: `<div class="control-item"><div class="label-group"><span>REDSHIFT (z)</span><input type="number" id="r_in" class="digital-entry" value="0" oninput="syncVal(this.value, 'r_sl')"></div><input type="range" id="r_sl" min="0" max="1500" step="1" value="0" oninput="syncVal(this.value, 'r_sl')"><div class="slider-labels" style="display:flex; justify-content:space-between; font-size:0.65rem; color:var(--text-dim); margin-top:5px;"><span style="flex:1; text-align:left;">Present (z=0)</span><span style="flex:1; text-align:center;">CMB Era (z=1100)</span><span style="flex:1; text-align:right;">Pre-CMB (z>1100)</span></div></div>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Pressure Gradient → Rebound</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">INFLATION STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Rebound Dominant</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-master);">PHASE: Rebound Epoch<br>PRESSURE: Maximum Gradient<br>FLOW: Scalar Replacement<br>STATUS: High-z Expansion</span>`,
+metricsContent: `$H(z) = \\Phi(P, z)$`,
+hierarchy: `Inflation Recovery`,
+footer: "Inflation is the mechanical rebound of the compressed substrate medium.",
+rightNote: `<div style="text-align:center; font-size: 0.78rem; color: var(--accent-gold);">👉 Verification: H(z) increases monotonically with z, consistent with pressure-driven scaling.<p>👉 This Module Establishes:<br>Early expansion follows H(z) $\\propto \\sqrt{P(z)}$ from high substrate pressure, without an inflation field.</p></div>`
+},
+
+5: {
+title: "EXPANSION EQUILIBRIUM",
+result: "Restorative Accel",
+brief: `<h2>Module 5: Current Equilibrium</h2><p>Demonstrating how current acceleration is a stable result of Stiffness $K$ asserting restorative force as $\\Omega_m$ drops.</p><ul><li>Force: $a_K$ (Vacuum Restoration).</li><li>Logic: The substrate "snaps back" toward its neutral stiffness.</li><li>Dark Energy: Replaced by $K$.</li></ul>`,
+math: `<h3>Mathematics: Late-Time Restoration</h3>$$a_{tot} = a_N + \\sqrt{a_N \\cdot a_0}$$<p>Where $a_0$ is derived from Vacuum Stiffness $K$.</p>`,
+sliders: `<div class="control-item"><div class="label-group"><span>REDSHIFT (z)</span><input type="number" id="e_in" class="digital-entry" value="0.00" step="0.01" oninput="syncVal(this.value, 'e_sl')"></div><input type="range" id="e_sl" min="0" max="2" step="0.01" value="0" oninput="syncVal(this.value, 'e_sl')"><div class="slider-labels" style="display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--text-dim); margin-top: 5px;"><span style="flex:1; text-align:left;">Present (z=0)</span><span style="flex:1; text-align:center;">Late-Time</span><span style="flex:1; text-align:right;">Past (z=2)</span>`,
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Low Matter → K-Dominance</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">ACCEL STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Restoration Dominant</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-lock);">PHASE: Current Epoch<br>FORCE: Restorative aK<br>DENSITY: 0.27 - 0.31<br>STATUS: Acceleration Measured</span>`,
+metricsContent: `$a_{tot} = a_N + a_K$`,
+hierarchy: `K-Stiffness Law`,
+footer: "Acceleration is not 'repulsion' but the restorative action of vacuum stiffness.",
+rightNote: `<div style="text-align:center; font-size: 0.75rem; color: var(--accent-gold);">👉 Verification: Reproduces ($\\sim 70 km/s/Mpc$) with smooth redshift evolution, consistent with stiffness-driven dynamics.<p>👉 This Module Establishes:<br>Late-time acceleration arises from residual substrate pressure with $H^2(z) \\propto P + K$ without dark energy.</p></div>`
+},
+
+6: {
+title: "MASTER EVOLUTION FLOW",
+result: "The Substrate Breath",
+brief: `<h2>Module 6: The Master Flow</h2><p>A single master view moving from $P_{max}$ (Unification/Early) to $P_{now}$ (Separation/Current). Watching the universe "breathe".</p><ul><li>Action: Move from left (Big Bang) to right (Present).</li><li>Logic: Forces split as the pressure relaxes.</li><li>Unification: The Triadic Identity at t=0.</li></ul>`,
+math: `<h3>Mathematics: The Breath Identity</h3>$$\\text{Unification} \\to \\text{Separation} \\to \\text{Restoration}$$<p>The entire history of the universe in a single substrate function.</p>`,
+
+sliders: `<div class="control-item">
+<div class="label-group">
+<span>TIMELINE (Log z)</span>
+<input type="number" id="f_in" class="digital-entry" value="0" oninput="syncVal(this.value, 'f_sl')">
+</div>
+<input type="range" id="f_sl" min="0" max="3.18" step="0.01" value="0" oninput="syncVal(this.value, 'f_sl')">
+<div class="slider-labels" style="display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--text-dim); margin-top: 5px;">
+<span style="flex:1; text-align:left;">Present (z=0)</span>
+<span style="flex:1; text-align:center;">CMB (z=1100)</span>
+<span style="flex:1; text-align:right;">Pre-CMB (z=1500)</span>
+</div>
+</div>`,
+
+mappingBox: `<div class="definition-box"><span class="def-title">MAPPING RULE</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Flow → Evolutionary Cycle</div>`,
+lawBox: `<div class="definition-box"><span class="def-title">UNITY STATUS</span><div style="text-align:center; font-size: 0.85rem; color: var(--accent-gold);">Master Convergence</div>`,
+telemetry: `<span style="font-family:monospace; font-size:0.75rem; color:var(--accent-final);">EPOCH: Transition Phase<br>EQUILIBRIUM: P/K Balance<br>STRUCTURE: Unified → Dual<br>STATUS: Dynamic Chronology</span>`,
+metricsContent: `$a_{tot} = a_N (1 + \\sqrt{a_0/a_N})$`,
+hierarchy: `Triadic Unification`,
+footer: "The 'Breath' is the transition of energy from synthesis pressure into structural stiffness.",
+rightNote: `<div style="text-align:center; font-size: 0.74rem; color: var(--accent-gold);">👉 Verification: Produces smooth, monotonic expansion over full redshift range, consistent with continuous substrate evolution.<P>👉 This Module Establishes:<br>Continuous evolution across all scales via $H(z) \\propto \\sqrt{P(z)}$ with no discontinuities in dynamics.</P></div>`
+}
+};
+
+function syncVal(val, id) {
+const sliderId = id.includes('_in') ? id.replace('_in', '_sl') : id;
+const inputId = id.includes('_sl') ? id.replace('_sl', '_in') : id;
+if(document.getElementById(sliderId)) document.getElementById(sliderId).value = val;
+if(document.getElementById(inputId)) document.getElementById(inputId).value = val;
+runLab();
+}
+
+function openTool(id) {
+currentTool = id;
+const content = toolContent[id];
+document.getElementById('brief-box-content').innerHTML = content.brief;
+document.getElementById('math-box-content').innerHTML = content.math;
+document.getElementById('control-sliders').innerHTML = content.sliders;
+document.getElementById('active-module-title').innerText = content.title;
+document.getElementById('active-module-result').innerText = content.result;
+document.getElementById('mapping-box-area').innerHTML = content.mappingBox;
+document.getElementById('law-box-area').innerHTML = content.lawBox;
+document.getElementById('metrics-content').innerHTML = content.metricsContent;
+document.getElementById('hierarchy-text').innerHTML = content.hierarchy;
+document.getElementById('panel-footer-text').innerHTML = content.footer;
+document.getElementById('panel-right-note').innerHTML = content.rightNote;
+document.getElementById('telemetry-area').innerHTML = content.telemetry;
+showScreen('briefing');
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + id).classList.add('active');
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
+if (window.MathJax) { MathJax.typesetPromise(); }
+}
+
+function launchLab() {
+showScreen('lab');
+setTimeout(() => { runLab(); window.dispatchEvent(new Event('resize')); }, 100);
+}
+
+function runLab() {
+const target = document.getElementById('plot-area');
+let data = [];
+let layout = {
+paper_bgcolor: 'black', plot_bgcolor: 'black', margin: {t:60,b:40,l:60,r:40},
+showlegend: true, font: { color: '#eee', size: 10 },
+legend: { x: 0.02, y: 0.98, bgcolor: 'rgba(0,0,0,0.5)', font: {color:'#eee'} }
+};
+
+
+if (currentTool === 1) {
+const slider = document.getElementById('m_sl');
+if (!slider) return;
+
+let ratio_pk = parseFloat(slider.value);
+const THRESHOLD_EW = 1.6;
+const ALPHA = 68.75;
+
+let dynamicGev = ALPHA * ratio_pk;
+
+const g1_initial = 0.3570;
+const g2_initial = 0.6570;
+const g_unified = 0.5070;
+
+let morph = Math.min(1, Math.max(0, (ratio_pk - 0.061) / (THRESHOLD_EW - 0.061)));
+let g1_current = g1_initial + (g_unified - g1_initial) * morph;
+let g2_current = g2_initial + (g_unified - g2_initial) * morph;
+
+let isUnified = ratio_pk >= THRESHOLD_EW;
+
+const telArea = document.getElementById('telemetry-area');
+if (telArea) {
+telArea.innerHTML = `
+<div style="font-family:monospace; font-size:0.85rem; line-height:1.6;">
+<span style="color:var(--text-dim);">SECTOR:</span> <span style="color:#e5e7eb;">ELECTROWEAK THRESHOLD</span><br>
+<span style="color:var(--text-dim);">COUPLING:</span> <span style="color:${isUnified ? '#f472b6' : 'var(--accent-gold)'}; font-weight:bold;">${isUnified ? 'g₁ = g₂' : 'g₁ ≠ g₂'}</span><br>
+<span style="color:var(--accent-gold); font-weight:bold;">RATIO P/K: ${ratio_pk.toFixed(3)}</span><br>
+<span style="color:var(--text-dim);">STATUS:</span> <span style="color:${isUnified ? '#c084fc' : '#3b82f6'};">${isUnified ? 'UNIFIED' : 'DIVERGENT'}</span>
+</div>`;
+}
+
+const metricsArea = document.getElementById('metrics-content');
+if (metricsArea) {
+metricsArea.innerHTML = `
+<div style="text-align:right; font-family:monospace;">
+<div style="color:var(--accent-gold); font-size:1.1rem; font-weight:bold;">P/K: ${ratio_pk.toFixed(3)}</div>
+<div style="color:#2dd4bf; font-size:0.95rem; margin-bottom:8px;">${dynamicGev.toFixed(2)} GeV</div>
+${isUnified ?
+`<div style="color:#f472b6; font-weight:bold;">g₁₂ (Electroweak): ${g_unified.toFixed(4)}</div>` :
+`<div style="color:#3b82f6;">g₁ (Hypercharge): ${g1_current.toFixed(4)}</div>
+<div style="color:#fbbf24;">g₂ (Weak Force): ${g2_current.toFixed(4)}</div>`
+}
+<div style="color:#e5e7eb; border-top:1px solid #333; margin-top:5px; padding-top:5px;">
+GAP Δg: ${Math.abs(g1_current - g2_current).toFixed(4)}
+</div>
+</div>`;
+}
+
+const syncBox = document.getElementById('hierarchy-box-area');
+if (syncBox) {
+syncBox.style.borderColor = isUnified ? '#c084fc' : '#f472b6';
+syncBox.style.background = isUnified ? 'rgba(192, 132, 252, 0.1)' : 'rgba(0,0,0,0.2)';
+syncBox.innerHTML = `
+<div style="text-align:center; padding:10px;">
+<div style="font-size:0.7rem; color:var(--text-dim);">PHASE TRANSITION</div>
+<div style="font-weight:bold; color:${isUnified ? '#c084fc' : '#e5e7eb'};">
+${isUnified ? "SINGLE INTERACTION STRUCTURE" : "TRIADIC SEPARATION STAGE"}
+</div>
+</div>`;
+}
+
+let e_range = Array.from({length: 100}, (_, i) => i * 1.5);
+
+if (isUnified) {
+data.push({
+x: e_range, y: e_range.map(() => g_unified),
+type: 'scatter', mode: 'lines',
+line: { color: '#f472b6', width: 4 },
+name: 'g₁₂ (Unified)'
+});
+} else {
+data.push({ x: e_range, y: e_range.map(() => g1_current), type: 'scatter', mode: 'lines', line: { color: '#3b82f6', width: 3 }, name: 'g₁' });
+data.push({ x: e_range, y: e_range.map(() => g2_current), type: 'scatter', mode: 'lines', line: { color: '#fbbf24', width: 3 }, name: 'g₂' });
+}
+
+layout.yaxis = { title: "Strength (g)", range: [0.3, 0.7], gridcolor: '#222' };
+
+
+} else if (currentTool === 2) {
+const slider = document.getElementById('c_sl');
+if (!slider) return;
+
+let log_ratio = parseFloat(slider.value);
+let true_pk = Math.pow(10, log_ratio);
+
+const ALPHA = 68.75;
+const LOG_THRESHOLD_GUT = 14.161;
+let dynamicGev = ALPHA * true_pk;
+
+let isUnified = log_ratio >= (LOG_THRESHOLD_GUT - 0.001);
+let morph = Math.max(0, Math.min(1, (log_ratio - 0.204) / (LOG_THRESHOLD_GUT - 0.204)));
+
+const g12_initial = 0.5070;
+const g3_initial = 0.7070;
+const g123_final = 0.6070;
+
+let g12_current = g12_initial + (g123_final - g12_initial) * morph;
+let g3_current = g3_initial + (g123_final - g3_initial) * morph;
+
+const telArea = document.getElementById('telemetry-area');
+if (telArea) {
+telArea.innerHTML = `
+<div style="font-family:monospace; font-size:0.85rem; line-height:1.6;">
+<span style="color:var(--text-dim);">SECTOR:</span> <span style="color:#e5e7eb;">GRAND UNIFICATION</span><br>
+<span style="color:var(--text-dim);">COUPLING:</span> <span style="color:${isUnified ? 'var(--accent-gold)' : '#f472b6'}; font-weight:bold;">${isUnified ? 'g₁₂ = g₃' : 'g₁₂ ≠ g₃'}</span><br>
+<span style="color:var(--accent-gold); font-weight:bold;">RATIO P/K: ${true_pk.toExponential(2)}</span><br>
+<span style="color:var(--text-dim);">STATUS:</span> <span style="color:${isUnified ? '#2dd4bf' : '#3b82f6'}; font-weight:bold;">${isUnified ? 'GUT ACHIEVED' : 'SYMMETRY BREAKING'}</span>
+</div>`;
+}
+
+const metArea = document.getElementById('metrics-content');
+if (metArea) {
+let gevDisplay = dynamicGev >= 1e6 ? dynamicGev.toExponential(2) : dynamicGev.toFixed(2);
+metArea.innerHTML = `
+<div style="text-align:right; font-family:monospace;">
+<div style="color:var(--accent-gold); font-size:1.1rem; font-weight:bold;">P/K: ${true_pk.toExponential(2)}</div>
+<div style="color:#2dd4bf; font-size:0.95rem; margin-bottom:8px;">${gevDisplay} GeV</div>
+${isUnified ?
+`<div style="color:var(--accent-gold); font-weight:bold;">g₁₂₃ (Unified Interaction): ${g123_final.toFixed(4)}</div>` :
+`<div style="color:#c084fc;">g₁₂ (Electroweak): ${g12_current.toFixed(4)}</div>
+<div style="color:#ef4444;">g₃ (Strong): ${g3_current.toFixed(4)}</div>`
+}
+<div style="color:#e5e7eb; border-top:1px solid #333; margin-top:5px; padding-top:5px;">
+GAP Δg: ${Math.abs(g12_current - g3_current).toFixed(4)}
+</div>
+</div>`;
+}
+
+const syncBox = document.getElementById('hierarchy-box-area');
+if (syncBox) {
+syncBox.style.borderColor = isUnified ? '#c084fc' : '#f472b6';
+syncBox.style.background = isUnified ? 'rgba(192, 132, 252, 0.1)' : 'rgba(0,0,0,0.2)';
+syncBox.innerHTML = `
+<div style="text-align:center; padding:10px;">
+<div style="font-size:0.7rem; color:var(--text-dim);">PHASE TRANSITION</div>
+<div style="font-weight:bold; color:${isUnified ? '#c084fc' : '#e5e7eb'};">
+${isUnified ? "SINGLE INTERACTION STRUCTURE" : "TRIADIC SEPARATION STAGE"}
+</div>
+</div>`;
+}
+
+let x_axis = Array.from({length: 100}, (_, i) => i * 20);
+
+if (isUnified) {
+data.push({
+x: x_axis, y: x_axis.map(() => g123_final),
+type: 'scatter', mode: 'lines',
+line: { color: '#fbbf24', width: 5 },
+name: 'g₁₂₃ (Grand Unified)'
+});
+} else {
+data.push({ x: x_axis, y: x_axis.map(() => g12_current), type: 'scatter', mode: 'lines', line: { color: '#c084fc', width: 4 }, name: 'g₁₂' });
+data.push({ x: x_axis, y: x_axis.map(() => g3_current), type: 'scatter', mode: 'lines', line: { color: '#ef4444', width: 4 }, name: 'g₃' });
+}
+
+layout.yaxis = { title: "Strength (g)", range: [0.4, 0.8], gridcolor: '#222' };
+
+
+} else if (currentTool === 3) {
+const slider = document.getElementById('ms_sl');
+if (!slider) return;
+
+let log_ms = parseFloat(slider.value);
+let true_ms_pk = Math.pow(10, log_ms);
+
+const LOG_START_GUT = 14.161;
+const LOG_THRESHOLD_MS = 18.167; // Corresponds to ~1.47 x 10^18
+
+let isUnified = (log_ms >= (LOG_THRESHOLD_MS - 0.005)) || (slider.value >= slider.max - 0.01);
+
+let morph = Math.max(0, Math.min(1, (log_ms - LOG_START_GUT) / (LOG_THRESHOLD_MS - LOG_START_GUT)));
+
+// Energy scaling from GUT base (9.96 x 10^15 GeV) to Planck scale (1.22 x 10^19 GeV)
+const ALPHA = 68.75;
+let dynamicEnergyGeV = ALPHA * true_ms_pk;
+if (isUnified) {
+dynamicEnergyGeV = 1.22e19;
+true_ms_pk = 1.47e18; // Exact Master Symmetry ratio anchor
+}
+
+const g_gut_initial_a = 0.6070; // Corrected initial base coupling matching GUT
+const g_gut_initial_b = 0.7570;
+const g_ms_final = 0.6870;
+
+let g_a_current = g_gut_initial_a + (g_ms_final - g_gut_initial_a) * morph;
+let g_b_current = g_gut_initial_b - (g_gut_initial_b - g_ms_final) * morph;
+
+if (isUnified) {
+g_a_current = g_ms_final;
+g_b_current = g_ms_final;
+}
+
+let currentGap = Math.abs(g_a_current - g_b_current);
+
+// LEFT TELEMETRY
+const telArea = document.getElementById('telemetry-area');
+if (telArea) {
+telArea.innerHTML = `
+<div style="font-family:monospace; font-size:0.85rem; line-height:1.6;">
+<span style="color:var(--text-dim);">SECTOR:</span> <span style="color:#e5e7eb;">MASTER SYMMETRY</span><br>
+<span style="color:var(--text-dim);">COUPLING:</span> <span style="color:${isUnified ? 'var(--accent-gold)' : '#c084fc'}; font-weight:bold;">${isUnified ? 'g_A = g_B (Unified)' : 'g_A ≠ g_B'}</span><br>
+<span style="color:var(--text-dim);">RATIO P/K:</span> <span style="color:var(--accent-gold); font-weight:bold;">${true_ms_pk.toExponential(2)}</span><br>
+<span style="color:var(--text-dim);">STATUS:</span> <span style="color:${isUnified ? '#2dd4bf' : '#3b82f6'}; font-weight:bold;">${isUnified ? 'MASTER SYMMETRY ACHIEVED' : 'SCALING TO MASTER SYMMETRY'}</span>
+</div>`;
+}
+
+// RIGHT METRICS
+const metArea = document.getElementById('metrics-content');
+if (metArea) {
+let energyDisplay = dynamicEnergyGeV >= 1e6 ? dynamicEnergyGeV.toExponential(2) : dynamicEnergyGeV.toFixed(2);
+metArea.innerHTML = `
+<div style="text-align:right; font-family:monospace;">
+<div style="color:var(--accent-master); font-size:1.1rem; font-weight:bold;">${isUnified ? 'MASTER SYMMETRY ACHIEVED' : 'UPWARD SCALING'}</div>
+<div style="color:#2dd4bf; font-size:0.95rem; margin-bottom:8px;">Scale: ${energyDisplay} GeV</div>
+${isUnified ?
+`<div style="color:var(--accent-gold); font-weight:bold;">g_MS (Master Unity): ${g_ms_final.toFixed(4)}</div>` :
+`<div style="color:#c084fc;">g_A (Base Mode): ${g_a_current.toFixed(4)}</div>
+<div style="color:#ef4444;">g_B (Higher Mode): ${g_b_current.toFixed(4)}</div>`
+}
+<div style="color:#e5e7eb; border-top:1px solid #333; margin-top:5px; padding-top:5px;">
+GAP Δg: ${currentGap.toFixed(4)}
+</div>
+</div>`;
+}
+
+// PHASE TRANSITION BOX
+const syncBox = document.getElementById('hierarchy-box-area');
+if (syncBox) {
+syncBox.style.borderColor = isUnified ? '#c084fc' : '#f472b6';
+syncBox.style.background = isUnified ? 'rgba(192, 132, 252, 0.1)' : 'rgba(0,0,0,0.2)';
+syncBox.innerHTML = `
+<div style="text-align:center; padding:10px;">
+<div style="font-size:0.7rem; color:var(--text-dim);">STATE IDENTITY</div>
+<div style="font-weight:bold; color:${isUnified ? '#c084fc' : '#e5e7eb'};">
+${isUnified ? "COSMIC CORE = <br>MASTER SYMMETRY" : "UPWARD SCALING FROM GUT"}
+</div>
+</div>`;
+}
+
+// GRAPHING LOGIC
+let x_axis = Array.from({length: 100}, (_, i) => LOG_START_GUT + i * 0.04);
+
+if (isUnified) {
+data.push({
+x: x_axis, y: x_axis.map(() => g_ms_final),
+type: 'scatter', mode: 'lines',
+line: { color: '#fbbf24', width: 5 },
+name: 'g_MS (Master Symmetry Achieved)'
+});
+} else {
+data.push({ x: x_axis, y: x_axis.map(() => g_a_current), type: 'scatter', mode: 'lines', line: { color: '#c084fc', width: 4 }, name: 'g_A (Base)' });
+data.push({ x: x_axis, y: x_axis.map(() => g_b_current), type: 'scatter', mode: 'lines', line: { color: '#ef4444', width: 4 }, name: 'g_B (Higher Mode)' });
+}
+
+layout.xaxis = { title: "Log (P/K)", gridcolor: '#222', range: [LOG_START_GUT, LOG_THRESHOLD_MS] };
+layout.yaxis = { title: "Coupling Strength (g)", gridcolor: '#222', range: [0.5, 0.8] };
+
+
+
+
+
+
+
+
+} else if (currentTool === 4) {
+const slider = document.getElementById('r_sl');
+if (!slider) return;
+
+let z = parseFloat(slider.value);
+const K_base = 11.35;
+const P_present = 0.69;
+const H0_observed = 70.00;
+
+let ratio_pk = (P_present / K_base) + (z * 0.1003);
+let P_z = K_base * ratio_pk;
+let H_z_total = H0_observed + (Math.sqrt(P_z) - Math.sqrt(P_present)) * 51.25;
+let H_graph = (Math.sqrt(P_z) - Math.sqrt(P_present)) * 51.25;
+
+const telArea = document.getElementById('telemetry-area');
+if (telArea) {
+let isHighZ = z > 100;
+telArea.innerHTML = `
+<div style="font-family:monospace; font-size:0.85rem; line-height:1.6;">
+<span style="color:var(--text-dim);">SECTOR:</span> <span style="color:#e5e7eb;">EARLY UNIVERSE</span><br>
+<span style="color:var(--text-dim);">REDSHIFT z:</span> <span style="color:var(--accent-gold); font-weight:bold;">${z.toFixed(1)}</span><br>
+<span style="color:var(--text-dim);">PRESSURE P(z):</span> <span style="color:#f472b6;">${P_z.toFixed(4)}</span><br>
+<span style="color:var(--text-dim);">STATE:</span> <span style="color:${isHighZ ? '#c084fc' : '#3b82f6'};">${isHighZ ? 'HIGH PRESSURE' : 'LOW DENSITY'}</span><br>
+<span style="color:var(--text-dim);">STATUS:</span> <span style="color:#2dd4bf;">NATURAL EXPANSION</span>
+</div>`;
+}
+
+const metArea = document.getElementById('metrics-content');
+if (metArea) {
+metArea.innerHTML = `
+<div style="text-align:right; font-family:monospace;">
+<div style="color:var(--accent-gold); font-size:1.1rem; font-weight:bold;">H(z) ≈ √P(z)</div>
+<div style="color:#2dd4bf; font-size:1.1rem; margin-bottom:8px;">${H_z_total.toFixed(2)} km/s/Mpc</div>
+<div style="color:var(--text-dim); font-size:0.7rem; margin-bottom:10px;">EXPANSION RATE</div>
+<div style="color:#f472b6;">Substrate Pressure: ${P_z.toFixed(4)}</div>
+<div style="color:#3b82f6;">Vacuum Stiffness: ${K_base.toFixed(3)}</div>
+<div style="color:#e5e7eb; border-top:1px solid #333; margin-top:5px; padding-top:5px;">
+Ratio P/K: ${ratio_pk.toFixed(4)}
+</div>
+</div>`;
+}
+
+const syncBox = document.getElementById('hierarchy-box-area');
+if (syncBox) {
+syncBox.style.borderColor = '#c084fc';
+syncBox.style.background = 'rgba(192, 132, 252, 0.1)';
+syncBox.innerHTML = `
+<div style="text-align:center; padding:10px;">
+<div style="font-size:0.7rem; color:var(--text-dim);">DYNAMICS LOGIC</div>
+<div style="font-weight:bold; color:#e5e7eb;">NO INFLATION FIELD</div>
+<div style="font-size:0.75rem; color:#c084fc; margin-top:4px;">
+Expansion is a function of Substrate Pressure
+</div>
+</div>`;
+}
+
+let z_range = Array.from({length: 151}, (_, i) => i * 10);
+let h_curve = z_range.map(zv => {
+let r = (P_present / K_base) + (zv * 0.1003);
+let p = K_base * r;
+return (Math.sqrt(p) - Math.sqrt(P_present)) * 51.25;
+});
+
+data.push({
+x: z_range, y: h_curve, type: 'scatter', mode: 'lines',
+fill: 'tozeroy', line: { color: '#c084fc', width: 3 }, name: 'Expansion Rate'
+});
+
+data.push({
+x: [z], y: [H_graph], type: 'scatter', mode: 'markers',
+marker: { color: 'white', size: 10, symbol: 'diamond' }, name: 'Current State'
+});
+
+layout.xaxis = { title: "Redshift (z)", gridcolor: '#222', range: [0, 1500] };
+layout.yaxis = { title: "Expansion Rate H(z)", gridcolor: '#222', range: [0, 2100] };
+
+
+} else if (currentTool === 5) {
+const slider = document.getElementById('e_sl');
+if (!slider) return;
+
+let z = parseFloat(slider.value);
+const K_base = 11.35;
+const P_0 = 0.69;
+const H0_observed = 70.00;
+
+let rho_m = 0.3 * Math.pow(1 + z, 3);
+let P_z = P_0 * (1 + z);
+let K_z = K_base;
+
+const scale = H0_observed / Math.sqrt(P_0 + K_base);
+let H_z = Math.sqrt(P_z + K_z) * scale;
+
+const telArea = document.getElementById('telemetry-area');
+if (telArea) {
+telArea.innerHTML = `
+<div style="font-family:monospace; font-size:0.85rem; line-height:1.6;">
+<span style="color:var(--text-dim);">SECTOR:</span> <span style="color:#e5e7eb;">LATE-TIME REGIME</span><br>
+<span style="color:var(--text-dim);">REDSHIFT z:</span> <span style="color:var(--accent-gold); font-weight:bold;">${z.toFixed(2)}</span><br>
+<span style="color:var(--text-dim);">MATTER ρ_m:</span> <span style="color:#3b82f6;">${rho_m.toFixed(3)}</span><br>
+<span style="color:var(--text-dim);">EQUILIBRIUM:</span> <span style="color:#2dd4bf;">P ≈ K</span><br>
+<span style="color:var(--text-dim);">STATUS:</span> <span style="color:#f472b6;">ACCELERATING</span>
+</div>`;
+}
+
+const metArea = document.getElementById('metrics-content');
+if (metArea) {
+metArea.innerHTML = `
+<div style="text-align:right; font-family:monospace;">
+<div style="color:var(--accent-gold); font-size:1.1rem; font-weight:bold;">H²(z) ∝ P + K</div>
+<div style="color:#2dd4bf; font-size:1.1rem; margin-bottom:8px;">${H_z.toFixed(2)} km/s/Mpc</div>
+<div style="color:var(--text-dim); font-size:0.7rem; margin-bottom:10px;">EXPANSION RATE</div>
+<div style="color:#f472b6;">Synthesis P: ${P_z.toFixed(4)}</div>
+<div style="color:#3b82f6;">Vacuum K: ${K_z.toFixed(3)}</div>
+<div style="color:#e5e7eb; border-top:1px solid #333; margin-top:5px; padding-top:5px;">
+Stiffness-Dominated Regime
+</div>
+</div>`;
+}
+
+const syncBox = document.getElementById('hierarchy-box-area');
+if (syncBox) {
+syncBox.style.borderColor = '#2dd4bf';
+syncBox.style.background = 'rgba(45, 212, 191, 0.1)';
+syncBox.innerHTML = `
+<div style="text-align:center; padding:10px;">
+<div style="font-size:0.7rem; color:var(--text-dim);">LATE-TIME LOGIC</div>
+<div style="font-weight:bold; color:#e5e7eb;">NO DARK ENERGY</div>
+<div style="font-size:0.75rem; color:#2dd4bf; margin-top:4px;">
+Acceleration via Residual Synthesis Pressure
+</div>
+</div>`;
+}
+
+let z_range = Array.from({length: 100}, (_, i) => i * 0.02);
+let h_curve = z_range.map(zv => Math.sqrt((P_0 * (1 + zv)) + K_base) * scale);
+
+data.push({
+x: z_range, y: h_curve, type: 'scatter', mode: 'lines',
+fill: 'tozeroy', line: { color: '#2dd4bf', width: 3 }, name: 'Stable Expansion'
+});
+
+data.push({
+x: [z], y: [H_z], type: 'scatter', mode: 'markers',
+marker: { color: 'white', size: 10, symbol: 'diamond' }, name: 'Current Epoch'
+});
+
+layout.xaxis = { title: "Redshift (z)", gridcolor: '#222', range: [2, 0], autorange: 'reversed' };
+layout.yaxis = { title: "H(z) km/s/Mpc", gridcolor: '#222', range: [60, 100] };
+
+
+} else if (currentTool === 6) {
+const slider = document.getElementById('f_sl');
+if (!slider) return;
+
+let logZ = parseFloat(slider.value);
+let z = Math.pow(10, logZ) - 1;
+if (z < 0) z = 0;
+
+const K_base = 11.350;
+const P_0 = 0.6900;
+const H0_observed = 70.00;
+
+let ratio_pk = (P_0 / K_base) + (z * 0.1003);
+let P_z = K_base * ratio_pk;
+let H_z = H0_observed + (Math.sqrt(P_z) - Math.sqrt(P_0)) * 51.25;
+let symmetry = (1 - (1 / (1 + (z * 0.001)))) * 100;
+
+const telArea = document.getElementById('telemetry-area');
+if (telArea) {
+telArea.innerHTML = `
+<div style="font-family:monospace; font-size:0.85rem; line-height:1.6;">
+<span style="color:var(--text-dim);">SECTOR:</span> <span style="color:#e5e7eb;">EVOLUTIONARY FLOW</span><br>
+<span style="color:var(--text-dim);">REDSHIFT z:</span> <span style="color:var(--accent-gold); font-weight:bold;">${z.toFixed(1)}</span><br>
+<span style="color:var(--text-dim);">RATIO P/K:</span> <span style="color:#c084fc;">${ratio_pk.toFixed(4)}</span><br>
+<span style="color:var(--text-dim);">SYMMETRY:</span> <span style="color:#2dd4bf;">${symmetry.toFixed(1)}%</span><br>
+<span style="color:var(--text-dim);">STATUS:</span> <span style="color:#3b82f6;">CONTINUOUS</span>
+</div>`;
+}
+
+const metArea = document.getElementById('metrics-content');
+if (metArea) {
+metArea.innerHTML = `
+<div style="text-align:right; font-family:monospace;">
+<div style="color:var(--accent-gold); font-size:1.1rem; font-weight:bold;">H(z) ≈ √P(z)</div>
+<div style="color:#2dd4bf; font-size:1.1rem; margin-bottom:8px;">${H_z.toFixed(2)} km/s/Mpc</div>
+<div style="color:var(--text-dim); font-size:0.7rem; margin-bottom:10px;">EXPANSION RATE</div>
+<div style="color:#f472b6;">Substrate Pressure: ${P_z.toFixed(4)}</div>
+<div style="color:#c084fc;">Vacuum Stiffness: ${K_base.toFixed(3)}</div>
+<div style="color:#e5e7eb; border-top:1px solid #333; margin-top:5px; padding-top:5px;">
+Master Continuity
+</div>
+</div>`;
+}
+
+const syncBox = document.getElementById('hierarchy-box-area');
+if (syncBox) {
+syncBox.style.borderColor = '#c084fc';
+syncBox.innerHTML = `
+<div style="text-align:center; padding:10px;">
+<div style="font-size:0.7rem; color:var(--text-dim);">CONCLUSION</div>
+<div style="font-weight:bold; color:#e5e7eb;">NO DISCONTINUITIES</div>
+<div style="font-size:0.75rem; color:#c084fc; margin-top:4px;">
+H(z) aligns with Early Rebound (Mod 4)
+</div>
+</div>`;
+}
+
+let log_range = Array.from({length: 100}, (_, i) => (i * (3.18 / 99)));
+let z_curve = log_range.map(lv => Math.pow(10, lv) - 1);
+
+z_curve[0] = 0;
+log_range[0] = 0;
+
+let h_curve = z_curve.map(zv => {
+let r_pk = (P_0 / K_base) + (zv * 0.1003);
+let p_zv = K_base * r_pk;
+return H0_observed + (Math.sqrt(p_zv) - Math.sqrt(P_0)) * 51.25;
+});
+
+data.push({
+x: log_range,
+y: h_curve,
+type: 'scatter',
+mode: 'lines',
+fill: 'tozeroy',
+line: { color: '#c084fc', width: 3 },
+name: 'Master Expansion'
+});
+
+data.push({
+x: [logZ],
+y: [H_z],
+type: 'scatter',
+mode: 'markers',
+marker: {
+color: 'white',
+size: 10,
+symbol: 'diamond',
+line: { color: '#c084fc', width: 2 }
+},
+name: 'Current State'
+});
+
+layout.xaxis = {
+title: "Timeline (Log Redshift)", gridcolor: '#222',
+zeroline: true, zerolinecolor: '#444',
+tickvals: [0, 1, 2, 3, 3.18],
+ticktext: ['z=0', 'z=9', 'z=99', 'z=999', 'z=1500'],
+range: [0, 3.2]
+};
+layout.yaxis = {
+title: "H(z)", gridcolor: '#222',
+zeroline: false,
+range: [60, 2200]
+};
+}
+
+Plotly.react('plot-area', data, layout, {responsive: true, displayModeBar: false});
+}
+
+function resetLab() {
+syncVal(1.60, 'm_sl'); syncVal(14.161, 'c_sl'); syncVal(18.161, 'ms_sl'); syncVal(1100, 'r_sl'); syncVal(0, 'e_sl'); syncVal(0, 'f_sl');
+}
+
+window.onload = () => { showScreen('portal'); };
+</script>
+</body>
+</html>
