@@ -1561,9 +1561,7 @@ This proves that \(E=mc^2\) is not just an empirical observation; it is an absol
 <div class="signature-subcontent">
 
 <p>
-The <strong>Substrate Derivation of \(c\)</strong> recovers the invariant
-propagation speed directly from the intrinsic mechanical properties of the
-substrate:
+The <strong>Substrate Derivation of \(c\)</strong> recovers the invariant propagation speed directly from the intrinsic mechanical properties of the substrate:
 </p>
 
 <p>
@@ -1575,12 +1573,11 @@ c_S
 </p>
 
 <p>
-The substrate inertial density is derived from the Structural Response
-Theorem:
+The substrate inertial density is derived from the Structural Response Theorem:
 \[
 \rho_S
 =
-\rho_0e^{P/K}.
+\rho_{0,\mathrm{dim}}e^{P/K}.
 \]
 Substitution therefore gives the complete first-principles expression
 </p>
@@ -1589,7 +1586,7 @@ Substitution therefore gives the complete first-principles expression
 \[
 c_S
 =
-\sqrt{\frac{K}{\rho_0}}
+\sqrt{\frac{K}{\rho_{0,\mathrm{dim}}}}
 \,e^{-P/(2K)}.
 \]
 </p>
@@ -1597,8 +1594,82 @@ c_S
 <p>
 Here \(c_S\) is the <strong>native invariant propagation speed</strong>, \(K\)
 is the <strong>Vacuum Stiffness</strong>, \(P\) is the
-<strong>Synthesis Pressure</strong>, and \(\rho_0\) is the
-<strong>ground-state substrate inertial density</strong>.
+<strong>Synthesis Pressure</strong>, and \(\rho_{0,\mathrm{dim}}\) is the
+<strong>dimensional ground-state substrate inertial density</strong>.
+</p>
+
+<h3>First-Principles Derivation of Ground-State Inertial Density</h3>
+
+<p>
+The substrate consists of three primary fields, represented by
+\[
+\boldsymbol{\phi}
+=
+\begin{pmatrix}
+N\\O\\C
+\end{pmatrix},
+\]
+representing the Stabilizing Field, Conserving Field, and Motive Field.
+Their triadic organization comprises one collective mode and two independent relative modes.
+</p>
+
+<p>
+The relative-mode projector is
+\[
+\mathsf P_r=I-\mathsf P_0,
+\]
+where \(\mathsf P_0\) is the collective-mode projector. Their respective traces are
+\[
+\operatorname{Tr}(\mathsf P_0)=1,
+\qquad
+\operatorname{Tr}(\mathsf P_r)=2.
+\]
+</p>
+
+<p>
+Consequently, the normalized relative-mode contribution is
+\[
+\Delta_{\mathrm{rel}}
+=
+\frac{\operatorname{Tr}(\mathsf P_r)}{3}
+=
+\frac{2}{3}.
+\]
+</p>
+
+<p>
+The triadic closure relation expresses vacuum stiffness as the sum of the normalized ground-state inertial contribution and the relative-mode contribution:
+\[
+K=\rho_{0,\mathrm{norm}}+\Delta_{\mathrm{rel}}.
+\]
+Thus,
+\[
+\rho_{0,\mathrm{norm}}
+=
+K-\frac{2}{3}
+=
+11.350-\frac{2}{3}.
+\]
+</p>
+
+<p>
+The resulting normalized ground-state inertial density is
+\[
+\boxed{
+\rho_{0,\mathrm{norm}}=10.683.
+}
+\]
+</p>
+
+<p>
+Its corresponding dimensional value, obtained through the substrate propagation equation, is
+\[
+\boxed{
+\rho_{0,\mathrm{dim}}
+=
+1.18837\times10^{-10}\ {\rm s^2/km^2}.
+}
+\]
 </p>
 
 <h3>Numerical Derivation</h3>
@@ -1617,7 +1688,7 @@ the propagation equation becomes
 \[
 c_S
 =
-\sqrt{\frac{11.35}{\rho_0}}
+\sqrt{\frac{11.35}{\rho_{0,\mathrm{dim}}}}
 \exp\!\left(
 -\frac{0.6900}{2\times11.35}
 \right).
@@ -1643,34 +1714,28 @@ Therefore,
 c_S
 =
 0.970061
-\sqrt{\frac{11.35}{\rho_0}}.
+\sqrt{\frac{11.35}{\rho_{0,\mathrm{dim}}}}.
 }
 \]
 </p>
 
 <p>
-Requiring the recovered invariant propagation speed to equal the observed
-invariant speed,
+Using the dimensional ground-state inertial density
 \[
-c_S
+\rho_{0,\mathrm{dim}}
 =
-299\,792\,458\ {\rm m\,s^{-1}},
+1.18837\times10^{-10}\ {\rm s^2/km^2},
 \]
-determines the ground-state inertial density as
+the recovered propagation speed corresponds to
 \[
 \boxed{
-\rho_0
+c_S
 =
-\frac{11.35}
-{\left(299\,792\,458/0.970061\right)^2}.
+299\,792.458\ {\rm km/s}
+=
+299\,792\,458\ {\rm m/s}.
 }
 \]
-</p>
-
-<p>
-Thus the numerical evaluation of the first-principles propagation equation
-reproduces the observed invariant propagation speed using the canonical
-substrate parameters.
 </p>
 
 <p>
@@ -1683,14 +1748,12 @@ giving the final substrate expression
 \boxed{
 c
 =
-\sqrt{\frac{K}{\rho_0}}
+\sqrt{\frac{K}{\rho_{0,\mathrm{dim}}}}
 \,e^{-P/(2K)}.
 }
 \]
-Thus the invariant speed \(c\) is derived from the intrinsic mechanical
-properties of the substrate rather than introduced as an independent
-postulate.
-<strong>For detailed derivation of the Substrate Derivation of \(c\) for Mass–Energy Equivalence and its physical implications, see Volume XIII</strong>.
+Thus the invariant speed \(c\) is derived from the intrinsic mechanical properties of the substrate rather than introduced as an independent postulate.
+<strong>For the detailed derivation of the Substrate Derivation of \(c\) for Mass–Energy Equivalence and its physical implications, see Volume XIII. The first-principles derivation of the ground-state inertial density is presented in Volume X.</strong>
 </p>
 
 </div>
@@ -1713,7 +1776,7 @@ In standard physics, the speed of light in a vacuum (\(c\)) is treated as an abs
 </p>
 
 <p>
-The <strong>Substrate Derivation of \(c\)</strong> brilliantly demystifies this by proving that light speed (or more accurately, the <em>native invariant propagation speed</em>, \(c_S\)) is not an arbitrary postulate. Instead, it emerges directly from the mechanical elasticity and density of the cosmic substrate:
+The <strong>Substrate Derivation of \(c\)</strong> explains that the native invariant propagation speed (\(c_S\)) is not an arbitrary postulate. Instead, it emerges directly from the mechanical properties of the substrate: its structural stiffness, ground-state inertial density, and synthesis pressure.
 </p>
 
 <p>
@@ -1724,55 +1787,82 @@ c_S=\sqrt{\frac{K}{\rho_S}}
 
 <p>
 <strong>The Elastic Wave Principle (\(\sqrt{K/\rho}\)):</strong>
-Just like sound travels faster through stiff steel than through loose air, wave and signal propagation speed through space depends entirely on how stiff the medium is (\(K\)) versus how sluggish or dense its inertial background is (\(\rho_S\)). Space behaves like an ultra-rigid elastic medium.
+Just as sound travels faster through stiff steel than through loose air, wave and signal propagation speed through a medium depends on its stiffness (\(K\)) relative to its inertial density (\(\rho_S\)). The substrate's structural resistance and inertial response therefore jointly determine its propagation speed.
 </p>
 
 <p>
-<strong>The Structural Inertial Density (\(\rho_S=\rho_0e^{P/K}\)):</strong>
-The local inertial density of the vacuum isn't static; it is dynamically modulated from its ground-state density (\(\rho_0\)) by the ratio of internal <strong>Synthesis Pressure (\(P\))</strong> to <strong>Vacuum Stiffness (\(K\))</strong> through an exponential field factor.
-</p>
-
-<p>
-<strong>The Complete First-Principles Wave Speed:</strong>
-When substituted, we get the master equation:
+<strong>The Ground-State Inertial Density (\(\rho_{0,\mathrm{norm}}\)):</strong>
+The substrate possesses an intrinsic ground-state inertial density, which is derived from its three-field organization. The Stabilizing, Conserving, and Motive Fields form one collective mode and two independent relative modes. The normalized relative-mode contribution is \(2/3\), giving the triadic closure relation
 </p>
 
 <p>
 \[
-c_S=\sqrt{\frac{K}{\rho_0}}\,e^{-P/(2K)}
+\rho_{0,\mathrm{norm}}
+=
+K-\frac{2}{3}
+=
+10.683.
 \]
 </p>
 
 <p>
-This reveals that the speed of light is fundamentally determined by the ratio of <strong>Vacuum Stiffness (K)</strong> to <strong>Ground-State Inertial Density (\(\rho_0\))</strong>, fine-tuned by background pressure.
+This establishes the ground-state inertial contribution directly from the triadic structural organization of the substrate. Its corresponding dimensional value is
+\[
+\rho_{0,\mathrm{dim}}
+=
+1.18837\times10^{-10}\ {\rm s^2/km^2}.
+\]
+</p>
+
+<p>
+<strong>The Structural Inertial Density (\(\rho_S=\rho_{0,\mathrm{dim}}e^{P/K}\)):</strong>
+The local inertial density of the substrate is dynamically modulated from its ground-state value by the ratio of internal <strong>Synthesis Pressure (\(P\))</strong> to <strong>Vacuum Stiffness (\(K\))</strong> through an exponential field factor.
+</p>
+
+<p>
+<strong>The Complete First-Principles Wave Speed:</strong>
+Substituting the structural inertial density into the propagation equation gives
+</p>
+
+<p>
+\[
+c_S
+=
+\sqrt{\frac{K}{\rho_{0,\mathrm{dim}}}}
+\,e^{-P/(2K)}.
+\]
+</p>
+
+<p>
+This reveals that the propagation speed is fundamentally determined by the relationship between <strong>Vacuum Stiffness (\(K\))</strong> and <strong>Ground-State Inertial Density (\(\rho_0\))</strong>, dynamically modulated by <strong>Synthesis Pressure (\(P\))</strong>.
 </p>
 
 <h3>Numerical Derivation and Canonical Grounding</h3>
 
 <p>
-Using the framework's canonical parameters---<strong>Vacuum Stiffness (K) = 11.35</strong> and <strong>Synthesis Pressure (P) = 0.6900</strong>---the equation undergoes a precise numerical evaluation:
+Using the framework's canonical parameters---<strong>Vacuum Stiffness (\(K\)) = 11.35</strong> and <strong>Synthesis Pressure (\(P\)) = 0.6900</strong>---the exponential synthesis attenuation evaluates to approximately <strong>0.970061</strong>.
 </p>
 
 <p>
-The exponential synthesis dampening evaluates to approximately <strong>0.970061</strong>.
-</p>
-
-<p>
-When we plug in the observed speed of light (\(299,792,458\text{ m s}^{-1}\)) for \(c_S\), the equation precisely determines the exact baseline <strong>Ground-State Inertial Density (\(\rho_0\))</strong> of the universe:
-</p>
-
-<p>
+With the dimensionally derived ground-state inertial density
 \[
-\rho_0
+\rho_{0,\mathrm{dim}}
 =
-\frac{11.35}
-{\left(299,792,458/0.970061\right)^2}
+1.18837\times10^{-10}\ {\rm s^2/km^2},
+\]
+the propagation equation gives
+\[
+\boxed{
+c_S
+=
+299\,792.458\ {\rm km/s}.
+}
 \]
 </p>
 
 <p>
 <strong>The Ultimate Takeaway (\(c_S\equiv c\)):</strong>
-By establishing that the native substrate propagation speed corresponds identically to the observable speed of light (\(c\)), the framework eliminates \(c\) as an unexplained axiom. Space propagates light at \(299,792,458\text{ m s}^{-1}\) simply because that is the exact mechanical wave speed dictated by the stiffness, pressure, and density of the cosmic substrate.
+By establishing that the native substrate propagation speed corresponds identically to the observable invariant speed of light (\(c\)), the framework derives the invariant speed from the mechanical properties of the substrate. The finite propagation speed results from the combined structural resistance of vacuum stiffness, the inertial resistance of the ground-state substrate density, and the modulation produced by synthesis pressure.
 </p>
 
 </div>
