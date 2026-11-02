@@ -106,7 +106,7 @@ color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrin
 <div id="nav-math-controls">
 <button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
 <button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
-<button class="btn-nav-brief" onclick="launchLab()">LAUNCH LAB</button>
+<button class="btn-nav-brief" id="launch-lab-math-btn" onclick="launchLab()">LAUNCH LAB</button>
 </div>
 <div id="nav-summary-controls">
 <button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
@@ -389,7 +389,7 @@ brief: `<div class="briefing-content" style="padding: 0px 40px 40px 40px;">
 
 math: `<div class="math-content" style="padding: 0px 40px 40px 40px;">
 <h2 style="color:var(--accent-blue); margin-top: 20px; text-align:center;">Explicit Mathematics: Emergent Wavefield</h2>
-<p style="text-align:center;">$$\Psi(x,t) = \int \tilde{\phi}(k) e^{i(k \cdot x - \omega(k)t)} dk$$</p>
+<p style="text-align:center;">$$\\Psi(x,t) = \\int \\tilde{\\phi}(k) e^{i(k \\cdot x - \\omega(k)t)} dk$$</p>
 </div>`,
 
 sliders: `<div class="control-item"><div class="label-group"><span>Coherence Factor</span><input type="number" id="coherence_in" class="digital-entry" value="10" oninput="syncVal(this.value, 'coherence_sl')"></div><input type="range" id="coherence_sl" min="1" max="50" value="10" oninput="syncVal(this.value, 'coherence_in')"></div><div class="control-item"><div class="label-group"><span>Update Frequency</span><input type="number" id="freq_in" class="digital-entry" value="1.0" oninput="syncVal(this.value, 'freq_sl')"></div><input type="range" id="freq_sl" min="0.1" max="5.0" step="0.2" value="1.0" oninput="syncVal(this.value, 'freq_in')"></div>`,
@@ -536,6 +536,9 @@ document.getElementById('panel-right-note').innerHTML = content.rightNote;
 
 const launchBtn = document.getElementById('launch-lab-btn');
 launchBtn.style.display = (id === 4) ? 'none' : 'flex';
+
+const launchMathBtn = document.getElementById('launch-lab-math-btn');
+if (launchMathBtn) launchMathBtn.style.display = (id === 4) ? 'none' : 'flex';
 
 const metrics = document.getElementById('metrics-content');
 if (id === 4) {
