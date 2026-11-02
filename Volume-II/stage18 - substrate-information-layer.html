@@ -5,54 +5,53 @@
 <title>Stage 18 — Substrate Information Layer</title>
 
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-
 <script>
 window.MathJax = {
 tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
 options: { ignoreHtmlClass: 'plotly-graph-div|js-plotly-plot', processHtmlClass: 'math-process' }
 };
 </script>
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
 
 <style>
 :root {
---bg-deep: #050505; --bg-card: #0f1115; --accent-blue: #3b82f6;
---accent-emerald: #10b981; --accent-gold: #f59e0b; --text-main: #e5e7eb;
---text-dim: #94a3b8; --border: #262626;
+--bg-deep: #050505; --bg-card: #0f1115; --accent-unified: #00ffcc;
+--accent-purple: #a855f7; --accent-blue: #3b82f6; --accent-gold: #f59e0b; --accent-green: #10b981;
+--text-main: #e5e7eb; --text-dim: #94a3b8; --border: #262626;
 }
 
-body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; }
+body { margin: 0; font-family: Georgia, serif; background-color: var(--bg-deep); color: var(--text-main); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
 
 nav {
 padding: 10px 40px; display: flex; justify-content: space-between; align-items: center;
-border-bottom: 1px solid var(--border); background: #000; position: sticky; top: 0; z-index: 1000; height: 50px;
+border-bottom: 1px solid var(--border); background: #000; height: 50px; z-index: 1000; flex-shrink: 0;
 }
 .logo { font-weight: bold; letter-spacing: 1px; color: var(--accent-gold); font-family: sans-serif; font-size: 0.85rem; min-width: 350px; }
 .back-link { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-family: sans-serif; min-width: 140px; text-align: right; }
 
-#nav-briefing-controls { display: none; gap: 15px; align-items: center; }
+#nav-briefing-controls, #nav-math-controls, #nav-summary-controls { display: none; gap: 15px; align-items: center; }
 
-.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; height: calc(100vh - 50px); box-sizing: border-box; }
+.screen { display: none; flex-direction: column; align-items: center; padding: 0px 24px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
 .screen.active { display: flex; }
+#screen-lab.active { display: flex; flex-direction: column; height: calc(100vh - 50px); }
 
-#screen-portal { justify-content: flex-start; padding-top: 15px; }
+#screen-portal { justify-content: flex-start; padding-top: 8dvh; overflow-y: auto; }
 
-.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; }
+.portal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%; max-width: 1100px; margin-top: 20px; margin-bottom: 70px; }
 .portal-card {
-background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; text-decoration: none; color: inherit; width: 320px; box-sizing: border-box;
+background: var(--bg-card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 320px; box-sizing: border-box;
 }
 .portal-card:hover { border-color: var(--accent-gold); transform: translateY(-3px); }
 .portal-card h2 { font-size: 0.90rem; margin: 8px 0; color: #fff; line-height: 1.3; }
 
-.briefing-box {
+.briefing-box, .math-box, .summary-box {
 max-width: 850px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
-padding: 0px 40px 40px 40px;
-margin: 0px 40px 40px 40px;
-box-shadow: 0 20px 50px rgba(0,0,0,0.5); height: 100%; overflow-y: auto;
+padding: 0px 40px 10px 40px; margin: 0px 40px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
 }
 
 #tool { display: grid; width: 100%; max-width: 100%; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; box-sizing: border-box; }
-.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 95%; box-sizing: border-box; }
+.panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
 
 .module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
 
@@ -70,20 +69,12 @@ display: flex; justify-content: space-around; margin-bottom: 10px;
 .label-group { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-dim); margin-bottom: 2px; text-transform: uppercase; align-items: center; }
 input[type=range] { width: 100%; accent-color: var(--accent-gold); cursor: pointer; margin: 6px 0; height: 10px; }
 
-.consistency-footer {
-font-size: 0.62rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.4; margin-top: auto;
-}
-
-.status-ok { color: var(--accent-emerald); font-weight: bold; font-family: monospace; }
-
 .btn-nav-brief { background: var(--accent-gold); color: #000; border: none; padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
 .btn-nav-menu { background: transparent; border: 1px solid #333; color: var(--text-dim); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; text-transform: uppercase; }
 
-.btn-action { width: 100%; margin-top: 8px; background: transparent; border: 1px solid #333; color: var(--text-dim); font-size: 0.62rem; text-transform: uppercase; cursor: pointer; padding: 6px; transition: 0.2s; }
-.btn-action:hover { border-color: var(--accent-gold); color: #fff; }
-.btn-exit-lab { width: 100%; margin-top: 8px; background: transparent; border: 1px solid #333; color: var(--accent-blue); font-size: 0.62rem; text-transform: uppercase; cursor: pointer; padding: 6px; }
+.status-ok { color: var(--accent-green); font-weight: bold; font-family: monospace; }
 
-#plot-container { background: #000; border: 1px solid var(--border); border-radius: 12px; height: 95%; }
+#plot-container { background: #000; border: 1px solid var(--border); border-radius: 12px; height: 100%; }
 
 .isfp-footer {
 width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem;
@@ -97,70 +88,125 @@ color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrin
 <div class="logo">Σ STAGE 18 — SUBSTRATE INFORMATION LAYER</div>
 <div id="nav-briefing-controls">
 <button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('math')">VIEW MATHEMATICS</button>
+<button class="btn-nav-brief" id="launch-lab-btn" onclick="launchLab()">LAUNCH SYNTHESIZER</button>
+</div>
+<div id="nav-math-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
+<button class="btn-nav-menu" onclick="showScreen('briefing')">BACK TO BRIEFING</button>
 <button class="btn-nav-brief" onclick="launchLab()">LAUNCH SYNTHESIZER</button>
+</div>
+<div id="nav-summary-controls">
+<button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
 </div>
 <a href="../index.html" class="back-link">BACK TO WEBSITE</a>
 </nav>
 
 <div id="screen-portal" class="screen active">
-<h1 style="font-size: 2.0rem; margin: 20px 0 5px 0;">Information Hierarchy Portal</h1>
+<div style="text-align:center;">
+<h1 style="font-size: 2.0rem; margin: 0px 0 5px 0;">Information Hierarchy Portal</h1>
+<p style="color:var(--text-dim); margin-bottom:20px;">Substrate refractive index, Unruh horizon, quantized inertia, and information emergence.</p>
 <div class="portal-grid">
-<div class="portal-card" onclick="openTool(1)">
-<h2>Substrate Refractive Index</h2>
+<div class="portal-card" onclick="openTool(1)" style="border-color: var(--accent-gold);">
+<h2 style="color:var(--accent-gold);">1. Substrate Refractive Index</h2>
 <p>Mapping signal dispersion (FRBs) as an interaction with vacuum stiffness $K$.</p>
 </div>
-<div class="portal-card" onclick="openTool(2)">
-<h2>The Unruh Horizon</h2>
+<div class="portal-card" onclick="openTool(2)" style="border-color: var(--accent-blue);">
+<h2 style="color:var(--accent-blue);">2. The Unruh Horizon</h2>
 <p>Thermal emergence and information boundaries within the substrate.</p>
 </div>
-<div class="portal-card" onclick="openTool(3)">
-<h2>Quantized Inertia Bridge</h2>
+<div class="portal-card" onclick="openTool(3)" style="border-color: var(--accent-purple);">
+<h2 style="color:var(--accent-purple);">3. Quantized Inertia Bridge</h2>
 <p>Deriving inertia from information-bounded horizons.</p>
 </div>
-<div class="portal-card" onclick="openTool(4)">
-<h2 style="color: var(--accent-gold);">Emergence Synthesizer</h2>
-<p>What this tool collectively does: Synthesizing dispersion, horizons, and inertia.</p>
+<div class="portal-card" onclick="openTool(4)" style="border-color: var(--accent-green);">
+<h2 style="color:var(--accent-green);">4. Emergence Synthesizer</h2>
+<p>Synthesizing dispersion, horizons, and inertia across the (N,O,C) triad.</p>
+</div>
+<div class="portal-card" onclick="showScreen('summary')" style="border-color: var(--accent-unified); background: linear-gradient(135deg, #0f1115 0%, #0a1a1a 100%);">
+<h2 style="color:var(--accent-unified);">5. Mathematical Structure</h2>
+<p>Summary of Substrate Information Layer.</p>
 </div>
 </div>
-
+</div>
 <footer class="isfp-footer">
 Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
 </footer>
 </div>
-</div>
 
 <div id="screen-briefing" class="screen">
-<div class="briefing-box" id="brief-box-content">
-<footer class="isfp-footer" style="padding: 10px 0;">
+<div class="briefing-box">
+<div id="brief-box-content" style="flex-grow:1;"></div>
+<footer class="isfp-footer">
 Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-math" class="screen">
+<div class="math-box">
+<div id="math-box-content" style="flex-grow:1;" class="math-process"></div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
+</footer>
+</div>
+</div>
+
+<div id="screen-summary" class="screen">
+<div class="summary-box">
+<div id="summary-content" class="math-process">
+<h2 style="color:var(--accent-gold); text-align:center;">Summary — Mathematical Structure of Stage 18</h2>
+<section>
+<p>Stage 18 extends the framework from macroscopic gravity and cosmology into microscopic information propagation, horizon thermodynamics, and quantized inertia through the spacetime substrate.</p>
+
+<h4 style="color:var(--accent-gold);">1. Substrate Refractive Index & Dispersion</h4>
+<p>High-energy signals experience frequency-dependent delays through vacuum stiffness $K$:</p>
+<p style="text-align:center;">$$n(\nu) \approx 1 + \frac{\chi \cdot K}{\nu^2}$$</p>
+
+<h4 style="color:var(--accent-gold);">2. The Unruh Horizon & Thermal Radiation</h4>
+<p>Observer acceleration relative to substrate pressure $P$ yields emergent thermal temperatures:</p>
+<p style="text-align:center;">$$T = \frac{\hbar a}{2\pi c k_B}$$</p>
+
+<h4 style="color:var(--accent-gold);">3. Quantized Inertia Bridge</h4>
+<p>Low-acceleration inertial transition coupled with cosmic horizon boundaries:</p>
+<p style="text-align:center;">$$m_i = m_g \left( 1 - \frac{2c^2}{a \cdot D_{Hubble}} \right)$$</p>
+
+<h4 style="color:var(--accent-gold);">4. Triadic Vacuum Fields (N, O, C)</h4>
+<p>Macroscopic stiffness $K$ and pressure $P$ emerge directly from the Stabilizing Field ($N$), Conserving Field ($O$), and Motive Field ($C$).</p>
+</div>
+</section>
+</div>
+<footer class="isfp-footer">
+Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
+<p style="text-align:center; font-size:0.85rem; margin-top:8px; margin-bottom:0;">
+© 2026 Mohan Vaishnav. All rights reserved. The original content of the Treatise on Substrate Physics and of this website, including graphics, diagrams, and visualizations, may not be reproduced, republished, or redistributed without prior written permission of the copyright holder, except as permitted by applicable law.
+</p>
 </footer>
 </div>
 </div>
 
 <div id="screen-lab" class="screen">
-<div id="tool" style="display: grid;">
+<div id="tool">
 <div class="panel">
 <div id="active-module-title" class="module-header">--</div>
 <div class="constant-display-box">
 <div class="const-item"><span class="const-label">Stiffness K</span><span class="const-val" id="global-k-val">11.350</span></div>
 <div class="const-item"><span class="const-label">Pressure P</span><span class="const-val" id="global-p-val">0.6900</span></div>
 </div>
-
 <div class="diagnostic-panel">
 <span class="diag-title" id="diag-label">--</span>
 <span id="dm-val" style="font-family:monospace; font-size:0.85rem; color:var(--accent-blue);">--</span>
 </div>
-
-<div id="control-sliders">
-</div>
-
-<button onclick="resetSliders()" class="btn-action">RESET PARAMETERS</button>
-
-<div class="consistency-footer" id="consistency-footer-text">
-<b>Mathematical Consistency Statement:</b> This stage connects substrate parameters to observational information limits.
-</div>
-
-<button onclick="showScreen('briefing')" class="btn-exit-lab">BACK TO BRIEFING</button>
+<div id="control-sliders"></div>
+<button onclick="resetSliders()" style="width:100%; margin-top:8px; background:transparent; border:1px solid #333; color:var(--accent-gold); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:6px;">RESET PARAMETERS</button>
+<div id="consistency-footer-text" style="font-size: 0.75rem; color: var(--text-dim); padding: 8px 0; text-align: justify; border-top: 1px solid var(--border); line-height: 1.4; margin-top: auto;"></div>
+<button onclick="showScreen('briefing')" style="width:100%; margin-top:8px; background:transparent; border:1px solid #333; color:var(--accent-blue); font-size:0.75rem; text-transform:uppercase; cursor:pointer; padding:6px;">BACK TO BRIEFING</button>
 </div>
 
 <div id="plot-container"></div>
@@ -175,10 +221,11 @@ Dispersion Limit: <span class="status-ok">ACTIVE</span><br>
 Lorentz Invariance: <span class="status-ok">PRESERVED</span>
 </div>
 </div>
+<div style="font-size: 0.75rem; color: var(--text-dim); line-height: 1.4; background: #000; padding: 10px; border-radius: 8px; border: 1px solid #222; margin-top: auto;">
+<b>Information Layer Note:</b> All parameters respect structural bounds across (N, O, C) vacuum fields.
 </div>
 </div>
 </div>
-
 <footer class="isfp-footer">
 Institute of Structural Foundations of Physics (ISFP), Ahmedabad, India - Synthesis Framework © Mohan Vaishnav
 </footer>
@@ -190,7 +237,9 @@ let currentToolId = 1;
 const toolContent = {
 1: {
 title: "Substrate Refractive Index",
-brief: `
+
+brief: `<div class="briefing-content" style="padding: 0px 40px 40px 40px;">
+<h2 style="color:var(--accent-gold); margin-top: 20px; text-align:center;">Detailed Briefing: Substrate Refractive Index</h2>
 <p>This Module extends the framework from gravity and cosmology into information propagation through the spacetime substrate.</p>
 
 <h4>1. The Vacuum as a Medium</h4>
@@ -255,23 +304,24 @@ $$(K,P) \\rightarrow \\text{substrate properties} \\rightarrow \\text{signal pro
 <p>Thus the framework extends from gravitational dynamics to the behavior of information traveling through spacetime. </p>
 </div>
 `,
+
+math: `<div class="math-content" style="padding: 0px 40px 40px 40px;">
+<h2 style="color:var(--accent-gold); margin-top: 20px; text-align:center;">Explicit Mathematics: Refractive Dispersion</h2>
+<p style="text-align:center; background:rgba(255,255,255,0.03); padding:15px; border-radius:8px; font-size:1.1rem;">
+$$n(\\nu) = 1 + \\frac{\\chi \\cdot K}{\\nu^2}, \\quad \\Delta t = 4.15 \\times DM \\times \\left(\\frac{\\nu}{1000}\\right)^{-2}$$
+</p>
+</div>`,
 consistency: `Dispersion is calculated using the relation $\\Delta t \\propto \\frac{DM}{\\nu^2}$. In this module, $DM$ is derived as an emergent property of the interaction between the photon field and the substrate stiffness $K = 11.350$.`,
-sliders: `
-<div class="control-item" style="margin-bottom: 6px;">
-<div class="label-group"><span>Signal Redshift (z)</span></div>
-<input type="range" id="z_slider" min="0.01" max="5.0" step="0.01" value="0.5" oninput="update()">
-<div id="z_readout" style="font-family:monospace; font-size:0.75rem; text-align:right; color:var(--accent-gold);">0.500</div>
-</div>
-<div class="control-item" style="margin-bottom: 10px;">
-<div class="label-group"><span>Substrate Coupling (χ)</span></div>
-<input type="range" id="chi_slider" min="0.1" max="2.0" step="0.0001" value="1.0" oninput="update()">
-<div id="chi_readout" style="font-family:monospace; font-size:0.75rem; text-align:right; color:var(--accent-emerald);">1.0000</div>
-</div>
-`
+sliders: `<div class="control-item" style="margin-bottom: 6px;"><div class="label-group"><span>Signal Redshift (z)</span></div><input type="range" id="z_slider" min="0.01" max="5.0" step="0.01" value="0.5" oninput="update()"><div id="z_readout" style="font-family:monospace; font-size:0.75rem; text-align:right; color:var(--accent-gold);">0.500</div></div><div class="control-item" style="margin-bottom: 10px;"><div class="label-group"><span>Substrate Coupling (χ)</span></div><input type="range" id="chi_slider" min="0.1" max="2.0" step="0.0001" value="1.0" oninput="update()"><div id="chi_readout" style="font-family:monospace; font-size:0.75rem; text-align:right; color:var(--accent-green);">1.0000</div></div>`
 },
+
+
 2: {
 title: "The Unruh Horizon",
-brief: `
+brief: `<div class="briefing-content" style="padding: 0px 40px 40px 40px;">
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align:center;">Detailed Briefing: The Unruh Horizon</h2>
+<h3 style="color:var(--text-main); font-style: italic;">Thermal Emergence and Information Boundaries</h3>
+
 <h4>1. Acceleration and the Substrate</h4>
 <p>When an object accelerates through the substrate, it encounters a "thermal bath" known as the Unruh Effect. In this framework, the temperature of this radiation is linked directly to the substrate pressure $P$.</p>
 
@@ -361,18 +411,23 @@ $$T = \\frac{\\hbar a}{2\\pi c k_B}$$
 <p>This connects the gravitational framework with quantum field theory in curved spacetime. </p>
 </div>
 `,
+
+math: `<div class="math-content" style="padding: 0px 40px 40px 40px;">
+<h2 style="color:var(--accent-blue); margin-top: 20px; text-align:center;">Explicit Mathematics: Horizon Thermodynamics</h2>
+<p style="text-align:center; background:rgba(255,255,255,0.03); padding:15px; border-radius:8px; font-size:1.1rem;">
+$$T = \\frac{\\hbar a}{2\\pi c k_B}, \\quad D_H = \\frac{c^2}{a}$$
+</p>
+</div>`,
+
 consistency: `The Unruh temperature $T$ is verified against the substrate pressure $P$ to ensure thermal equilibrium within the vacuum medium.`,
-sliders: `
-<div class="control-item" style="margin-bottom: 6px;">
-<div class="label-group"><span>Acceleration ($a/a_0$)</span></div>
-<input type="range" id="accel_slider" min="0.1" max="10.0" step="0.1" value="1.0" oninput="update()">
-<div id="accel_readout" style="font-family:monospace; font-size:0.75rem; text-align:right; color:var(--accent-gold);">1.0</div>
-</div>
-`
+sliders: `<div class="control-item" style="margin-bottom: 6px;"><div class="label-group"><span>Acceleration ($a/a_0$)</span></div><input type="range" id="accel_slider" min="0.1" max="10.0" step="0.1" value="1.0" oninput="update()"><div id="accel_readout" style="font-family:monospace; font-size:0.75rem; text-align:right; color:var(--accent-gold);">1.0</div></div>`
 },
 3: {
 title: "Quantized Inertia Bridge",
-brief: `
+brief: `<div class="briefing-content" style="padding: 0px 40px 40px 40px;">
+<h2 style="color:var(--accent-purple); margin-top: 20px; text-align:center;">Detailed Briefing: Quantized Inertia Bridge</h2>
+<h3 style="color:var(--text-main); font-style: italic;">Deriving Inertia from Information-Bounded Horizons</h3>
+
 <h4>1. The Origin of Inertia</h4>
 <p>In this framework, inertia is not an intrinsic property of mass, but a result of the information horizon created by acceleration ($a$). This is known as Quantized Inertia.</p>
 
@@ -457,18 +512,24 @@ This quantity represents the ratio between inertial mass and gravitational mass.
 <p>Together, these visualizations illustrate how the same structural parameters that govern large-scale gravitational phenomena may also play a role in the informational and thermodynamic aspects of spacetime. </p>
 </div>
 `,
+
+math: `<div class="math-content" style="padding: 0px 40px 40px 40px;">
+<h2 style="color:var(--accent-purple); margin-top: 20px; text-align:center;">Explicit Mathematics: Quantized Inertia</h2>
+<p style="text-align:center; background:rgba(255,255,255,0.03); padding:15px; border-radius:8px; font-size:1.1rem;">
+$$m_i = m_g \\left( 1 - \\frac{2c^2}{a \\cdot D_{Hubble}} \\right)$$
+</p>
+</div>`,
 consistency: `The inertial transition is bounded by the substrate stiffness $K$. As $a \\to 0$, the information horizon $D_H$ interacts with the global substrate boundary.`,
-sliders: `
-<div class="control-item" style="margin-bottom: 6px;">
-<div class="label-group"><span>Newtonian Acceleration (a)</span></div>
-<input type="range" id="qi_accel_slider" min="0.0000000001" max="1.0" step="0.0000000001" value="0.5" oninput="update()">
-<div id="qi_accel_readout" style="font-family:monospace; font-size:0.75rem; text-align:right; color:var(--accent-gold);">0.5000000000</div>
-</div>
-`
+sliders: `<div class="control-item" style="margin-bottom: 6px;"><div class="label-group"><span>Newtonian Acceleration (a)</span></div><input type="range" id="qi_accel_slider" min="0.0000000001" max="1.0" step="0.0000000001" value="0.5" oninput="update()"><div id="qi_accel_readout" style="font-family:monospace; font-size:0.75rem; text-align:right; color:var(--accent-gold);">0.5000000000</div></div>`
 },
+
+
 4: {
 title: "Emergence Synthesizer",
-brief: `
+brief: `<div class="briefing-content" style="padding: 0px 40px 40px 40px;">
+<h2 style="color:var(--accent-green); margin-top: 20px; text-align:center;">Detailed Briefing: Emergence Synthesizer</h2>
+<h3 style="color:var(--text-main); font-style: italic;">Synthesizing Dispersion, Horizons, and Inertia</h3>
+
 <h4 style="color: var(--accent-gold);">Purpose of the Module</h4>
 <p>The Emergence Synthesizer serves as the integrative module of Stage 18. Its purpose is to demonstrate how the structural parameters of the spacetime substrate—vacuum stiffness K and synthesis pressure P—jointly determine the information capacity and response behavior of the universe. Where earlier modules examine individual aspects of the substrate, the Synthesizer brings them together into a unified representation.</p>
 
@@ -533,35 +594,18 @@ $$G_{\\mu\\nu} = \\kappa (T_{\\mu\\nu}^{\\text{matter}} + T_{\\mu\\nu}^{\\text{v
 </div>
 `,
 consistency: `The Emergence Synthesizer verifies consistency between $a_0$, $K$, and signal dispersion behavior across the entire (N, O, C) parameter framework.`,
-sliders: `
-<div class="control-item" style="margin-bottom: 10px;">
-<div class="label-group"><span>Global Stiffness K</span></div>
-<input type="range" id="synth_k_slider" min="5.0" max="25.0" step="0.001" value="11.350" oninput="update()">
-<div id="synth_k_readout" style="font-family:monospace; font-size:0.75rem; text-align:right; color:var(--accent-gold);">11.350</div>
-</div>
-<div class="control-item" style="margin-bottom: 10px;">
-<div class="label-group"><span>System Acceleration (a)</span></div>
-<input type="range" id="synth_a_slider" min="0.1" max="10.0" step="0.1" value="1.0" oninput="update()">
-<div id="synth_a_readout" style="font-family:monospace; font-size:0.75rem; text-align:right; color:var(--accent-emerald);">1.0</div>
-</div>
-`
+sliders: `<div class="control-item" style="margin-bottom: 10px;"><div class="label-group"><span>Global Stiffness K</span></div><input type="range" id="synth_k_slider" min="5.0" max="25.0" step="0.001" value="11.350" oninput="update()"><div id="synth_k_readout" style="font-family:monospace; font-size:0.75rem; text-align:right; color:var(--accent-gold);">11.350</div></div><div class="control-item" style="margin-bottom: 10px;"><div class="label-group"><span>System Acceleration (a)</span></div><input type="range" id="synth_a_slider" min="0.1" max="10.0" step="0.1" value="1.0" oninput="update()"><div id="synth_a_readout" style="font-family:monospace; font-size:0.75rem; text-align:right; color:var(--accent-green);">1.0</div></div>`
 }
 };
 
 function openTool(id) {
 currentToolId = id;
-const box = document.getElementById('brief-box-content');
-box.innerHTML = `
-<h2 style="text-align: center; color: var(--accent-gold);">Detailed Briefing: ${toolContent[id].title}</h2>
-<div id="brief-content">${toolContent[id].brief}</div>
-<hr style="border: 0; border-top: 1px solid var(--border); margin: 25px 0;">
-<div style="font-size: 0.85rem; line-height: 1.6; color: var(--text-dim);">
-<h4 style="color: var(--text-main);">Mathematical Consistency Statement</h4>
-${toolContent[id].consistency}
-</div>
-`;
-document.getElementById('control-sliders').innerHTML = toolContent[id].sliders;
-document.getElementById('active-module-title').innerText = toolContent[id].title;
+const content = toolContent[id];
+if (!content) return;
+document.getElementById('brief-box-content').innerHTML = content.brief;
+document.getElementById('math-box-content').innerHTML = content.math;
+document.getElementById('control-sliders').innerHTML = content.sliders;
+document.getElementById('active-module-title').innerText = content.title;
 
 if(id === 4) {
 document.getElementById('diag-label').innerText = "Systemic Coherence";
@@ -570,18 +614,23 @@ document.getElementById('dm-val').innerText = "100% UNIFIED";
 document.getElementById('diag-label').innerText = (id === 1) ? "Est. Dispersion Measure" : (id === 2) ? "Unruh Temperature (K)" : "Inertial Deviation";
 }
 
-document.getElementById('consistency-footer-text').innerHTML = `<b>Mathematical Consistency Statement:</b> ${toolContent[id].consistency}`;
+document.getElementById('consistency-footer-text').innerHTML = `<b>Mathematical Consistency Statement:</b> ${content.consistency}`;
 showScreen('briefing');
 }
 
 function showScreen(id) {
 document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
 document.getElementById('screen-' + id).classList.add('active');
-document.getElementById('nav-briefing-controls').style.display = (id === 'briefing') ? 'flex' : 'none';
+document.getElementById('nav-briefing-controls').style.display = id === 'briefing' ? 'flex' : 'none';
+document.getElementById('nav-math-controls').style.display = id === 'math' ? 'flex' : 'none';
+document.getElementById('nav-summary-controls').style.display = id === 'summary' ? 'flex' : 'none';
 if (id === 'lab') {
-setTimeout(update, 100);
+setTimeout(() => {
+update();
+window.dispatchEvent(new Event('resize'));
+}, 100);
 }
-if (window.MathJax) MathJax.typesetPromise();
+if (window.MathJax) { MathJax.typesetPromise(); }
 }
 
 function launchLab() {
@@ -712,3 +761,4 @@ Plotly.react('plot-container', data, layout, {displayModeBar: false});
 </script>
 </body>
 </html>
+
