@@ -51,7 +51,7 @@ padding: 0px 40px 10px 40px; margin: 0px 40px;
 box-shadow: 0 20px 50px rgba(0,0,0,0.5); flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;
 }
 
-#tool { display: grid; width: 100%; max-width: 1400px; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; }
+#tool { display: grid; width: 100%; max-width: 100%; margin: 0 auto; grid-template-columns: 320px 1fr 320px; gap: 10px; flex-grow: 1; padding: 0; overflow: hidden; box-sizing: border-box; }
 .panel { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; overflow-y: auto; }
 
 .module-header { text-align: center; font-family: sans-serif; font-size: 0.85rem; color: #fff; margin-bottom: 2px; font-weight: bold; letter-spacing: 0.5px; padding-bottom: 0px; }
@@ -433,14 +433,12 @@ const SX_BASE = 0.30680751;
 
 if (currentTool === 1) { // Saturation Threshold
 let val = parseFloat(document.getElementById('m_sl')?.value || 100) / 100;
-// Reconstructed constant S_x based on Chapter 68
 const SX_BASE = 0.30680751;
 const SX_dynamic = SX_BASE * val;
 
 const res = document.getElementById('calc-result-1');
 if(res) res.innerText = "= " + SX_dynamic.toFixed(7);
 
-// High-resolution stress profile
 let x = Array.from({length: 150}, (_, i) => i / 100);
 let y = x.map(xi => (xi < SX_dynamic) ? xi : SX_dynamic);
 
@@ -452,7 +450,6 @@ fill: 'tozeroy',
 line: { color: '#3b82f6', width: 3 }
 });
 
-// Reconstructed Marker with 7-decimal precision
 data.push({
 x: [SX_dynamic],
 y: [SX_dynamic],
@@ -466,24 +463,18 @@ marker: { color: '#ffffff', size: 10, line: { color: '#3b82f6', width: 2 } }
 });
 
 layout.title = { text: "SUBSTRATE ELASTIC SATURATION PROFILE", font: { color: '#3b82f6' } };
-
-// Range set to 0.75 to accommodate the 200% stress load
 layout.xaxis = { title: "Applied Stress", range: [0, 0.75], gridcolor: '#222' };
 layout.yaxis = { title: "Deformation", range: [0, 0.75], gridcolor: '#222' };
-
-
 
 } else if (currentTool === 2) { // Manifold Tension
 let val = parseFloat(document.getElementById('c_sl')?.value || 100) / 100;
 const K_BASE = 11.350;
 const SX_BASE = 0.3068075;
 
-// Precise Calculation
 const E_geo_dynamic = K_BASE * Math.pow(SX_BASE, 2) * val;
 const res = document.getElementById('calc-result-2');
 if(res) res.innerText = "= " + E_geo_dynamic.toFixed(7);
 
-// X-axis: Range increased to 0.75 to accommodate the 200% slider (0.6136...)
 let x_range = Array.from({length: 250}, (_, i) => (i / 249) * 0.75);
 
 let y_curve = x_range.map(xi => {
@@ -502,7 +493,6 @@ fill: 'tozeroy',
 line: { color: '#fbbf24', width: 2 }
 });
 
-// MARKER: Riding the curve with full 7-decimal precision
 let currentX = SX_BASE * val;
 let currentY = (K_BASE * currentX) / Math.sqrt(0.005);
 
@@ -512,7 +502,6 @@ y: [Math.min(currentY, 55)],
 type: 'scatter',
 mode: 'markers+text',
 name: 'Current Tension',
-// Changed to 7 decimal places as requested
 text: [E_geo_dynamic.toFixed(7)],
 textposition: 'top center',
 textfont: { color: '#ffffff', size: 10 },
@@ -524,7 +513,6 @@ line: { color: '#fbbf24', width: 2 }
 });
 
 layout.title = { text: "NON-LINEAR MANIFOLD TENSION INTEGRAL", font: { color: '#fbbf24' } };
-// Range updated to 0.75 for full visibility
 layout.xaxis = {
 title: {
 text: "<b>Threshold Ratio x/Sχ</b><br><span style='font-size: 0.65rem; color: #eee; font-style: italic;'>Displacement (x) Scaling to Energy (Egeo)</span>",
@@ -543,9 +531,7 @@ gridcolor: '#222',
 zeroline: false
 };
 
-// Increase bottom margin slightly to accommodate the extra line of text
 layout.margin = { t: 40, r: 20, b: 70, l: 60 };
-
 
 } else if (currentTool === 3) { // Quantum Flux Density
 let val = parseFloat(document.getElementById('r_sl')?.value || 100) / 100;
@@ -565,7 +551,6 @@ marker: {
 colors: ['#c084fc', '#2dd4bf', '#fbbf24'],
 line: { color: '#111', width: 2 }
 },
-// Restoration of Name, % and Figure
 textinfo: 'label+percent+value',
 texttemplate: '<b>%{label}</b><br>%{percent}<br>%{value:.4f}',
 hoverinfo: 'label+percent+value',
@@ -583,7 +568,6 @@ y: -0.15,
 font: { color: '#94a3b8', size: 10 }
 };
 
-// Center figure restored with full 7-decimal precision
 layout.annotations = [{
 font: { size: 14, color: '#fbbf24', family: 'monospace', weight: 'bold' },
 showarrow: false,
@@ -591,8 +575,6 @@ text: E_man_dynamic.toFixed(7),
 x: 0.5,
 y: 0.5
 }];
-
-
 
 } else if (currentTool === 4) { // Gauge Connection
 let val = parseFloat(document.getElementById('e_sl')?.value || 100) / 100;
@@ -606,10 +588,7 @@ const res = document.getElementById('calc-result-4');
 if(res) res.innerText = "= " + Psi_dynamic.toFixed(7);
 
 let theta = Array.from({length: 101}, (_, i) => (i * 360) / 100);
-
-// Radial saturation boundary (scales with val)
 let r_radial = theta.map(() => (1/SX_BASE) * val);
-// Tangential restorative inertia (scales with val)
 let r_tangent = theta.map(() => Math.pow(CHI, 2) * val);
 
 data.push({
@@ -628,7 +607,6 @@ fillcolor: 'rgba(59, 130, 246, 0.2)',
 line: { color: '#3b82f6', width: 2 }
 });
 
-// MARKER: Placed at the 45-degree vector to show coupling state
 data.push({
 r: [Math.pow(CHI, 2) * val],
 theta: [45],
@@ -649,15 +627,12 @@ bgcolor: 'rgba(0,0,0,0)'
 };
 layout.showlegend = true;
 
-
-
 } else if (currentTool === 5) { // Mass Handshake
 let val = parseFloat(document.getElementById('f_sl')?.value || 100) / 100;
 
-// Using the established 7-decimal pillars for calculation
 const E_MAN = 3.2051553;
 const PSI_SCALE = 0.1594301;
-const ME_BASE = E_MAN * PSI_SCALE; // 0.5109982
+const ME_BASE = E_MAN * PSI_SCALE;
 const ME_dynamic = ME_BASE * val;
 const CODATA = 0.5109989;
 
@@ -680,10 +655,10 @@ name: 'Mass Comparison'
 layout.title = { text: "ELECTRON REST MASS DERIVATION", font: { color: '#2dd4bf' } };
 layout.yaxis = {
 title: "Rest Mass (MeV)",
-range: [0, 1.2], // Range expanded to accommodate 200% slider
+range: [0, 1.2],
 gridcolor: '#222'
 };
-layout.showlegend = false; // Bar labels are self-explanatory
+layout.showlegend = false;
 }
 
 Plotly.react('plot-area', data, layout, {responsive: true, displayModeBar: false});
@@ -697,3 +672,4 @@ window.onload = () => { showScreen('portal'); };
 </script>
 </body>
 </html>
+
