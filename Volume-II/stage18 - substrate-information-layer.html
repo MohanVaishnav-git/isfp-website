@@ -1,6 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+<!-- NEW ADDITION -->
+
+<script>
+(function () {
+const savedScreenId = sessionStorage.getItem('activeScreenId');
+
+if (savedScreenId) {
+document.documentElement.setAttribute(
+'data-initial-screen',
+savedScreenId
+);
+}
+})();
+</script>
+
+<!-- END ADDITION -->
+
 <meta charset="UTF-8">
 <title>Stage 18 — Substrate Information Layer</title>
 
@@ -80,6 +98,25 @@ input[type=range] { width: 100%; accent-color: var(--accent-gold); cursor: point
 width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-size: 0.75rem;
 color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0;
 }
+
+<!-- NEW ADDITION -->
+
+html[data-initial-screen="screen-briefing"] #screen-briefing,
+html[data-initial-screen="screen-math"] #screen-math,
+html[data-initial-screen="screen-summary"] #screen-summary,
+html[data-initial-screen="screen-lab"] #screen-lab {
+display: flex !important;
+}
+
+html[data-initial-screen="screen-briefing"] #screen-portal,
+html[data-initial-screen="screen-math"] #screen-portal,
+html[data-initial-screen="screen-summary"] #screen-portal,
+html[data-initial-screen="screen-lab"] #screen-portal {
+display: none !important;
+}
+
+<!-- END ADDITION -->
+
 </style>
 </head>
 <body>
@@ -758,7 +795,224 @@ margin: {t: 30, l: 0, r: 0, b: 0}
 };
 Plotly.react('plot-container', data, layout, {displayModeBar: false});
 }
+
 </script>
+
+
+<!-- NEW ADDITION -->
+
+
+<!-- Synchronized Screen, Module and Scroll Persistence -->
+<script>
+(function () {
+
+// Preserve browser refresh position manually
+if ('scrollRestoration' in history) {
+history.scrollRestoration = 'manual';
+}
+
+// Save the currently active screen and module
+function savePageState() {
+
+const activeScreen = document.querySelector('.screen.active');
+
+if (activeScreen) {
+sessionStorage.setItem(
+'activeScreenId',
+activeScreen.id
+);
+}
+
+// IMPORTANT:
+// currentToolId is a lexical global variable (let),
+// so access it directly, not through window.
+
+if (
+typeof currentToolId !== 'undefined' &&
+Number.isInteger(Number(currentToolId)) &&
+Number(currentToolId) >= 1 &&
+Number(currentToolId) <= 4
+) {
+sessionStorage.setItem(
+'currentToolId',
+String(currentToolId)
+);
+}
+
+// Save internal scroll positions
+const scrollData = {};
+
+document.querySelectorAll(
+'#screen-briefing .briefing-box, ' +
+'#screen-math .math-box, ' +
+'#screen-summary .summary-box, ' +
+'#screen-portal, ' +
+'#screen-lab .panel'
+).forEach(function (element, index) {
+
+const key = element.id || element.className + '_' + index;
+
+scrollData[key] = element.scrollTop;
+
+});
+
+sessionStorage.setItem(
+'screenScrollData',
+JSON.stringify(scrollData)
+);
+}
+
+// Save state before page refresh or navigation
+window.addEventListener('pagehide', savePageState);
+
+window.addEventListener('beforeunload', savePageState);
+
+
+// Restore the complete page state
+window.addEventListener('load', function () {
+
+const savedScreenId =
+sessionStorage.getItem('activeScreenId');
+
+const savedToolId =
+sessionStorage.getItem('currentToolId');
+
+const savedScrollData =
+sessionStorage.getItem('screenScrollData');
+
+// 1. Restore the module first
+// This repopulates briefing, mathematics and sliders.
+
+if (
+savedToolId !== null &&
+Number.isInteger(Number(savedToolId)) &&
+Number(savedToolId) >= 1 &&
+Number(savedToolId) <= 4
+) {
+
+openTool(Number(savedToolId));
+
+}
+
+// 2. Restore the previously active screen
+
+if (
+savedScreenId &&
+document.getElementById(savedScreenId)
+) {
+
+const screenName =
+savedScreenId.replace('screen-', '');
+
+// Restore active screen directly
+document.querySelectorAll('.screen').forEach(function (screen) {
+screen.classList.toggle(
+'active',
+screen.id === savedScreenId
+);
+});
+
+// Restore navigation control visibility
+document.getElementById('nav-briefing-controls').style.display =
+screenName === 'briefing' ? 'flex' : 'none';
+
+document.getElementById('nav-math-controls').style.display =
+screenName === 'math' ? 'flex' : 'none';
+
+document.getElementById('nav-summary-controls').style.display =
+screenName === 'summary' ? 'flex' : 'none';
+
+// Reinitialize graph when restoring the lab screen
+if (screenName === 'lab') {
+
+setTimeout(function () {
+update();
+window.dispatchEvent(new Event('resize'));
+}, 100);
+
+}
+
+// Restore mathematical typesetting if available
+if (
+window.MathJax &&
+typeof MathJax.typesetPromise === 'function'
+) {
+MathJax.typesetPromise();
+}
+
+}
+
+// Remove temporary initial-screen restrictions
+document.documentElement.removeAttribute('data-initial-screen');
+
+
+// 3. Restore internal scroll positions
+// Wait for screen layout and module initialization.
+
+if (savedScrollData) {
+
+try {
+
+const positions =
+JSON.parse(savedScrollData);
+
+setTimeout(function () {
+
+document.querySelectorAll(
+'#screen-briefing .briefing-box, ' +
+'#screen-math .math-box, ' +
+'#screen-summary .summary-box, ' +
+'#screen-portal, ' +
+'#screen-lab .panel'
+).forEach(function (element, index) {
+
+const key =
+element.id ||
+element.className + '_' + index;
+
+if (positions[key] !== undefined) {
+
+element.scrollTop = positions[key];
+
+}
+
+});
+
+// Recalculate Plotly dimensions after restoration
+if (
+savedScreenId === 'screen-lab' &&
+document.getElementById('plot-container') &&
+typeof Plotly !== 'undefined'
+) {
+
+Plotly.Plots.resize(
+document.getElementById('plot-container')
+);
+
+}
+
+}, 50);
+
+} catch (error) {
+
+console.error(
+'Scroll restoration error:',
+error
+);
+
+}
+
+}
+
+});
+
+})();
+</script>
+
+
+<!-- END ADDITION -->
+
+
 </body>
 </html>
 
