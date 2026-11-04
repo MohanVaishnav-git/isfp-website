@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 
-<!-- NEW ADDITION -->
+<!-- NEW ADDITION FOR REFRESH MECHANISM -->
 
 <script>
 (function () {
@@ -17,7 +17,7 @@ savedScreenId
 })();
 </script>
 
-<!-- END ADDITION -->
+<!-- END ADDITION FOR REFRESH MECHANISM -->
 
 <meta charset="UTF-8">
 <title>Stage 18 — Substrate Information Layer</title>
@@ -99,7 +99,7 @@ width: 100%; text-align: center; padding: 12px 0; font-family: sans-serif; font-
 color: var(--text-dim); letter-spacing: 1px; background: transparent; flex-shrink: 0;
 }
 
-<!-- NEW ADDITION -->
+<!-- NEW ADDITION FOR REFRESH MECHANISM -->
 
 html[data-initial-screen="screen-briefing"] #screen-briefing,
 html[data-initial-screen="screen-math"] #screen-math,
@@ -115,7 +115,7 @@ html[data-initial-screen="screen-lab"] #screen-portal {
 display: none !important;
 }
 
-<!-- END ADDITION -->
+<!-- END ADDITION FOR REFRESH MECHANISM -->
 
 </style>
 </head>
@@ -136,7 +136,10 @@ display: none !important;
 <div id="nav-summary-controls">
 <button class="btn-nav-menu" onclick="showScreen('portal')">BACK TO MENU</button>
 </div>
-<a href="../index.html" class="back-link">BACK TO WEBSITE</a>
+<a href="../index.html" class="back-link"
+onclick="showScreen('portal'); window.location.href='../index.html'; return false;">
+BACK TO WEBSITE
+</a>
 </nav>
 
 <div id="screen-portal" class="screen active">
@@ -799,7 +802,7 @@ Plotly.react('plot-container', data, layout, {displayModeBar: false});
 </script>
 
 
-<!-- NEW ADDITION -->
+<!-- NEW ADDITION FOR REFRESH MECHANISM -->
 
 
 <!-- Synchronized Screen, Module and Scroll Persistence -->
@@ -1010,7 +1013,7 @@ error
 </script>
 
 
-<!-- END ADDITION -->
+<!-- END ADDITION FOR REFRESH MECHANISM -->
 
 
 </body>
